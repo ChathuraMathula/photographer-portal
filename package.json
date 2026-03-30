@@ -8,7 +8,8 @@
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run docker:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "stop": "docker-compose down"
+    "stop": "docker-compose down",
+    "seed": "cd backend && npm run seed"
   },
   "keywords": [],
   "author": "",
