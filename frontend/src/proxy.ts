@@ -4,7 +4,7 @@ import { PUBLIC_ROUTES, ROLE_PERMISSIONS, REDIRECTS } from '@/config/routes';
 import { decodeJwtPayload } from '@/lib/jwt';
 import { UserRole } from '@/store/slices/authSlice';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('access_token')?.value;
 
