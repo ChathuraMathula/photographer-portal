@@ -15,9 +15,11 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
+    console.log(email, password);
 
     // 1. Find user by email
     const user = await this.userModel.findOne({ email });
+
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid credentials');
     }
