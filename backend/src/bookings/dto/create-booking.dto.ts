@@ -17,9 +17,9 @@ export class CreateBookingDto {
   @IsString() @IsNotEmpty() phone: string;
 
   // Shoot details
-  @IsDateString() date: string;           // "YYYY-MM-DD"
+  @IsDateString() date: string; // "YYYY-MM-DD"
   @IsString() @Matches(TIME_RE) startTime: string; // "HH:MM"
-  @IsString() @Matches(TIME_RE) endTime: string;   // "HH:MM"
+  @IsString() @Matches(TIME_RE) endTime: string; // "HH:MM"
   @IsString() @IsNotEmpty() eventType: string;
 
   @IsOptional() @IsString() location?: string;

@@ -19,14 +19,16 @@ export class BookingsController {
     @Query('startTime') startTime: string,
     @Query('endTime') endTime: string,
   ) {
-    return this.bookingsService.checkAvailability(slug, date, startTime, endTime);
+    return this.bookingsService.checkAvailability(
+      slug,
+      date,
+      startTime,
+      endTime,
+    );
   }
 
   @Post(':slug')
-  createBooking(
-    @Param('slug') slug: string,
-    @Body() dto: CreateBookingDto,
-  ) {
+  createBooking(@Param('slug') slug: string, @Body() dto: CreateBookingDto) {
     return this.bookingsService.createBooking(slug, dto);
   }
 

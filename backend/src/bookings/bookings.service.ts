@@ -53,7 +53,10 @@ export class BookingsService {
     if (!profile) throw new NotFoundException('Photographer not found');
 
     if (!profile.isAvailableForBooking) {
-      return { available: false, reason: 'Photographer is not accepting bookings' };
+      return {
+        available: false,
+        reason: 'Photographer is not accepting bookings',
+      };
     }
 
     const dayStart = new Date(date);
@@ -130,8 +133,12 @@ export class BookingsService {
   async trackReservation(token: string) {
     const reservation = await this.reservationModel
       .findOne({ reservationToken: token })
-      .populate<{ customerId: Customer }>('customerId', 'firstName lastName email')
-      .populate<{ photographerId: User }>('photographerId', 'firstName lastName');
+      .populate<{
+        customerId: Customer;
+      }>('customerId', 'firstName lastName email')
+      .populate<{
+        photographerId: User;
+      }>('photographerId', 'firstName lastName');
 
     if (!reservation) throw new NotFoundException('Reservation not found');
 
@@ -143,8 +150,8 @@ export class BookingsService {
       eventType: reservation.eventType,
       location: reservation.location,
       photographer: {
-        firstName: (reservation.photographerId as User).firstName,
-        lastName: (reservation.photographerId as User).lastName,
+        firstName: reservation.photographerId.firstName,
+        lastName: reservation.photographerId.lastName,
       },
     };
   }

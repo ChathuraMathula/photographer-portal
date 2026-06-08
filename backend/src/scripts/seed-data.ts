@@ -162,7 +162,7 @@ export async function seedDatabase(
 
   await reservationModel.insertMany([
     {
-      customerId: priya!._id,
+      customerId: priya._id,
       photographerId: sarah._id,
       date: daysFromNow(30),
       startTime: '16:00',
@@ -174,7 +174,7 @@ export async function seedDatabase(
       customerNotes: 'Beach ceremony at 4pm, reception at 7pm.',
     },
     {
-      customerId: david!._id,
+      customerId: david._id,
       photographerId: michael._id,
       date: daysFromNow(7),
       startTime: '09:00',
@@ -186,7 +186,7 @@ export async function seedDatabase(
       customerNotes: 'Annual tech conference, ~200 attendees.',
     },
     {
-      customerId: amali!._id,
+      customerId: amali._id,
       photographerId: sarah._id,
       date: daysFromNow(14),
       startTime: '08:00',
@@ -198,7 +198,7 @@ export async function seedDatabase(
       customerNotes: 'Outdoor session, prefer morning light.',
     },
     {
-      customerId: priya!._id,
+      customerId: priya._id,
       photographerId: michael._id,
       date: daysFromNow(-30),
       startTime: '10:00',

@@ -42,7 +42,11 @@ export class Reservation extends Document {
   @Prop({ min: 0 })
   totalAmountInCents?: number;
 
-  @Prop({ required: true, enum: ReservationStatus, default: ReservationStatus.PENDING })
+  @Prop({
+    required: true,
+    enum: ReservationStatus,
+    default: ReservationStatus.PENDING,
+  })
   status!: ReservationStatus;
 
   @Prop({ required: true, unique: true })

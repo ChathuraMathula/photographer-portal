@@ -7,13 +7,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../schemas/user.schema';
 import { ReservationStatus } from '../schemas/reservation.schema';
 import { ReservationsService } from './reservations.service';
+import type { Request } from 'express';
 
 @Controller('reservations')
 @UseGuards(JwtAuthGuard, RolesGuard)

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -14,10 +14,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('photographers')
-  createPhotographer(
-    @Body() dto: CreatePhotographerDto,
-    @Req() req: Request,
-  ) {
+  createPhotographer(@Body() dto: CreatePhotographerDto, @Req() req: Request) {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     return this.usersService.createPhotographer(dto, baseUrl);
   }

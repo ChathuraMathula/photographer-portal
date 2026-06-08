@@ -13,10 +13,7 @@ export class PhotographersService {
   ) {}
 
   async findAll() {
-    return this.profileModel
-      .find()
-      .populate('userId', '-passwordHash')
-      .lean();
+    return this.profileModel.find().populate('userId', '-passwordHash').lean();
   }
 
   async findOne(userId: string) {
