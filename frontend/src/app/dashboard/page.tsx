@@ -62,6 +62,8 @@ export default function DashboardPage() {
     (state: RootState) => state.auth,
   );
 
+  console.log(isAuthenticated)
+  
   // Fallback while Redux is loading (or if they bypassed middleware somehow)
   if (!isAuthenticated) return <div className="p-8">Loading profile...</div>;
 
