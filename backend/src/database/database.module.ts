@@ -3,6 +3,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../schemas/user.schema';
 import { Customer, CustomerSchema } from '../schemas/customer.schema';
 import { Reservation, ReservationSchema } from '../schemas/reservation.schema';
+import {
+  PhotographerProfile,
+  PhotographerProfileSchema,
+} from '../schemas/photographer-profile.schema';
+import { Package, PackageSchema } from '../schemas/package.schema';
 
 @Module({
   imports: [
@@ -10,8 +15,10 @@ import { Reservation, ReservationSchema } from '../schemas/reservation.schema';
       { name: User.name, schema: UserSchema },
       { name: Customer.name, schema: CustomerSchema },
       { name: Reservation.name, schema: ReservationSchema },
+      { name: PhotographerProfile.name, schema: PhotographerProfileSchema },
+      { name: Package.name, schema: PackageSchema },
     ]),
   ],
-  exports: [MongooseModule], // Export so other modules can use the models
+  exports: [MongooseModule],
 })
 export class DatabaseModule {}

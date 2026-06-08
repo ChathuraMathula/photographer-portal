@@ -85,7 +85,6 @@ export default function DashboardPage() {
         {/* Dynamic Rendering Based on Role */}
         <section>
           {role === UserRole.SUPER_ADMIN && <SuperAdminView />}
-          {role === UserRole.ADMIN && <SuperAdminView />}
           {role === UserRole.PHOTOGRAPHER && <PhotographerView />}
         </section>
       </div>

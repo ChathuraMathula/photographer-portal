@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export enum UserRole {
   SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
   PHOTOGRAPHER = "PHOTOGRAPHER",
 }
 

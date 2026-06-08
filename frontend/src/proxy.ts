@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { PUBLIC_ROUTES, ROLE_PERMISSIONS, REDIRECTS } from '@/config/routes';
+import { PUBLIC_ROUTES, PUBLIC_PREFIXES, ROLE_PERMISSIONS, REDIRECTS } from '@/config/routes';
 import { decodeJwtPayload } from '@/lib/jwt';
 import { UserRole } from '@/store/slices/authSlice';
 
@@ -8,7 +8,11 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('access_token')?.value;
 
-  if (PUBLIC_ROUTES.includes(pathname)) {
+  const isPublic =
+    PUBLIC_ROUTES.includes(pathname) ||
+    PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+
+  if (isPublic) {
     if (token && pathname === '/login') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }

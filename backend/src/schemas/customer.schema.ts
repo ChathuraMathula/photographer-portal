@@ -4,16 +4,22 @@ import { Document } from 'mongoose';
 @Schema({ timestamps: true })
 export class Customer extends Document {
   @Prop({ required: true })
-  firstName: string;
+  firstName!: string;
 
   @Prop({ required: true })
-  lastName: string;
+  lastName!: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  email!: string;
 
   @Prop({ required: true })
-  phone: string;
+  phone!: string;
+
+  @Prop()
+  address?: string;
+
+  @Prop()
+  notes?: string;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

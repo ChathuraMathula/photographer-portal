@@ -38,7 +38,7 @@ export default function LoginPage() {
   const formik = useFormik({
     initialValues: {
       email: "admin@photoportal.com",
-      password: "SuperSecretPassword123!",
+      password: "SuperSecret123!",
     },
     validationSchema: LoginSchema,
     onSubmit: async (values, { setSubmitting }) => {

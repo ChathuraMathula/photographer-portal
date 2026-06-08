@@ -3,37 +3,50 @@ import { Document, Types } from 'mongoose';
 
 export enum ReservationStatus {
   PENDING = 'PENDING',
-  AWAITING_PAYMENT = 'AWAITING_PAYMENT',
   CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
+  COMPLETED = 'COMPLETED',
 }
 
 @Schema({ timestamps: true })
 export class Reservation extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
-  customerId: Types.ObjectId;
+  customerId!: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  photographerId: Types.ObjectId;
+  photographerId!: Types.ObjectId;
 
   @Prop({ required: true })
-  date: Date;
+  date!: Date;
+
+  // 24-hour format strings ("08:00", "17:30") — easy to compare lexicographically
+  @Prop({ required: true })
+  startTime!: string;
 
   @Prop({ required: true })
-  packageDetails: string;
+  endTime!: string;
 
-  @Prop({
-    required: true,
-    enum: ReservationStatus,
-    default: ReservationStatus.PENDING,
-  })
-  status: ReservationStatus;
+  @Prop({ required: true })
+  eventType!: string;
 
   @Prop()
-  paymentDeadline: Date;
+  location?: string;
+
+  @Prop()
+  customerNotes?: string;
+
+  // Internal fields — never exposed to customers
+  @Prop()
+  adminNotes?: string;
+
+  @Prop({ min: 0 })
+  totalAmountInCents?: number;
+
+  @Prop({ required: true, enum: ReservationStatus, default: ReservationStatus.PENDING })
+  status!: ReservationStatus;
 
   @Prop({ required: true, unique: true })
-  reservationToken: string; // The secret URL token for the customer
+  reservationToken!: string;
 }
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);

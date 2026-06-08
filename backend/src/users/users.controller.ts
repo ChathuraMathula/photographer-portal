@@ -1,28 +1,29 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UsersService } from './users.service';
+import { CreatePhotographerDto } from './dto/create-photographer.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.SUPER_ADMIN)
 export class UsersController {
-  @Post('create-admin')
-  @Roles(UserRole.SUPER_ADMIN)
-  createAdmin(@Body() createUserDto: CreateUserDto) {
-    return {
-      message: 'Admin creation authorized.',
-      dataReceived: createUserDto.email,
-    };
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post('photographers')
+  createPhotographer(
+    @Body() dto: CreatePhotographerDto,
+    @Req() req: Request,
+  ) {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    return this.usersService.createPhotographer(dto, baseUrl);
   }
 
-  @Post('create-photographer')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-  createPhotographer(@Body() createUserDto: CreateUserDto) {
-    return {
-      message: 'Photographer creation authorized.',
-      dataReceived: createUserDto.email,
-    };
+  @Get('photographers')
+  listPhotographers() {
+    return this.usersService.listPhotographers();
   }
 }
