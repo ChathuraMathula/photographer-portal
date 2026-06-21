@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from '../schemas/user.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
@@ -9,7 +9,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
 
@@ -18,7 +18,7 @@ export class AuthService {
     console.log(email, password);
 
     // 1. Find user by email
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userRepository.findOneBy({ email });
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid credentials');
@@ -32,7 +32,7 @@ export class AuthService {
 
     // 3. Generate JWT Payload
     const payload = {
-      sub: user._id,
+      sub: user.id,
       email: user.email,
       role: user.role,
     };
@@ -40,7 +40,7 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         role: user.role,
         firstName: user.firstName,

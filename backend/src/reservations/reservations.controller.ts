@@ -4,49 +4,90 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../schemas/user.schema';
-import { ReservationStatus } from '../schemas/reservation.schema';
+import { UserRole } from '../entities/user.entity';
+import { ReservationStatus } from '../entities/reservation.entity';
 import { ReservationsService } from './reservations.service';
 import type { Request } from 'express';
+import { CreateManualBookingDto } from './dto/create-manual-booking.dto';
+import { ProposeQuotationDto } from './dto/propose-quotation.dto';
+import { RejectReservationDto } from './dto/reject-reservation.dto';
+
+interface RequestWithUser extends Request {
+  user: {
+    userId: string;
+    email: string;
+    role: UserRole;
+    firstName?: string;
+    lastName?: string;
+  };
+}
 
 @Controller('reservations')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.PHOTOGRAPHER)
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
   @Get()
-  findAll(@Req() req: Request) {
-    return this.reservationsService.findAll(req.user as any);
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  findAll(@Req() req: RequestWithUser) {
+    return this.reservationsService.findAll(req.user);
+  }
+
+  @Post()
+  @Roles(UserRole.PHOTOGRAPHER)
+  createManual(
+    @Body() dto: CreateManualBookingDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reservationsService.createManualBooking(dto, req.user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: Request) {
-    return this.reservationsService.findOne(id, req.user as any);
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.reservationsService.findOne(id, req.user);
   }
 
-  @Patch(':id/status')
-  updateStatus(
+  @Post(':id/propose')
+  @Roles(UserRole.PHOTOGRAPHER)
+  proposeQuotation(
     @Param('id') id: string,
-    @Body('status') status: ReservationStatus,
-    @Req() req: Request,
+    @Body() dto: ProposeQuotationDto,
+    @Req() req: RequestWithUser,
   ) {
-    return this.reservationsService.updateStatus(id, status, req.user as any);
+    return this.reservationsService.proposeQuotation(id, dto, req.user);
   }
 
-  @Patch(':id/notes')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.PHOTOGRAPHER)
-  addNote(
+  @Post(':id/reject')
+  @Roles(UserRole.PHOTOGRAPHER)
+  reject(
     @Param('id') id: string,
-    @Body('note') note: string,
-    @Req() req: Request,
+    @Body() dto: RejectReservationDto,
+    @Req() req: RequestWithUser,
   ) {
-    return this.reservationsService.addAdminNote(id, note, req.user as any);
+    return this.reservationsService.rejectReservation(id, dto, req.user);
+  }
+
+  @Get(':id/messages')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  getMessages(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.reservationsService.getMessages(id, req.user);
+  }
+
+  @Post(':id/messages')
+  @Roles(UserRole.PHOTOGRAPHER)
+  sendMessage(
+    @Param('id') id: string,
+    @Body('content') content: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reservationsService.sendMessage(id, content, req.user);
   }
 }

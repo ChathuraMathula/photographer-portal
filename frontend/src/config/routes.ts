@@ -8,6 +8,7 @@ export const PUBLIC_PREFIXES = ["/book"];
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   [UserRole.SUPER_ADMIN]: ["/dashboard", "/users", "/photographers", "/settings"],
+  [UserRole.ADMIN]: ["/dashboard", "/users"],
   [UserRole.PHOTOGRAPHER]: ["/dashboard", "/reservations", "/profile"],
 };
 

@@ -1,18 +1,51 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  IsOptional,
+  IsEnum,
+  IsArray,
+} from 'class-validator';
+import { UserRole } from '../../entities/user.entity';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  password: string;
+  password!: string;
+
+  @IsEnum(UserRole)
+  role!: UserRole;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  bookingSlug?: string;
+
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @IsOptional()
+  @IsString()
+  baseLocation?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  specializations?: string[];
 }

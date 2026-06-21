@@ -1,14 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
-import { Connection, ConnectionStates } from 'mongoose';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
 @Injectable()
-export class AppService {
-  constructor(@InjectConnection() private connection: Connection) {}
+export class AppService implements OnModuleInit {
+  constructor(private dataSource: DataSource) {}
 
   onModuleInit() {
-    if (this.connection.readyState === ConnectionStates.connected) {
-      console.log('✅ MongoDB connected successfully to Docker container');
+    if (this.dataSource.isInitialized) {
+      console.log('✅ PostgreSQL connected successfully to Docker container via TypeORM');
     }
   }
 

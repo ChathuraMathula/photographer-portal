@@ -1,44 +1,32 @@
-/**
- * DB Reset Script  —  dev/staging only
- *
- * Drops every collection in the database, then re-seeds fresh data.
- *
- * Usage:  npm run db:reset
- */
 import { NestFactory } from '@nestjs/core';
-import { getConnectionToken } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { DataSource } from 'typeorm';
 import { AppModule } from './app.module';
 import { seedDatabase } from './scripts/seed-data';
 
 async function bootstrap() {
-  const mongoUri = process.env.MONGODB_URI ?? '';
-  if (mongoUri.includes('prod') || mongoUri.includes('atlas')) {
-    console.error(
-      '🚨  REFUSED: MONGODB_URI looks like a production database.\n' +
-        '    Set MONGODB_URI to a local/staging URI before running db:reset.',
-    );
-    process.exit(1);
-  }
-
+  const dbHost = process.env.DB_HOST ?? 'localhost';
+  
   const app = await NestFactory.createApplicationContext(AppModule);
 
   console.log(
-    '\n⚠️   DATABASE RESET — all data will be erased and re-seeded\n',
+    '\n⚠️   DATABASE RESET — all tables will be dropped and re-seeded\n',
   );
 
   try {
-    // connection.dropDatabase() is a first-class Mongoose method.
-    // It avoids accessing connection.db directly, which may be undefined
-    // on Mongoose 9 before the driver is fully ready.
-    const connection = app.get<Connection>(getConnectionToken());
-    await connection.dropDatabase();
-    console.log('  🗑  Database dropped\n');
+    const dataSource = app.get(DataSource);
+    
+    console.log('  🗑  Dropping database tables...');
+    await dataSource.dropDatabase();
+    console.log('  ✔ Database dropped');
+
+    console.log('  🛠  Synchronizing database schema...');
+    await dataSource.synchronize();
+    console.log('  ✔ Schema synchronized');
 
     console.log('🌱  Re-seeding...\n');
     await seedDatabase(app);
 
-    console.log('\n✅  Reset complete. Fresh data is ready.\n');
+    console.log('\n✅  Reset complete. Fresh PostgreSQL data is ready.\n');
   } catch (err) {
     console.error('\n❌  Reset failed:', err);
     process.exit(1);

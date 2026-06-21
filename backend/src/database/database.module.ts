@@ -1,24 +1,23 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../schemas/user.schema';
-import { Customer, CustomerSchema } from '../schemas/customer.schema';
-import { Reservation, ReservationSchema } from '../schemas/reservation.schema';
-import {
-  PhotographerProfile,
-  PhotographerProfileSchema,
-} from '../schemas/photographer-profile.schema';
-import { Package, PackageSchema } from '../schemas/package.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../entities/user.entity';
+import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { Package } from '../entities/package.entity';
+import { Customer } from '../entities/customer.entity';
+import { Reservation } from '../entities/reservation.entity';
+import { Message } from '../entities/message.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Customer.name, schema: CustomerSchema },
-      { name: Reservation.name, schema: ReservationSchema },
-      { name: PhotographerProfile.name, schema: PhotographerProfileSchema },
-      { name: Package.name, schema: PackageSchema },
+    TypeOrmModule.forFeature([
+      User,
+      PhotographerProfile,
+      Package,
+      Customer,
+      Reservation,
+      Message,
     ]),
   ],
-  exports: [MongooseModule],
+  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

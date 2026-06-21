@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express'; // Import Express Request
-import { UserRole } from '../../schemas/user.schema';
+import { UserRole } from '../../entities/user.entity';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 // 1. Define our custom Request type that includes the User payload

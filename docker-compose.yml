@@ -2,29 +2,35 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:8.0
-    container_name: portal_mongodb
+  postgres:
+    image: postgres:16-alpine
+    container_name: portal_postgres
     restart: always
     ports:
-      - "27017:27017"
+      - "5433:5432"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: securepassword123
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: securepassword123
+      POSTGRES_DB: portal
     volumes:
-      # Maps the container's data to your local ./database folder
-      - ./database:/data/db
+      - ./postgres-data:/var/lib/postgresql/data
 
-  # Optional but highly recommended: Mongo Express for a web-based DB UI
-  mongo-express:
-    image: mongo-express
-    container_name: portal_mongo_express
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: portal_pgadmin
     restart: always
     ports:
-      - "8081:8081"
+      - "5050:80"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: securepassword123
-      ME_CONFIG_MONGODB_URL: mongodb://admin:securepassword123@mongodb:27017/
+      PGADMIN_DEFAULT_EMAIL: admin@photoportal.com
+      PGADMIN_DEFAULT_PASSWORD: pgadminsecure123
     depends_on:
-      - mongodb
+      - postgres
+
+  maildev:
+    image: maildev/maildev
+    container_name: portal_maildev
+    restart: always
+    ports:
+      - "1080:1080"
+      - "1025:1025"

@@ -1,39 +1,54 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Brackets } from 'typeorm';
 import * as crypto from 'crypto';
-import { User } from '../schemas/user.schema';
-import { Customer } from '../schemas/customer.schema';
-import { Reservation, ReservationStatus } from '../schemas/reservation.schema';
-import { PhotographerProfile } from '../schemas/photographer-profile.schema';
+import { User } from '../entities/user.entity';
+import { Customer } from '../entities/customer.entity';
+import { Reservation, ReservationStatus } from '../entities/reservation.entity';
+import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { Package } from '../entities/package.entity';
+import { Message } from '../entities/message.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { ChatGateway } from '../reservations/chat.gateway';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class BookingsService {
   constructor(
-    @InjectModel(PhotographerProfile.name)
-    private profileModel: Model<PhotographerProfile>,
-    @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(Customer.name) private customerModel: Model<Customer>,
-    @InjectModel(Reservation.name) private reservationModel: Model<Reservation>,
+    @InjectRepository(PhotographerProfile)
+    private profileRepository: Repository<PhotographerProfile>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Customer)
+    private customerRepository: Repository<Customer>,
+    @InjectRepository(Reservation)
+    private reservationRepository: Repository<Reservation>,
+    @InjectRepository(Message)
+    private messageRepository: Repository<Message>,
+    private chatGateway: ChatGateway,
+    private emailService: EmailService,
   ) {}
 
   async getPhotographerProfile(slug: string) {
-    const profile = await this.profileModel
-      .findOne({ bookingSlug: slug })
-      .populate<{ userId: User }>('userId', '-passwordHash');
+    const profile = await this.profileRepository.findOne({
+      where: { bookingSlug: slug },
+      relations: { user: true },
+    });
 
     if (!profile) throw new NotFoundException('Photographer not found');
+    if (!profile.user.isActive) {
+      throw new NotFoundException('Photographer is not active');
+    }
 
-    const { userId: user } = profile;
     return {
       bookingSlug: profile.bookingSlug,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: profile.user.firstName,
+      lastName: profile.user.lastName,
       bio: profile.bio,
       specializations: profile.specializations,
       portfolioUrl: profile.portfolioUrl,
@@ -49,7 +64,10 @@ export class BookingsService {
     startTime: string,
     endTime: string,
   ) {
-    const profile = await this.profileModel.findOne({ bookingSlug: slug });
+    const profile = await this.profileRepository.findOne({
+      where: { bookingSlug: slug },
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Photographer not found');
 
     if (!profile.isAvailableForBooking) {
@@ -59,21 +77,29 @@ export class BookingsService {
       };
     }
 
-    const dayStart = new Date(date);
-    dayStart.setUTCHours(0, 0, 0, 0);
-    const dayEnd = new Date(date);
-    dayEnd.setUTCHours(23, 59, 59, 999);
+    const now = new Date();
 
-    // Overlap condition: existing.start < requested.end  AND  existing.end > requested.start
-    const conflict = await this.reservationModel.findOne({
-      photographerId: profile.userId,
-      date: { $gte: dayStart, $lte: dayEnd },
-      status: { $in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED] },
-      startTime: { $lt: endTime },
-      endTime: { $gt: startTime },
-    });
+    // Check overlaps:
+    // A conflict is any reservation for the same photographer, on the same date, which overlap with the requested time:
+    // requested.startTime < existing.endTime AND requested.endTime > existing.startTime
+    // AND is in status PENDING, CONFIRMED, or PROPOSED (only if PROPOSED lock hasn't expired yet)
+    const conflicts = await this.reservationRepository.createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', { photographerId: profile.userId })
+      .andWhere('res.date = :date', { date })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', { startTime, endTime })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('res.status IN (:...activeStatuses)', {
+            activeStatuses: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
+          }).orWhere(
+            'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
+            { proposedStatus: ReservationStatus.PROPOSED, now },
+          );
+        }),
+      )
+      .getMany();
 
-    return { available: !conflict };
+    return { available: conflicts.length === 0 };
   }
 
   async createBooking(slug: string, dto: CreateBookingDto) {
@@ -81,7 +107,10 @@ export class BookingsService {
       throw new BadRequestException('startTime must be before endTime');
     }
 
-    const profile = await this.profileModel.findOne({ bookingSlug: slug });
+    const profile = await this.profileRepository.findOne({
+      where: { bookingSlug: slug },
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Photographer not found');
     if (!profile.isAvailableForBooking) {
       throw new BadRequestException('Photographer is not accepting bookings');
@@ -97,62 +126,182 @@ export class BookingsService {
       throw new BadRequestException('The requested time slot is not available');
     }
 
-    // Upsert customer: same email = same person
-    let customer = await this.customerModel.findOne({ email: dto.email });
+    // Find or create customer
+    let customer = await this.customerRepository.findOneBy({ email: dto.email });
     if (!customer) {
-      customer = await this.customerModel.create({
+      customer = this.customerRepository.create({
         firstName: dto.firstName,
         lastName: dto.lastName,
         email: dto.email,
         phone: dto.phone,
       });
+      await this.customerRepository.save(customer);
     }
 
-    const shootDate = new Date(dto.date);
-    shootDate.setUTCHours(0, 0, 0, 0);
-
-    const reservation = await this.reservationModel.create({
-      customerId: customer._id,
+    const token = crypto.randomBytes(32).toString('hex');
+    const reservation = this.reservationRepository.create({
+      customerId: customer.id,
       photographerId: profile.userId,
-      date: shootDate,
+      date: new Date(dto.date),
       startTime: dto.startTime,
       endTime: dto.endTime,
       eventType: dto.eventType,
       location: dto.location,
       customerNotes: dto.notes,
       status: ReservationStatus.PENDING,
-      reservationToken: crypto.randomBytes(32).toString('hex'),
+      reservationToken: token,
     });
+    await this.reservationRepository.save(reservation);
+
+    // Send email notification to customer
+    const trackingLink = `http://localhost:3001/book/track/${token}`;
+    await this.emailService.sendBookingReceived(
+      customer.email,
+      `${customer.firstName} ${customer.lastName}`,
+      trackingLink,
+    );
+
+    // Broadcast real-time availability change
+    this.chatGateway.broadcastAvailabilityChange(slug, dto.date, dto.startTime, dto.endTime, false);
 
     return {
-      reservationToken: reservation.reservationToken,
+      reservationToken: token,
       message: 'Reservation request submitted successfully',
     };
   }
 
-  async trackReservation(token: string) {
-    const reservation = await this.reservationModel
-      .findOne({ reservationToken: token })
-      .populate<{
-        customerId: Customer;
-      }>('customerId', 'firstName lastName email')
-      .populate<{
-        photographerId: User;
-      }>('photographerId', 'firstName lastName');
+  async trackReservation(token: string, email: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true, photographer: true },
+    });
 
     if (!reservation) throw new NotFoundException('Reservation not found');
 
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied. Verification required.');
+    }
+
     return {
+      id: reservation.id,
       status: reservation.status,
       date: reservation.date,
       startTime: reservation.startTime,
       endTime: reservation.endTime,
       eventType: reservation.eventType,
       location: reservation.location,
+      customerNotes: reservation.customerNotes,
+      advancePaymentPriceInCents: reservation.advancePaymentPriceInCents,
+      quotationNotes: reservation.quotationNotes,
+      clientSelectedPackageId: reservation.clientSelectedPackageId,
+      selectedPackages: reservation.selectedPackages,
+      paymentDeadline: reservation.paymentDeadline,
+      rejectionReason: reservation.rejectionReason,
       photographer: {
-        firstName: reservation.photographerId.firstName,
-        lastName: reservation.photographerId.lastName,
+        firstName: reservation.photographer.firstName,
+        lastName: reservation.photographer.lastName,
       },
+    };
+  }
+
+  async verifyTrackingEmail(token: string, email: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true },
+    });
+
+    if (!reservation) throw new NotFoundException('Reservation not found');
+
+    const matches = reservation.customer.email.toLowerCase() === email.toLowerCase();
+    if (!matches) {
+      throw new ForbiddenException('Invalid email address for this booking');
+    }
+
+    return { verified: true };
+  }
+
+  async getMessages(token: string, email: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true },
+    });
+    if (!reservation) throw new NotFoundException('Reservation not found');
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.messageRepository.find({
+      where: { reservationId: reservation.id },
+      order: { timestamp: 'ASC' },
+    });
+  }
+
+  async sendMessage(token: string, email: string, content: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true },
+    });
+    if (!reservation) throw new NotFoundException('Reservation not found');
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const message = this.messageRepository.create({
+      reservationId: reservation.id,
+      sender: 'CUSTOMER',
+      senderName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+      content,
+    });
+    await this.messageRepository.save(message);
+
+    // Broadcast to room
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('message', message);
+
+    return message;
+  }
+
+  async confirmBooking(token: string, email: string, packageId: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true, photographer: true },
+    });
+    if (!reservation) throw new NotFoundException('Reservation not found');
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    if (reservation.status !== ReservationStatus.PROPOSED) {
+      throw new BadRequestException('Reservation is not in proposed state');
+    }
+
+    // Verify if package exists in snapshotted selectedPackages
+    const packages = reservation.selectedPackages || [];
+    const selectedPkg = packages.find((p: any) => p.id === packageId);
+    if (!selectedPkg) {
+      throw new BadRequestException('Selected package is not part of the proposal');
+    }
+
+    reservation.status = ReservationStatus.CONFIRMED;
+    reservation.clientSelectedPackageId = packageId;
+    reservation.totalAmountInCents = selectedPkg.priceInCents;
+    reservation.paymentDeadline = undefined; // Clear lock expiry
+
+    await this.reservationRepository.save(reservation);
+
+    // Send confirmation email to photographer
+    await this.emailService.sendReservationConfirmed(
+      reservation.photographer.email,
+      reservation.photographer.firstName,
+      `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+      reservation.date.toString().split('T')[0],
+      selectedPkg.name,
+    );
+
+    return {
+      status: reservation.status,
+      message: 'Reservation confirmed successfully',
     };
   }
 }

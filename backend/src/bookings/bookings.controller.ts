@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 
-// No auth guards — this is the public-facing booking API
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
@@ -33,7 +32,44 @@ export class BookingsController {
   }
 
   @Get('track/:token')
-  trackReservation(@Param('token') token: string) {
-    return this.bookingsService.trackReservation(token);
+  trackReservation(
+    @Param('token') token: string,
+    @Query('email') email: string,
+  ) {
+    return this.bookingsService.trackReservation(token, email);
+  }
+
+  @Post('track/:token/verify')
+  verifyEmail(
+    @Param('token') token: string,
+    @Body('email') email: string,
+  ) {
+    return this.bookingsService.verifyTrackingEmail(token, email);
+  }
+
+  @Get('track/:token/messages')
+  getMessages(
+    @Param('token') token: string,
+    @Query('email') email: string,
+  ) {
+    return this.bookingsService.getMessages(token, email);
+  }
+
+  @Post('track/:token/messages')
+  sendMessage(
+    @Param('token') token: string,
+    @Body('email') email: string,
+    @Body('content') content: string,
+  ) {
+    return this.bookingsService.sendMessage(token, email, content);
+  }
+
+  @Post('track/:token/confirm')
+  confirm(
+    @Param('token') token: string,
+    @Body('email') email: string,
+    @Body('packageId') packageId: string,
+  ) {
+    return this.bookingsService.confirmBooking(token, email, packageId);
   }
 }
