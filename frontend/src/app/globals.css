@@ -362,6 +362,40 @@
     @apply bg-primary-white text-primary-dark border-primary-dark;
   }
 
+  .btn-danger {
+    @apply bg-red-600 text-white border border-red-600;
+  }
+  .btn-danger:hover:not(:disabled) {
+    @apply bg-red-700 text-white border-red-700 shadow-[0px_1px_1px_0px_#00000008];
+  }
+  .btn-danger:active:not(:disabled) {
+    @apply bg-red-800 text-white border-red-800;
+  }
+
+  /* Neutral outlined button — ideal for cancel/dismiss actions */
+  .btn-outline {
+    @apply bg-white text-zinc-700 border border-zinc-300;
+  }
+  .btn-outline:hover:not(:disabled) {
+    @apply bg-zinc-50 text-zinc-900 border-zinc-400 shadow-[0px_1px_1px_0px_#00000008];
+  }
+  .btn-outline:active:not(:disabled) {
+    @apply bg-zinc-100 text-zinc-900 border-zinc-400;
+  }
+
+  /* Modifier: resets the page-level CTA constraints so btn works inside
+     small containers like modals (removes min-w-[250px] and centering) */
+  .btn-modal {
+    @apply min-w-0 max-w-none mx-0 flex-1;
+  }
+
+  .btn-link {
+    @apply text-primary-dark p-0 min-w-fit max-w-fit h-fit;
+  }
+  .btn-link:hover {
+    @apply shadow-none underline;
+  }
+
   .btn-secondary-dark {
     @apply bg-secondary-dark text-primary-dark border border-secondary-dark;
   }
@@ -380,13 +414,6 @@
   }
   .btn-ghost:active:not(:disabled) {
     @apply bg-secondary-dark text-text-heading border-secondary-dark;
-  }
-
-  .btn-link {
-    @apply text-primary-dark p-0 min-w-fit max-w-fit h-fit;
-  }
-  .btn-link:hover {
-    @apply shadow-none underline;
   }
 
   .footer-nav-link {

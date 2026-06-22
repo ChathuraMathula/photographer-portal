@@ -1,13 +1,25 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { UserRole, logout } from "@/store/slices/authSlice";
 import { useUserManagement } from "./hooks/useUserManagement";
-import { UserRole } from "@/store/slices/authSlice";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
 import { Button } from "@/components/ui/button";
 import { UserTable } from "@/components/users/UserTable";
 import { CreateUserModal } from "@/components/users/CreateUserModal";
 import { UserPlus } from "lucide-react";
 
 export default function UserManagementPage() {
+  const dispatch = useDispatch();
+  const router   = useRouter();
+
+  const { firstName, role: authRole } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   const {
     loggedInRole,
     isAuthenticated,
@@ -26,6 +38,16 @@ export default function UserManagementPage() {
     handleRemoveSpec,
   } = useUserManagement();
 
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/login");
+  };
+
+  const handleTabChange = (tab: string) => {
+    if (tab === "overview") router.push("/dashboard");
+    else router.push("/dashboard/users");
+  };
+
   if (
     !isAuthenticated ||
     (loggedInRole !== UserRole.SUPER_ADMIN && loggedInRole !== UserRole.ADMIN)
@@ -38,20 +60,24 @@ export default function UserManagementPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-4 md:p-8 dark:bg-zinc-950">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <DashboardLayout
+      activeTab="users"
+      onTabChange={handleTabChange}
+      onLogout={handleLogout}
+      userName={firstName ?? ""}
+      userRole={authRole ?? ""}
+      menuItems={ADMIN_MENU}
+    >
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            <h1 className="text-title-large text-primary-dark">
               User Management
             </h1>
-            <p className="text-zinc-500 text-sm mt-1">
+            <p className="text-body-small text-zinc-500 mt-1">
               Logged in as{" "}
-              <span className="font-semibold text-zinc-800 dark:text-zinc-200">
-                {loggedInRole}
-              </span>
-              .{" "}
+              <span className="font-semibold text-zinc-800">{loggedInRole}</span>.{" "}
               {loggedInRole === UserRole.SUPER_ADMIN
                 ? "Manage all system users, administrators, and photographers."
                 : "Manage and register new photographers."}
@@ -59,13 +85,14 @@ export default function UserManagementPage() {
           </div>
           <Button
             onClick={() => setShowModal(true)}
-            className="h-11 gap-2 text-sm bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 shadow-sm"
+            className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-sm shadow-sm"
           >
-            <UserPlus className="h-4 w-4" /> Create User
+            <UserPlus className="h-4 w-4" />
+            Create User
           </Button>
         </div>
 
-        {/* Users List */}
+        {/* Users list */}
         {loading ? (
           <div className="text-center py-12 text-zinc-500 animate-pulse">
             Loading users...
@@ -76,7 +103,7 @@ export default function UserManagementPage() {
           <UserTable users={users} onToggleActive={handleToggleActive} />
         )}
 
-        {/* Modal */}
+        {/* Create user modal */}
         {showModal && (
           <CreateUserModal
             formik={formik}
@@ -91,6 +118,6 @@ export default function UserManagementPage() {
           />
         )}
       </div>
-    </main>
+    </DashboardLayout>
   );
 }

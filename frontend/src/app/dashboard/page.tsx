@@ -77,15 +77,17 @@ export default function DashboardPage() {
       <AdminDashboard
         firstName={firstName ?? ""}
         role={role}
+        activeTab="overview"
         onLogout={handleLogout}
       />
     );
   }
 
+
   return (
     <DashboardLayout
       activeTab={activeTab}
-      onTabChange={setActiveTab}
+      onTabChange={(tab) => setActiveTab(tab as "reservations" | "calendar" | "packages" | "profile")}
       onLogout={handleLogout}
       userName={firstName ?? ""}
       userRole={role ?? ""}
