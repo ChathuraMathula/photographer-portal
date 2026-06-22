@@ -10,7 +10,7 @@ A reservation management system for photographers. Super Admins manage photograp
 |---|---|
 | Backend | NestJS 11, TypeScript |
 | Frontend | Next.js 16 (App Router), React 19 |
-| Database | MongoDB 8 (via Mongoose 9) |
+| Database | PostgreSQL 16 (via TypeORM) |
 | Auth | JWT (cookie-based), Passport |
 | UI | shadcn/ui, Tailwind CSS 4 |
 | Forms | Formik + Yup |
@@ -31,16 +31,17 @@ A reservation management system for photographers. Super Admins manage photograp
 
 ```
 photographer-portal/
-├── docker-compose.yml       # MongoDB + Mongo Express
+├── docker-compose.yml       # PostgreSQL + pgAdmin + Maildev
 ├── backend/                 # NestJS API (port 3000)
 │   ├── src/
-│   │   ├── auth/            # JWT auth, guards, decorators
+│   │   ├── auth/            # JWT auth, guards, strategies
 │   │   ├── bookings/        # Public booking flow (no auth)
 │   │   ├── photographers/   # Photographer profile management
 │   │   ├── reservations/    # Reservation management (protected)
 │   │   ├── users/           # User / photographer account creation
-│   │   ├── schemas/         # Mongoose schemas
-│   │   ├── database/        # DatabaseModule (registers all schemas)
+│   │   ├── entities/        # TypeORM entity schemas
+│   │   ├── migrations/      # DB Schema migrations
+│   │   ├── database/        # DatabaseModule configurations
 │   │   ├── scripts/         # seed-data.ts (shared seed logic)
 │   │   ├── seed.ts          # npm run seed entry point
 │   │   └── reset.ts         # npm run db:reset entry point
@@ -49,9 +50,10 @@ photographer-portal/
     └── src/
         ├── app/
         │   ├── login/       # Login page
-        │   ├── dashboard/   # Role-based dashboard
+        │   ├── dashboard/   # Role-based collapsible dashboard
+        │   ├── api-tester/  # Interactive developer API Docs & Tester Console
         │   └── book/[slug]/ # Public booking page
-        ├── config/routes.ts # Route permissions + public prefixes
+        ├── config/routes.ts # Route permissions + prefixes
         ├── proxy.ts         # Next.js middleware (auth guard)
         └── store/           # Redux store + authSlice
 ```
@@ -60,29 +62,31 @@ photographer-portal/
 
 ## Getting Started
 
-### 1. Start the database
+### 1. Start the services
 
 ```bash
 docker compose up -d
 ```
 
 This starts:
-- **MongoDB 8** on `localhost:27017`
-- **Mongo Express** (DB UI) on `http://localhost:8081`
+- **PostgreSQL 16** on `localhost:5433`
+- **pgAdmin 4** (DB UI) on `http://localhost:5050`
+- **Maildev** (Local SMTP Web UI) on `http://localhost:1080` (SMTP port `1025`)
 
-MongoDB credentials (defined in `docker-compose.yml`):
-- Username: `admin`
-- Password: `securepassword123`
+pgAdmin credentials (defined in `docker-compose.yml`):
+- Username: `admin@photoportal.com`
+- Password: `pgadminsecure123`
 
 ### 2. Configure backend environment
 
 Create `backend/.env`:
 
 ```env
-MONGODB_URI=mongodb://admin:securepassword123@localhost:27017/photographer_portal?authSource=admin
 JWT_SECRET=your-secret-key-change-in-production
 PORT=3000
 ```
+
+*Note: Database connection parameters default to host: `localhost` and port: `5433` for local development.*
 
 ### 3. Install dependencies
 
@@ -103,8 +107,9 @@ npm run seed
 
 This creates:
 - 1 Super Admin: `admin@photoportal.com` / `SuperSecret123!`
-- 2 Photographers: Sarah Johnson (`sarah-johnson`) and Michael Fernando (`michael-fernando`)
-- Sample customers and reservations
+- 1 Agency Admin: `agency@photoportal.com` / `AdminSecret123!`
+- 2 Photographers: Sarah Johnson (`sarah@photoportal.com`) and Michael Fernando (`michael@photoportal.com`) with password `Photographer123!`
+- Sample customers, packages, messages, and reservations
 
 ### 5. Start the servers
 
@@ -150,49 +155,15 @@ Customers do not need an account.
 
 ---
 
-## API Reference
+## API Documentation & Tester Console
 
-### Public endpoints (no auth)
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/bookings/:slug` | Photographer public profile |
-| `GET` | `/bookings/:slug/availability?date=&startTime=&endTime=` | Check time slot availability |
-| `POST` | `/bookings/:slug` | Submit a reservation request |
-| `GET` | `/bookings/track/:token` | Track reservation status by token |
-
-### Auth
-
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/auth/login` | Login, returns JWT cookie |
-| `POST` | `/auth/logout` | Clear JWT cookie |
-
-### Users (Super Admin only)
-
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/users/photographers` | Create photographer account + profile |
-| `GET` | `/users/photographers` | List all photographers |
-
-### Reservations (Super Admin + Photographer)
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/reservations` | List reservations (scoped by role) |
-| `GET` | `/reservations/:id` | Get single reservation |
-| `PATCH` | `/reservations/:id/status` | Update status |
-| `PATCH` | `/reservations/:id/notes` | Add admin note |
-
-### Photographers (Super Admin + Photographer)
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/photographers` | List all profiles (Super Admin only) |
-| `GET` | `/photographers/:id` | Get profile |
-| `PATCH` | `/photographers/:id/profile` | Update profile |
-| `GET` | `/photographers/:id/booking-link` | Get shareable URL |
-| `PATCH` | `/photographers/:id/toggle-availability` | Toggle availability |
+For testing API endpoints, use the interactive panel built directly into the frontend:
+- **URL**: `http://localhost:3001/api-tester`
+- **Features**:
+  - Displays endpoint metadata, HTTP methods, and required roles.
+  - Interactive playground allowing query parameter manipulation and request body configurations.
+  - Quick-login buttons simulating admin and photographer authentication via session cookies.
+  - Formatted JSON response viewers displaying latency metrics, statuses, and headers.
 
 ---
 
@@ -208,31 +179,31 @@ npm run seed
 npm run db:reset
 ```
 
-`db:reset` is blocked if `MONGODB_URI` contains `prod` or `atlas` as a safety guard.
-
 ---
 
 ## Database Schema
 
 ### `users`
-Auth records for Super Admins and Photographers only. Customers never log in.
+Auth records for Admins and Photographers only. Customers never log in.
 
 | Field | Type | Notes |
 |---|---|---|
+| `id` | UUID (string) | primary key |
 | `firstName` | String | |
 | `lastName` | String | |
 | `email` | String | unique |
 | `passwordHash` | String | bcrypt |
-| `role` | Enum | `SUPER_ADMIN` \| `PHOTOGRAPHER` |
+| `role` | Enum | `SUPER_ADMIN` \| `ADMIN` \| `PHOTOGRAPHER` |
 | `isActive` | Boolean | default `true` |
 | `phone` | String | optional |
 
-### `photographerprofiles`
+### `photographer_profiles`
 Public-facing profile, 1-to-1 with a User of role `PHOTOGRAPHER`.
 
 | Field | Type | Notes |
 |---|---|---|
-| `userId` | ObjectId | ref: User |
+| `id` | UUID (string) | primary key |
+| `userId` | UUID (string) | foreign key: User |
 | `bookingSlug` | String | unique, URL-safe (e.g. `sarah-johnson`) |
 | `bio` | String | optional |
 | `specializations` | String[] | e.g. `["Wedding", "Portrait"]` |
@@ -245,6 +216,7 @@ Created automatically on first booking. No passwords.
 
 | Field | Type | Notes |
 |---|---|---|
+| `id` | UUID (string) | primary key |
 | `firstName` | String | |
 | `lastName` | String | |
 | `email` | String | unique |
@@ -253,11 +225,13 @@ Created automatically on first booking. No passwords.
 | `notes` | String | optional |
 
 ### `reservations`
+Tracks client requests, proposal statuses, and advance deposit payments.
 
 | Field | Type | Notes |
 |---|---|---|
-| `customerId` | ObjectId | ref: Customer |
-| `photographerId` | ObjectId | ref: User |
+| `id` | UUID (string) | primary key |
+| `customerId` | UUID (string) | foreign key: Customer |
+| `photographerId` | UUID (string) | foreign key: User |
 | `date` | Date | |
 | `startTime` | String | `HH:MM` 24-hour format |
 | `endTime` | String | `HH:MM` 24-hour format |
@@ -266,36 +240,34 @@ Created automatically on first booking. No passwords.
 | `customerNotes` | String | optional |
 | `adminNotes` | String | internal only |
 | `totalAmountInCents` | Number | internal only, integer cents |
-| `status` | Enum | `PENDING` \| `CONFIRMED` \| `CANCELLED` \| `COMPLETED` |
+| `advancePaymentPriceInCents` | Number | deposit required |
+| `status` | Enum | `PENDING` \| `PROPOSED` \| `REJECTED` \| `CONFIRMED` \| `CANCELLED` \| `COMPLETED` |
 | `reservationToken` | String | unique, used for customer tracking URL |
+| `paymentDeadline` | Timestamp | time limit to accept proposal / pay deposit |
 
 ### `packages`
-Internal pricing reference. Never exposed to customers.
+Pricing references and templates. Owned by photographer.
 
 | Field | Type | Notes |
 |---|---|---|
+| `id` | UUID (string) | primary key |
+| `photographerId` | UUID (string) | foreign key: User |
 | `name` | String | |
 | `description` | String | optional |
-| `priceInCents` | Number | integer cents |
+| `price` | Number | price in rupees |
 | `durationHours` | Number | |
 | `includes` | String[] | |
 | `isActive` | Boolean | default `true` |
 
----
+### `messages`
+Simulates custom portal chat logs between photographers and customer trackers.
 
-## Roles & Permissions
-
-| Role | Can do |
-|---|---|
-| `SUPER_ADMIN` | Create photographers, view all reservations, manage all profiles |
-| `PHOTOGRAPHER` | View own reservations, update own profile, toggle availability |
-| Customer (no auth) | Check availability, submit booking, track reservation by token |
-
----
-
-## Database UI
-
-Mongo Express runs at `http://localhost:8081` while Docker is up. No credentials required in the default dev setup.
+| Field | Type | Notes |
+|---|---|---|
+| `id` | UUID (string) | primary key |
+| `reservationId` | UUID (string) | foreign key: Reservation |
+| `sender` | String | `CUSTOMER` \| `PHOTOGRAPHER` |
+| `content` | String | chat message text |
 
 ---
 
@@ -305,9 +277,9 @@ Mongo Express runs at `http://localhost:8081` while Docker is up. No credentials
 docker compose down
 ```
 
-Data is persisted in `./database/` and survives restarts. To wipe the data volume:
+Data is persisted in `./postgres-data/` and survives restarts. To wipe the data volume:
 
 ```bash
 docker compose down -v
-rm -rf ./database
+rm -rf ./postgres-data
 ```
