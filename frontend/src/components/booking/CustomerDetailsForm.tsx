@@ -30,35 +30,36 @@ type Props = {
 
 export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Props) {
   return (
-    <Card>
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       <CardHeader>
-        <CardTitle>Your Details</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-title-medium text-primary-dark dark:text-white">Your Details</CardTitle>
+        <CardDescription className="text-body-small text-zinc-500 mt-1">
           {availabilityChecked.date} · {availabilityChecked.startTime}–
-          {availabilityChecked.endTime} · {availabilityChecked.eventType}
-          <span className="ml-2 font-medium text-emerald-600">Available</span>
+          {availabilityChecked.endTime} · {availabilityChecked.eventType} ·{" "}
+          <span className="font-semibold text-emerald-600 dark:text-emerald-400">Available</span>
         </CardDescription>
       </CardHeader>
 
       <form onSubmit={formik.handleSubmit}>
         <CardContent className="space-y-4">
           {formik.status && (
-            <div className="rounded-md bg-red-100 p-3 text-sm text-red-600 dark:bg-red-900/30">
+            <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-sm text-red-650 dark:text-red-400 border border-red-250/20">
               {formik.status}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">First Name</Label>
               <Input
                 id="firstName"
+                placeholder="John"
                 {...formik.getFieldProps("firstName")}
-                className={
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.firstName && formik.errors.firstName
                     ? "border-red-500"
                     : ""
-                }
+                }`}
               />
               <FieldError
                 msg={
@@ -67,15 +68,16 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Last Name</Label>
               <Input
                 id="lastName"
+                placeholder="Doe"
                 {...formik.getFieldProps("lastName")}
-                className={
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.lastName && formik.errors.lastName
                     ? "border-red-500"
                     : ""
-                }
+                }`}
               />
               <FieldError
                 msg={
@@ -86,16 +88,17 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Email</Label>
             <Input
               id="email"
               type="email"
+              placeholder="john@example.com"
               {...formik.getFieldProps("email")}
-              className={
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                 formik.touched.email && formik.errors.email
                   ? "border-red-500"
                   : ""
-              }
+              }`}
             />
             <FieldError
               msg={formik.touched.email ? formik.errors.email : undefined}
@@ -103,16 +106,17 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Phone</Label>
             <Input
               id="phone"
               type="tel"
+              placeholder="+94 77 123 4567"
               {...formik.getFieldProps("phone")}
-              className={
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                 formik.touched.phone && formik.errors.phone
                   ? "border-red-500"
                   : ""
-              }
+              }`}
             />
             <FieldError
               msg={formik.touched.phone ? formik.errors.phone : undefined}
@@ -120,25 +124,26 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">
-              Venue / Location{" "}
-              <span className="text-zinc-400">(optional)</span>
+            <Label htmlFor="location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Venue / Location <span className="text-zinc-400 font-normal">(optional)</span>
             </Label>
             <Input
               id="location"
               placeholder="e.g. Cinnamon Grand, Colombo"
               {...formik.getFieldProps("location")}
+              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">
-              Notes <span className="text-zinc-400">(optional)</span>
+            <Label htmlFor="notes" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Notes <span className="text-zinc-400 font-normal">(optional)</span>
             </Label>
             <Input
               id="notes"
               placeholder="Any special requirements..."
               {...formik.getFieldProps("notes")}
+              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
           </div>
         </CardContent>
@@ -146,15 +151,14 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
         <CardFooter className="flex gap-3">
           <Button
             type="button"
-            variant="outline"
-            className="flex-1"
+            className="btn btn-secondary flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
             onClick={onBack}
           >
             Back
           </Button>
           <Button
             type="submit"
-            className="flex-1"
+            className="btn btn-primary flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
             disabled={formik.isSubmitting}
           >
             {formik.isSubmitting ? "Submitting..." : "Submit Request"}

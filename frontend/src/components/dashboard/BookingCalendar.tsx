@@ -58,34 +58,44 @@ export function BookingCalendar({
   };
 
   return (
-    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4 bg-zinc-50/20">
         <div>
-          <CardTitle className="text-lg">Visual Bookings Grid</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-title-medium text-primary-dark dark:text-white">Visual Bookings Grid</CardTitle>
+          <CardDescription className="text-body-small text-zinc-500 mt-1">
             Click a day slot to inspect photographer reservations
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="outline" onClick={onPrevMonth}>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={onPrevMonth}
+            className="btn btn-secondary h-9 w-9 shrink-0 p-0 shadow-sm min-w-0 md:min-w-0"
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="font-semibold text-sm w-32 text-center">
+          <span className="text-body-small-s font-semibold w-32 text-center text-primary-dark dark:text-white">
             {currentDate.toLocaleString("default", {
               month: "long",
               year: "numeric",
             })}
           </span>
-          <Button size="icon" variant="outline" onClick={onNextMonth}>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={onNextMonth}
+            className="btn btn-secondary h-9 w-9 shrink-0 p-0 shadow-sm min-w-0 md:min-w-0"
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
         {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1 text-center font-bold text-xs text-zinc-500 mb-2">
+        <div className="grid grid-cols-7 gap-1 text-center font-bold text-body-caption text-zinc-550 mb-3">
           {DAYS.map((d) => (
-            <span key={d}>{d}</span>
+            <span key={d} className="title-font">{d}</span>
           ))}
         </div>
 
@@ -96,7 +106,7 @@ export function BookingCalendar({
               return (
                 <div
                   key={`empty-${idx}`}
-                  className="bg-zinc-50/25 dark:bg-zinc-950/10 rounded-lg min-h-[70px]"
+                  className="bg-zinc-50/25 dark:bg-zinc-950/10 rounded-xl min-h-[70px] border border-transparent"
                 />
               );
 
@@ -106,15 +116,15 @@ export function BookingCalendar({
             return (
               <div
                 key={day.toISOString()}
-                className={`border p-2 rounded-lg min-h-[75px] text-left relative flex flex-col justify-between transition-colors ${
+                className={`border p-2 rounded-xl min-h-[75px] text-left relative flex flex-col justify-between transition-colors ${
                   isToday
-                    ? "border-zinc-900 bg-zinc-50/50 dark:border-white dark:bg-zinc-900"
-                    : "border-zinc-200 dark:border-zinc-800"
+                    ? "border-primary-dark bg-zinc-50/50 dark:border-white dark:bg-zinc-900"
+                    : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700"
                 }`}
               >
                 <span
-                  className={`text-xs font-bold ${
-                    isToday ? "text-zinc-900 dark:text-white" : "text-zinc-500"
+                  className={`text-body-caption font-bold ${
+                    isToday ? "text-primary-dark dark:text-white" : "text-zinc-500"
                   }`}
                 >
                   {day.getDate()}
@@ -124,10 +134,10 @@ export function BookingCalendar({
                     <div
                       key={r.id}
                       onClick={() => onDayReservationClick(r)}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:opacity-80"
                     >
                       <StatusPill status={r.status} />
-                      <span className="text-[9px] text-zinc-500 truncate block">
+                      <span className="text-[9px] text-zinc-550 truncate block mt-0.5 font-medium leading-none">
                         {r.startTime} {r.customer.firstName}
                       </span>
                     </div>

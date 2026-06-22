@@ -33,10 +33,10 @@ export function AvailabilityForm({
   today,
 }: Props) {
   return (
-    <Card>
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       <CardHeader>
-        <CardTitle>Check Availability</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-title-medium text-primary-dark dark:text-white">Check Availability</CardTitle>
+        <CardDescription className="text-body-small text-zinc-500 mt-1">
           Pick your preferred date and time to see if {photographerFirstName} is
           free.
         </CardDescription>
@@ -45,23 +45,23 @@ export function AvailabilityForm({
       <form onSubmit={formik.handleSubmit}>
         <CardContent className="space-y-4">
           {availabilityError && (
-            <div className="rounded-md bg-red-100 p-3 text-sm text-red-600 dark:bg-red-900/30">
+            <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-sm text-red-650 dark:text-red-400 border border-red-250/20">
               {availabilityError}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="date" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Date</Label>
             <Input
               id="date"
               type="date"
               min={today}
               {...formik.getFieldProps("date")}
-              className={
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                 formik.touched.date && formik.errors.date
                   ? "border-red-500"
                   : ""
-              }
+              }`}
             />
             <FieldError
               msg={formik.touched.date ? formik.errors.date : undefined}
@@ -70,16 +70,16 @@ export function AvailabilityForm({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startTime">Start Time</Label>
+              <Label htmlFor="startTime" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Start Time</Label>
               <Input
                 id="startTime"
                 type="time"
                 {...formik.getFieldProps("startTime")}
-                className={
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.startTime && formik.errors.startTime
                     ? "border-red-500"
                     : ""
-                }
+                }`}
               />
               <FieldError
                 msg={
@@ -88,16 +88,16 @@ export function AvailabilityForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endTime">End Time</Label>
+              <Label htmlFor="endTime" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">End Time</Label>
               <Input
                 id="endTime"
                 type="time"
                 {...formik.getFieldProps("endTime")}
-                className={
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.endTime && formik.errors.endTime
                     ? "border-red-500"
                     : ""
-                }
+                }`}
               />
               <FieldError
                 msg={
@@ -108,16 +108,16 @@ export function AvailabilityForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="eventType">Event Type</Label>
+            <Label htmlFor="eventType" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Event Type</Label>
             <Input
               id="eventType"
               placeholder="e.g. Wedding, Portrait, Corporate Event"
               {...formik.getFieldProps("eventType")}
-              className={
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                 formik.touched.eventType && formik.errors.eventType
                   ? "border-red-500"
                   : ""
-              }
+              }`}
             />
             <FieldError
               msg={
@@ -130,7 +130,7 @@ export function AvailabilityForm({
         <CardFooter>
           <Button
             type="submit"
-            className="w-full"
+            className="btn btn-primary w-full min-w-0 max-w-none md:max-w-none shadow-sm"
             disabled={formik.isSubmitting}
           >
             {formik.isSubmitting ? "Checking..." : "Check Availability"}

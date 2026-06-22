@@ -18,15 +18,15 @@ type Props = {
 
 export function PackageCard({ pkg, onEdit, onDelete }: Props) {
   return (
-    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm flex flex-col justify-between overflow-hidden">
-      <CardHeader className="pb-3">
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm flex flex-col justify-between overflow-hidden rounded-xl">
+      <CardHeader className="pb-3 bg-zinc-50/20 border-b border-zinc-100 dark:border-zinc-850">
         <div className="flex justify-between items-start gap-2">
-          <CardTitle className="text-md font-bold">{pkg.name}</CardTitle>
+          <CardTitle className="text-title-base text-primary-dark dark:text-white">{pkg.name}</CardTitle>
           <div className="flex gap-1">
             <Button
               size="icon"
               variant="ghost"
-              className="h-7 w-7 text-zinc-500"
+              className="h-7 w-7 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-350 cursor-pointer"
               onClick={() => onEdit(pkg)}
             >
               <Edit3 className="h-3.5 w-3.5" />
@@ -34,20 +34,20 @@ export function PackageCard({ pkg, onEdit, onDelete }: Props) {
             <Button
               size="icon"
               variant="ghost"
-              className="h-7 w-7 text-red-500"
+              className="h-7 w-7 text-red-500 hover:text-red-700 dark:hover:text-red-400 cursor-pointer"
               onClick={() => onDelete(pkg.id)}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-body-caption text-zinc-500 mt-1">
           Duration: {pkg.durationHours} hr(s)
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-4 flex-1">
         {pkg.description && (
-          <p className="text-xs text-zinc-500 line-clamp-3 leading-relaxed">
+          <p className="text-body-small-s text-zinc-550 line-clamp-3 leading-relaxed">
             {pkg.description}
           </p>
         )}
@@ -56,7 +56,7 @@ export function PackageCard({ pkg, onEdit, onDelete }: Props) {
             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
               Includes:
             </p>
-            <ul className="text-xs text-zinc-600 dark:text-zinc-400 list-disc pl-4 space-y-0.5">
+            <ul className="text-body-caption text-zinc-600 dark:text-zinc-400 list-disc pl-4 space-y-0.5">
               {pkg.includes.map((inc) => (
                 <li key={inc}>{inc}</li>
               ))}
@@ -64,9 +64,9 @@ export function PackageCard({ pkg, onEdit, onDelete }: Props) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t bg-zinc-50/50 dark:bg-zinc-900/30 p-4 flex items-baseline gap-1">
-        <span className="text-xs font-semibold text-zinc-400">LKR</span>
-        <span className="text-lg font-bold text-zinc-950 dark:text-white">
+      <CardFooter className="border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/30 p-4 flex items-baseline gap-1">
+        <span className="text-body-caption font-semibold text-zinc-400">LKR</span>
+        <span className="text-title-base text-zinc-950 dark:text-white">
           {(pkg.priceInCents / 100).toLocaleString()}
         </span>
       </CardFooter>

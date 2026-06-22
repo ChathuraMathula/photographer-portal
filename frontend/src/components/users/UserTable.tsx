@@ -9,15 +9,15 @@ type Props = {
 
 export function UserTable({ users, onToggleActive }: Props) {
   return (
-    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Registered Users</CardTitle>
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
+      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/20">
+        <CardTitle className="text-title-medium text-primary-dark dark:text-white">Registered Users</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-sm">
+          <table className="w-full text-left border-collapse text-body-small">
             <thead>
-              <tr className="border-b border-zinc-150 bg-zinc-50/75 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 font-medium">
+              <tr className="border-b border-zinc-100 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-body-small-s font-semibold">
                 <th className="p-4">Name</th>
                 <th className="p-4">Email</th>
                 <th className="p-4">Role</th>

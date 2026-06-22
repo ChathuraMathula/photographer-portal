@@ -17,16 +17,16 @@ export function PhotographerBanner({
   return (
     <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
+        <h2 className="text-title-large text-primary-dark dark:text-white">
           Welcome back, {firstName}
         </h2>
-        <p className="text-zinc-500 text-sm mt-1">
+        <p className="text-body-small text-zinc-500 mt-1">
           Manage your reservations, packages and profile below.
         </p>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-zinc-500">Accepting bookings:</span>
+          <span className="text-body-small-s font-semibold text-zinc-550 dark:text-zinc-400">Accepting bookings:</span>
           <button
             onClick={onToggleAvailability}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
@@ -43,9 +43,9 @@ export function PhotographerBanner({
         <Button
           onClick={onAddManualBooking}
           variant="outline"
-          className="h-10 text-xs font-semibold gap-1.5 border-zinc-200 dark:border-zinc-800"
+          className="btn btn-secondary h-10 px-4 py-0 min-w-0 md:min-w-0 text-sm shadow-sm gap-1.5"
         >
-          <Plus className="h-4 w-4" /> Add Manual Booking
+          <Plus className="h-4 w-4 shrink-0" /> Add Manual Booking
         </Button>
       </div>
     </header>
