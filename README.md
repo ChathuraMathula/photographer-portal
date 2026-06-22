@@ -155,6 +155,69 @@ Customers do not need an account.
 
 ---
 
+## API Reference
+
+### Auth & Health
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/health` | Public | Fetch health status of the backend systems. |
+| `POST` | `/auth/login` | Public | Authenticate user and set HTTP-only cookie access token. |
+
+### Public Bookings (No Auth)
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/bookings/:slug` | Public | Get public photographer bio, location, & specialties. |
+| `GET` | `/bookings/:slug/availability` | Public | Check if a photographer slot is open for date and time range. |
+| `POST` | `/bookings/:slug` | Public | Submit a new booking request to a photographer. |
+| `POST` | `/bookings/track/:token/verify` | Public | Verify client email matches booking tracking token. |
+| `GET` | `/bookings/track/:token` | Public | Fetch status tracker detail card information. |
+| `GET` | `/bookings/track/:token/messages` | Public | Get message/chat negotiation logs. |
+| `POST` | `/bookings/track/:token/messages` | Public | Send chat reply message as customer. |
+| `POST` | `/bookings/track/:token/confirm` | Public | Accept proposal package and pay simulated deposit. |
+
+### Photographer Profiles
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/photographers` | Super Admin Only | List all registered photographer profiles. |
+| `GET` | `/photographers/:id` | Super Admin & Photographer | Get specific profile configurations. |
+| `PATCH` | `/photographers/:id/profile` | Super Admin & Photographer | Update biography, location, & specialties. |
+| `PATCH` | `/photographers/:id/toggle-availability` | Super Admin & Photographer | Toggle whether photographer is accepting new inquiries. |
+| `GET` | `/photographers/:id/booking-link` | Super Admin Only | Retrieve generated booking url details. |
+
+### Packages
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/packages` | Photographer Only | List standard packages owned by logged-in photographer. |
+| `POST` | `/packages` | Photographer Only | Create a standard pricing package proposal option. |
+| `PATCH` | `/packages/:id` | Photographer Only | Update package info and pricing details. |
+| `DELETE` | `/packages/:id` | Photographer Only | Permanently delete standard package template option. |
+
+### Reservations
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/reservations` | Super Admin, Admin & Photographer | List active reservations (scoped by role). |
+| `POST` | `/reservations` | Photographer Only | Create an offline/manual reservation. |
+| `GET` | `/reservations/:id` | Super Admin, Admin & Photographer | Get specific details for a reservation record. |
+| `POST` | `/reservations/:id/propose` | Photographer Only | Submit package recommendation proposal and lock slot. |
+| `POST` | `/reservations/:id/reject` | Photographer Only | Reject incoming client booking request with notes. |
+| `GET` | `/reservations/:id/messages` | Super Admin, Admin & Photographer | Retrieve communication logs for reservation. |
+| `POST` | `/reservations/:id/messages` | Photographer Only | Send chat negotiation message as photographer. |
+
+### Users
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `GET` | `/users` | Super Admin & Admin | List portal user accounts. |
+| `POST` | `/users` | Super Admin & Admin | Create system user account (Admin or Photographer). |
+| `PATCH` | `/users/:id/toggle-active` | Super Admin & Admin | Toggle active state of user account. |
+
+---
+
 ## API Documentation & Tester Console
 
 For testing API endpoints, use the interactive panel built directly into the frontend:
