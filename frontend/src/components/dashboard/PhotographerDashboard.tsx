@@ -79,7 +79,7 @@ export function PhotographerDashboard({ activeTab }: Props) {
   } = usePhotographerDashboard();
 
   useEffect(() => {
-    if (isAuthenticated && role !== UserRole.PHOTOGRAPHER) {
+    if (isAuthenticated && (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN)) {
       router.replace("/dashboard");
     }
   }, [isAuthenticated, role, router]);
