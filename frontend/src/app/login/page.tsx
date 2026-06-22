@@ -17,7 +17,7 @@ export default function LoginPage() {
       
       {/* Brand logo (floating on mobile, static on desktop) */}
       <div className="absolute top-6 left-6 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm border border-zinc-200/50 dark:border-zinc-800/50 md:bg-transparent md:dark:bg-transparent md:shadow-none md:border-none md:p-0 md:left-12 md:top-10">
-        <span className="h-7 w-7 rounded-full bg-[#2d4a43] flex items-center justify-center text-white font-bold text-sm shadow-inner">P</span>
+        <span className="h-7 w-7 rounded-full bg-primary-dark flex items-center justify-center text-white font-bold text-sm shadow-inner">P</span>
         <span className="text-zinc-900 dark:text-zinc-100 font-bold tracking-tight text-sm sm:text-base">
           Photographer Portal
         </span>
@@ -28,10 +28,10 @@ export default function LoginPage() {
         <div className="w-full max-w-sm mx-auto space-y-8">
           
           <div className="space-y-3 text-center md:text-left mt-8 md:mt-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">
+            <h1 className="text-title-large text-primary-dark dark:text-white leading-tight">
               Access your photographer portal
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-body-small text-zinc-500 dark:text-zinc-400">
               Manage reservations, proposals, and chat with customers in real-time.
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
                 Email
               </Label>
               <Input
@@ -52,7 +52,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="you@example.com"
                 {...formik.getFieldProps("email")}
-                className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#2d4a43] focus:border-[#2d4a43] dark:bg-zinc-950 ${
+                className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
                   formik.touched.email && formik.errors.email ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
                 }`}
               />
@@ -62,7 +62,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label htmlFor="password" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
                 Password
               </Label>
               <div className="relative">
@@ -71,7 +71,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   {...formik.getFieldProps("password")}
-                  className={`h-11 md:h-12 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#2d4a43] focus:border-[#2d4a43] dark:bg-zinc-950 ${
+                  className={`h-11 md:h-12 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
                     formik.touched.password && formik.errors.password ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
                   }`}
                 />
@@ -96,14 +96,14 @@ export default function LoginPage() {
               <a
                 href="#"
                 onClick={(e) => e.preventDefault()}
-                className="text-xs sm:text-sm font-semibold text-[#2d4a43] hover:text-[#1f332e] dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
+                className="text-body-small-s font-semibold text-primary-dark hover:underline dark:text-primary-light transition-colors"
               >
                 Forgot password?
               </a>
             </div>
 
             <Button
-              className="w-full h-11 md:h-12 rounded-xl text-base font-semibold bg-[#2d4a43] hover:bg-[#1f332e] text-white transition-colors duration-200 shadow-sm dark:bg-emerald-600 dark:hover:bg-emerald-700"
+              className="btn btn-primary w-full min-w-0 max-w-none md:max-w-none"
               type="submit"
               disabled={formik.isSubmitting}
             >
