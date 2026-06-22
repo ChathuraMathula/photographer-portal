@@ -1,12 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "@/store/slices/authSlice";
-
+import { useLogin } from "./hooks/useLogin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,65 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-// 1. Define Yup Validation Rules
-const LoginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
-
 export default function LoginPage() {
-  const [apiError, setApiError] = useState("");
-  const router = useRouter();
-  const dispatch = useDispatch(); // Hook to send data to Redux
-
-  // 2. Initialize Formik
-  const formik = useFormik({
-    initialValues: {
-      email: "admin@photoportal.com",
-      password: "SuperSecret123!",
-    },
-    validationSchema: LoginSchema,
-    onSubmit: async (values, { setSubmitting }) => {
-      setApiError("");
-
-      try {
-        const response = await fetch("http://localhost:3000/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-          credentials: "include",
-        });
-
-        const data = await response.json();
-        console.log(data);
-
-        if (!response.ok) {
-          throw new Error(data.message || "Login failed");
-        }
-
-        // 3. Send the user data to our Global Redux Store
-        dispatch(
-          setCredentials({
-            id: data.user.id,
-            email: data.user.email,
-            role: data.user.role,
-            firstName: data.user.firstName,
-          }),
-        );
-
-        // 4. Redirect to the newly protected dashboard!
-        router.push("/dashboard");
-      } catch (err: unknown) {
-        if (err instanceof Error) setApiError(err.message);
-      } finally {
-        setSubmitting(false);
-      }
-    },
-  });
+  const { formik, apiError } = useLogin();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 p-4 sm:p-8 dark:bg-zinc-950">
