@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Send, MessageSquare } from "lucide-react";
 import { type ChatMessage } from "@/types";
 
@@ -36,7 +35,7 @@ export function ChatBox({
           <MessageSquare className="h-4 w-4" />
           {title}
         </h3>
-        <p className="text-xs text-zinc-500 mt-0.5">{description}</p>
+        <p className="text-xs text-zinc-550 mt-0.5">{description}</p>
       </div>
 
       {/* Message list */}
@@ -88,14 +87,13 @@ export function ChatBox({
           className="h-9 text-xs"
           disabled={disabled}
         />
-        <Button
+        <button
           type="submit"
-          size="icon"
-          className="h-9 w-9"
           disabled={!messageText.trim() || disabled}
+          className="h-9 w-9 flex items-center justify-center rounded-lg bg-[#0e2d5c] hover:bg-[#1a4175] text-white transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0e2d5c]"
         >
           <Send className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </form>
     </div>
   );
