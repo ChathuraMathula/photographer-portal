@@ -13,7 +13,7 @@ import { type Reservation, type Package, type ChatMessage } from "@/types";
 import { type ManualBookingValues } from "@/components/dashboard/ManualBookingModal";
 import { type PackageFormValues } from "@/components/dashboard/PackageFormModal";
 
-const API = "http://localhost:4001";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 type Tab = "reservations" | "calendar" | "packages" | "profile";
 

@@ -11,7 +11,7 @@ import { DatabaseModule } from '../database/database.module';
     DatabaseModule, // Gives us access to the User model
     PassportModule,
     JwtModule.register({
-      secret: 'SUPER_SECRET_KEY_CHANGE_ME',
+      secret: process.env.JWT_SECRET ?? 'SUPER_SECRET_KEY_CHANGE_ME',
       signOptions: { expiresIn: '1d' }, // Token valid for 24 hours
     }),
   ],

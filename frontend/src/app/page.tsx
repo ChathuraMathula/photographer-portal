@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+
 export default function Home() {
   const [status, setStatus] = useState("Connecting...");
 
   useEffect(() => {
-    fetch("http://localhost:4001/health")
+    fetch(`${API}/health`)
       .then((res) => res.json())
       .then((data) => setStatus(data.status))
       .catch(() => setStatus("Backend unreachable ❌"));

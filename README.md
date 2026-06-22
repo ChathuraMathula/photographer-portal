@@ -77,16 +77,32 @@ pgAdmin credentials (defined in `docker-compose.yml`):
 - Username: `admin@photoportal.com`
 - Password: `pgadminsecure123`
 
-### 2. Configure backend environment
+### 2. Configure environment variables
 
+#### Backend configurations
 Create `backend/.env`:
 
 ```env
-JWT_SECRET=your-secret-key-change-in-production
 PORT=4001
+FRONTEND_URL=http://localhost:4000
+
+# Database configurations
+DB_HOST=localhost
+DB_PORT=5433
+DB_USERNAME=admin
+DB_PASSWORD=securepassword123
+DB_DATABASE=portal
+
+# Authentication configs
+JWT_SECRET=SUPER_SECRET_KEY_CHANGE_ME
 ```
 
-*Note: Database connection parameters default to host: `localhost` and port: `5433` for local development.*
+#### Frontend configurations
+Create `frontend/.env`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4001
+```
 
 ### 3. Install dependencies
 

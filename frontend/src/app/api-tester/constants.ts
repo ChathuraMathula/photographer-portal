@@ -1,6 +1,6 @@
 import { Endpoint, SeedAccount } from "./types";
 
-export const API = "http://localhost:4001";
+export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 // Mock/Seeded accounts for easy login
 export const SEED_ACCOUNTS: SeedAccount[] = [

@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         extractJwtFromCookie,
       ]),
       ignoreExpiration: false,
-      secretOrKey: 'SUPER_SECRET_KEY_CHANGE_ME', // TODO: Move to .env
+      secretOrKey: process.env.JWT_SECRET ?? 'SUPER_SECRET_KEY_CHANGE_ME',
     });
   }
 

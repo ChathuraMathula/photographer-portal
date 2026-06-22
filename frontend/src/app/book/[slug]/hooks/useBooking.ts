@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import { type PhotographerProfile } from "@/types";
 import { type AvailabilityValues } from "@/components/booking/AvailabilityForm";
 
-const API = "http://localhost:4001";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 type Step = "availability" | "details" | "confirmed";
 

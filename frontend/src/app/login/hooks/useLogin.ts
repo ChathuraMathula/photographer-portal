@@ -16,6 +16,8 @@ const LoginSchema = Yup.object().shape({
     .required("Password is required"),
 });
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+
 export function useLogin() {
   const [apiError, setApiError] = useState("");
   const router = useRouter();
@@ -31,7 +33,7 @@ export function useLogin() {
       setApiError("");
 
       try {
-        const response = await fetch("http://localhost:4001/auth/login", {
+        const response = await fetch(`${API}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),

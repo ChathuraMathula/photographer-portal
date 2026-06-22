@@ -6,7 +6,7 @@ import { io, Socket } from "socket.io-client";
 
 import { type TrackingReservation, type ChatMessage } from "@/types";
 
-const API = "http://localhost:4001";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 export function useTracking() {
   const params = useParams();
