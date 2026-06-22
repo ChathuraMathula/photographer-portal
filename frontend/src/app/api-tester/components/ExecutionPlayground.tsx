@@ -36,7 +36,7 @@ export function ExecutionPlayground({
   return (
     <CardLayout 
       title="Execution Playground" 
-      desc="Construct and execute live HTTP requests directly into the local port 3000 backend."
+      desc="Construct and execute live HTTP requests directly into the local port 4001 backend."
     >
       <div className="space-y-4">
         

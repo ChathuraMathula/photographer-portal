@@ -32,7 +32,7 @@ A reservation management system for photographers. Super Admins manage photograp
 ```
 photographer-portal/
 ├── docker-compose.yml       # PostgreSQL + pgAdmin + Maildev
-├── backend/                 # NestJS API (port 3000)
+├── backend/                 # NestJS API (port 4001)
 │   ├── src/
 │   │   ├── auth/            # JWT auth, guards, strategies
 │   │   ├── bookings/        # Public booking flow (no auth)
@@ -46,7 +46,7 @@ photographer-portal/
 │   │   ├── seed.ts          # npm run seed entry point
 │   │   └── reset.ts         # npm run db:reset entry point
 │   └── package.json
-└── frontend/                # Next.js app (port 3001)
+└── frontend/                # Next.js app (port 4000)
     └── src/
         ├── app/
         │   ├── login/       # Login page
@@ -83,7 +83,7 @@ Create `backend/.env`:
 
 ```env
 JWT_SECRET=your-secret-key-change-in-production
-PORT=3000
+PORT=4001
 ```
 
 *Note: Database connection parameters default to host: `localhost` and port: `5433` for local development.*
@@ -114,10 +114,10 @@ This creates:
 ### 5. Start the servers
 
 ```bash
-# Backend (port 3000)
+# Backend (port 4001)
 cd backend && npm run start:dev
 
-# Frontend (port 3001) — in a separate terminal
+# Frontend (port 4000) — in a separate terminal
 cd frontend && npm run dev
 ```
 
@@ -127,7 +127,7 @@ cd frontend && npm run dev
 
 ### Admin login
 
-Open `http://localhost:3001/login`
+Open `http://localhost:4000/login`
 
 | Field | Value |
 |---|---|
@@ -139,12 +139,12 @@ Open `http://localhost:3001/login`
 Each photographer has a unique shareable link:
 
 ```
-http://localhost:3001/book/<booking-slug>
+http://localhost:4000/book/<booking-slug>
 ```
 
 Seeded examples:
-- `http://localhost:3001/book/sarah-johnson`
-- `http://localhost:3001/book/michael-fernando`
+- `http://localhost:4000/book/sarah-johnson`
+- `http://localhost:4000/book/michael-fernando`
 
 The booking flow has three steps:
 1. **Check availability** — pick a date, time range, and event type
@@ -221,7 +221,7 @@ Customers do not need an account.
 ## API Documentation & Tester Console
 
 For testing API endpoints, use the interactive panel built directly into the frontend:
-- **URL**: `http://localhost:3001/api-tester`
+- **URL**: `http://localhost:4000/api-tester`
 - **Features**:
   - Displays endpoint metadata, HTTP methods, and required roles.
   - Interactive playground allowing query parameter manipulation and request body configurations.

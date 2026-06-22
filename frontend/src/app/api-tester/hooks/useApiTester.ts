@@ -193,7 +193,7 @@ export function useApiTester() {
       setResponseStatusText("Network Error / Connection Refused");
       setResponseData(JSON.stringify({
         error: "Failed to connect to the backend API.",
-        suggestion: "Ensure the NestJS backend server is running locally at http://localhost:3000.",
+        suggestion: "Ensure the NestJS backend server is running locally at http://localhost:4001.",
         details: err?.message || String(err)
       }, null, 2));
     } finally {

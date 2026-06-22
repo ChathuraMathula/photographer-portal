@@ -1,6 +1,6 @@
 import { Endpoint, SeedAccount } from "./types";
 
-export const API = "http://localhost:3000";
+export const API = "http://localhost:4001";
 
 // Mock/Seeded accounts for easy login
 export const SEED_ACCOUNTS: SeedAccount[] = [

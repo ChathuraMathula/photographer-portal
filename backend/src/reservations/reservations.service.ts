@@ -198,7 +198,7 @@ export class ReservationsService {
     await this.reservationRepository.save(reservation);
 
     // Send email notification to client
-    const trackingLink = `http://localhost:3001/book/track/${reservation.reservationToken}`;
+    const trackingLink = `http://localhost:4000/book/track/${reservation.reservationToken}`;
     await this.emailService.sendQuotationProposed(
       reservation.customer.email,
       `${reservation.customer.firstName} ${reservation.customer.lastName}`,

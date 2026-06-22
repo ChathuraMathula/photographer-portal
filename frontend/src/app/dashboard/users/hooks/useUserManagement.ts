@@ -10,7 +10,7 @@ import { UserRole } from "@/store/slices/authSlice";
 import { type UserAccount } from "@/types";
 import { type CreateUserValues } from "@/components/users/CreateUserModal";
 
-const API = "http://localhost:3000";
+const API = "http://localhost:4001";
 
 const CreateUserSchema = Yup.object().shape({
   firstName: Yup.string().required("First name is required"),

@@ -5,7 +5,7 @@ export default function Home() {
   const [status, setStatus] = useState("Connecting...");
 
   useEffect(() => {
-    fetch("http://localhost:3000/health")
+    fetch("http://localhost:4001/health")
       .then((res) => res.json())
       .then((data) => setStatus(data.status))
       .catch(() => setStatus("Backend unreachable ❌"));
