@@ -84,6 +84,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .emit('message', message);
   }
 
+  @SubscribeMessage('joinPhotographerDashboard')
+  handleJoinPhotographer(
+    @MessageBody() data: { photographerId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(`👤 Photographer ${data.photographerId} joining room: photographer_${data.photographerId}`);
+    client.join(`photographer_${data.photographerId}`);
+    return { status: 'joined' };
+  }
+
   // Live slot status locking:
   @SubscribeMessage('joinBooking')
   handleJoinBooking(

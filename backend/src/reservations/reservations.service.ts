@@ -80,7 +80,10 @@ export class ReservationsService {
   async updateStatus(id: string, status: ReservationStatus, user: JwtUser) {
     const reservation = await this.findOne(id, user);
     reservation.status = status;
-    return this.reservationRepository.save(reservation);
+    const saved = await this.reservationRepository.save(reservation);
+    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', saved);
+    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', saved);
+    return saved;
   }
 
   async createManualBooking(dto: CreateManualBookingDto, user: JwtUser) {
@@ -147,6 +150,9 @@ export class ReservationsService {
 
     await this.reservationRepository.save(reservation);
 
+    // Broadcast new reservation created
+    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationCreated', reservation);
+
     // Broadcast change
     this.chatGateway.broadcastAvailabilityChange(
       profile.bookingSlug,
@@ -197,6 +203,10 @@ export class ReservationsService {
 
     await this.reservationRepository.save(reservation);
 
+    // Broadcast updated reservation
+    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
+
     // Send email notification to client
     const trackingLink = `http://localhost:4000/book/track/${reservation.reservationToken}`;
     await this.emailService.sendQuotationProposed(
@@ -225,6 +235,10 @@ export class ReservationsService {
     reservation.rejectionReason = dto.rejectionReason;
 
     await this.reservationRepository.save(reservation);
+
+    // Broadcast updated reservation
+    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
 
     // Send rejection email to client
     await this.emailService.sendReservationRejected(

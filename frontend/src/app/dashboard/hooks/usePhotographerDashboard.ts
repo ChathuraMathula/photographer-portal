@@ -156,7 +156,44 @@ export function usePhotographerDashboard() {
 
   // ── Chat / Socket.io ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (!selectedRes) {
+    if (!isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
+
+    const socket = io(API);
+    socketRef.current = socket;
+
+    socket.emit("joinPhotographerDashboard", { photographerId: userId });
+
+    socket.on("reservationCreated", (newRes: Reservation) => {
+      setReservations((prev) => {
+        if (prev.some((r) => r.id === newRes.id)) return prev;
+        return [newRes, ...prev];
+      });
+    });
+
+    socket.on("reservationUpdated", (updatedRes: Reservation) => {
+      setReservations((prev) =>
+        prev.map((r) => (r.id === updatedRes.id ? updatedRes : r))
+      );
+      setSelectedRes((prev) =>
+        prev && prev.id === updatedRes.id ? updatedRes : prev
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [isAuthenticated, role, userId]);
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket || !selectedRes) {
       setMessages([]);
       return;
     }
@@ -169,17 +206,18 @@ export function usePhotographerDashboard() {
       })
       .catch(console.error);
 
-    const socket = io(API);
-    socketRef.current = socket;
     socket.emit("joinReservation", { reservationId: selectedRes.id });
-    socket.on("message", (msg: ChatMessage) => {
+
+    const handleMessage = (msg: ChatMessage) => {
       setMessages((prev) => [...prev, msg]);
       scrollToBottom();
-    });
+    };
+
+    socket.on("message", handleMessage);
 
     return () => {
       socket.emit("leaveReservation", { reservationId: selectedRes.id });
-      socket.disconnect();
+      socket.off("message", handleMessage);
     };
   }, [selectedRes]);
 

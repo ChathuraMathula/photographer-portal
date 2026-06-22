@@ -153,6 +153,9 @@ export class BookingsService {
     });
     await this.reservationRepository.save(reservation);
 
+    // Broadcast new reservation created
+    this.chatGateway.server.to(`photographer_${profile.userId}`).emit('reservationCreated', reservation);
+
     // Send email notification to customer
     const trackingLink = `http://localhost:4000/book/track/${token}`;
     await this.emailService.sendBookingReceived(
@@ -289,6 +292,10 @@ export class BookingsService {
     reservation.paymentDeadline = undefined; // Clear lock expiry
 
     await this.reservationRepository.save(reservation);
+
+    // Broadcast updated reservation
+    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
 
     // Send confirmation email to photographer
     await this.emailService.sendReservationConfirmed(

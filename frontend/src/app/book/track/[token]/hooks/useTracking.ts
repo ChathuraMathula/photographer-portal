@@ -63,7 +63,7 @@ export function useTracking() {
 
   // 3. Chat + Socket.io
   useEffect(() => {
-    if (!reservation || !verifiedEmail || !token) return;
+    if (!reservation?.id || !verifiedEmail || !token) return;
     fetch(`${API}/bookings/track/${token}/messages?email=${encodeURIComponent(verifiedEmail)}`)
       .then((r) => r.json())
       .then((data) => {
@@ -75,15 +75,33 @@ export function useTracking() {
     const socket = io(API);
     socketRef.current = socket;
     socket.emit("joinReservation", { reservationId: reservation.id });
+
     socket.on("message", (msg: ChatMessage) => {
       setMessages((prev) => [...prev, msg]);
       scrollToBottom();
     });
+
+    socket.on("reservationUpdated", (updatedRes: any) => {
+      setReservation((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          status: updatedRes.status,
+          advancePaymentPriceInCents: updatedRes.advancePaymentPriceInCents,
+          quotationNotes: updatedRes.quotationNotes,
+          clientSelectedPackageId: updatedRes.clientSelectedPackageId,
+          selectedPackages: updatedRes.selectedPackages,
+          paymentDeadline: updatedRes.paymentDeadline,
+          rejectionReason: updatedRes.rejectionReason,
+        };
+      });
+    });
+
     return () => {
       socket.emit("leaveReservation", { reservationId: reservation.id });
       socket.disconnect();
     };
-  }, [reservation, verifiedEmail, token]);
+  }, [reservation?.id, verifiedEmail, token]);
 
   const scrollToBottom = () => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
