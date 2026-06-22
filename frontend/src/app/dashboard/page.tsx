@@ -5,7 +5,7 @@ import { UserRole } from "@/store/slices/authSlice";
 
 // Dashboard sub-components
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
-import { DashboardNav } from "@/components/dashboard/DashboardNav";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PhotographerBanner } from "@/components/dashboard/PhotographerBanner";
 import { ReservationList } from "@/components/dashboard/ReservationList";
 import { CustomerDetailsCard } from "@/components/dashboard/CustomerDetailsCard";
@@ -83,14 +83,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <DashboardNav
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onLogout={handleLogout}
-      />
-
-      <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
+    <DashboardLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onLogout={handleLogout}
+      userName={firstName ?? ""}
+      userRole={role ?? ""}
+    >
+      <div className="space-y-6">
         <PhotographerBanner
           firstName={firstName ?? ""}
           profileAvailability={profileAvailability}
@@ -238,6 +238,6 @@ export default function DashboardPage() {
           onClose={() => setShowPackageModal(false)}
         />
       )}
-    </main>
+    </DashboardLayout>
   );
 }
