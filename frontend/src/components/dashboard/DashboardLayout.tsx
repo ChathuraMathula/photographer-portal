@@ -102,7 +102,7 @@ export function DashboardLayout({
 
       {/* ── Desktop Sidebar ───────────────────────────────────────────────── */}
       <aside
-        className={`hidden md:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-all duration-300 ease-in-out shrink-0 sticky top-0 h-screen z-30 ${
+        className={`hidden lg:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-all duration-300 ease-in-out shrink-0 sticky top-0 h-screen z-30 ${
           isCollapsed ? "w-16" : "w-64"
         }`}
       >
@@ -153,7 +153,7 @@ export function DashboardLayout({
 
       {/* ── Mobile Sidebar Drawer ─────────────────────────────────────────── */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden flex">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
@@ -221,7 +221,7 @@ export function DashboardLayout({
             {/* Desktop collapse toggle */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden md:flex h-9 w-9 items-center justify-center text-zinc-500 hover:bg-zinc-100 rounded-lg mr-3 cursor-pointer"
+              className="hidden lg:flex h-9 w-9 items-center justify-center text-zinc-500 hover:bg-zinc-100 rounded-lg mr-3 cursor-pointer"
             >
               {isCollapsed ? (
                 <ChevronRight className="h-5 w-5" />
@@ -233,12 +233,12 @@ export function DashboardLayout({
             {/* Mobile hamburger */}
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="flex md:hidden h-9 w-9 items-center justify-center text-zinc-500 hover:bg-zinc-100 rounded-lg mr-3 cursor-pointer"
+              className="flex lg:hidden h-9 w-9 items-center justify-center text-zinc-500 hover:bg-zinc-100 rounded-lg mr-3 cursor-pointer"
             >
               <Menu className="h-5 w-5" />
             </button>
 
-            <span className="h-5 w-[1px] bg-zinc-200 mr-4 hidden md:inline" />
+            <span className="h-5 w-[1px] bg-zinc-200 mr-4 hidden lg:inline" />
 
             {/* Page title */}
             <h2 className="font-extrabold text-lg sm:text-xl tracking-tight text-zinc-900 title-font">
@@ -265,7 +265,7 @@ export function DashboardLayout({
         </header>
 
         {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto focus:outline-none bg-zinc-50 p-4 sm:p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto focus:outline-none bg-zinc-50 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

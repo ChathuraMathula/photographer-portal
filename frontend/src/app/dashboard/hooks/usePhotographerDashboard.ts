@@ -154,6 +154,19 @@ export function usePhotographerDashboard() {
     }
   }, [isAuthenticated, role, userId]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const resId = params.get("id");
+      if (resId && reservations.length > 0) {
+        const found = reservations.find((r) => r.id === resId);
+        if (found) {
+          setSelectedRes(found);
+        }
+      }
+    }
+  }, [reservations]);
+
   // ── Chat / Socket.io ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {

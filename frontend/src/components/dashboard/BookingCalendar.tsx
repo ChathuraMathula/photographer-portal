@@ -16,6 +16,7 @@ type Props = {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onDayReservationClick: (res: Reservation) => void;
+  onDayClick: (date: Date) => void;
 };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -46,6 +47,7 @@ export function BookingCalendar({
   onPrevMonth,
   onNextMonth,
   onDayReservationClick,
+  onDayClick,
 }: Props) {
   const days = generateCalendarDays(currentDate);
 
@@ -123,10 +125,11 @@ export function BookingCalendar({
             return (
               <div
                 key={day.toISOString()}
-                className={`border p-2 rounded-xl min-h-[75px] text-left relative flex flex-col justify-between transition-colors ${
+                onClick={() => onDayClick(day)}
+                className={`border p-2 rounded-xl min-h-[75px] text-left relative flex flex-col justify-between transition-colors cursor-pointer ${
                   isToday
-                    ? "border-primary-dark bg-zinc-50/50 dark:border-white dark:bg-zinc-900"
-                    : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700"
+                    ? "border-primary-dark bg-zinc-50/50 dark:border-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20"
                 }`}
               >
                 <span
@@ -140,7 +143,10 @@ export function BookingCalendar({
                   {dayRes.map((r) => (
                     <div
                       key={r.id}
-                      onClick={() => onDayReservationClick(r)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDayReservationClick(r);
+                      }}
                       className="cursor-pointer hover:opacity-80"
                     >
                       <StatusPill status={r.status} />
