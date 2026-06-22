@@ -38,9 +38,18 @@ export default function UserManagementPage() {
     handleRemoveSpec,
   } = useUserManagement();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Backend logout error:", err);
+    }
     dispatch(logout());
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const handleTabChange = (tab: string) => {

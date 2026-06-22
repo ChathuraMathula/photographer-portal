@@ -14,6 +14,7 @@ type Props = {
   bio: string;
   location: string;
   portfolio: string;
+  bookingSlug?: string;
   onBioChange: (v: string) => void;
   onLocationChange: (v: string) => void;
   onPortfolioChange: (v: string) => void;
@@ -24,6 +25,7 @@ export function ProfileSettingsForm({
   bio,
   location,
   portfolio,
+  bookingSlug,
   onBioChange,
   onLocationChange,
   onPortfolioChange,
@@ -38,7 +40,36 @@ export function ProfileSettingsForm({
         </CardDescription>
       </CardHeader>
       <form onSubmit={onSubmit}>
-        <CardContent className="space-y-4 pt-6">
+        <CardContent className="space-y-6 pt-6">
+          {bookingSlug && (
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 space-y-2">
+              <Label className="text-body-small-s font-semibold text-primary-dark dark:text-primary-light">
+                Your Public Booking Page Link
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={typeof window !== "undefined" ? `${window.location.origin}/book/${bookingSlug}` : ""}
+                  className="h-11 rounded-xl bg-white dark:bg-zinc-950 font-mono text-xs border-zinc-200 dark:border-zinc-800 focus-visible:ring-0 focus-visible:ring-offset-0 select-all cursor-text"
+                />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const url = `${window.location.origin}/book/${bookingSlug}`;
+                    navigator.clipboard.writeText(url);
+                    alert("Public booking link copied to clipboard!");
+                  }}
+                  className="btn btn-outline h-11 px-4 py-0 min-w-0 md:min-w-0 font-medium text-sm text-zinc-700 dark:text-zinc-300 shadow-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                >
+                  Copy Link
+                </Button>
+              </div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                Share this link with your customers so they can view your availability, packages, and submit booking requests directly.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="profBio" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Short Biography</Label>
             <textarea

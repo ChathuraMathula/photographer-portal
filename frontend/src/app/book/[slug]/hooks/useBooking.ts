@@ -13,8 +13,30 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 type Step = "availability" | "details" | "confirmed";
 
 const AvailabilitySchema = Yup.object({
-  date: Yup.string().required("Date is required"),
-  startTime: Yup.string().required("Start time is required"),
+  date: Yup.string()
+    .required("Date is required")
+    .test("not-past", "Date cannot be in the past", function (value) {
+      if (!value) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selected = new Date(value);
+      selected.setHours(0, 0, 0, 0);
+      return selected >= today;
+    }),
+  startTime: Yup.string()
+    .required("Start time is required")
+    .test("not-past-time", "Start time cannot be in the past", function (value) {
+      if (!value) return false;
+      const { date } = this.parent;
+      if (!date) return true;
+      const today = new Date();
+      const todayStr = today.toLocaleDateString("en-CA");
+      if (date === todayStr) {
+        const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
+        return value >= currentTime;
+      }
+      return true;
+    }),
   endTime: Yup.string()
     .required("End time is required")
     .test("after-start", "End time must be after start time", function (v) {

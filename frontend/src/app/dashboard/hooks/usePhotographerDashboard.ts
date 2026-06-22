@@ -22,8 +22,30 @@ const ManualBookingSchema = Yup.object().shape({
   lastName: Yup.string().required("Last name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phone: Yup.string().required("Phone is required"),
-  date: Yup.string().required("Date is required"),
-  startTime: Yup.string().required("Start time is required"),
+  date: Yup.string()
+    .required("Date is required")
+    .test("not-past", "Date cannot be in the past", function (value) {
+      if (!value) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selected = new Date(value);
+      selected.setHours(0, 0, 0, 0);
+      return selected >= today;
+    }),
+  startTime: Yup.string()
+    .required("Start time is required")
+    .test("not-past-time", "Start time cannot be in the past", function (value) {
+      if (!value) return false;
+      const { date } = this.parent;
+      if (!date) return true;
+      const today = new Date();
+      const todayStr = today.toLocaleDateString("en-CA");
+      if (date === todayStr) {
+        const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
+        return value >= currentTime;
+      }
+      return true;
+    }),
   endTime: Yup.string()
     .required("End time is required")
     .test("after-start", "End time must be after start time", function (v) {
@@ -87,6 +109,7 @@ export function usePhotographerDashboard() {
   const [profileLocation, setProfileLocation] = useState("");
   const [profilePortfolio, setProfilePortfolio] = useState("");
   const [profileAvailability, setProfileAvailability] = useState(true);
+  const [bookingSlug, setBookingSlug] = useState("");
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -99,6 +122,7 @@ export function usePhotographerDashboard() {
   // ── Data loading ──────────────────────────────────────────────────────────
   const loadPhotographerData = async () => {
     if (role !== UserRole.PHOTOGRAPHER) return;
+    if (!userId || userId === "null" || userId === "undefined") return;
     try {
       const [resRes, pkgRes, profRes] = await Promise.all([
         fetch(`${API}/reservations`, { credentials: "include" }),
@@ -117,6 +141,7 @@ export function usePhotographerDashboard() {
         setProfileLocation(profData.baseLocation || "");
         setProfilePortfolio(profData.portfolioUrl || "");
         setProfileAvailability(profData.isAvailableForBooking);
+        setBookingSlug(profData.bookingSlug || "");
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);
@@ -163,9 +188,17 @@ export function usePhotographerDashboard() {
   };
 
   // ── Actions ───────────────────────────────────────────────────────────────
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Backend logout error:", err);
+    }
     dispatch(logout());
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const handleSendChatMessage = async (e: React.FormEvent) => {
@@ -401,6 +434,7 @@ export function usePhotographerDashboard() {
     profilePortfolio,
     setProfilePortfolio,
     profileAvailability,
+    bookingSlug,
     currentDate,
     setCurrentDate,
     handleLogout,

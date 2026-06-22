@@ -85,6 +85,7 @@ export function ManualBookingModal({ formik, onClose }: Props) {
               <Input
                 id="mb-date"
                 type="date"
+                min={new Date().toLocaleDateString("en-CA")}
                 {...formik.getFieldProps("date")}
                 className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />

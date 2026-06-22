@@ -140,15 +140,6 @@ export function DashboardLayout({
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-zinc-200/50 space-y-1.5">
           <button
-            onClick={() => alert("Frequently Asked Questions coming soon!")}
-            title={isCollapsed ? "FAQs" : undefined}
-            className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950 transition-all duration-200 cursor-pointer"
-          >
-            <HelpCircle className="h-5 w-5 shrink-0" />
-            {!isCollapsed && <span className="truncate">FAQs</span>}
-          </button>
-
-          <button
             id="sidebar-logout-btn"
             onClick={handleLogoutRequest}
             title={isCollapsed ? "Log out" : undefined}
@@ -210,17 +201,6 @@ export function DashboardLayout({
             {/* Mobile Footer */}
             <div className="space-y-1.5 pt-4 border-t border-zinc-200/50">
               <button
-                onClick={() => {
-                  alert("Frequently Asked Questions coming soon!");
-                  setIsMobileOpen(false);
-                }}
-                className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950 transition-all duration-200 cursor-pointer"
-              >
-                <HelpCircle className="h-5 w-5 shrink-0" />
-                <span>FAQs</span>
-              </button>
-
-              <button
                 id="mobile-sidebar-logout-btn"
                 onClick={handleLogoutRequest}
                 className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
@@ -268,7 +248,17 @@ export function DashboardLayout({
 
           <div className="flex items-center gap-3">
             <span className="h-8 w-[1px] bg-zinc-200" />
-            <div className="h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-sm text-zinc-800 shadow-inner">
+            <div
+              onClick={() => {
+                if (userRole === "PHOTOGRAPHER") {
+                  onTabChange("profile");
+                }
+              }}
+              title={userRole === "PHOTOGRAPHER" ? "View Profile" : undefined}
+              className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-sm text-zinc-800 shadow-inner ${
+                userRole === "PHOTOGRAPHER" ? "cursor-pointer hover:bg-zinc-200 transition-colors" : ""
+              }`}
+            >
               {userName ? userName[0].toUpperCase() : "P"}
             </div>
           </div>
