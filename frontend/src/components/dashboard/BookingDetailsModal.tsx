@@ -1,0 +1,213 @@
+import { type Reservation } from "@/types";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, HelpCircle, X } from "lucide-react";
+
+type Props = {
+  reservation: Reservation;
+  onClose: () => void;
+  onNavigateToReservation: (res: Reservation) => void;
+};
+
+export function BookingDetailsModal({
+  reservation,
+  onClose,
+  onNavigateToReservation,
+}: Props) {
+  const formattedDate = new Date(reservation.date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 space-y-6">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b pb-4 dark:border-zinc-800">
+          <div className="space-y-1">
+            <h2 className="text-title-medium text-primary-dark dark:text-white">
+              Booking Details
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-body-caption text-zinc-400">Current Status:</span>
+              <StatusBadge status={reservation.status} />
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-9 w-9 p-0 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-6 text-zinc-655 dark:text-zinc-400">
+          
+          {/* Client Details Section */}
+          <div className="space-y-3">
+            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2">
+              <User className="h-4 w-4 text-zinc-450" /> Client Profile
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+              <div>
+                <p className="text-body-caption font-semibold text-zinc-400">Full Name</p>
+                <p className="text-body-small-s font-semibold text-zinc-950 dark:text-white">
+                  {reservation.customer.firstName} {reservation.customer.lastName}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-body-caption font-semibold text-zinc-400">Contacts</p>
+                <p className="text-body-small-s text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 truncate">
+                  <Mail className="h-3 w-3 text-zinc-400" /> {reservation.customer.email}
+                </p>
+                <p className="text-body-small-s text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                  <Phone className="h-3 w-3 text-zinc-400" /> {reservation.customer.phone}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Event Details Section */}
+          <div className="space-y-3">
+            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-zinc-450" /> Event Metadata
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+              <div className="space-y-2">
+                <div>
+                  <p className="text-body-caption font-semibold text-zinc-400">Event Date</p>
+                  <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-zinc-400" /> {formattedDate}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-body-caption font-semibold text-zinc-400">Time Range</p>
+                  <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-zinc-400" /> {reservation.startTime} – {reservation.endTime}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <p className="text-body-caption font-semibold text-zinc-400">Event Type</p>
+                  <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <Tag className="h-3.5 w-3.5 text-zinc-400" /> {reservation.eventType}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-body-caption font-semibold text-zinc-400">Location</p>
+                  <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-zinc-400" /> {reservation.location || "Offline / Not Provided"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Client Notes */}
+          {reservation.customerNotes && (
+            <div className="space-y-1.5 border-t border-zinc-150 dark:border-zinc-800/80 pt-4">
+              <p className="text-body-caption font-semibold text-zinc-400">Client's Event Notes</p>
+              <p className="text-body-small italic text-zinc-600 dark:text-zinc-350 bg-zinc-50/50 dark:bg-zinc-950/20 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+                "{reservation.customerNotes}"
+              </p>
+            </div>
+          )}
+
+          {/* Proposal / Package selections details */}
+          {(reservation.selectedPackages && reservation.selectedPackages.length > 0 || reservation.totalAmountInCents) && (
+            <div className="space-y-3 border-t border-zinc-150 dark:border-zinc-800/80 pt-4">
+              <h3 className="text-body-base-bold text-primary-dark dark:text-white">
+                Proposal &amp; Package Details
+              </h3>
+              <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+                {reservation.clientSelectedPackageId && reservation.selectedPackages && (
+                  <div>
+                    <p className="text-body-caption font-semibold text-zinc-400">Selected Option</p>
+                    <p className="text-body-small-s font-semibold text-primary-dark dark:text-white">
+                      {reservation.selectedPackages.find(p => p.id === reservation.clientSelectedPackageId)?.name || "Standard Option"}
+                    </p>
+                  </div>
+                )}
+                {reservation.selectedPackages && reservation.selectedPackages.length > 0 && !reservation.clientSelectedPackageId && (
+                  <div>
+                    <p className="text-body-caption font-semibold text-zinc-400">Proposed Packages</p>
+                    <ul className="list-disc pl-5 mt-1 space-y-1 text-body-small-s text-zinc-700 dark:text-zinc-300">
+                      {reservation.selectedPackages.map((pkg) => (
+                        <li key={pkg.id}>
+                          <strong>{pkg.name}</strong> – LKR {(pkg.priceInCents / 100).toLocaleString()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2">
+                  {reservation.totalAmountInCents && (
+                    <div>
+                      <p className="text-body-caption font-semibold text-zinc-400">Total Price</p>
+                      <p className="text-body-small-s font-bold text-zinc-950 dark:text-white">
+                        LKR {(reservation.totalAmountInCents / 100).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  {reservation.advancePaymentPriceInCents && (
+                    <div>
+                      <p className="text-body-caption font-semibold text-zinc-400">Advance Requested</p>
+                      <p className="text-body-small-s font-bold text-zinc-950 dark:text-white">
+                        LKR {(reservation.advancePaymentPriceInCents / 100).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {reservation.quotationNotes && (
+                  <div className="border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2">
+                    <p className="text-body-caption font-semibold text-zinc-400">Quotation Notes</p>
+                    <p className="text-body-small-s italic text-zinc-550 dark:text-zinc-400">
+                      "{reservation.quotationNotes}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Rejection Details */}
+          {reservation.rejectionReason && (
+            <div className="space-y-1.5 border-t border-zinc-150 dark:border-zinc-800/80 pt-4">
+              <p className="text-body-caption font-semibold text-zinc-400">Rejection Reason</p>
+              <p className="text-body-small text-red-650 dark:text-red-400 bg-red-50/30 dark:bg-red-950/10 p-3 rounded-xl border border-red-100/55 dark:border-red-900/35 italic">
+                "{reservation.rejectionReason}"
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer / Actions */}
+        <div className="border-t border-zinc-100 dark:border-zinc-850 pt-4 dark:border-zinc-800 flex flex-col sm:flex-row justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="btn btn-secondary h-11 px-6 text-sm"
+          >
+            Close Dialog
+          </Button>
+          <Button
+            type="button"
+            onClick={() => onNavigateToReservation(reservation)}
+            className="btn btn-primary h-11 px-6 text-sm shadow-sm font-semibold"
+          >
+            View Reservation &amp; Chat
+          </Button>
+        </div>
+
+      </div>
+    </div>
+  );
+}

@@ -3,7 +3,7 @@
 import { usePhotographerDashboard } from "@/app/dashboard/hooks/usePhotographerDashboard";
 import { UserRole } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Dashboard sub-components
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -18,6 +18,8 @@ import { ProfileSettingsForm } from "@/components/dashboard/ProfileSettingsForm"
 import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
 import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
 import { ChatBox } from "@/components/common/ChatBox";
+import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal";
+import { type Reservation } from "@/types";
 
 type Props = {
   activeTab: "reservations" | "calendar" | "packages" | "profile";
@@ -25,6 +27,7 @@ type Props = {
 
 export function PhotographerDashboard({ activeTab }: Props) {
   const router = useRouter();
+  const [calendarSelectedRes, setCalendarSelectedRes] = useState<Reservation | null>(null);
   const {
     firstName,
     role,
@@ -110,9 +113,9 @@ export function PhotographerDashboard({ activeTab }: Props) {
 
         {/* ── Reservations Tab ── */}
         {activeTab === "reservations" && (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-3">
             {/* Left list */}
-            <div className="md:col-span-1">
+            <div className="lg:col-span-1">
               <ReservationList
                 reservations={reservations}
                 selectedId={selectedRes?.id}
@@ -124,9 +127,9 @@ export function PhotographerDashboard({ activeTab }: Props) {
             </div>
 
             {/* Right details pane */}
-            <div className="md:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-4">
               {selectedRes ? (
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 xl:grid-cols-2">
                   {/* Summary & Actions */}
                   <div className="space-y-4">
                     <CustomerDetailsCard reservation={selectedRes} />
@@ -197,8 +200,7 @@ export function PhotographerDashboard({ activeTab }: Props) {
               )
             }
             onDayReservationClick={(res) => {
-              setSelectedRes(res);
-              router.push("/dashboard/reservations");
+              setCalendarSelectedRes(res);
             }}
           />
         )}
@@ -234,6 +236,17 @@ export function PhotographerDashboard({ activeTab }: Props) {
       </div>
 
       {/* Modals */}
+      {calendarSelectedRes && (
+        <BookingDetailsModal
+          reservation={calendarSelectedRes}
+          onClose={() => setCalendarSelectedRes(null)}
+          onNavigateToReservation={(res) => {
+            setSelectedRes(res);
+            setCalendarSelectedRes(null);
+            router.push("/dashboard/reservations");
+          }}
+        />
+      )}
       {showManualModal && (
         <ManualBookingModal
           formik={manualFormik}

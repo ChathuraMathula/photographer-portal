@@ -138,7 +138,7 @@ export class ReservationsService {
     const reservation = this.reservationRepository.create({
       customerId: customer.id,
       photographerId: user.userId,
-      date: new Date(dto.date),
+      date: dto.date as any,
       startTime: dto.startTime,
       endTime: dto.endTime,
       eventType: dto.eventType,

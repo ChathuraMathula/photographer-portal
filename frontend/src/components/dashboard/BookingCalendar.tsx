@@ -49,10 +49,17 @@ export function BookingCalendar({
 }: Props) {
   const days = generateCalendarDays(currentDate);
 
+  const formatDateLocal = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const dateStr = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${dateStr}`;
+  };
+
   const getReservationsForDay = (day: Date) => {
-    const formatted = day.toISOString().split("T")[0];
+    const formatted = formatDateLocal(day);
     return reservations.filter((r) => {
-      const resDate = new Date(r.date).toISOString().split("T")[0];
+      const resDate = typeof r.date === "string" ? r.date.split("T")[0] : formatDateLocal(new Date(r.date));
       return resDate === formatted;
     });
   };
