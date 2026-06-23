@@ -32,7 +32,7 @@ export function ReservationListItem({ reservation: res, isSelected, onSelect }: 
     >
       <div className="flex justify-between items-start gap-1">
         <span className="text-body-small-s font-semibold text-zinc-950 dark:text-white truncate flex items-center gap-2">
-          {res.customer.firstName} {res.customer.lastName}
+          {res.customer?.firstName ?? ""} {res.customer?.lastName ?? "Customer"}
           {unreadCount > 0 && (
             <span className="bg-red-500 text-white text-body-caption font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center animate-pulse">
               {unreadCount}

@@ -151,6 +151,9 @@ export class ReservationsService {
 
     await this.reservationRepository.save(reservation);
 
+    // Populate customer relation for the socket broadcast
+    reservation.customer = customer;
+
     // Broadcast new reservation created
     this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationCreated', reservation);
 
