@@ -65,6 +65,8 @@ export default function BookingPage() {
             photographerFirstName={profile.firstName}
             availabilityError={availabilityError}
             today={today}
+            allowedEventTypes={profile.allowedEventTypes}
+            allowCustomEventTypes={profile.allowCustomEventTypes}
           />
         )}
 

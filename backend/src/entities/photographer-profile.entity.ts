@@ -35,6 +35,12 @@ export class PhotographerProfile {
   @Column({ default: true })
   isAvailableForBooking!: boolean;
 
+  @Column({ type: 'simple-array', default: '' })
+  allowedEventTypes!: string[];
+
+  @Column({ default: true })
+  allowCustomEventTypes!: boolean;
+
   @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;

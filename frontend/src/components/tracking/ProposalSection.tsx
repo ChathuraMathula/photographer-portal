@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 import { ProposalPackageCard } from "./ProposalPackageCard";
+import { CountdownTimer } from "./CountdownTimer";
 
 type Props = {
   reservation: TrackingReservation;
@@ -28,11 +29,10 @@ export function ProposalSection({
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-title-medium text-primary-dark dark:text-white">Photographer Proposal</CardTitle>
-        {reservation.status === "PROPOSED" && (
-          <CardDescription className="flex items-center gap-1.5 text-red-650 dark:text-red-400 text-body-small-s font-semibold">
-            <Clock className="h-4 w-4 animate-pulse shrink-0" />
-            Slot locked: {getDeadlineText(reservation.paymentDeadline)}
-          </CardDescription>
+        {reservation.status === "PROPOSED" && reservation.paymentDeadline && (
+          <div className="pt-2">
+            <CountdownTimer deadline={reservation.paymentDeadline} />
+          </div>
         )}
         {reservation.quotationNotes && (
           <div className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800/50 p-4 rounded-xl text-body-small italic text-zinc-650 dark:text-zinc-300 mt-3">

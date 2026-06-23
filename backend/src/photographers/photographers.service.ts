@@ -46,6 +46,8 @@ export class PhotographersService {
       'profileImageUrl',
       'baseLocation',
       'isAvailableForBooking',
+      'allowedEventTypes',
+      'allowCustomEventTypes',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),

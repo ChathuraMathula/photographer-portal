@@ -66,6 +66,9 @@ export type PhotographerProfile = {
   specializations: string[];
   baseLocation?: string;
   isAvailableForBooking: boolean;
+  profileImageUrl?: string;
+  allowedEventTypes?: string[];
+  allowCustomEventTypes?: boolean;
 };
 
 export type TrackingReservation = {

@@ -76,6 +76,12 @@ export function PhotographerDashboard({ activeTab }: Props) {
     manualFormik,
     packageFormik,
     chatDisabled,
+    profileImageUrl,
+    setProfileImageUrl,
+    allowedEventTypes,
+    setAllowedEventTypes,
+    allowCustomEventTypes,
+    setAllowCustomEventTypes,
   } = usePhotographerDashboard();
 
   useEffect(() => {
@@ -183,6 +189,12 @@ export function PhotographerDashboard({ activeTab }: Props) {
             onLocationChange={setProfileLocation}
             onPortfolioChange={setProfilePortfolio}
             onSubmit={handleSaveProfile}
+            profileImageUrl={profileImageUrl}
+            onProfileImageUrlChange={setProfileImageUrl}
+            allowedEventTypes={allowedEventTypes}
+            onAllowedEventTypesChange={setAllowedEventTypes}
+            allowCustomEventTypes={allowCustomEventTypes}
+            onAllowCustomEventTypesChange={setAllowCustomEventTypes}
           />
         )}
       </div>

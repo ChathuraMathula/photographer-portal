@@ -55,6 +55,8 @@ export class BookingsService {
       profileImageUrl: profile.profileImageUrl,
       baseLocation: profile.baseLocation,
       isAvailableForBooking: profile.isAvailableForBooking,
+      allowedEventTypes: profile.allowedEventTypes,
+      allowCustomEventTypes: profile.allowCustomEventTypes,
     };
   }
 

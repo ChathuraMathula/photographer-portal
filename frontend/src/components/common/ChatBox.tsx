@@ -31,6 +31,14 @@ export function ChatBox({
   const lastResIdRef = useRef<string | null>(null);
   const [initialLastViewed, setInitialLastViewed] = useState<string | null>(null);
 
+  // Scroll to bottom on message load and updates
+  useEffect(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [messages]);
+
+  // Set initial last viewed state on reservation ID changes
   useEffect(() => {
     if (reservationId) {
       if (reservationId !== lastResIdRef.current) {
@@ -39,7 +47,7 @@ export function ChatBox({
         const stored = localStorage.getItem(key);
         setInitialLastViewed(stored || new Date(0).toISOString());
 
-        // Mark all messages as read after 2 seconds
+        // Mark as read after 2s delay
         const timer = setTimeout(() => {
           localStorage.setItem(key, new Date().toISOString());
         }, 2000);
@@ -50,6 +58,14 @@ export function ChatBox({
       setInitialLastViewed(null);
     }
   }, [reservationId, myRole]);
+
+  // Keep local storage read indicator updated in real-time as messages arrive
+  useEffect(() => {
+    if (reservationId && messages.length > 0) {
+      const key = `chat_last_viewed_${myRole.toLowerCase()}_${reservationId}`;
+      localStorage.setItem(key, new Date().toISOString());
+    }
+  }, [messages.length, reservationId, myRole]);
 
   const firstUnreadIndex = messages.findIndex(
     (msg) =>

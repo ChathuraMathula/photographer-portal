@@ -110,6 +110,9 @@ export function usePhotographerDashboard() {
   const [profilePortfolio, setProfilePortfolio] = useState("");
   const [profileAvailability, setProfileAvailability] = useState(true);
   const [bookingSlug, setBookingSlug] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [allowedEventTypes, setAllowedEventTypes] = useState<string[]>([]);
+  const [allowCustomEventTypes, setAllowCustomEventTypes] = useState(true);
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -142,6 +145,9 @@ export function usePhotographerDashboard() {
         setProfilePortfolio(profData.portfolioUrl || "");
         setProfileAvailability(profData.isAvailableForBooking);
         setBookingSlug(profData.bookingSlug || "");
+        setProfileImageUrl(profData.profileImageUrl || "");
+        setAllowedEventTypes(profData.allowedEventTypes || []);
+        setAllowCustomEventTypes(profData.allowCustomEventTypes !== false);
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);
@@ -351,6 +357,9 @@ export function usePhotographerDashboard() {
           bio: profileBio,
           baseLocation: profileLocation,
           portfolioUrl: profilePortfolio,
+          profileImageUrl,
+          allowedEventTypes,
+          allowCustomEventTypes,
         }),
         credentials: "include",
       });
@@ -535,5 +544,11 @@ export function usePhotographerDashboard() {
     manualFormik,
     packageFormik,
     chatDisabled,
+    profileImageUrl,
+    setProfileImageUrl,
+    allowedEventTypes,
+    setAllowedEventTypes,
+    allowCustomEventTypes,
+    setAllowCustomEventTypes,
   };
 }
