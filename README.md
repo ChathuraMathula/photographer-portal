@@ -94,6 +94,20 @@ To access and manage the database via the pgAdmin web UI:
      - Check **Save password?**
    - Click **Save**.
 
+### Navigating the Database & Generating ERDs
+
+Once connected to the server in pgAdmin, navigate the sidebar tree to view your tables, data, and entity diagrams:
+
+* **View Tables**:
+  1. Expand **Servers** > **Photographer Portal** *(or your custom server name)*.
+  2. Expand **Databases** > **portal**.
+  3. Expand **Schemas** > **public**.
+  4. Expand **Tables** to see all tables (e.g., `users`, `reservations`, `photographer_profiles`, etc.).
+* **View Table Data**:
+  * Right-click any table (e.g., `users`) > **View/Edit Data** > **All Rows** (or use the Query Tool and run `SELECT * FROM table_name;`).
+* **Generate Entity Relationship Diagram (ERD)**:
+  * Right-click the **portal** database name > select **ERD Tool**. This opens pgAdmin's automatic schema visualizer showing table keys, columns, types, and relations.
+
 ### 2. Configure environment variables
 
 #### Backend configurations
