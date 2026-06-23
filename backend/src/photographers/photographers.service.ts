@@ -50,6 +50,8 @@ export class PhotographersService {
       'isAvailableForBooking',
       'allowedEventTypes',
       'allowCustomEventTypes',
+      'universalDepositType',
+      'universalDepositValue',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),

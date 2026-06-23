@@ -48,6 +48,12 @@ export class PhotographerProfile {
   @Column()
   userId!: string;
 
+  @Column({ default: 'fixed' })
+  universalDepositType!: string;
+
+  @Column({ type: 'integer', default: 500000 })
+  universalDepositValue!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

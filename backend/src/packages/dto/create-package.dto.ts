@@ -28,4 +28,13 @@ export class CreatePackageDto {
   @IsString({ each: true })
   @IsOptional()
   includes?: string[];
+
+  @IsString()
+  @IsOptional()
+  depositType?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  depositValue?: number;
 }

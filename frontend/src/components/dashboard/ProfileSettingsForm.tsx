@@ -12,6 +12,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Copy, Check, Upload, X, Plus, Image as ImageIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Props = {
   bio: string;
@@ -28,6 +35,10 @@ type Props = {
   onAllowedEventTypesChange: (v: string[]) => void;
   allowCustomEventTypes: boolean;
   onAllowCustomEventTypesChange: (v: boolean) => void;
+  universalDepositType: string;
+  universalDepositValue: number;
+  onUniversalDepositTypeChange: (v: string) => void;
+  onUniversalDepositValueChange: (v: number) => void;
 };
 
 const PREDEFINED_EVENT_TYPES = [
@@ -57,6 +68,10 @@ export function ProfileSettingsForm({
   onAllowedEventTypesChange,
   allowCustomEventTypes,
   onAllowCustomEventTypesChange,
+  universalDepositType,
+  universalDepositValue,
+  onUniversalDepositTypeChange,
+  onUniversalDepositValueChange,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [customTypeInput, setCustomTypeInput] = useState("");
@@ -297,6 +312,54 @@ export function ProfileSettingsForm({
                 placeholder="e.g. https://myportfolio.com"
                 className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
+            </div>
+          </div>
+
+          {/* Universal Advanced Payment Settings */}
+          <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            <div>
+              <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                Universal Advanced Payment (Default Deposit)
+              </Label>
+              <p className="text-body-caption text-zinc-455 dark:text-zinc-500 mt-0.5">
+                Configure a default deposit amount (fixed LKR or percentage of total package price) used when sending proposals.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="universalDepositType" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                  Deposit Rule Type
+                </Label>
+                <Select
+                  value={universalDepositType}
+                  onValueChange={onUniversalDepositTypeChange}
+                >
+                  <SelectTrigger className="h-[50px] bg-white dark:bg-zinc-950 text-body-small border-zinc-200 dark:border-zinc-800 rounded-xl cursor-pointer">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                    <SelectItem value="fixed" className="cursor-pointer">Fixed Price (LKR)</SelectItem>
+                    <SelectItem value="percentage" className="cursor-pointer">Percentage (%)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="universalDepositValue" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                  {universalDepositType === "fixed" ? "Deposit Amount (LKR)" : "Deposit Percentage (%)"}
+                </Label>
+                <Input
+                  id="universalDepositValue"
+                  type="number"
+                  min="0"
+                  max={universalDepositType === "percentage" ? "100" : undefined}
+                  value={universalDepositValue}
+                  onChange={(e) => onUniversalDepositValueChange(Number(e.target.value))}
+                  placeholder={universalDepositType === "fixed" ? "e.g. 5000" : "e.g. 10"}
+                  className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                />
+              </div>
             </div>
           </div>
 

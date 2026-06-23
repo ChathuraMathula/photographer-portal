@@ -233,9 +233,9 @@ export function BookingCalendar({
         </div>
 
         {/* Filter bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 mt-2 bg-zinc-50/50 dark:bg-zinc-950/30 border border-zinc-150/70 dark:border-zinc-850/70 rounded-xl">
           {/* Status Select */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Status Filter</span>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
@@ -252,7 +252,7 @@ export function BookingCalendar({
           </div>
 
           {/* Event Type Select */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Event Type</span>
             <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
               <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
@@ -269,7 +269,7 @@ export function BookingCalendar({
           </div>
 
           {/* Search Input */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Search Bookings</span>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
@@ -278,7 +278,7 @@ export function BookingCalendar({
                 placeholder="Search by client or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 pl-9 text-body-caption bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-lg"
+                className="h-10 pl-9 text-body-caption bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-lg focus-visible:ring-1 focus-visible:ring-[#0e2d5c] dark:focus-visible:ring-white"
               />
             </div>
           </div>

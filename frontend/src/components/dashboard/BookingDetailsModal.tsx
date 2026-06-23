@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, HelpCircle, X, Copy, Check } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, X, Copy, Check } from "lucide-react";
 
 type Props = {
   reservation: Reservation;
@@ -55,16 +55,16 @@ export function BookingDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 space-y-6">
+      <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         
-        {/* Header */}
-        <div className="flex items-center justify-between border-b pb-4 dark:border-zinc-800">
+        {/* Sticky Header with Background & Close Button */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
           <div className="space-y-1">
-            <h2 className="text-title-medium text-primary-dark dark:text-white">
+            <h2 className="text-title-medium text-primary-dark dark:text-white font-bold">
               Booking Details
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-body-caption text-zinc-400">Current Status:</span>
+              <span className="text-body-caption text-zinc-400 font-semibold">Status:</span>
               <StatusBadge status={reservation.status} />
             </div>
           </div>
@@ -72,14 +72,14 @@ export function BookingDetailsModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-9 w-9 p-0 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950"
+            className="h-8 w-8 rounded-lg text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 cursor-pointer animate-in fade-in duration-100"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Content */}
-        <div className="space-y-6 text-zinc-655 dark:text-zinc-400">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 text-zinc-655 dark:text-zinc-400">
           
           {/* Reservation ID & Tracking Link Section */}
           <div className="space-y-3">
@@ -134,7 +134,7 @@ export function BookingDetailsModal({
 
           {/* Client Details Section */}
           <div className="space-y-3">
-            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2">
+            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2 font-semibold">
               <User className="h-4 w-4 text-zinc-450" /> Client Profile
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
@@ -158,7 +158,7 @@ export function BookingDetailsModal({
 
           {/* Event Details Section */}
           <div className="space-y-3">
-            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2">
+            <h3 className="text-body-base-bold text-primary-dark dark:text-white flex items-center gap-2 font-semibold">
               <Calendar className="h-4 w-4 text-zinc-450" /> Event Metadata
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
@@ -204,9 +204,9 @@ export function BookingDetailsModal({
           )}
 
           {/* Proposal / Package selections details */}
-          {(reservation.selectedPackages && reservation.selectedPackages.length > 0 || reservation.totalAmountInCents) && (
+          {((reservation.selectedPackages && reservation.selectedPackages.length > 0) || reservation.totalAmountInCents) && (
             <div className="space-y-3 border-t border-zinc-150 dark:border-zinc-800/80 pt-4">
-              <h3 className="text-body-base-bold text-primary-dark dark:text-white">
+              <h3 className="text-body-base-bold text-primary-dark dark:text-white font-semibold">
                 Proposal &amp; Package Details
               </h3>
               <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
@@ -271,20 +271,20 @@ export function BookingDetailsModal({
           )}
         </div>
 
-        {/* Footer / Actions */}
-        <div className="border-t border-zinc-100 dark:border-zinc-850 pt-4 dark:border-zinc-800 flex flex-col sm:flex-row justify-end gap-2">
+        {/* Sticky Footer */}
+        <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800 flex flex-col sm:flex-row justify-end gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            className="btn btn-secondary h-11 px-6 text-body-small-s"
+            className="btn btn-secondary h-11 px-6 text-body-small-s cursor-pointer"
           >
             Close Dialog
           </Button>
           <Button
             type="button"
             onClick={() => onNavigateToReservation(reservation)}
-            className="btn btn-primary h-11 px-6 text-body-small-s shadow-sm font-semibold"
+            className="btn btn-primary h-11 px-6 text-body-small-s shadow-sm font-semibold cursor-pointer"
           >
             View Reservation &amp; Chat
           </Button>

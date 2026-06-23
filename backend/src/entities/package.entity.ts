@@ -39,6 +39,12 @@ export class Package {
   @Column({ default: true })
   isActive!: boolean;
 
+  @Column({ default: 'universal' })
+  depositType!: string;
+
+  @Column({ type: 'integer', default: 0 })
+  depositValue!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

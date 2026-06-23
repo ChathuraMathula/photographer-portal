@@ -34,4 +34,13 @@ export class UpdatePackageDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsString()
+  @IsOptional()
+  depositType?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  depositValue?: number;
 }

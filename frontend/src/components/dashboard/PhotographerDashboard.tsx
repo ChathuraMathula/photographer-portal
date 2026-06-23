@@ -82,6 +82,10 @@ export function PhotographerDashboard({ activeTab }: Props) {
     setAllowedEventTypes,
     allowCustomEventTypes,
     setAllowCustomEventTypes,
+    universalDepositType,
+    setUniversalDepositType,
+    universalDepositValue,
+    setUniversalDepositValue,
   } = usePhotographerDashboard();
 
   useEffect(() => {
@@ -196,6 +200,10 @@ export function PhotographerDashboard({ activeTab }: Props) {
             onAllowedEventTypesChange={setAllowedEventTypes}
             allowCustomEventTypes={allowCustomEventTypes}
             onAllowCustomEventTypesChange={setAllowCustomEventTypes}
+            universalDepositType={universalDepositType}
+            universalDepositValue={universalDepositValue}
+            onUniversalDepositTypeChange={setUniversalDepositType}
+            onUniversalDepositValueChange={setUniversalDepositValue}
           />
         )}
       </div>

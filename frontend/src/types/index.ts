@@ -10,6 +10,8 @@ export type Package = {
   durationHours: number;
   includes: string[];
   isActive: boolean;
+  depositType?: string;
+  depositValue?: number;
 };
 
 export type Customer = {
@@ -69,6 +71,8 @@ export type PhotographerProfile = {
   profileImageUrl?: string;
   allowedEventTypes?: string[];
   allowCustomEventTypes?: boolean;
+  universalDepositType?: string;
+  universalDepositValue?: number;
 };
 
 export type TrackingReservation = {

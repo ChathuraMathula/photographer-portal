@@ -114,6 +114,8 @@ export function usePhotographerDashboard() {
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [allowedEventTypes, setAllowedEventTypes] = useState<string[]>([]);
   const [allowCustomEventTypes, setAllowCustomEventTypes] = useState(true);
+  const [universalDepositType, setUniversalDepositType] = useState("fixed");
+  const [universalDepositValue, setUniversalDepositValue] = useState(5000);
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -149,6 +151,12 @@ export function usePhotographerDashboard() {
         setProfileImageUrl(profData.profileImageUrl || "");
         setAllowedEventTypes(profData.allowedEventTypes || []);
         setAllowCustomEventTypes(profData.allowCustomEventTypes !== false);
+        setUniversalDepositType(profData.universalDepositType || "fixed");
+        setUniversalDepositValue(
+          profData.universalDepositType === "percentage"
+            ? profData.universalDepositValue ?? 10
+            : (profData.universalDepositValue ?? 500000) / 100
+        );
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);
@@ -361,6 +369,11 @@ export function usePhotographerDashboard() {
           profileImageUrl,
           allowedEventTypes,
           allowCustomEventTypes,
+          universalDepositType,
+          universalDepositValue:
+            universalDepositType === "fixed"
+              ? Math.round(universalDepositValue * 100)
+              : Math.round(universalDepositValue),
         }),
         credentials: "include",
       });
@@ -398,6 +411,11 @@ export function usePhotographerDashboard() {
       description: pkg.description || "",
       price: pkg.priceInCents / 100,
       durationHours: pkg.durationHours,
+      depositType: (pkg.depositType as any) || "universal",
+      depositValue:
+        pkg.depositType === "fixed"
+          ? (pkg.depositValue ?? 0) / 100
+          : pkg.depositValue ?? 0,
     });
     setPackageIncludesText(pkg.includes.join(", "));
     setShowPackageModal(true);
@@ -451,7 +469,14 @@ export function usePhotographerDashboard() {
   });
 
   const packageFormik = useFormik<PackageFormValues>({
-    initialValues: { name: "", description: "", price: 0, durationHours: 1 },
+    initialValues: {
+      name: "",
+      description: "",
+      price: 0,
+      durationHours: 1,
+      depositType: "universal",
+      depositValue: 0,
+    },
     validationSchema: PackageSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
@@ -464,6 +489,11 @@ export function usePhotographerDashboard() {
             .split(",")
             .map((i) => i.trim())
             .filter((i) => i.length > 0),
+          depositType: values.depositType,
+          depositValue:
+            values.depositType === "fixed"
+              ? Math.round(values.depositValue * 100)
+              : Math.round(values.depositValue),
         };
         const url = editingPkg ? `${API}/packages/${editingPkg.id}` : `${API}/packages`;
         const method = editingPkg ? "PATCH" : "POST";
@@ -495,6 +525,38 @@ export function usePhotographerDashboard() {
       setReservations((prev) => [...prev]);
     }
   };
+
+  // Automatically calculate the default advanceAmount when selectedPkgIds changes
+  useEffect(() => {
+    if (selectedPkgIds.length === 0) {
+      setAdvanceAmount(0);
+      return;
+    }
+
+    const firstPkgId = selectedPkgIds[0];
+    const pkg = packages.find((p) => p.id === firstPkgId);
+    if (!pkg) return;
+
+    let computedDeposit = 0;
+    const depType = pkg.depositType || "universal";
+    
+    if (depType === "fixed") {
+      computedDeposit = (pkg.depositValue ?? 0) / 100;
+    } else if (depType === "percentage") {
+      const priceLkr = pkg.priceInCents / 100;
+      computedDeposit = (priceLkr * (pkg.depositValue ?? 0)) / 100;
+    } else {
+      // Inherit universal
+      if (universalDepositType === "fixed") {
+        computedDeposit = universalDepositValue;
+      } else {
+        const priceLkr = pkg.priceInCents / 100;
+        computedDeposit = (priceLkr * universalDepositValue) / 100;
+      }
+    }
+
+    setAdvanceAmount(Math.round(computedDeposit));
+  }, [selectedPkgIds, packages, universalDepositType, universalDepositValue]);
 
   const chatDisabled =
     selectedRes?.status === "CANCELLED" || selectedRes?.status === "REJECTED";
@@ -558,5 +620,9 @@ export function usePhotographerDashboard() {
     setAllowedEventTypes,
     allowCustomEventTypes,
     setAllowCustomEventTypes,
+    universalDepositType,
+    setUniversalDepositType,
+    universalDepositValue,
+    setUniversalDepositValue,
   };
 }

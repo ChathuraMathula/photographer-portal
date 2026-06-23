@@ -55,11 +55,20 @@ export function ProposalPackageCard({
           </ul>
         )}
       </div>
-      <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-3 mt-4 flex items-baseline gap-1">
-        <span className="text-body-caption font-semibold text-zinc-400">LKR</span>
-        <span className="text-title-base text-zinc-950 dark:text-white">
-          {(pkg.priceInCents / 100).toLocaleString()}
-        </span>
+      <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-3 mt-4 flex items-center justify-between">
+        <div className="flex items-baseline gap-1">
+          <span className="text-body-caption font-semibold text-zinc-400">LKR</span>
+          <span className="text-title-base text-zinc-950 dark:text-white font-bold">
+            {(pkg.priceInCents / 100).toLocaleString()}
+          </span>
+        </div>
+        {pkg.depositType && pkg.depositType !== "universal" && (
+          <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-700/50">
+            {pkg.depositType === "fixed"
+              ? `LKR ${((pkg.depositValue ?? 0) / 100).toLocaleString()} Deposit`
+              : `${pkg.depositValue}% Deposit`}
+          </span>
+        )}
       </div>
     </div>
   );
