@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
+import { toast } from "sonner";
 import * as Yup from "yup";
 import { io, Socket } from "socket.io-client";
 
@@ -320,9 +321,9 @@ export function usePhotographerDashboard() {
       setQuotationNotes("");
       loadPhotographerData();
       setSelectedRes(null);
-      alert("Proposal sent successfully to customer email!");
+      toast.success("Proposal sent successfully to customer email!");
     } catch (err: any) {
-      alert(err.message || "Error sending proposal");
+      toast.error(err.message || "Error sending proposal");
     }
   };
 
@@ -341,9 +342,9 @@ export function usePhotographerDashboard() {
       setShowRejectForm(false);
       loadPhotographerData();
       setSelectedRes(null);
-      alert("Request rejected professionally.");
+      toast.success("Request rejected professionally.");
     } catch (err: any) {
-      alert(err.message || "Error rejecting request");
+      toast.error(err.message || "Error rejecting request");
     }
   };
 
@@ -363,9 +364,15 @@ export function usePhotographerDashboard() {
         }),
         credentials: "include",
       });
-      if (res.ok) alert("Profile updated successfully!");
-    } catch (err) {
+      if (res.ok) {
+        toast.success("Profile updated successfully!");
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Failed to update profile.");
+      }
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.message || "Error updating profile.");
     }
   };
 
@@ -436,9 +443,9 @@ export function usePhotographerDashboard() {
         setShowManualModal(false);
         resetForm();
         loadPhotographerData();
-        alert("Manual offline booking registered successfully!");
+        toast.success("Manual offline booking registered successfully!");
       } catch (err: any) {
-        alert(err.message || "Manual booking failed");
+        toast.error(err.message || "Manual booking failed");
       }
     },
   });
@@ -472,8 +479,9 @@ export function usePhotographerDashboard() {
         setEditingPkg(null);
         setPackageIncludesText("");
         loadPhotographerData();
+        toast.success(editingPkg ? "Package updated successfully!" : "Package created successfully!");
       } catch (err) {
-        alert("Error saving package details");
+        toast.error("Error saving package details");
       }
     },
   });

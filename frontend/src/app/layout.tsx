@@ -3,6 +3,7 @@ import { Josefin_Sans, Lato } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ReduxProvider } from "@/components/ReduxProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const josefinSans = Josefin_Sans({
   variable: "--font-josefin-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReduxProvider>{children}</ReduxProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

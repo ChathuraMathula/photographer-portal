@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,14 +68,54 @@ export function ProfileSettingsForm({
 
     // Verify it is an image
     if (!file.type.startsWith("image/")) {
-      alert("Please upload a valid image file.");
+      toast.error("Please upload a valid image file.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result) {
-        onProfileImageUrlChange(event.target.result as string);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Max dimension for profile image (reduced size but good resolution)
+          const MAX_WIDTH = 400;
+          const MAX_HEIGHT = 400;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width * MAX_HEIGHT) / height);
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            // Compress with JPEG format and 0.7 quality
+            const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+            onProfileImageUrlChange(compressedDataUrl);
+            toast.success("Profile image uploaded and compressed successfully!");
+          } else {
+            onProfileImageUrlChange(reader.result as string);
+            toast.warning("Profile image uploaded without compression.");
+          }
+        };
+        img.onerror = () => {
+          toast.error("Failed to load image for compression.");
+        };
+        img.src = reader.result as string;
       }
     };
     reader.readAsDataURL(file);
@@ -185,7 +226,8 @@ export function ProfileSettingsForm({
                   <Button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="btn btn-outline h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-body-caption text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm"
+                    variant="outline"
+                    className="h-9 px-3 rounded-xl font-medium text-body-caption text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                   >
                     <Upload className="h-3.5 w-3.5" />
                     Upload Image
@@ -194,7 +236,8 @@ export function ProfileSettingsForm({
                     <Button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="btn btn-outline border-red-200 hover:border-red-300 text-red-650 hover:bg-red-50/50 h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-body-caption flex items-center gap-1.5 shadow-sm"
+                      variant="outline"
+                      className="h-9 px-3 rounded-xl font-medium text-body-caption border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300 flex items-center gap-1.5 shadow-sm cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
                       Remove
