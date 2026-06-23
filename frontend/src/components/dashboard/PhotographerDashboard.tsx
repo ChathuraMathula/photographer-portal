@@ -245,6 +245,8 @@ export function PhotographerDashboard({ activeTab }: Props) {
         <ManualBookingModal
           formik={manualFormik}
           onClose={() => setShowManualModal(false)}
+          allowedEventTypes={allowedEventTypes}
+          allowCustomEventTypes={allowCustomEventTypes}
         />
       )}
       {showPackageModal && (

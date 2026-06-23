@@ -346,7 +346,7 @@
     @apply bg-primary-dark text-text-light border border-primary-dark;
   }
   .btn-primary:hover:not(:disabled) {
-    @apply bg-secondary-dark text-text-heading shadow-[0px_1px_1px_0px_#00000008] border-secondary-dark;
+    @apply bg-primary-light text-text-light border-primary-light shadow-[0px_1px_1px_0px_#00000008];
   }
   .btn-primary:active:not(:disabled) {
     @apply bg-primary-dark text-text-light;
@@ -356,10 +356,10 @@
     @apply bg-primary-white text-primary-dark border border-primary-dark;
   }
   .btn-secondary:hover:not(:disabled) {
-    @apply bg-secondary-dark text-text-heading border-secondary-dark shadow-[0px_1px_1px_0px_#00000008];
+    @apply bg-[#0e2d5c]/10 text-primary-dark border-primary-dark shadow-[0px_1px_1px_0px_#00000008];
   }
   .btn-secondary:active:not(:disabled) {
-    @apply bg-primary-white text-primary-dark border-primary-dark;
+    @apply bg-primary-white text-primary-dark border border-primary-dark;
   }
 
   .btn-danger {
@@ -470,18 +470,18 @@
 
 /* Custom scrollbar styling for all scrollable content (like modal scrollable areas and lists) */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 6px !important;
+  height: 6px !important;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.85 0 0);
-  border-radius: 9999px;
+  background: oklch(0.85 0 0) !important;
+  border-radius: 9999px !important;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.7 0 0);
+  background: oklch(0.7 0 0) !important;
 }
 /* For Firefox */
 * {
@@ -489,16 +489,36 @@
   scrollbar-color: oklch(0.85 0 0) transparent;
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(0.85 0 0) !important;
+  border-radius: 9999px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.7 0 0) !important;
+}
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: oklch(0.85 0 0) transparent !important;
+}
+
 /* Usability upgrades: make standard form inputs, select dropdowns, and buttons min-height 50px */
 input[data-slot="input"]:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]),
 select,
-button[data-slot="select-trigger"]:not([class*="h-9"]):not([class*="h-10"]):not([class*="h-8"]):not([class*="h-7"]) {
+button[data-slot="select-trigger"]:not(.h-9):not(.h-10):not(.h-8):not(.h-7) {
   height: 50px !important;
   min-height: 50px !important;
+  width: 100% !important;
 }
 
 .btn:not(.btn-link):not(.w-9):not(.h-9),
-button[data-slot="button"]:not([class*="size-"]):not([class*="icon"]):not([class*="h-6"]):not([class*="h-7"]):not([class*="h-8"]):not([class*="h-9"]):not(.btn-link) {
+button[data-slot="button"]:not(.size-8):not(.size-9):not(.size-10):not(.h-6):not(.h-7):not(.h-8):not(.h-9):not(.btn-link) {
   height: 50px !important;
   min-height: 50px !important;
 }

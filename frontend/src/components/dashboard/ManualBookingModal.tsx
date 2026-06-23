@@ -4,6 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/common/FieldError";
 import { X } from "lucide-react";
+import { CalendarPicker } from "@/components/booking/CalendarPicker";
+import { TimeSelect } from "@/components/booking/TimeSelect";
+import { EventTypeSelect } from "@/components/booking/EventTypeSelect";
 
 export type ManualBookingValues = {
   firstName: string;
@@ -21,18 +24,31 @@ export type ManualBookingValues = {
 type Props = {
   formik: FormikProps<ManualBookingValues>;
   onClose: () => void;
+  allowedEventTypes?: string[];
+  allowCustomEventTypes?: boolean;
 };
 
-export function ManualBookingModal({ formik, onClose }: Props) {
+export function ManualBookingModal({
+  formik,
+  onClose,
+  allowedEventTypes = [],
+  allowCustomEventTypes = true,
+}: Props) {
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        {/* Sticky Header with Background & Close Button */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-6 py-4 bg-white dark:bg-zinc-900 dark:border-zinc-800 shrink-0">
           <h2 className="text-title-medium text-primary-dark dark:text-white font-bold">
             Log Offline / Manual Booking
           </h2>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={onClose}
@@ -43,7 +59,7 @@ export function ManualBookingModal({ formik, onClose }: Props) {
         </div>
 
         {/* Scrollable Form Content */}
-        <form onSubmit={formik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="mb-firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Client First Name</Label>
@@ -87,58 +103,59 @@ export function ManualBookingModal({ formik, onClose }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          {/* Date Picker using client flow style */}
+          <div className="space-y-2">
+            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Date</Label>
+            <CalendarPicker
+              value={formik.values.date}
+              onChange={(val) => formik.setFieldValue("date", val)}
+              today={today}
+              error={formik.touched.date ? formik.errors.date : undefined}
+            />
+          </div>
+
+          {/* Time Picker using client flow style */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="mb-date" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Date</Label>
-              <Input
-                id="mb-date"
-                type="date"
-                min={new Date().toLocaleDateString("en-CA")}
-                {...formik.getFieldProps("date")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Start Time</Label>
+              <TimeSelect
+                value={formik.values.startTime}
+                onChange={(val) => formik.setFieldValue("startTime", val)}
+                placeholder="Select start"
+                error={formik.touched.startTime ? formik.errors.startTime : undefined}
               />
-              <FieldError msg={formik.touched.date ? formik.errors.date : undefined} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mb-startTime" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Start Time</Label>
-              <Input
-                id="mb-startTime"
-                type="time"
-                {...formik.getFieldProps("startTime")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">End Time</Label>
+              <TimeSelect
+                value={formik.values.endTime}
+                onChange={(val) => formik.setFieldValue("endTime", val)}
+                placeholder="Select end"
+                startTimeFilter={formik.values.startTime}
+                error={formik.touched.endTime ? formik.errors.endTime : undefined}
               />
-              <FieldError msg={formik.touched.startTime ? formik.errors.startTime : undefined} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mb-endTime" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">End Time</Label>
-              <Input
-                id="mb-endTime"
-                type="time"
-                {...formik.getFieldProps("endTime")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
-              />
-              <FieldError msg={formik.touched.endTime ? formik.errors.endTime : undefined} />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Event Type select and Location inputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="mb-eventType" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Event Type</Label>
-              <Input
-                id="mb-eventType"
-                placeholder="e.g. Wedding, Portrait"
-                {...formik.getFieldProps("eventType")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Event Type</Label>
+              <EventTypeSelect
+                value={formik.values.eventType}
+                onChange={(val) => formik.setFieldValue("eventType", val)}
+                allowedEventTypes={allowedEventTypes}
+                allowCustomEventTypes={allowCustomEventTypes}
+                error={formik.touched.eventType ? formik.errors.eventType : undefined}
               />
-              <FieldError msg={formik.touched.eventType ? formik.errors.eventType : undefined} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mb-location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Location</Label>
+              <Label htmlFor="mb-location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Location (optional)</Label>
               <Input
                 id="mb-location"
                 placeholder="e.g. Colombo 03"
                 {...formik.getFieldProps("location")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
             </div>
           </div>
@@ -152,26 +169,26 @@ export function ManualBookingModal({ formik, onClose }: Props) {
               className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
             />
           </div>
+        </div>
 
-          {/* Sticky Footer inside the flex form */}
-          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              Book Event
-            </Button>
-          </div>
-        </form>
-      </div>
+        {/* Footer */}
+        <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            Book Event
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

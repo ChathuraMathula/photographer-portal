@@ -50,14 +50,17 @@ export function CreateUserModal({
 }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        
-        {/* Sticky Header with Background & Close Button */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-6 py-4 bg-white dark:bg-zinc-900 dark:border-zinc-800 shrink-0">
           <h2 className="text-title-medium text-primary-dark dark:text-white flex items-center gap-2 font-bold">
             <Sparkles className="h-5 w-5 text-indigo-500" /> Create New User
           </h2>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={onClose}
@@ -68,9 +71,9 @@ export function CreateUserModal({
         </div>
 
         {/* Scrollable Form Content */}
-        <form onSubmit={formik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
           {submitError && (
-            <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
+            <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20 animate-in fade-in duration-100">
               {submitError}
             </div>
           )}
@@ -82,7 +85,7 @@ export function CreateUserModal({
               <Input
                 id="cu-firstName"
                 {...formik.getFieldProps("firstName")}
-                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.firstName && formik.errors.firstName
                     ? "border-red-500"
                     : ""
@@ -99,7 +102,7 @@ export function CreateUserModal({
               <Input
                 id="cu-lastName"
                 {...formik.getFieldProps("lastName")}
-                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.lastName && formik.errors.lastName
                     ? "border-red-500"
                     : ""
@@ -120,7 +123,7 @@ export function CreateUserModal({
                 id="cu-email"
                 type="email"
                 {...formik.getFieldProps("email")}
-                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.email && formik.errors.email
                     ? "border-red-500"
                     : ""
@@ -136,7 +139,7 @@ export function CreateUserModal({
                 id="cu-password"
                 type="password"
                 {...formik.getFieldProps("password")}
-                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
                   formik.touched.password && formik.errors.password
                     ? "border-red-500"
                     : ""
@@ -177,7 +180,7 @@ export function CreateUserModal({
               <Input
                 id="cu-phone"
                 {...formik.getFieldProps("phone")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
             </div>
           </div>
@@ -199,7 +202,7 @@ export function CreateUserModal({
                     id="cu-bookingSlug"
                     placeholder="e.g. sarah-johnson"
                     {...formik.getFieldProps("bookingSlug")}
-                    className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                    className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
                   <p className="text-body-caption text-zinc-455 mt-1 pl-1">
                     If left blank, slug will generate from name.
@@ -211,7 +214,7 @@ export function CreateUserModal({
                     id="cu-baseLocation"
                     placeholder="e.g. Colombo, Kandy"
                     {...formik.getFieldProps("baseLocation")}
-                    className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                    className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
                 </div>
               </div>
@@ -222,7 +225,7 @@ export function CreateUserModal({
                   id="cu-bio"
                   placeholder="Wedding & portrait photographer with 5 years experience..."
                   {...formik.getFieldProps("bio")}
-                  className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                  className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                 />
               </div>
 
@@ -240,12 +243,12 @@ export function CreateUserModal({
                         onAddSpec();
                       }
                     }}
-                    className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                    className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
                   <Button
                     type="button"
                     onClick={onAddSpec}
-                    className="btn btn-secondary h-11 py-0 min-w-0 md:min-w-0 px-4 shadow-sm animate-in fade-in duration-100"
+                    className="btn btn-secondary h-[50px] py-0 min-w-0 md:min-w-0 px-4 shadow-sm animate-in fade-in duration-100"
                   >
                     Add
                   </Button>
@@ -270,27 +273,27 @@ export function CreateUserModal({
               </div>
             </div>
           )}
+        </div>
 
-          {/* Sticky Footer inside the flex form */}
-          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              Close
-            </Button>
-            <Button
-              type="submit"
-              disabled={formik.isSubmitting}
-              className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              {formik.isSubmitting ? "Creating..." : "Save User"}
-            </Button>
-          </div>
-        </form>
-      </div>
+        {/* Footer */}
+        <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            Close
+          </Button>
+          <Button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            {formik.isSubmitting ? "Creating..." : "Save User"}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

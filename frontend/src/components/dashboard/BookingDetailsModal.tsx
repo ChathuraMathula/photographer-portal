@@ -57,8 +57,8 @@ export function BookingDetailsModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         
-        {/* Sticky Header with Background & Close Button */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-6 py-4 bg-white dark:bg-zinc-900 dark:border-zinc-800 shrink-0">
           <div className="space-y-1">
             <h2 className="text-title-medium text-primary-dark dark:text-white font-bold">
               Booking Details
@@ -79,7 +79,7 @@ export function BookingDetailsModal({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 text-zinc-655 dark:text-zinc-400">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 text-zinc-655 dark:text-zinc-400 custom-scrollbar">
           
           {/* Reservation ID & Tracking Link Section */}
           <div className="space-y-3">
@@ -93,11 +93,11 @@ export function BookingDetailsModal({
                 </div>
                 <Button
                   onClick={handleCopyId}
-                  className="flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-body-caption text-zinc-600 dark:text-zinc-400 hover:text-primary-dark dark:hover:text-white transition-all cursor-pointer font-semibold shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                  className="flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 dark:border-zinc-855 bg-white dark:bg-zinc-950 text-body-caption text-zinc-600 dark:text-zinc-400 hover:text-primary-dark dark:hover:text-white transition-all cursor-pointer font-semibold shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900"
                 >
                   {copiedId ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      <Check className="h-3.5 w-3.5 text-emerald-650" />
                       Copied
                     </>
                   ) : (
@@ -112,7 +112,7 @@ export function BookingDetailsModal({
                 <div className="pt-3 border-t border-zinc-200/50 dark:border-zinc-850">
                   <p className="text-body-caption font-semibold text-zinc-400 mb-1.5">Client Tracking Link</p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-body-caption select-all text-zinc-655 dark:text-zinc-350">
+                    <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-body-caption select-all text-zinc-655 dark:text-zinc-355">
                       {`${typeof window !== "undefined" ? window.location.origin : "http://localhost:4000"}/book/track/${reservation.reservationToken}`}
                     </code>
                     <Button
@@ -271,8 +271,8 @@ export function BookingDetailsModal({
           )}
         </div>
 
-        {/* Sticky Footer */}
-        <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800 grid grid-cols-2 gap-3">
+        {/* Footer */}
+        <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3 shrink-0">
           <Button
             type="button"
             variant="outline"

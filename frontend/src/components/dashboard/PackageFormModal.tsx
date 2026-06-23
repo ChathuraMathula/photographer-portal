@@ -39,13 +39,17 @@ export function PackageFormModal({
 }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
-        {/* Sticky Header with Background & Close Button */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-6 py-4 bg-white dark:bg-zinc-900 dark:border-zinc-800 shrink-0">
           <h2 className="text-title-medium text-primary-dark dark:text-white font-bold">
             {editingPkg ? "Edit Package Details" : "Create New Package"}
           </h2>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={onClose}
@@ -56,14 +60,14 @@ export function PackageFormModal({
         </div>
 
         {/* Scrollable Form Content */}
-        <form onSubmit={formik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
           <div className="space-y-2">
             <Label htmlFor="pkg-name" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Package Name</Label>
             <Input
               id="pkg-name"
               placeholder="e.g. Bronze Portrait Package"
               {...formik.getFieldProps("name")}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
             <FieldError msg={formik.touched.name ? formik.errors.name : undefined} />
           </div>
@@ -86,7 +90,7 @@ export function PackageFormModal({
                 id="pkg-price"
                 type="number"
                 {...formik.getFieldProps("price")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
               <FieldError msg={formik.touched.price ? formik.errors.price : undefined} />
             </div>
@@ -96,7 +100,7 @@ export function PackageFormModal({
                 id="pkg-duration"
                 type="number"
                 {...formik.getFieldProps("durationHours")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
               <FieldError
                 msg={formik.touched.durationHours ? formik.errors.durationHours : undefined}
@@ -114,7 +118,7 @@ export function PackageFormModal({
               placeholder="e.g. 1 Hour coverage, 15 edited photos, raw images"
               value={includesText}
               onChange={(e) => onIncludesChange(e.target.value)}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
             <p className="text-body-caption text-zinc-455 mt-1 pl-1">Separate items by comma.</p>
           </div>
@@ -132,7 +136,7 @@ export function PackageFormModal({
                   value={formik.values.depositType}
                   onValueChange={(val) => formik.setFieldValue("depositType", val)}
                 >
-                  <SelectTrigger className="h-11 bg-white dark:bg-zinc-950 text-body-small border-zinc-200 dark:border-zinc-800 rounded-xl cursor-pointer">
+                  <SelectTrigger className="h-[50px] bg-white dark:bg-zinc-950 text-body-small border-zinc-200 dark:border-zinc-800 rounded-xl cursor-pointer">
                     <SelectValue placeholder="Select rule" />
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
@@ -154,33 +158,33 @@ export function PackageFormModal({
                     min="0"
                     max={formik.values.depositType === "percentage" ? 100 : undefined}
                     {...formik.getFieldProps("depositValue")}
-                    className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                    className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
                   <FieldError msg={formik.touched.depositValue ? formik.errors.depositValue : undefined} />
                 </div>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Sticky Footer inside the flex form */}
-          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
-            >
-              {editingPkg ? "Save Changes" : "Create Package"}
-            </Button>
-          </div>
-        </form>
-      </div>
+        {/* Footer */}
+        <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
+          >
+            {editingPkg ? "Save Changes" : "Create Package"}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
