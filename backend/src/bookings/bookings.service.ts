@@ -262,6 +262,10 @@ export class BookingsService {
       .to(`reservation_${reservation.id}`)
       .emit('message', message);
 
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('messageReceived', { reservationId: reservation.id, message });
+
     return message;
   }
 

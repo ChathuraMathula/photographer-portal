@@ -198,6 +198,32 @@ export function usePhotographerDashboard() {
       );
     });
 
+    socket.on("messageReceived", ({ reservationId, message }) => {
+      setReservations((prev) =>
+        prev.map((r) => {
+          if (r.id === reservationId) {
+            const currentMessages = r.messages || [];
+            if (currentMessages.some((m) => m.id === message.id)) return r;
+            return {
+              ...r,
+              messages: [...currentMessages, message],
+            };
+          }
+          return r;
+        })
+      );
+
+      setSelectedRes((prev) => {
+        if (prev && prev.id === reservationId) {
+          setMessages((msgs) => {
+            if (msgs.some((m) => m.id === message.id)) return msgs;
+            return [...msgs, message];
+          });
+        }
+        return prev;
+      });
+    });
+
     return () => {
       socket.disconnect();
       socketRef.current = null;
@@ -443,6 +469,16 @@ export function usePhotographerDashboard() {
     },
   });
 
+  const handleSetSelectedRes = (res: Reservation | null) => {
+    setSelectedRes(res);
+    if (res) {
+      const key = `chat_last_viewed_photographer_${res.id}`;
+      localStorage.setItem(key, new Date().toISOString());
+      // Force trigger state update to re-render the list items
+      setReservations((prev) => [...prev]);
+    }
+  };
+
   const chatDisabled =
     selectedRes?.status === "CANCELLED" || selectedRes?.status === "REJECTED";
 
@@ -455,7 +491,7 @@ export function usePhotographerDashboard() {
     reservations,
     packages,
     selectedRes,
-    setSelectedRes,
+    setSelectedRes: handleSetSelectedRes,
     messages,
     messageText,
     setMessageText,

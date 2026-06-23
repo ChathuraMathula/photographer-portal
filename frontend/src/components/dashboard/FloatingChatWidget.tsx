@@ -254,20 +254,14 @@ export function FloatingChatWidget({
   };
 
   const getUnreadCount = (msgs: any[]) => {
-    let lastPhotographerIndex = -1;
-    for (let i = msgs.length - 1; i >= 0; i--) {
-      if (msgs[i].sender === "PHOTOGRAPHER") {
-        lastPhotographerIndex = i;
-        break;
-      }
-    }
-    let unread = 0;
-    for (let i = lastPhotographerIndex + 1; i < msgs.length; i++) {
-      if (msgs[i].sender === "CUSTOMER") {
-        unread++;
-      }
-    }
-    return unread;
+    if (!selectedRes) return 0;
+    const key = `chat_last_viewed_photographer_${selectedRes.id}`;
+    const lastViewed = localStorage.getItem(key) || new Date(0).toISOString();
+    return msgs.filter(
+      (msg) =>
+        msg.sender === "CUSTOMER" &&
+        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime()
+    ).length;
   };
 
   const unreadCount = showFloatingChat ? 0 : getUnreadCount(messages);
@@ -313,6 +307,7 @@ export function FloatingChatWidget({
             myRole="PHOTOGRAPHER"
             title={`Chat with ${selectedRes.customer.firstName}`}
             description={`Negotiating details for ${selectedRes.eventType}`}
+            reservationId={selectedRes.id}
           />
         </div>
       )}

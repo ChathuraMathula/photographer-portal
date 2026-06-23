@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/StatusBadge";
@@ -17,6 +17,13 @@ export function BookingDetailsModal({
 }: Props) {
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  useEffect(() => {
+    if (reservation) {
+      const key = `chat_last_viewed_photographer_${reservation.id}`;
+      localStorage.setItem(key, new Date().toISOString());
+    }
+  }, [reservation]);
 
   const handleCopyId = async () => {
     try {

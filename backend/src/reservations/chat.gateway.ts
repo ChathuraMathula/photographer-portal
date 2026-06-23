@@ -82,6 +82,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server
       .to(`reservation_${data.reservationId}`)
       .emit('message', message);
+
+    const reservation = await this.reservationRepository.findOneBy({ id: data.reservationId });
+    if (reservation) {
+      this.server
+        .to(`photographer_${reservation.photographerId}`)
+        .emit('messageReceived', { reservationId: reservation.id, message });
+    }
   }
 
   @SubscribeMessage('joinPhotographerDashboard')

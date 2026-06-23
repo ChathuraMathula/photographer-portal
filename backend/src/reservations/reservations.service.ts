@@ -48,7 +48,8 @@ export class ReservationsService {
   async findAll(user: JwtUser) {
     const query = this.reservationRepository.createQueryBuilder('res')
       .leftJoinAndSelect('res.customer', 'customer')
-      .leftJoinAndSelect('res.photographer', 'photographer');
+      .leftJoinAndSelect('res.photographer', 'photographer')
+      .leftJoinAndSelect('res.messages', 'messages');
 
     if (user.role === UserRole.PHOTOGRAPHER) {
       query.where('res.photographerId = :photographerId', {
@@ -62,7 +63,7 @@ export class ReservationsService {
   async findOne(id: string, user: JwtUser) {
     const reservation = await this.reservationRepository.findOne({
       where: { id },
-      relations: { customer: true, photographer: true },
+      relations: { customer: true, photographer: true, messages: true },
     });
 
     if (!reservation) throw new NotFoundException('Reservation not found');
@@ -287,6 +288,10 @@ export class ReservationsService {
     this.chatGateway.server
       .to(`reservation_${id}`)
       .emit('message', message);
+
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('messageReceived', { reservationId: id, message });
 
     return message;
   }

@@ -47,6 +47,7 @@ export type Reservation = {
   customer: Customer;
   photographer: { id: string; firstName: string; lastName: string };
   reservationToken?: string;
+  messages?: ChatMessage[];
 };
 
 export type ChatMessage = {

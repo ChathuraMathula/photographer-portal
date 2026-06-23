@@ -8,6 +8,19 @@ type Props = {
 };
 
 export function ReservationListItem({ reservation: res, isSelected, onSelect }: Props) {
+  const getUnreadCount = () => {
+    if (!res.messages || res.messages.length === 0) return 0;
+    const key = `chat_last_viewed_photographer_${res.id}`;
+    const lastViewed = localStorage.getItem(key) || new Date(0).toISOString();
+    return res.messages.filter(
+      (msg) =>
+        msg.sender === "CUSTOMER" &&
+        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime()
+    ).length;
+  };
+
+  const unreadCount = isSelected ? 0 : getUnreadCount();
+
   return (
     <div
       onClick={() => onSelect(res)}
@@ -18,8 +31,13 @@ export function ReservationListItem({ reservation: res, isSelected, onSelect }: 
       }`}
     >
       <div className="flex justify-between items-start gap-1">
-        <span className="text-body-small-s font-semibold text-zinc-950 dark:text-white truncate">
+        <span className="text-body-small-s font-semibold text-zinc-950 dark:text-white truncate flex items-center gap-2">
           {res.customer.firstName} {res.customer.lastName}
+          {unreadCount > 0 && (
+            <span className="bg-red-500 text-white text-[9px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center animate-pulse">
+              {unreadCount}
+            </span>
+          )}
         </span>
         <span className="text-body-caption text-zinc-400 shrink-0">
           {new Date(res.date).toISOString().split("T")[0]}

@@ -116,6 +116,7 @@ export default function TrackingPage() {
               myRole="CUSTOMER"
               title="Negotiation Chat"
               description="Have questions about custom pricing or timing? Chat here."
+              reservationId={reservation.id}
             />
           </div>
         </div>

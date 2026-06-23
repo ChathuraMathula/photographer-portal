@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Send, MessageSquare } from "lucide-react";
 import { type ChatMessage } from "@/types";
@@ -13,6 +13,7 @@ type Props = {
   myRole: "PHOTOGRAPHER" | "CUSTOMER";
   title?: string;
   description?: string;
+  reservationId?: string;
 };
 
 export function ChatBox({
@@ -24,8 +25,38 @@ export function ChatBox({
   myRole,
   title = "Live Chat",
   description = "Negotiate event details directly",
+  reservationId,
 }: Props) {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const lastResIdRef = useRef<string | null>(null);
+  const [initialLastViewed, setInitialLastViewed] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (reservationId) {
+      if (reservationId !== lastResIdRef.current) {
+        lastResIdRef.current = reservationId;
+        const key = `chat_last_viewed_${myRole.toLowerCase()}_${reservationId}`;
+        const stored = localStorage.getItem(key);
+        setInitialLastViewed(stored || new Date(0).toISOString());
+
+        // Mark all messages as read after 2 seconds
+        const timer = setTimeout(() => {
+          localStorage.setItem(key, new Date().toISOString());
+        }, 2000);
+
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setInitialLastViewed(null);
+    }
+  }, [reservationId, myRole]);
+
+  const firstUnreadIndex = messages.findIndex(
+    (msg) =>
+      msg.sender !== myRole &&
+      initialLastViewed &&
+      new Date(msg.timestamp).getTime() > new Date(initialLastViewed).getTime()
+  );
 
   return (
     <div className="flex flex-col h-[500px] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
@@ -47,26 +78,39 @@ export function ChatBox({
             </p>
           </div>
         ) : (
-          messages.map((msg) => {
+          messages.map((msg, index) => {
             const isMe = msg.sender === myRole;
+            const displayName = isMe ? "You" : msg.senderName.split(" ")[0];
+            const isFirstUnread = index === firstUnreadIndex;
+
             return (
-              <div
-                key={msg.id}
-                className={`flex flex-col max-w-[85%] ${
-                  isMe ? "ml-auto items-end" : "mr-auto"
-                }`}
-              >
-                <span className="text-[9px] text-zinc-400 px-1">
-                  {msg.senderName}
-                </span>
+              <div key={msg.id} className="space-y-2">
+                {isFirstUnread && (
+                  <div className="flex items-center my-4 animate-in fade-in duration-300">
+                    <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
+                    <span className="mx-3 text-[10px] text-red-500 font-bold uppercase tracking-wider">
+                      New Messages
+                    </span>
+                    <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
+                  </div>
+                )}
                 <div
-                  className={`rounded-xl px-3 py-1.5 text-xs shadow-sm ${
-                    isMe
-                      ? "bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"
-                      : "bg-white text-zinc-900 border dark:bg-zinc-900 dark:text-zinc-100"
+                  className={`flex flex-col max-w-[85%] ${
+                    isMe ? "ml-auto items-end" : "mr-auto"
                   }`}
                 >
-                  <p className="break-all whitespace-pre-wrap">{msg.content}</p>
+                  <span className="text-[9px] text-zinc-400 px-1">
+                    {displayName}
+                  </span>
+                  <div
+                    className={`rounded-xl px-3 py-1.5 text-xs shadow-sm ${
+                      isMe
+                        ? "bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"
+                        : "bg-white text-zinc-900 border dark:bg-zinc-900 dark:text-zinc-100"
+                    }`}
+                  >
+                    <p className="break-all whitespace-pre-wrap">{msg.content}</p>
+                  </div>
                 </div>
               </div>
             );
