@@ -480,3 +480,16 @@ button[data-slot="button"]:not([class*="size-"]):not([class*="icon"]):not([class
   height: 50px !important;
   min-height: 50px !important;
 }
+
+/* Chat alignments */
+.chat-input {
+  height: 40px !important;
+  min-height: 40px !important;
+}
+
+.chat-button {
+  height: 40px !important;
+  width: 40px !important;
+  min-height: 40px !important;
+  min-width: 40px !important;
+}

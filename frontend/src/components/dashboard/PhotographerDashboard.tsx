@@ -149,6 +149,7 @@ export function PhotographerDashboard({ activeTab }: Props) {
                 new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
               )
             }
+            onDateChange={setCurrentDate}
             onDayReservationClick={(res) => {
               setCalendarSelectedRes(res);
             }}

@@ -144,13 +144,13 @@ export function ChatBox({
           placeholder="Type a message..."
           value={messageText}
           onChange={(e) => onMessageChange(e.target.value)}
-          className="h-9 text-body-caption"
+          className="chat-input text-body-caption"
           disabled={disabled}
         />
         <button
           type="submit"
           disabled={!messageText.trim() || disabled}
-          className="h-9 w-9 flex items-center justify-center rounded-lg bg-[#0e2d5c] hover:bg-[#1a4175] text-white transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0e2d5c]"
+          className="chat-button flex items-center justify-center rounded-lg bg-[#0e2d5c] hover:bg-[#1a4175] text-white transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0e2d5c]"
         >
           <Send className="h-3.5 w-3.5" />
         </button>
