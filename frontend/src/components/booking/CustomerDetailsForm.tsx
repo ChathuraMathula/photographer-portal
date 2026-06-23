@@ -43,7 +43,7 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
       <form onSubmit={formik.handleSubmit}>
         <CardContent className="space-y-4">
           {formik.status && (
-            <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-sm text-red-650 dark:text-red-400 border border-red-250/20">
+            <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-body-small-s text-red-650 dark:text-red-400 border border-red-250/20">
               {formik.status}
             </div>
           )}

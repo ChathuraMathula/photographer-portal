@@ -26,7 +26,7 @@ export function LoginForm({ formik, apiError }: Props) {
 
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {apiError && (
-          <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-sm text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30">
+          <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-body-small-s text-red-650 dark:text-red-400 border border-red-200/50 dark:border-red-900/30">
             {apiError}
           </div>
         )}
@@ -45,7 +45,7 @@ export function LoginForm({ formik, apiError }: Props) {
             }`}
           />
           {formik.touched.email && formik.errors.email && (
-            <p className="text-xs text-red-500 mt-1">{formik.errors.email}</p>
+            <p className="text-body-caption text-red-500 mt-1">{formik.errors.email}</p>
           )}
         </div>
 
@@ -76,7 +76,7 @@ export function LoginForm({ formik, apiError }: Props) {
             </button>
           </div>
           {formik.touched.password && formik.errors.password && (
-            <p className="text-xs text-red-500 mt-1">{formik.errors.password}</p>
+            <p className="text-body-caption text-red-500 mt-1">{formik.errors.password}</p>
           )}
         </div>
 

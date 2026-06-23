@@ -52,14 +52,14 @@ export function CreateUserModal({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-sm"
+            className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-body-small-s"
           >
             Cancel
           </Button>
         </div>
 
         {submitError && (
-          <div className="rounded-xl bg-red-50 p-4 text-sm text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
+          <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
             {submitError}
           </div>
         )}
@@ -179,7 +179,7 @@ export function CreateUserModal({
                 <div className="space-y-2">
                   <Label htmlFor="cu-bookingSlug" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
                     Booking Link Slug{" "}
-                    <span className="text-zinc-400 font-normal text-xs">(optional)</span>
+                    <span className="text-zinc-400 font-normal text-body-caption">(optional)</span>
                   </Label>
                   <Input
                     id="cu-bookingSlug"
@@ -187,7 +187,7 @@ export function CreateUserModal({
                     {...formik.getFieldProps("bookingSlug")}
                     className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
-                  <p className="text-[10px] text-zinc-450 mt-1 pl-1">
+                  <p className="text-body-caption text-zinc-455 mt-1 pl-1">
                     If left blank, slug will generate from name.
                   </p>
                 </div>

@@ -47,7 +47,7 @@ export function StatusBadge({ status }: { status: ReservationStatus }) {
   const cfg = statusConfig[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${cfg.className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-body-caption font-semibold ${cfg.className}`}
     >
       <cfg.Icon className="h-3.5 w-3.5" />
       {cfg.label}
@@ -72,7 +72,7 @@ export function StatusPill({ status }: { status: ReservationStatus }) {
   };
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${map[status]}`}
+      className={`rounded-full px-2 py-0.5 text-body-caption font-medium uppercase ${map[status]}`}
     >
       {status}
     </span>

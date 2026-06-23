@@ -108,7 +108,7 @@ export function CalendarPicker({ value, onChange, today, error }: Props) {
           />
           <div className="absolute top-[55px] left-0 z-40 w-full sm:w-[320px] rounded-xl border border-zinc-200/60 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3">
-              <h4 className="text-xs font-bold text-zinc-900 dark:text-white">
+              <h4 className="text-body-small-s font-bold text-zinc-900 dark:text-white">
                 {MONTHS[navDate.getMonth()]} {navDate.getFullYear()}
               </h4>
               <div className="flex gap-1.5">
@@ -129,7 +129,7 @@ export function CalendarPicker({ value, onChange, today, error }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-7 text-center text-[10px] font-semibold text-zinc-450 uppercase mb-2">
+            <div className="grid grid-cols-7 text-center text-body-caption font-semibold text-zinc-450 uppercase mb-2">
               {DAYS_OF_WEEK.map((d) => (
                 <span key={d}>{d}</span>
               ))}
@@ -148,7 +148,7 @@ export function CalendarPicker({ value, onChange, today, error }: Props) {
                     type="button"
                     disabled={isDisabled}
                     onClick={() => handleDateSelect(date)}
-                    className={`h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-all ${
+                    className={`h-8 rounded-lg text-body-caption font-semibold flex items-center justify-center transition-all ${
                       isSelected
                         ? "bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold"
                         : isDisabled

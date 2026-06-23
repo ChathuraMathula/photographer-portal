@@ -58,7 +58,7 @@ export function UserTableRow({ user, onToggleActive }: Props) {
           variant="outline"
           size="sm"
           onClick={() => onToggleActive(user.id)}
-          className={`btn btn-secondary h-8 px-3 py-0 min-w-0 md:min-w-0 text-xs shadow-none gap-1 border ${
+          className={`btn btn-secondary h-8 px-3 py-0 min-w-0 md:min-w-0 text-body-caption shadow-none gap-1 border ${
             user.isActive
               ? "text-emerald-700 border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-950/30 dark:bg-emerald-950/10"
               : "text-zinc-550 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-700"

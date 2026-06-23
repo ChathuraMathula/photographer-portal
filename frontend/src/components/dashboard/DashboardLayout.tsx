@@ -85,7 +85,7 @@ export function DashboardLayout({
         key={item.id}
         onClick={onClick}
         title={collapsed ? item.label : undefined}
-        className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
+        className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium transition-all duration-200 cursor-pointer ${
           isActive
             ? "bg-primary-dark text-white shadow-sm"
             : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
@@ -114,10 +114,10 @@ export function DashboardLayout({
             </div>
             {!isCollapsed && (
               <div className="flex flex-col truncate">
-                <span className="font-bold text-sm leading-none title-font tracking-tight">
+                <span className="font-bold text-body-small-s leading-none title-font tracking-tight">
                   Photographer Portal
                 </span>
-                <span className="text-[10px] text-zinc-400 font-medium mt-1 truncate">
+                <span className="text-body-caption text-zinc-400 font-medium mt-1 truncate">
                   {userName ? `${userName} · ${userRole}` : userRole}
                 </span>
               </div>
@@ -143,7 +143,7 @@ export function DashboardLayout({
             id="sidebar-logout-btn"
             onClick={handleLogoutRequest}
             title={isCollapsed ? "Log out" : undefined}
-            className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
+            className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
           >
             <LogOut className="h-5 w-5 shrink-0" />
             {!isCollapsed && <span className="truncate">Log out</span>}
@@ -170,8 +170,8 @@ export function DashboardLayout({
                     <Camera className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-bold text-xs title-font tracking-tight">Photographer Portal</span>
-                    <span className="text-[9px] text-zinc-400 truncate">{userName}</span>
+                    <span className="font-bold text-body-caption title-font tracking-tight">Photographer Portal</span>
+                    <span className="text-body-caption text-zinc-400 truncate">{userName}</span>
                   </div>
                 </div>
                 <button
@@ -203,7 +203,7 @@ export function DashboardLayout({
               <button
                 id="mobile-sidebar-logout-btn"
                 onClick={handleLogoutRequest}
-                className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
+                className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
               >
                 <LogOut className="h-5 w-5 shrink-0" />
                 <span>Log out</span>
@@ -241,7 +241,7 @@ export function DashboardLayout({
             <span className="h-5 w-[1px] bg-zinc-200 mr-4 hidden lg:inline" />
 
             {/* Page title */}
-            <h2 className="font-extrabold text-lg sm:text-xl tracking-tight text-zinc-900 title-font">
+            <h2 className="font-extrabold text-title-base tracking-tight text-zinc-900 title-font">
               {activeLabel}
             </h2>
           </div>
@@ -255,7 +255,7 @@ export function DashboardLayout({
                 }
               }}
               title={userRole === "PHOTOGRAPHER" ? "View Profile" : undefined}
-              className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-sm text-zinc-800 shadow-inner ${
+              className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-body-small-s text-zinc-800 shadow-inner ${
                 userRole === "PHOTOGRAPHER" ? "cursor-pointer hover:bg-zinc-200 transition-colors" : ""
               }`}
             >

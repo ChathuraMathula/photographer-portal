@@ -27,7 +27,7 @@ export function PackageGrid({
         </div>
         <Button
           onClick={onAddPackage}
-          className="btn btn-primary h-10 px-4 py-0 min-w-0 md:min-w-0 text-sm shadow-sm gap-1"
+          className="btn btn-primary h-10 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm gap-1"
         >
           <Plus className="h-4 w-4 shrink-0" /> Add Package
         </Button>

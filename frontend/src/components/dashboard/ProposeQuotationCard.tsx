@@ -122,7 +122,7 @@ export function ProposeQuotationCard({
               <Button
                 variant="ghost"
                 onClick={onCancelReject}
-                className="btn btn-secondary h-9 px-4 py-0 min-w-0 md:min-w-0 text-sm shadow-sm"
+                className="btn btn-secondary h-9 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm"
               >
                 Cancel
               </Button>
@@ -130,7 +130,7 @@ export function ProposeQuotationCard({
                 variant="destructive"
                 onClick={onReject}
                 disabled={!rejectionReason.trim()}
-                className="btn h-9 px-4 py-0 min-w-0 md:min-w-0 text-sm bg-destructive text-white hover:bg-destructive/90 border border-destructive shadow-sm"
+                className="btn h-9 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s bg-destructive text-white hover:bg-destructive/90 border border-destructive shadow-sm"
               >
                 Confirm Reject
               </Button>
@@ -140,7 +140,7 @@ export function ProposeQuotationCard({
           <>
             <Button
               variant="outline"
-              className="btn btn-secondary text-red-650 hover:text-red-700 h-10 px-4 py-0 min-w-0 md:min-w-0 text-sm border-zinc-200 dark:border-zinc-800"
+              className="btn btn-secondary text-red-650 hover:text-red-700 h-10 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s border-zinc-200 dark:border-zinc-800"
               onClick={onShowRejectForm}
             >
               Reject Request
@@ -148,7 +148,7 @@ export function ProposeQuotationCard({
             <Button
               onClick={onPropose}
               disabled={selectedPkgIds.length === 0}
-              className="btn btn-primary h-10 px-4 py-0 min-w-0 md:min-w-0 text-sm shadow-sm"
+              className="btn btn-primary h-10 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm"
             >
               Send Proposal
             </Button>

@@ -24,7 +24,7 @@ export function ResponseConsole({
       <div className="flex items-center justify-between">
         <h4 className="text-body-small-s font-semibold text-zinc-750 dark:text-zinc-250">Response Console</h4>
         {latency && (
-          <span className="text-[10px] font-bold text-zinc-405 font-mono">
+          <span className="text-body-caption font-bold text-zinc-405 font-mono">
             Time: {latency} ms
           </span>
         )}
@@ -44,7 +44,7 @@ export function ResponseConsole({
             </div>
             <button
               onClick={() => handleCopy(responseData, "resp")}
-              className="text-[10px] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-body-caption font-bold hover:underline flex items-center gap-1 cursor-pointer"
             >
               {copiedText === "resp" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
               {copiedText === "resp" ? "Copied" : "Copy Body"}
@@ -53,7 +53,7 @@ export function ResponseConsole({
 
           {/* Header Summary */}
           {Object.keys(responseHeaders).length > 0 && (
-            <div className="text-[10px] font-mono text-zinc-400 max-h-[80px] overflow-y-auto border border-zinc-150 dark:border-zinc-850 p-2 rounded-lg bg-zinc-50/50">
+            <div className="text-body-caption font-mono text-zinc-400 max-h-[80px] overflow-y-auto border border-zinc-150 dark:border-zinc-850 p-2 rounded-lg bg-zinc-50/50">
               {Object.entries(responseHeaders).slice(0, 3).map(([k, v]) => (
                 <div key={k} className="truncate">
                   <span className="font-bold">{k}:</span> {v}
@@ -63,7 +63,7 @@ export function ResponseConsole({
           )}
 
           {/* Body Scroll area */}
-          <pre className="max-h-[350px] overflow-auto rounded-xl border border-zinc-150 dark:border-zinc-850 bg-zinc-950 p-4 font-mono text-xs text-zinc-350 select-all leading-normal font-medium">
+          <pre className="max-h-[350px] overflow-auto rounded-xl border border-zinc-150 dark:border-zinc-850 bg-zinc-950 p-4 font-mono text-body-caption text-zinc-350 select-all leading-normal font-medium">
             {responseData || "{}"}
           </pre>
         </div>

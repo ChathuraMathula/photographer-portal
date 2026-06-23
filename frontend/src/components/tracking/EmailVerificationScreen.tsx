@@ -41,7 +41,7 @@ export function EmailVerificationScreen({
         <form onSubmit={onSubmit}>
           <CardContent className="space-y-4">
             {verificationError && (
-              <div className="flex items-center gap-2 rounded-xl bg-red-50 p-4 text-sm text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
+              <div className="flex items-center gap-2 rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <p className="text-body-small-s">{verificationError}</p>
               </div>

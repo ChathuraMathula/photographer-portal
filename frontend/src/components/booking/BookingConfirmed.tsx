@@ -46,7 +46,7 @@ export function BookingConfirmed({ photographerFirstName, trackingToken, origin 
             Save this unique tracking URL to monitor updates on your booking:
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-xs select-all text-zinc-650 dark:text-zinc-350">
+            <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-body-caption select-all text-zinc-650 dark:text-zinc-350">
               {trackUrl}
             </code>
             <button

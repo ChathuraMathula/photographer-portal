@@ -94,7 +94,7 @@ export default function UserManagementPage() {
           </div>
           <Button
             onClick={() => setShowModal(true)}
-            className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-sm shadow-sm"
+            className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-body-small-s shadow-sm"
           >
             <UserPlus className="h-4 w-4" />
             Create User

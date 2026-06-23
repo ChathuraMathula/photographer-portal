@@ -30,7 +30,7 @@ export function ManualBookingModal({ formik, onClose }: Props) {
           <h2 className="text-title-medium text-primary-dark dark:text-white">
             Log Offline / Manual Booking
           </h2>
-          <Button variant="ghost" size="sm" onClick={onClose} className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-sm">
+          <Button variant="ghost" size="sm" onClick={onClose} className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-body-small-s">
             Cancel
           </Button>
         </div>

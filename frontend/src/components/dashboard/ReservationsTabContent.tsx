@@ -92,7 +92,7 @@ export function ReservationsTabContent({
             )}
           </div>
         ) : (
-          <div className="h-[400px] flex items-center justify-center border border-dashed rounded-xl text-zinc-400 text-sm">
+          <div className="h-[400px] flex items-center justify-center border border-dashed rounded-xl text-zinc-400 text-body-small-s">
             Select a reservation from the list to view details, proposal
             forms, and client chat thread.
           </div>

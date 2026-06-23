@@ -78,18 +78,18 @@ export function ChatBox({
     <div className="flex flex-col h-[500px] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
       {/* Header */}
       <div className="pb-3 px-4 pt-4 border-b border-zinc-100 dark:border-zinc-800">
-        <h3 className="text-sm font-bold flex items-center gap-1.5">
+        <h3 className="text-body-small-s font-bold flex items-center gap-1.5">
           <MessageSquare className="h-4 w-4" />
           {title}
         </h3>
-        <p className="text-xs text-zinc-550 mt-0.5">{description}</p>
+        <p className="text-body-caption text-zinc-550 mt-0.5">{description}</p>
       </div>
 
       {/* Message list */}
       <div className="flex-1 p-3 overflow-y-auto space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20">
         {messages.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xs text-zinc-400 italic">
+            <p className="text-body-caption text-zinc-400 italic">
               No messages yet. Start the conversation.
             </p>
           </div>
@@ -104,7 +104,7 @@ export function ChatBox({
                 {isFirstUnread && (
                   <div className="flex items-center my-4 animate-in fade-in duration-300">
                     <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
-                    <span className="mx-3 text-[10px] text-red-500 font-bold uppercase tracking-wider">
+                    <span className="mx-3 text-body-caption text-red-500 font-bold uppercase tracking-wider">
                       New Messages
                     </span>
                     <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
@@ -115,11 +115,11 @@ export function ChatBox({
                     isMe ? "ml-auto items-end" : "mr-auto"
                   }`}
                 >
-                  <span className="text-[9px] text-zinc-400 px-1">
+                  <span className="text-body-caption text-zinc-400 px-1">
                     {displayName}
                   </span>
                   <div
-                    className={`rounded-xl px-3 py-1.5 text-xs shadow-sm ${
+                    className={`rounded-xl px-3 py-1.5 text-body-caption shadow-sm ${
                       isMe
                         ? "bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"
                         : "bg-white text-zinc-900 border dark:bg-zinc-900 dark:text-zinc-100"
@@ -144,7 +144,7 @@ export function ChatBox({
           placeholder="Type a message..."
           value={messageText}
           onChange={(e) => onMessageChange(e.target.value)}
-          className="h-9 text-xs"
+          className="h-9 text-body-caption"
           disabled={disabled}
         />
         <button

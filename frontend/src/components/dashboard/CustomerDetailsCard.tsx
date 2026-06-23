@@ -48,14 +48,14 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
           <div className="flex items-center justify-between gap-2">
             <div>
               <p className="text-body-caption font-semibold text-zinc-400">Reservation ID</p>
-              <p className="font-mono text-xs font-semibold text-zinc-700 dark:text-zinc-300 select-all">
+              <p className="font-mono text-body-caption font-semibold text-zinc-700 dark:text-zinc-300 select-all">
                 {reservation.id}
               </p>
             </div>
             <button
               onClick={handleCopyId}
               type="button"
-              className="flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs text-zinc-650 dark:text-zinc-350 hover:text-primary-dark dark:hover:text-white transition-all cursor-pointer font-semibold shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900 focus:outline-none"
+              className="flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-body-caption text-zinc-655 dark:text-zinc-350 hover:text-primary-dark dark:hover:text-white transition-all cursor-pointer font-semibold shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900 focus:outline-none"
             >
               {copiedId ? (
                 <>
@@ -74,7 +74,7 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
             <div className="pt-3 border-t border-zinc-200/50 dark:border-zinc-850">
               <p className="text-body-caption font-semibold text-zinc-400 mb-1.5">Client Tracking Link</p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-xs select-all text-zinc-650 dark:text-zinc-350">
+                <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-body-caption select-all text-zinc-650 dark:text-zinc-350">
                   {`${typeof window !== "undefined" ? window.location.origin : "http://localhost:4000"}/book/track/${reservation.reservationToken}`}
                 </code>
                 <button

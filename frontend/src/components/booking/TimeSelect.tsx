@@ -65,7 +65,7 @@ export function TimeSelect({ value, onChange, error, placeholder = "Select time"
                     onChange(slot);
                     setShowTimes(false);
                   }}
-                  className={`w-full text-left px-4 py-2 text-xs transition-colors ${
+                  className={`w-full text-left px-4 py-2 text-body-caption transition-colors ${
                     isDisabled
                       ? "text-zinc-300 dark:text-zinc-700 pointer-events-none cursor-not-allowed bg-zinc-50/30 dark:bg-zinc-950/20"
                       : "hover:bg-zinc-100 dark:hover:bg-zinc-800"

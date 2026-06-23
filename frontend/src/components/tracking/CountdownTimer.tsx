@@ -29,7 +29,7 @@ export function CountdownTimer({ deadline }: Props) {
 
   if (timeLeft <= 0) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400 font-bold text-xs">
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400 font-bold text-body-caption">
         <Clock className="h-3.5 w-3.5" />
         Expired
       </span>
@@ -49,7 +49,7 @@ export function CountdownTimer({ deadline }: Props) {
   return (
     <div className="flex items-center gap-1.5 font-mono">
       <span
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shadow-sm ${
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-body-caption font-bold transition-all shadow-sm ${
           isUrgent
             ? "bg-red-500 text-white animate-pulse"
             : "bg-amber-100 text-amber-800 dark:bg-amber-950/20 dark:text-amber-400"
@@ -60,7 +60,7 @@ export function CountdownTimer({ deadline }: Props) {
         <span className="tracking-wider">
           {formattedHours}h {formattedMinutes}m {formattedSeconds}s
         </span>
-        <span className="text-[10px] uppercase font-bold opacity-90 shrink-0">remaining</span>
+        <span className="text-body-caption uppercase font-bold opacity-90 shrink-0">remaining</span>
       </span>
     </div>
   );

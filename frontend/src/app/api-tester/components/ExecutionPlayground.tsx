@@ -89,7 +89,7 @@ export function ExecutionPlayground({
                       list[index].key = e.target.value;
                       setQueryParams(list);
                     }}
-                    className="h-9 font-mono rounded-lg text-xs"
+                    className="h-9 font-mono rounded-lg text-body-caption"
                   />
                   <Input
                     placeholder="value"
@@ -99,7 +99,7 @@ export function ExecutionPlayground({
                       list[index].value = e.target.value;
                       setQueryParams(list);
                     }}
-                    className="h-9 font-mono rounded-lg text-xs"
+                    className="h-9 font-mono rounded-lg text-body-caption"
                   />
                   <button
                     type="button"
@@ -108,7 +108,7 @@ export function ExecutionPlayground({
                       list.splice(index, 1);
                       setQueryParams(list);
                     }}
-                    className="text-zinc-400 hover:text-red-500 text-xs px-1 cursor-pointer font-bold"
+                    className="text-zinc-400 hover:text-red-500 text-body-caption px-1 cursor-pointer font-bold"
                   >
                     &times;
                   </button>
@@ -127,7 +127,7 @@ export function ExecutionPlayground({
               value={reqBody}
               onChange={(e) => setReqBody(e.target.value)}
               placeholder={`{\n  "key": "value"\n}`}
-              className="w-full rounded-xl border border-zinc-200 bg-white p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary-dark dark:border-zinc-800 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200"
+              className="w-full rounded-xl border border-zinc-200 bg-white p-3 font-mono text-body-caption focus:outline-none focus:ring-2 focus:ring-primary-dark dark:border-zinc-800 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200"
             />
           </div>
         )}

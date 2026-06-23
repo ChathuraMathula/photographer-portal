@@ -50,7 +50,7 @@ export function EndpointDirectory({
                   {ep.path}
                 </code>
               </div>
-              <span className="text-[10px] font-semibold flex items-center gap-1 rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-zinc-650 dark:text-zinc-400">
+              <span className="text-body-caption font-semibold flex items-center gap-1 rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-zinc-650 dark:text-zinc-400">
                 <Lock className="h-2.5 w-2.5" />
                 {ep.access}
               </span>
@@ -66,7 +66,7 @@ export function EndpointDirectory({
               </div>
               <button
                 onClick={() => prefillPlayground(ep)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 text-xs font-semibold shadow-sm cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 text-body-caption font-semibold shadow-sm cursor-pointer transition-colors"
               >
                 <Play className="h-3 w-3 fill-current" /> Use in Tester
               </button>

@@ -102,7 +102,7 @@ export function EventTypeSelect({
                 key={type}
                 type="button"
                 onClick={() => handleSelectEventType(type)}
-                className={`w-full text-left px-4 py-2 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors ${
+                className={`w-full text-left px-4 py-2 text-body-caption hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors ${
                   !isOtherSelected && value === type ? "bg-zinc-50 dark:bg-zinc-950 font-bold" : ""
                 }`}
               >
@@ -113,7 +113,7 @@ export function EventTypeSelect({
               <button
                 type="button"
                 onClick={() => handleSelectEventType("OTHER_OPTION")}
-                className={`w-full text-left px-4 py-2 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-t border-zinc-100 dark:border-zinc-800 text-zinc-500 font-medium ${
+                className={`w-full text-left px-4 py-2 text-body-caption hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-t border-zinc-100 dark:border-zinc-800 text-zinc-500 font-medium ${
                   isOtherSelected ? "bg-zinc-50 dark:bg-zinc-950 font-bold" : ""
                 }`}
               >
@@ -131,7 +131,7 @@ export function EventTypeSelect({
             placeholder="Specify your custom event type here..."
             value={customEventValue}
             onChange={handleCustomEventChange}
-            className="h-[50px] rounded-xl border-zinc-200 dark:border-zinc-850 dark:bg-zinc-950 text-sm focus:ring-primary-dark"
+            className="h-[50px] rounded-xl border-zinc-200 dark:border-zinc-850 dark:bg-zinc-950 text-body-small-s focus:ring-primary-dark"
           />
         </div>
       )}

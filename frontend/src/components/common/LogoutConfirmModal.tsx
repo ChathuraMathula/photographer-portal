@@ -39,7 +39,7 @@ export function LogoutConfirmModal({ open, onConfirm, onCancel }: Props) {
             id="logout-confirm-btn"
             type="button"
             onClick={onConfirm}
-            className="btn btn-danger btn-modal text-sm h-11"
+            className="btn btn-danger btn-modal text-body-small-s h-11"
           >
             Yes, log out
           </button>
@@ -47,7 +47,7 @@ export function LogoutConfirmModal({ open, onConfirm, onCancel }: Props) {
             id="logout-cancel-btn"
             type="button"
             onClick={onCancel}
-            className="btn btn-outline btn-modal text-sm h-11"
+            className="btn btn-outline btn-modal text-body-small-s h-11"
           >
             Cancel
           </button>

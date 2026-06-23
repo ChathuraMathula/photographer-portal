@@ -131,7 +131,7 @@ export function ProfileSettingsForm({
                 <Input
                   readOnly
                   value={typeof window !== "undefined" ? `${window.location.origin}/book/${bookingSlug}` : ""}
-                  className="h-[50px] rounded-xl bg-white dark:bg-zinc-950 font-mono text-xs border-zinc-200 dark:border-zinc-800 focus-visible:ring-0 focus-visible:ring-offset-0 select-all cursor-text"
+                  className="h-[50px] rounded-xl bg-white dark:bg-zinc-950 font-mono text-body-caption border-zinc-200 dark:border-zinc-800 focus-visible:ring-0 focus-visible:ring-offset-0 select-all cursor-text"
                 />
                 <Button
                   type="button"
@@ -141,7 +141,7 @@ export function ProfileSettingsForm({
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="btn btn-outline h-[50px] px-4 py-0 min-w-0 md:min-w-0 font-medium text-sm text-zinc-700 dark:text-zinc-300 shadow-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5"
+                  className="btn btn-outline h-[50px] px-4 py-0 min-w-0 md:min-w-0 font-medium text-body-small-s text-zinc-700 dark:text-zinc-300 shadow-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5"
                 >
                   {copied ? (
                     <>
@@ -156,7 +156,7 @@ export function ProfileSettingsForm({
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+              <p className="text-body-caption text-zinc-450 dark:text-zinc-500">
                 Share this link with your customers so they can view your availability, packages, and submit booking requests directly.
               </p>
             </div>
@@ -185,7 +185,7 @@ export function ProfileSettingsForm({
                   <Button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="btn btn-outline h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-xs text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm"
+                    className="btn btn-outline h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-body-caption text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm"
                   >
                     <Upload className="h-3.5 w-3.5" />
                     Upload Image
@@ -194,14 +194,14 @@ export function ProfileSettingsForm({
                     <Button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="btn btn-outline border-red-200 hover:border-red-300 text-red-650 hover:bg-red-50/50 h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-xs flex items-center gap-1.5 shadow-sm"
+                      className="btn btn-outline border-red-200 hover:border-red-300 text-red-650 hover:bg-red-50/50 h-9 px-3 py-0 min-w-0 md:min-w-0 font-medium text-body-caption flex items-center gap-1.5 shadow-sm"
                     >
                       <X className="h-3.5 w-3.5" />
                       Remove
                     </Button>
                   )}
                 </div>
-                <p className="text-[10px] text-zinc-450 dark:text-zinc-500">
+                <p className="text-body-caption text-zinc-455 dark:text-zinc-500">
                   PNG, JPG, or GIF. Max 5MB. Images are saved locally to your profile.
                 </p>
                 <input
@@ -228,7 +228,7 @@ export function ProfileSettingsForm({
               placeholder="Describe your style, experience, and custom offerings shown to clients..."
               className="w-full rounded-xl border border-zinc-200 bg-white p-3 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
             />
-            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+            <p className="text-body-caption text-zinc-400 dark:text-zinc-500 mt-1">
               Fully customize your profile description to entice prospective booking requests.
             </p>
           </div>
@@ -263,26 +263,26 @@ export function ProfileSettingsForm({
               <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
                 Offered Event Types
               </Label>
-              <p className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-0.5">
+              <p className="text-body-caption text-zinc-455 dark:text-zinc-500 mt-0.5">
                 Define the service types that clients can choose from in your booking availability checklist.
               </p>
             </div>
 
             {/* List active choices */}
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <Label className="text-body-caption font-semibold text-zinc-500 uppercase tracking-wider">
                 Currently Offered
               </Label>
               {allowedEventTypes.length === 0 ? (
                 <div className="text-center py-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/20">
-                  <p className="text-xs text-zinc-400 italic">No event types defined yet. Select or add one below.</p>
+                  <p className="text-body-caption text-zinc-400 italic">No event types defined yet. Select or add one below.</p>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {allowedEventTypes.map((type) => (
                     <span
                       key={type}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 px-3 py-1 text-xs font-semibold shadow-sm"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 px-3 py-1 text-body-caption font-semibold shadow-sm"
                     >
                       {type}
                       <button
@@ -300,7 +300,7 @@ export function ProfileSettingsForm({
 
             {/* Predefined Select buttons */}
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <Label className="text-body-caption font-semibold text-zinc-500 uppercase tracking-wider">
                 Select Predefined Types
               </Label>
               <div className="flex flex-wrap gap-1.5">
@@ -311,7 +311,7 @@ export function ProfileSettingsForm({
                       key={type}
                       type="button"
                       onClick={() => handleTogglePredefinedType(type)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${
+                      className={`px-3 py-1 rounded-lg text-body-caption font-medium border transition-all ${
                         isSelected
                           ? "bg-zinc-150 border-zinc-300 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                           : "border-zinc-200 text-zinc-650 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950"
@@ -326,7 +326,7 @@ export function ProfileSettingsForm({
 
             {/* Add Custom manually */}
             <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <Label className="text-body-caption font-semibold text-zinc-500 uppercase tracking-wider">
                 Add Custom Event Type
               </Label>
               <div className="flex gap-2">
@@ -334,7 +334,7 @@ export function ProfileSettingsForm({
                   value={customTypeInput}
                   onChange={(e) => setCustomTypeInput(e.target.value)}
                   placeholder="e.g. Newborn Session, Real Estate, Food"
-                  className="h-[50px] rounded-xl border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 text-sm"
+                  className="h-[50px] rounded-xl border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 text-body-small-s"
                 />
                 <Button
                   type="button"
@@ -359,11 +359,11 @@ export function ProfileSettingsForm({
               <div className="space-y-0.5">
                 <Label
                   htmlFor="allowCustomTog"
-                  className="text-xs font-semibold text-zinc-900 dark:text-white cursor-pointer"
+                  className="text-body-caption font-semibold text-zinc-900 dark:text-white cursor-pointer"
                 >
                   Allow custom client event types
                 </Label>
-                <p className="text-[10px] text-zinc-450 dark:text-zinc-550">
+                <p className="text-body-caption text-zinc-455 dark:text-zinc-550">
                   If toggled, clients can choose an &quot;Other&quot; option in your Booking Page and define their specific event type if they cannot find it in your list.
                 </p>
               </div>

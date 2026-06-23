@@ -41,7 +41,7 @@ export function AuthorizationGate({
             className="flex flex-col items-center justify-between text-center p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 cursor-pointer transition-all hover:border-zinc-350 active:scale-[0.98]"
           >
             <RoleBadge role={acc.role} />
-            <span className="text-[10px] text-zinc-405 mt-2 truncate max-w-full font-semibold">{acc.name}</span>
+            <span className="text-body-caption text-zinc-405 mt-2 truncate max-w-full font-semibold">{acc.name}</span>
           </button>
         ))}
       </div>
@@ -75,7 +75,7 @@ export function AuthorizationGate({
             <Button 
               type="submit" 
               disabled={loggingIn}
-              className="btn btn-primary h-10 w-full px-0 py-0 min-w-0 md:min-w-0 text-sm shadow-sm"
+              className="btn btn-primary h-10 w-full px-0 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm"
             >
               {loggingIn ? "..." : "Log In"}
             </Button>

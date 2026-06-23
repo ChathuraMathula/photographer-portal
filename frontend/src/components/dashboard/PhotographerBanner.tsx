@@ -43,7 +43,7 @@ export function PhotographerBanner({
         <Button
           onClick={onAddManualBooking}
           variant="outline"
-          className="btn btn-secondary h-10 px-4 py-0 min-w-0 md:min-w-0 text-sm shadow-sm gap-1.5"
+          className="btn btn-secondary h-10 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm gap-1.5"
         >
           <Plus className="h-4 w-4 shrink-0" /> Add Manual Booking
         </Button>

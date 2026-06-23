@@ -34,7 +34,7 @@ export function PackageFormModal({
           <h2 className="text-title-medium text-primary-dark dark:text-white">
             {editingPkg ? "Edit Package Details" : "Create New Package"}
           </h2>
-          <Button variant="ghost" size="sm" onClick={onClose} className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-sm">
+          <Button variant="ghost" size="sm" onClick={onClose} className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-body-small-s">
             Cancel
           </Button>
         </div>
@@ -99,7 +99,7 @@ export function PackageFormModal({
               onChange={(e) => onIncludesChange(e.target.value)}
               className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
-            <p className="text-[10px] text-zinc-450 mt-1 pl-1">Separate items by comma.</p>
+            <p className="text-body-caption text-zinc-455 mt-1 pl-1">Separate items by comma.</p>
           </div>
 
           <div className="border-t pt-4 mt-6 flex justify-end gap-3 dark:border-zinc-800">
