@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { ChatGateway } from '../reservations/chat.gateway';
 
 @Injectable()
 export class PhotographersService {
@@ -10,6 +11,7 @@ export class PhotographersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(PhotographerProfile)
     private profileRepository: Repository<PhotographerProfile>,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async findAll() {
@@ -53,11 +55,30 @@ export class PhotographersService {
       Object.entries(updates).filter(([k]) => allowed.includes(k)),
     );
 
-    const profile = await this.profileRepository.findOneBy({ userId });
+    const profile = await this.profileRepository.findOne({
+      where: { userId },
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Profile not found');
 
     Object.assign(profile, safe);
-    return this.profileRepository.save(profile);
+    const saved = await this.profileRepository.save(profile);
+
+    this.chatGateway.broadcastProfileUpdate(saved.bookingSlug, {
+      bookingSlug: saved.bookingSlug,
+      firstName: profile.user.firstName,
+      lastName: profile.user.lastName,
+      bio: saved.bio,
+      specializations: saved.specializations,
+      portfolioUrl: saved.portfolioUrl,
+      profileImageUrl: saved.profileImageUrl,
+      baseLocation: saved.baseLocation,
+      isAvailableForBooking: saved.isAvailableForBooking,
+      allowedEventTypes: saved.allowedEventTypes,
+      allowCustomEventTypes: saved.allowCustomEventTypes,
+    });
+
+    return saved;
   }
 
   async getBookingLink(userId: string, baseUrl: string) {
@@ -67,9 +88,28 @@ export class PhotographersService {
   }
 
   async toggleAvailability(userId: string) {
-    const profile = await this.profileRepository.findOneBy({ userId });
+    const profile = await this.profileRepository.findOne({
+      where: { userId },
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Profile not found');
     profile.isAvailableForBooking = !profile.isAvailableForBooking;
-    return this.profileRepository.save(profile);
+    const saved = await this.profileRepository.save(profile);
+
+    this.chatGateway.broadcastProfileUpdate(saved.bookingSlug, {
+      bookingSlug: saved.bookingSlug,
+      firstName: profile.user.firstName,
+      lastName: profile.user.lastName,
+      bio: saved.bio,
+      specializations: saved.specializations,
+      portfolioUrl: saved.portfolioUrl,
+      profileImageUrl: saved.profileImageUrl,
+      baseLocation: saved.baseLocation,
+      isAvailableForBooking: saved.isAvailableForBooking,
+      allowedEventTypes: saved.allowedEventTypes,
+      allowCustomEventTypes: saved.allowCustomEventTypes,
+    });
+
+    return saved;
   }
 }

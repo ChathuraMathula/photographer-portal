@@ -122,4 +122,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       available,
     });
   }
+
+  broadcastProfileUpdate(bookingSlug: string, profileData: any) {
+    console.log(`📢 Broadcasting profile update for ${bookingSlug}`);
+    this.server.to(`booking_${bookingSlug}`).emit('profileUpdated', profileData);
+  }
 }

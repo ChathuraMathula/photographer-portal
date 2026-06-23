@@ -79,10 +79,10 @@ export function CalendarPicker({ value, onChange, today, error }: Props) {
   const isDateDisabled = (date: Date | null) => {
     if (!date) return true;
     const checkDate = new Date(date);
-    checkDate.setHours(23, 59, 59, 999);
+    checkDate.setHours(0, 0, 0, 0);
     const limitDate = new Date(today);
     limitDate.setHours(0, 0, 0, 0);
-    return checkDate < limitDate;
+    return checkDate <= limitDate;
   };
 
   const calendarGrid = buildCalendarGrid();

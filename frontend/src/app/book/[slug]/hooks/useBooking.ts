@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { io } from "socket.io-client";
 
 import { type PhotographerProfile } from "@/types";
 import { type AvailabilityValues } from "@/components/booking/AvailabilityForm";
@@ -15,13 +16,13 @@ type Step = "availability" | "details" | "confirmed";
 const AvailabilitySchema = Yup.object({
   date: Yup.string()
     .required("Date is required")
-    .test("not-past", "Date cannot be in the past", function (value) {
+    .test("not-past", "Date must be in the future (tomorrow or later)", function (value) {
       if (!value) return false;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const selected = new Date(value);
       selected.setHours(0, 0, 0, 0);
-      return selected >= today;
+      return selected > today;
     }),
   startTime: Yup.string()
     .required("Start time is required")
@@ -87,6 +88,27 @@ export function useBooking() {
         }
       })
       .catch(() => setPageState("not-found"));
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    const socket = io(API);
+    socket.emit("joinBooking", { bookingSlug: slug });
+
+    socket.on("profileUpdated", (updatedProfile: PhotographerProfile) => {
+      console.log("⚡ Real-time profile update received:", updatedProfile);
+      setProfile((prev) => {
+        if (!prev) return updatedProfile;
+        return {
+          ...prev,
+          ...updatedProfile,
+        };
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [slug]);
 
   const availabilityFormik = useFormik<AvailabilityValues>({

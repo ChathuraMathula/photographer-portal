@@ -66,6 +66,14 @@ export class BookingsService {
     startTime: string,
     endTime: string,
   ) {
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    if (date <= todayStr) {
+      return {
+        available: false,
+        reason: 'Checking availability for today or past dates is not allowed.',
+      };
+    }
+
     const profile = await this.profileRepository.findOne({
       where: { bookingSlug: slug },
       relations: { user: true },
@@ -107,6 +115,13 @@ export class BookingsService {
   async createBooking(slug: string, dto: CreateBookingDto) {
     if (dto.startTime >= dto.endTime) {
       throw new BadRequestException('startTime must be before endTime');
+    }
+
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    if (dto.date <= todayStr) {
+      throw new BadRequestException(
+        'Booking is only allowed for future dates (tomorrow onwards).',
+      );
     }
 
     const profile = await this.profileRepository.findOne({
