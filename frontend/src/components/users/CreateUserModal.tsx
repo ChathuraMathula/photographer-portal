@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/common/FieldError";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type CreateUserValues = {
   firstName: string;
@@ -43,28 +50,31 @@ export function CreateUserModal({
 }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 space-y-6">
-        <div className="flex items-center justify-between border-b pb-4 dark:border-zinc-800">
-          <h2 className="text-title-medium text-primary-dark dark:text-white flex items-center gap-2">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Sticky Header with Background & Close Button */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800">
+          <h2 className="text-title-medium text-primary-dark dark:text-white flex items-center gap-2 font-bold">
             <Sparkles className="h-5 w-5 text-indigo-500" /> Create New User
           </h2>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={onClose}
-            className="btn btn-secondary h-9 px-3 py-0 min-w-0 md:min-w-0 text-body-small-s"
+            className="h-8 w-8 rounded-lg text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 cursor-pointer"
           >
-            Cancel
+            <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {submitError && (
-          <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
-            {submitError}
-          </div>
-        )}
+        {/* Scrollable Form Content */}
+        <form onSubmit={formik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+          {submitError && (
+            <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20">
+              {submitError}
+            </div>
+          )}
 
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
           {/* Basic Account Fields */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -143,20 +153,24 @@ export function CreateUserModal({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cu-role" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Role</Label>
-              <select
-                id="cu-role"
+              <Select
                 disabled={loggedInRole === UserRole.ADMIN}
-                {...formik.getFieldProps("role")}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 h-11 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
+                value={formik.values.role}
+                onValueChange={(val) => formik.setFieldValue("role", val)}
               >
-                <option value={UserRole.PHOTOGRAPHER}>Photographer</option>
-                {loggedInRole === UserRole.SUPER_ADMIN && (
-                  <>
-                    <option value={UserRole.ADMIN}>Admin</option>
-                    <option value={UserRole.SUPER_ADMIN}>Super Admin</option>
-                  </>
-                )}
-              </select>
+                <SelectTrigger className="h-[50px] bg-white dark:bg-zinc-950 text-body-small border-zinc-200 dark:border-zinc-800 rounded-xl cursor-pointer">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-in duration-100">
+                  <SelectItem value={UserRole.PHOTOGRAPHER} className="cursor-pointer">Photographer</SelectItem>
+                  {loggedInRole === UserRole.SUPER_ADMIN && (
+                    <>
+                      <SelectItem value={UserRole.ADMIN} className="cursor-pointer">Admin</SelectItem>
+                      <SelectItem value={UserRole.SUPER_ADMIN} className="cursor-pointer">Super Admin</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cu-phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Phone (optional)</Label>
@@ -231,7 +245,7 @@ export function CreateUserModal({
                   <Button
                     type="button"
                     onClick={onAddSpec}
-                    className="btn btn-secondary h-11 py-0 min-w-0 md:min-w-0 px-4 shadow-sm"
+                    className="btn btn-secondary h-11 py-0 min-w-0 md:min-w-0 px-4 shadow-sm animate-in fade-in duration-100"
                   >
                     Add
                   </Button>
@@ -240,7 +254,7 @@ export function CreateUserModal({
                   {specsList.map((spec) => (
                     <span
                       key={spec}
-                      className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-body-caption font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300"
+                      className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-body-caption font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 animate-in fade-in zoom-in-95 duration-100"
                     >
                       {spec}
                       <button
@@ -257,19 +271,20 @@ export function CreateUserModal({
             </div>
           )}
 
-          <div className="border-t pt-4 mt-6 flex justify-end gap-3 dark:border-zinc-800">
+          {/* Sticky Footer inside the flex form */}
+          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 grid grid-cols-2 gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="btn btn-secondary h-11 py-0 min-w-0 md:min-w-0 px-6 shadow-sm"
+              className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
             >
               Close
             </Button>
             <Button
               type="submit"
               disabled={formik.isSubmitting}
-              className="btn btn-primary h-11 py-0 min-w-0 md:min-w-0 px-6 shadow-sm"
+              className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
             >
               {formik.isSubmitting ? "Creating..." : "Save User"}
             </Button>

@@ -468,9 +468,31 @@
   }
 }
 
+/* Custom scrollbar styling for all scrollable content (like modal scrollable areas and lists) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.85 0 0);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.7 0 0);
+}
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.85 0 0) transparent;
+}
+
 /* Usability upgrades: make standard form inputs, select dropdowns, and buttons min-height 50px */
 input[data-slot="input"]:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]),
-select {
+select,
+button[data-slot="select-trigger"]:not([class*="h-9"]):not([class*="h-10"]):not([class*="h-8"]):not([class*="h-7"]) {
   height: 50px !important;
   min-height: 50px !important;
 }

@@ -10,7 +10,7 @@ import { io, Socket } from "socket.io-client";
 
 import { RootState } from "@/store/store";
 import { UserRole, logout } from "@/store/slices/authSlice";
-import { type Reservation, type Package, type ChatMessage } from "@/types";
+import { type Reservation, type Package, type ChatMessage, type NotificationItem } from "@/types";
 import { type ManualBookingValues } from "@/components/dashboard/ManualBookingModal";
 import { type PackageFormValues } from "@/components/dashboard/PackageFormModal";
 
@@ -120,6 +120,9 @@ export function usePhotographerDashboard() {
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  // Notifications state
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
   // ── Auth guard ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isAuthenticated) router.push("/login");
@@ -202,6 +205,19 @@ export function usePhotographerDashboard() {
         if (prev.some((r) => r.id === newRes.id)) return prev;
         return [newRes, ...prev];
       });
+      setNotifications((prev) => [
+        {
+          id: `booking_${newRes.id}_${Date.now()}`,
+          title: "New Booking Request",
+          description: `${newRes.customer?.firstName ?? "Client"} requested a ${newRes.eventType} session.`,
+          timestamp: new Date().toISOString(),
+          read: false,
+          type: "booking" as const,
+          referenceId: newRes.id,
+        },
+        ...prev,
+      ]);
+      toast.info(`New booking request from ${newRes.customer?.firstName ?? "Client"}!`);
     });
 
     socket.on("reservationUpdated", (updatedRes: Reservation) => {
@@ -237,6 +253,22 @@ export function usePhotographerDashboard() {
         }
         return prev;
       });
+
+      if (message.sender === "CUSTOMER") {
+        setNotifications((prev) => [
+          {
+            id: `msg_${message.id}`,
+            title: `New Message from ${message.senderName}`,
+            description: message.content,
+            timestamp: new Date().toISOString(),
+            read: false,
+            type: "chat" as const,
+            referenceId: reservationId,
+          },
+          ...prev,
+        ]);
+        toast.success(`Message from ${message.senderName}: "${message.content.substring(0, 40)}${message.content.length > 40 ? "..." : ""}"`);
+      }
     });
 
     return () => {
@@ -558,6 +590,20 @@ export function usePhotographerDashboard() {
     setAdvanceAmount(Math.round(computedDeposit));
   }, [selectedPkgIds, packages, universalDepositType, universalDepositValue]);
 
+  const handleMarkAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const handleClearAllNotifications = () => {
+    setNotifications([]);
+  };
+
   const chatDisabled =
     selectedRes?.status === "CANCELLED" || selectedRes?.status === "REJECTED";
 
@@ -624,5 +670,9 @@ export function usePhotographerDashboard() {
     setUniversalDepositType,
     universalDepositValue,
     setUniversalDepositValue,
+    notifications,
+    handleMarkAsRead,
+    handleMarkAllAsRead,
+    handleClearAllNotifications,
   };
 }

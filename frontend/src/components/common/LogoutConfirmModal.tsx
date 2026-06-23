@@ -34,7 +34,7 @@ export function LogoutConfirmModal({ open, onConfirm, onCancel }: Props) {
         </AlertDialogHeader>
 
         {/* Confirm LEFT · Cancel RIGHT — intentional order to prevent accidental logout */}
-        <div className="flex flex-row gap-3 pt-2">
+        <div className="w-full grid grid-cols-2 gap-3 pt-2">
           <button
             id="logout-confirm-btn"
             type="button"

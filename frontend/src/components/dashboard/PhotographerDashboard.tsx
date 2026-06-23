@@ -17,6 +17,7 @@ import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal"
 import { ReservationsTabContent } from "@/components/dashboard/ReservationsTabContent";
 import { FloatingChatWidget } from "@/components/dashboard/FloatingChatWidget";
 import { type Reservation } from "@/types";
+import { NotificationBell } from "@/components/dashboard/NotificationBell";
 
 type Props = {
   activeTab: "reservations" | "calendar" | "packages" | "profile";
@@ -86,6 +87,10 @@ export function PhotographerDashboard({ activeTab }: Props) {
     setUniversalDepositType,
     universalDepositValue,
     setUniversalDepositValue,
+    notifications,
+    handleMarkAsRead,
+    handleMarkAllAsRead,
+    handleClearAllNotifications,
   } = usePhotographerDashboard();
 
   useEffect(() => {
@@ -107,6 +112,22 @@ export function PhotographerDashboard({ activeTab }: Props) {
       onLogout={handleLogout}
       userName={firstName ?? ""}
       userRole={role ?? ""}
+      profileImageUrl={profileImageUrl}
+      notificationBell={
+        <NotificationBell
+          notifications={notifications}
+          onMarkAsRead={handleMarkAsRead}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onClearAll={handleClearAllNotifications}
+          onSelectReservation={(resId) => {
+            const res = reservations.find((r) => r.id === resId);
+            if (res) {
+              setSelectedRes(res);
+              router.push(`/dashboard/reservations?id=${resId}`);
+            }
+          }}
+        />
+      }
     >
       <div className="space-y-6">
         <PhotographerBanner

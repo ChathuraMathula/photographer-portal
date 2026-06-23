@@ -272,19 +272,19 @@ export function BookingDetailsModal({
         </div>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800 flex flex-col sm:flex-row justify-end gap-2">
+        <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm dark:border-zinc-800 grid grid-cols-2 gap-3">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            className="btn btn-secondary h-11 px-6 text-body-small-s cursor-pointer"
+            className="btn btn-secondary btn-modal h-11 px-6 text-body-small-s cursor-pointer animate-in fade-in duration-100"
           >
             Close Dialog
           </Button>
           <Button
             type="button"
             onClick={() => onNavigateToReservation(reservation)}
-            className="btn btn-primary h-11 px-6 text-body-small-s shadow-sm font-semibold cursor-pointer"
+            className="btn btn-primary btn-modal h-11 px-6 text-body-small-s shadow-sm font-semibold cursor-pointer animate-in fade-in duration-100"
           >
             View Reservation &amp; Chat
           </Button>

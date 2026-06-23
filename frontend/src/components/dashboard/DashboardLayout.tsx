@@ -33,6 +33,8 @@ type DashboardLayoutProps = {
   children: React.ReactNode;
   /** Optional custom nav items. Defaults to photographer tabs. */
   menuItems?: MenuItem[];
+  profileImageUrl?: string;
+  notificationBell?: React.ReactNode;
 };
 
 // ── Default photographer menu ─────────────────────────────────────────────────
@@ -54,6 +56,8 @@ export function DashboardLayout({
   userRole,
   children,
   menuItems,
+  profileImageUrl,
+  notificationBell,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed]       = useState(false);
   const [isMobileOpen, setIsMobileOpen]     = useState(false);
@@ -247,6 +251,7 @@ export function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-3">
+            {notificationBell}
             <span className="h-8 w-[1px] bg-zinc-200" />
             <div
               onClick={() => {
@@ -255,11 +260,20 @@ export function DashboardLayout({
                 }
               }}
               title={userRole === "PHOTOGRAPHER" ? "View Profile" : undefined}
-              className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-body-small-s text-zinc-800 shadow-inner ${
+              className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-body-small-s text-zinc-800 shadow-inner overflow-hidden ${
                 userRole === "PHOTOGRAPHER" ? "cursor-pointer hover:bg-zinc-200 transition-colors" : ""
               }`}
             >
-              {userName ? userName[0].toUpperCase() : "P"}
+              {profileImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profileImageUrl}
+                  alt="Profile"
+                  className="h-full w-full object-cover animate-in fade-in duration-100"
+                />
+              ) : (
+                userName ? userName[0].toUpperCase() : "P"
+              )}
             </div>
           </div>
         </header>

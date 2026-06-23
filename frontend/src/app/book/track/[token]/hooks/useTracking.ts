@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 import { type TrackingReservation, type ChatMessage } from "@/types";
 
@@ -159,7 +160,7 @@ export function useTracking() {
       );
       setConfirming(false);
     } catch (err: any) {
-      alert(err.message || "Failed to confirm reservation");
+      toast.error(err.message || "Failed to confirm reservation");
       setConfirming(false);
     }
   };

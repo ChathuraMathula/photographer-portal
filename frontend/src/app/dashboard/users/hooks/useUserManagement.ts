@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { toast } from "sonner";
 
 import { RootState } from "@/store/store";
 import { UserRole } from "@/store/slices/authSlice";
@@ -76,7 +77,7 @@ export function useUserManagement() {
         prev.map((u) => (u.id === userId ? { ...u, isActive: data.isActive } : u))
       );
     } catch (err: any) {
-      alert(err.message || "Error updating user status");
+      toast.error(err.message || "Error updating user status");
     }
   };
 

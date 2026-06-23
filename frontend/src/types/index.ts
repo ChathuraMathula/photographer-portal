@@ -110,3 +110,13 @@ export type UserAccount = {
   phone?: string;
   profile?: UserProfile;
 };
+
+export type NotificationItem = {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  read: boolean;
+  type: "booking" | "chat";
+  referenceId: string;
+};

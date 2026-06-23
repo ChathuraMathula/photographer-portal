@@ -163,18 +163,18 @@ export function PackageFormModal({
           </div>
 
           {/* Sticky Footer inside the flex form */}
-          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 border-t px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm -mx-6 -mb-6 mt-6 dark:border-zinc-800 grid grid-cols-2 gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="btn btn-secondary h-11 py-0 min-w-0 md:min-w-0 px-6 shadow-sm"
+              className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="btn btn-primary h-11 py-0 min-w-0 md:min-w-0 px-6 shadow-sm"
+              className="btn btn-primary btn-modal h-11 py-0 px-6 shadow-sm animate-in fade-in duration-100"
             >
               {editingPkg ? "Save Changes" : "Create Package"}
             </Button>
