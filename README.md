@@ -73,9 +73,26 @@ This starts:
 - **pgAdmin 4** (DB UI) on `http://localhost:5050`
 - **Maildev** (Local SMTP Web UI) on `http://localhost:1080` (SMTP port `1025`)
 
-pgAdmin credentials (defined in `docker-compose.yml`):
-- Username: `admin@photoportal.com`
-- Password: `pgadminsecure123`
+### pgAdmin Login & Database Connection
+
+To access and manage the database via the pgAdmin web UI:
+
+1. Open **pgAdmin 4** at [http://localhost:5050](http://localhost:5050)
+2. Log in with the pgAdmin credentials:
+   - **Email/Username**: `admin@photoportal.com`
+   - **Password**: `pgadminsecure123`
+3. Register/Connect to the PostgreSQL server:
+   - Right-click **Servers** in the left browser tree > **Register** > **Server...**
+   - Under the **General** tab:
+     - **Name**: `Photographer Portal`
+   - Under the **Connection** tab:
+     - **Host name/address**: `postgres` *(the Docker service name)*
+     - **Port**: `5432` *(internal Docker port, NOT 5433)*
+     - **Maintenance database**: `portal`
+     - **Username**: `admin`
+     - **Password**: `securepassword123`
+     - Check **Save password?**
+   - Click **Save**.
 
 ### 2. Configure environment variables
 
