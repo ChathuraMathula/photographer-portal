@@ -333,7 +333,7 @@
     font-size: var(--font-size-body-base-bold);
     line-height: var(--line-height-body-base-bold);
     font-weight: 700;
-    @apply flex justify-center items-center px-8 py-3 rounded-full h-[50px] md:h-[52px] text-center mx-auto md:mx-0 max-w-[30rem] md:max-w-fit min-w-[250px] transition-all duration-300 ease-in-out cursor-pointer;
+    @apply flex justify-center items-center px-8 py-3 rounded-full h-[50px] md:h-[50px] text-center mx-auto md:mx-0 max-w-[30rem] md:max-w-fit min-w-[250px] transition-all duration-300 ease-in-out cursor-pointer;
   }
   .btn:disabled {
     @apply opacity-50 cursor-not-allowed;
@@ -466,4 +466,17 @@
   label.entry__error.entry__error--primary {
     @apply !text-[10px] !leading-[10px] mt-0.5 mb-0 bg-transparent;
   }
+}
+
+/* Usability upgrades: make standard form inputs, select dropdowns, and buttons min-height 50px */
+input[data-slot="input"]:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]),
+select {
+  height: 50px !important;
+  min-height: 50px !important;
+}
+
+.btn:not(.btn-link):not(.w-9):not(.h-9),
+button[data-slot="button"]:not([class*="size-"]):not([class*="icon"]):not([class*="h-6"]):not([class*="h-7"]):not([class*="h-8"]):not([class*="h-9"]):not(.btn-link) {
+  height: 50px !important;
+  min-height: 50px !important;
 }
