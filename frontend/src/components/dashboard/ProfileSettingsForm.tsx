@@ -187,7 +187,7 @@ export function ProfileSettingsForm({
                 <Input
                   readOnly
                   value={typeof window !== "undefined" ? `${window.location.origin}/book/${bookingSlug}` : ""}
-                  className="h-[50px] rounded-xl bg-white dark:bg-zinc-950 font-mono text-body-caption border-zinc-200 dark:border-zinc-800 focus-visible:ring-0 focus-visible:ring-offset-0 select-all cursor-text"
+                  className="h-[50px] w-full min-w-0 rounded-xl bg-white dark:bg-zinc-950 font-mono text-body-caption border-zinc-200 dark:border-zinc-800 focus-visible:ring-0 focus-visible:ring-offset-0 select-all cursor-text"
                 />
                 <Button
                   type="button"
@@ -440,7 +440,7 @@ export function ProfileSettingsForm({
                   value={customTypeInput}
                   onChange={(e) => setCustomTypeInput(e.target.value)}
                   placeholder="e.g. Newborn Session, Real Estate, Food"
-                  className="h-[50px] rounded-xl border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 text-body-small-s"
+                  className="h-[50px] w-full min-w-0 rounded-xl border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 text-body-small-s"
                 />
                 <Button
                   type="button"

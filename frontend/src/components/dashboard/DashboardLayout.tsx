@@ -102,11 +102,11 @@ export function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen flex bg-zinc-50 font-sans antialiased text-zinc-900">
+    <div className="h-screen w-screen flex bg-zinc-50 font-sans antialiased text-zinc-900 overflow-hidden">
 
       {/* ── Desktop Sidebar ───────────────────────────────────────────────── */}
       <aside
-        className={`hidden lg:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-all duration-300 ease-in-out shrink-0 sticky top-0 h-screen z-30 ${
+        className={`hidden lg:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-all duration-300 ease-in-out shrink-0 h-full z-30 ${
           isCollapsed ? "w-16" : "w-64"
         }`}
       >
@@ -218,7 +218,7 @@ export function DashboardLayout({
       )}
 
       {/* ── Main Content Area ─────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Topbar */}
         <header className="h-16 flex items-center justify-between px-4 bg-white border-b border-zinc-200/80 shrink-0 select-none z-20">
           <div className="flex items-center">
