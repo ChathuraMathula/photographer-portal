@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Copy, Check } from "lucide-react";
 
 type Props = {
   bio: string;
@@ -31,6 +33,8 @@ export function ProfileSettingsForm({
   onPortfolioChange,
   onSubmit,
 }: Props) {
+  const [copied, setCopied] = useState(false);
+
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm max-w-2xl mx-auto rounded-xl overflow-hidden">
       <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-850 bg-zinc-50/20">
@@ -57,11 +61,22 @@ export function ProfileSettingsForm({
                   onClick={() => {
                     const url = `${window.location.origin}/book/${bookingSlug}`;
                     navigator.clipboard.writeText(url);
-                    alert("Public booking link copied to clipboard!");
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="btn btn-outline h-11 px-4 py-0 min-w-0 md:min-w-0 font-medium text-sm text-zinc-700 dark:text-zinc-300 shadow-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                  className="btn btn-outline h-11 px-4 py-0 min-w-0 md:min-w-0 font-medium text-sm text-zinc-700 dark:text-zinc-300 shadow-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5"
                 >
-                  Copy Link
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      Copy Link
+                    </>
+                  )}
                 </Button>
               </div>
               <p className="text-xs text-zinc-400 dark:text-zinc-500">
