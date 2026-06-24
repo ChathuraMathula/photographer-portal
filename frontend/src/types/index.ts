@@ -37,6 +37,7 @@ export type Reservation = {
   endTime: string;
   eventType: string;
   location?: string;
+  locationMapLink?: string;
   customerNotes?: string;
   adminNotes?: string;
   totalAmountInCents?: number;
@@ -73,6 +74,7 @@ export type PhotographerProfile = {
   allowCustomEventTypes?: boolean;
   universalDepositType?: string;
   universalDepositValue?: number;
+  offlineMessage?: string;
 };
 
 export type TrackingReservation = {
@@ -83,6 +85,7 @@ export type TrackingReservation = {
   endTime: string;
   eventType: string;
   location?: string;
+  locationMapLink?: string;
   customerNotes?: string;
   advancePaymentPriceInCents?: number;
   quotationNotes?: string;
@@ -98,6 +101,7 @@ export type UserProfile = {
   bio?: string;
   baseLocation?: string;
   specializations: string[];
+  offlineMessage?: string;
 };
 
 export type UserAccount = {

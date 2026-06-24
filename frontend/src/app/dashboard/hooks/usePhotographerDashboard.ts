@@ -117,6 +117,7 @@ export function usePhotographerDashboard() {
   const [allowCustomEventTypes, setAllowCustomEventTypes] = useState(true);
   const [universalDepositType, setUniversalDepositType] = useState("fixed");
   const [universalDepositValue, setUniversalDepositValue] = useState(5000);
+  const [offlineMessage, setOfflineMessage] = useState("");
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -162,6 +163,7 @@ export function usePhotographerDashboard() {
             ? profData.universalDepositValue ?? 10
             : (profData.universalDepositValue ?? 500000) / 100
         );
+        setOfflineMessage(profData.offlineMessage || "");
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);
@@ -414,6 +416,7 @@ export function usePhotographerDashboard() {
             universalDepositType === "fixed"
               ? Math.round(universalDepositValue * 100)
               : Math.round(universalDepositValue),
+          offlineMessage,
         }),
         credentials: "include",
       });
@@ -684,5 +687,7 @@ export function usePhotographerDashboard() {
     handleClearAllNotifications,
     calendarSelectedRes,
     setCalendarSelectedRes,
+    offlineMessage,
+    setOfflineMessage,
   };
 }

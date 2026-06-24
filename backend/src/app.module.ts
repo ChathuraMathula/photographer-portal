@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ReservationsModule } from './reservations/reservations.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PhotographersModule } from './photographers/photographers.module';
 import { PackagesModule } from './packages/packages.module';
 import { EmailModule } from './email/email.module';
@@ -18,6 +19,7 @@ import { Package } from './entities/package.entity';
 import { Customer } from './entities/customer.entity';
 import { Reservation } from './entities/reservation.entity';
 import { Message } from './entities/message.entity';
+import { Payment } from './entities/payment.entity';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
@@ -41,6 +43,7 @@ if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function'
         Customer,
         Reservation,
         Message,
+        Payment,
       ],
       synchronize: true, // Automatically synchronize schema in development
     }),
@@ -50,6 +53,7 @@ if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function'
     UsersModule,
     BookingsModule,
     ReservationsModule,
+    PaymentsModule,
     PhotographersModule,
     PackagesModule,
   ],

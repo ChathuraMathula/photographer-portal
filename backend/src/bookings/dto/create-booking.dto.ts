@@ -23,5 +23,6 @@ export class CreateBookingDto {
   @IsString() @IsNotEmpty() eventType: string;
 
   @IsOptional() @IsString() location?: string;
+  @IsOptional() @IsString() locationMapLink?: string;
   @IsOptional() @IsString() notes?: string;
 }

@@ -52,6 +52,7 @@ const DetailsSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Required"),
   phone: Yup.string().required("Required"),
   location: Yup.string(),
+  locationMapLink: Yup.string().url("Must be a valid URL").nullable(),
   notes: Yup.string(),
 });
 
@@ -133,7 +134,7 @@ export function useBooking() {
   });
 
   const detailsFormik = useFormik({
-    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", notes: "" },
+    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", locationMapLink: "", notes: "" },
     validationSchema: DetailsSchema,
     onSubmit: async (values, { setStatus }) => {
       if (!availabilityChecked) return;

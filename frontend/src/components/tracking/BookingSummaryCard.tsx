@@ -37,6 +37,16 @@ export function BookingSummaryCard({ reservation }: { reservation: TrackingReser
               Location
             </p>
             <p className="text-body-small mt-0.5 text-zinc-550 dark:text-zinc-450">{reservation.location || "Not specified"}</p>
+            {reservation.locationMapLink && (
+              <a
+                href={reservation.locationMapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-1 text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 hover:underline transition-all"
+              >
+                🗺️ View on Google Maps
+              </a>
+            )}
           </div>
         </div>
         {reservation.customerNotes && (

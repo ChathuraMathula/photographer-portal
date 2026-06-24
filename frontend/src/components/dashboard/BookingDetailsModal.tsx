@@ -188,6 +188,16 @@ export function BookingDetailsModal({
                   <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-zinc-400" /> {reservation.location || "Offline / Not Provided"}
                   </p>
+                  {reservation.locationMapLink && (
+                    <a
+                      href={reservation.locationMapLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 mt-1.5 text-body-caption font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 hover:underline transition-all"
+                    >
+                      🗺️ View on Google Maps
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

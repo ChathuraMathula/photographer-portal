@@ -73,11 +73,11 @@ export function ProposalSection({
                 </p>
               </div>
               <Button
-                disabled={!selectedPkgId || confirming}
+                disabled={!selectedPkgId}
                 onClick={onConfirm}
-                className="btn btn-primary h-11 py-0 min-w-0 md:min-w-0 px-6 shrink-0 shadow-sm"
+                className="w-full sm:w-auto bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 h-11 px-6 rounded-xl font-semibold shadow-md transition-all cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100"
               >
-                {confirming ? "Processing..." : "Select Package & Confirm"}
+                Select Package &amp; Pay Deposit
               </Button>
             </div>
           </div>

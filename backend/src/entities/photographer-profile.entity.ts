@@ -41,6 +41,9 @@ export class PhotographerProfile {
   @Column({ default: true })
   allowCustomEventTypes!: boolean;
 
+  @Column({ type: 'text', nullable: true })
+  offlineMessage?: string;
+
   @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;

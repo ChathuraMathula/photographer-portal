@@ -52,6 +52,7 @@ export class PhotographersService {
       'allowCustomEventTypes',
       'universalDepositType',
       'universalDepositValue',
+      'offlineMessage',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),
@@ -78,6 +79,7 @@ export class PhotographersService {
       isAvailableForBooking: saved.isAvailableForBooking,
       allowedEventTypes: saved.allowedEventTypes,
       allowCustomEventTypes: saved.allowCustomEventTypes,
+      offlineMessage: saved.offlineMessage,
     });
 
     return saved;
@@ -110,6 +112,7 @@ export class PhotographersService {
       isAvailableForBooking: saved.isAvailableForBooking,
       allowedEventTypes: saved.allowedEventTypes,
       allowCustomEventTypes: saved.allowCustomEventTypes,
+      offlineMessage: saved.offlineMessage,
     });
 
     return saved;

@@ -39,6 +39,8 @@ type Props = {
   universalDepositValue: number;
   onUniversalDepositTypeChange: (v: string) => void;
   onUniversalDepositValueChange: (v: number) => void;
+  offlineMessage: string;
+  onOfflineMessageChange: (v: string) => void;
 };
 
 const PREDEFINED_EVENT_TYPES = [
@@ -72,6 +74,8 @@ export function ProfileSettingsForm({
   universalDepositValue,
   onUniversalDepositTypeChange,
   onUniversalDepositValueChange,
+  offlineMessage,
+  onOfflineMessageChange,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [customTypeInput, setCustomTypeInput] = useState("");
@@ -288,6 +292,24 @@ export function ProfileSettingsForm({
             />
             <p className="text-body-caption text-zinc-400 dark:text-zinc-500 mt-1">
               Fully customize your profile description to entice prospective booking requests.
+            </p>
+          </div>
+
+          {/* Custom Offline Message */}
+          <div className="space-y-2">
+            <Label htmlFor="offlineMsg" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Custom Offline Message <span className="text-zinc-400 font-normal">(optional)</span>
+            </Label>
+            <textarea
+              id="offlineMsg"
+              rows={3}
+              value={offlineMessage}
+              onChange={(e) => onOfflineMessageChange(e.target.value)}
+              placeholder="Describe what clients should see when Accept Bookings is toggled off..."
+              className="w-full rounded-xl border border-zinc-200 bg-white p-3 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
+            />
+            <p className="text-body-caption text-zinc-400 dark:text-zinc-500 mt-1">
+              This message will be shown to users accessing your booking link when Accept Bookings is toggled off.
             </p>
           </div>
 

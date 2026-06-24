@@ -381,6 +381,24 @@ Simulates custom portal chat logs between photographers and customer trackers.
 
 ---
 
+## Sandbox Payment Gateway Testing
+
+The portal implements a secure, sandbox-powered advanced deposit flow. When a photographer proposes a quotation, the customer is required to make an advanced payment within **24 hours** to lock their reservation.
+
+To test this flow, type one of the following mock card numbers in the checkout gateway modal:
+
+| Test Scenario | Mock Card Number | Simulation Outcome |
+|---|---|---|
+| **Success** | `4242 4242 4242 4242` | Transaction succeeds, creates a Payment record, updates booking to `CONFIRMED`, triggers socket broadcasts and email updates. |
+| **Insufficient Funds** | `4000 0000 0000 0002` | Transaction gets declined. Error: `Card Declined: Insufficient Funds`. |
+| **Card Expired** | `4000 0000 0000 0005` | Transaction gets declined. Error: `Card Declined: Card Expired`. |
+| **Suspected Fraud** | `4000 0000 0000 0008` | Transaction gets declined. Error: `Card Declined: Suspected Fraud`. |
+| **Gateway Timeout** | `5555 5555 5555 5555` | Simulates a network gateway connection lag (2s delay) and fails. Error: `Connection lost`. |
+
+*Note: Any other 16-digit card number will succeed by default. Cardholder Name, Expiry Date (MM/YY), and CVV (3 digits) are required inputs.*
+
+---
+
 ## Stopping Docker
 
 ```bash

@@ -198,5 +198,6 @@ export function useTracking() {
     handleSendMessage,
     handleConfirmReservation,
     getDeadlineText,
+    setReservation,
   };
 }

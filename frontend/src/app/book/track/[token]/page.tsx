@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import { useTracking } from "./hooks/useTracking";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ChatBox } from "@/components/common/ChatBox";
@@ -11,6 +12,7 @@ import { CancelledNotice } from "@/components/tracking/CancelledNotice";
 import { ProposalSection } from "@/components/tracking/ProposalSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaymentSandboxModal } from "@/components/tracking/PaymentSandboxModal";
 
 export default function TrackingPage() {
   const {
@@ -35,7 +37,10 @@ export default function TrackingPage() {
     handleSendMessage,
     handleConfirmReservation,
     getDeadlineText,
+    setReservation,
   } = useTracking();
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // ── Render gates ──────────────────────────────────────────────────────────
 
@@ -83,7 +88,7 @@ export default function TrackingPage() {
     reservation.status === "CANCELLED" || reservation.status === "REJECTED";
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8 px-4 sm:px-6 md:px-8 dark:bg-zinc-950">
+    <main className="min-h-screen bg-zinc-50 py-8 px-4 sm:px-6 md:px-8 dark:bg-zinc-950 animate-in fade-in duration-300">
       <div className="mx-auto max-w-5xl space-y-6">
         <ReservationHeader reservation={reservation} />
 
@@ -100,7 +105,7 @@ export default function TrackingPage() {
               selectedPkgId={selectedPkgId}
               confirming={confirming}
               onSelectPackage={setSelectedPkgId}
-              onConfirm={handleConfirmReservation}
+              onConfirm={() => setShowPaymentModal(true)}
               getDeadlineText={getDeadlineText}
             />
           </div>
@@ -121,6 +126,21 @@ export default function TrackingPage() {
           </div>
         </div>
       </div>
+
+      {showPaymentModal && selectedPkgId && (
+        <PaymentSandboxModal
+          open={showPaymentModal}
+          reservation={reservation}
+          token={token}
+          packageId={selectedPkgId}
+          onSuccess={(updatedStatus, pkgId) => {
+            setReservation((prev) =>
+              prev ? { ...prev, status: updatedStatus as any, clientSelectedPackageId: pkgId } : null
+            );
+          }}
+          onClose={() => setShowPaymentModal(false)}
+        />
+      )}
     </main>
   );
 }

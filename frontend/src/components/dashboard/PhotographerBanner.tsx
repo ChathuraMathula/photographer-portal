@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { AcceptBookingsConfirmModal } from "./AcceptBookingsConfirmModal";
 
 type Props = {
   firstName: string;
@@ -14,8 +16,10 @@ export function PhotographerBanner({
   onToggleAvailability,
   onAddManualBooking,
 }: Props) {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   return (
-    <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+    <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm relative">
       <div>
         <h2 className="text-title-large text-primary-dark dark:text-white">
           Welcome back, {firstName}
@@ -28,7 +32,13 @@ export function PhotographerBanner({
         <div className="flex items-center gap-2">
           <span className="text-body-small-s font-semibold text-zinc-550 dark:text-zinc-400">Accepting bookings:</span>
           <button
-            onClick={onToggleAvailability}
+            onClick={() => {
+              if (profileAvailability) {
+                setShowConfirmModal(true);
+              } else {
+                onToggleAvailability();
+              }
+            }}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
               profileAvailability ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"
             }`}
@@ -48,6 +58,15 @@ export function PhotographerBanner({
           <Plus className="h-4 w-4 shrink-0" /> Add Manual Booking
         </Button>
       </div>
+
+      <AcceptBookingsConfirmModal
+        open={showConfirmModal}
+        onConfirm={() => {
+          setShowConfirmModal(false);
+          onToggleAvailability();
+        }}
+        onCancel={() => setShowConfirmModal(false)}
+      />
     </header>
   );
 }

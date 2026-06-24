@@ -19,6 +19,7 @@ export type CustomerDetailsValues = {
   email: string;
   phone: string;
   location: string;
+  locationMapLink: string;
   notes: string;
 };
 
@@ -133,6 +134,21 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
               {...formik.getFieldProps("location")}
               className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="locationMapLink" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Google Maps Location Link <span className="text-zinc-400 font-normal">(optional)</span>
+            </Label>
+            <Input
+              id="locationMapLink"
+              placeholder="e.g. https://maps.app.goo.gl/... or https://google.com/maps/..."
+              {...formik.getFieldProps("locationMapLink")}
+              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+            />
+            {formik.touched.locationMapLink && formik.errors.locationMapLink && (
+              <p className="text-xs text-red-500 font-medium">{formik.errors.locationMapLink}</p>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -26,6 +26,8 @@ export default function ProfilePage() {
     universalDepositValue,
     setUniversalDepositType,
     setUniversalDepositValue,
+    offlineMessage,
+    setOfflineMessage,
   } = context;
 
   return (
@@ -48,6 +50,8 @@ export default function ProfilePage() {
       universalDepositValue={universalDepositValue}
       onUniversalDepositTypeChange={setUniversalDepositType}
       onUniversalDepositValueChange={setUniversalDepositValue}
+      offlineMessage={offlineMessage}
+      onOfflineMessageChange={setOfflineMessage}
     />
   );
 }

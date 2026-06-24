@@ -57,6 +57,7 @@ export class BookingsService {
       isAvailableForBooking: profile.isAvailableForBooking,
       allowedEventTypes: profile.allowedEventTypes,
       allowCustomEventTypes: profile.allowCustomEventTypes,
+      offlineMessage: profile.offlineMessage,
     };
   }
 
@@ -164,6 +165,7 @@ export class BookingsService {
       endTime: dto.endTime,
       eventType: dto.eventType,
       location: dto.location,
+      locationMapLink: dto.locationMapLink,
       customerNotes: dto.notes,
       status: ReservationStatus.PENDING,
       reservationToken: token,
@@ -213,6 +215,7 @@ export class BookingsService {
       endTime: reservation.endTime,
       eventType: reservation.eventType,
       location: reservation.location,
+      locationMapLink: reservation.locationMapLink,
       customerNotes: reservation.customerNotes,
       advancePaymentPriceInCents: reservation.advancePaymentPriceInCents,
       quotationNotes: reservation.quotationNotes,
