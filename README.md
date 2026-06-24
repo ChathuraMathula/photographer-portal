@@ -381,21 +381,37 @@ Simulates custom portal chat logs between photographers and customer trackers.
 
 ---
 
-## Sandbox Payment Gateway Testing
+## Sandbox Payment Gateway & Sri Lankan Card Testing
 
-The portal implements a secure, sandbox-powered advanced deposit flow. When a photographer proposes a quotation, the customer is required to make an advanced payment within **24 hours** to lock their reservation.
+The portal implements a secure, sandbox-powered advanced deposit flow. When a photographer proposes a quotation, the customer is required to make an advanced payment within **24 hours** to lock their reservation. 
 
-To test this flow, type one of the following mock card numbers in the checkout gateway modal:
+### Package-Specific Deposits
+Rather than a single flat fee, the checkout deposit amount is dynamically calculated based on the photographer's package deposit policy:
+- **Fixed**: A set amount in LKR (e.g. LKR 5,000).
+- **Percentage**: A percentage of the package total (e.g. 20% of LKR 25,000).
+- **Universal**: Falls back to the photographer's default profile settings.
 
-| Test Scenario | Mock Card Number | Simulation Outcome |
-|---|---|---|
-| **Success** | `4242 4242 4242 4242` | Transaction succeeds, creates a Payment record, updates booking to `CONFIRMED`, triggers socket broadcasts and email updates. |
-| **Insufficient Funds** | `4000 0000 0000 0002` | Transaction gets declined. Error: `Card Declined: Insufficient Funds`. |
-| **Card Expired** | `4000 0000 0000 0005` | Transaction gets declined. Error: `Card Declined: Card Expired`. |
-| **Suspected Fraud** | `4000 0000 0000 0008` | Transaction gets declined. Error: `Card Declined: Suspected Fraud`. |
-| **Gateway Timeout** | `5555 5555 5555 5555` | Simulates a network gateway connection lag (2s delay) and fails. Error: `Connection lost`. |
+### Sri Lankan Bank Cards Simulation
+To simulate local card transactions, you can test with card numbers matching specific Sri Lankan bank BIN ranges. When matched, the system dynamically identifies and records the bank and card brand:
 
-*Note: Any other 16-digit card number will succeed by default. Cardholder Name, Expiry Date (MM/YY), and CVV (3 digits) are required inputs.*
+| Bank / Card Issuer | Card Brand | Test Card Number | Simulation Outcome |
+|---|---|---|---|
+| **Sampath Bank** | Visa | `4532 8511 2233 4455` | **Success** (Recorded as Sampath Bank (Visa)) |
+| **Commercial Bank** | Mastercard | `5254 9622 3344 5566` | **Success** (Recorded as Commercial Bank (Mastercard)) |
+| **Bank of Ceylon (BOC)** | Visa | `4005 8611 2233 4455` | **Success** (Recorded as Bank of Ceylon (Visa)) |
+| **Standard Sandbox Card** | Visa | `4242 4242 4242 4242` | **Success** (Recorded as Visa Sandbox) |
+| **Declined: Insufficient Funds** | Visa | `4000 0000 0000 0002` | **Decline** (`Card Declined: Insufficient Funds`) |
+| **Declined: Card Expired** | Visa | `4000 0000 0000 0005` | **Decline** (`Card Declined: Card Expired`) |
+| **Declined: Suspected Fraud** | Visa | `4000 0000 0000 0008` | **Decline** (`Card Declined: Suspected Fraud`) |
+| **Gateway Timeout** | Mastercard | `5555 5555 5555 5555` | **Fail** (Simulates 2s lag, returns gateway timeout) |
+
+*Note: Cardholder Name, Expiry Date (MM/YY), and CVV (3 digits) are required inputs. Any other valid 16-digit card will process as a generic success.*
+
+### Manual Offline Payments
+When registering a manual offline booking from the photographer's dashboard, the photographer can select a package to auto-fill pricing or enter the total amount and advance paid in cash. This automatically creates an offline payment log record (Cash / Offline Payment) on the backend and updates the booking to `CONFIRMED`.
+
+### Developer Transactions Log
+All transactions (simulated card payments and manual cash entries) can be monitored by the photographer in real-time under the **Transactions** navigation tab in the dashboard.
 
 ---
 
