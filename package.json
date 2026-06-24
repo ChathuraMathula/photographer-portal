@@ -7,7 +7,7 @@
     "docker:db": "docker-compose up -d",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev": "concurrently \"npm run docker:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "node scripts/kill-ports.js && concurrently \"npm run docker:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "stop": "docker-compose down",
     "db:reset": "cd backend && npm run db:reset",
     "db:seed": "cd backend && npm run seed",
