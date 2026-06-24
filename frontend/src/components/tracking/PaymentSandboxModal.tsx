@@ -194,10 +194,10 @@ export function PaymentSandboxModal({
 
   return (
     <AlertDialog open={open} onOpenChange={(v) => !v && paymentStatus !== "processing" && onClose()}>
-      <AlertDialogContent className="max-w-md w-full overflow-hidden p-0 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl">
+      <AlertDialogContent className="max-w-md w-full overflow-hidden p-0 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="border-b border-zinc-100 dark:border-zinc-800/80 px-6 py-4 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900">
+        <div className="border-b border-zinc-100 dark:border-zinc-800/80 px-6 py-4 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900 shrink-0">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
             <AlertDialogTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">
@@ -215,7 +215,7 @@ export function PaymentSandboxModal({
         </div>
 
         {paymentStatus === "processing" || paymentStatus === "success" ? (
-          <div className="p-8 flex flex-col items-center justify-center min-h-[350px] space-y-4 text-center">
+          <div className="p-8 flex flex-col items-center justify-center min-h-[350px] space-y-4 text-center shrink-0">
             {paymentStatus === "processing" ? (
               <>
                 <Loader2 className="h-12 w-12 text-blue-600 dark:text-blue-500 animate-spin" />
@@ -237,7 +237,7 @@ export function PaymentSandboxModal({
             )}
           </div>
         ) : (
-          <div className="p-6 space-y-5">
+          <div className="p-6 space-y-5 flex-1 overflow-y-auto custom-scrollbar">
             {/* Summary Details */}
             <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
               <div>
