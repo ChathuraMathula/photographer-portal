@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { DashboardLayout, type MenuItem } from "@/components/dashboard/DashboardLayout";
 import { LayoutDashboard, Users } from "lucide-react";
 
+import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
+
 // ── Admin nav items ───────────────────────────────────────────────────────────
 
 export const ADMIN_MENU: MenuItem[] = [
@@ -33,8 +35,10 @@ export function AdminDashboard({
   onLogout,
 }: Props) {
   const router = useRouter();
+  const { start } = useTopLoadingBar();
 
   const handleTabChange = (tab: string) => {
+    start();
     if (onTabChange) {
       onTabChange(tab);
     }

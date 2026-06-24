@@ -13,10 +13,12 @@ import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal";
 import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
 import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
+import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { start } = useTopLoadingBar();
   
   const context = usePhotographerDashboardContext();
   if (!context) return null;
@@ -58,6 +60,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
   const activeTab = pathname.split("/").pop() as any;
 
   const handleTabChange = (tab: string) => {
+    start();
     router.push(`/dashboard/${tab}`);
   };
 

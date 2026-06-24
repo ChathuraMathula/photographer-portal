@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ReduxProvider } from "@/components/ReduxProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { SocketProvider } from "@/context/SocketContext";
+import { TopLoadingBarProvider } from "@/context/TopLoadingBarContext";
 
 const josefinSans = Josefin_Sans({
   variable: "--font-josefin-sans",
@@ -42,7 +44,13 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <SocketProvider>
+              <TopLoadingBarProvider>
+                {children}
+              </TopLoadingBarProvider>
+            </SocketProvider>
+          </ReduxProvider>
           <Toaster />
         </ThemeProvider>
       </body>

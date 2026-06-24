@@ -13,6 +13,7 @@ import { UserRole, logout } from "@/store/slices/authSlice";
 import { type Reservation, type Package, type ChatMessage, type NotificationItem } from "@/types";
 import { type ManualBookingValues } from "@/components/dashboard/ManualBookingModal";
 import { type PackageFormValues } from "@/components/dashboard/PackageFormModal";
+import { useSocket } from "@/context/SocketContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -89,7 +90,7 @@ export function usePhotographerDashboard() {
   // Chat states
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messageText, setMessageText] = useState("");
-  const socketRef = useRef<Socket | null>(null);
+  const { socket } = useSocket();
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   // Proposal / rejection form states
@@ -188,20 +189,13 @@ export function usePhotographerDashboard() {
 
   // ── Chat / Socket.io ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (!isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+    if (!socket || !isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {
       return;
     }
 
-    const socket = io(API);
-    socketRef.current = socket;
-
     socket.emit("joinPhotographerDashboard", { photographerId: userId });
 
-    socket.on("reservationCreated", (newRes: Reservation) => {
+    const handleReservationCreated = (newRes: Reservation) => {
       setReservations((prev) => {
         if (prev.some((r) => r.id === newRes.id)) return prev;
         return [newRes, ...prev];
@@ -219,18 +213,18 @@ export function usePhotographerDashboard() {
         ...prev,
       ]);
       toast.info(`New booking request from ${newRes.customer?.firstName ?? "Client"}!`);
-    });
+    };
 
-    socket.on("reservationUpdated", (updatedRes: Reservation) => {
+    const handleReservationUpdated = (updatedRes: Reservation) => {
       setReservations((prev) =>
         prev.map((r) => (r.id === updatedRes.id ? updatedRes : r))
       );
       setSelectedRes((prev) =>
         prev && prev.id === updatedRes.id ? updatedRes : prev
       );
-    });
+    };
 
-    socket.on("messageReceived", ({ reservationId, message }) => {
+    const handleMessageReceived = ({ reservationId, message }: any) => {
       setReservations((prev) =>
         prev.map((r) => {
           if (r.id === reservationId) {
@@ -270,16 +264,20 @@ export function usePhotographerDashboard() {
         ]);
         toast.success(`Message from ${message.senderName}: "${message.content.substring(0, 40)}${message.content.length > 40 ? "..." : ""}"`);
       }
-    });
+    };
+
+    socket.on("reservationCreated", handleReservationCreated);
+    socket.on("reservationUpdated", handleReservationUpdated);
+    socket.on("messageReceived", handleMessageReceived);
 
     return () => {
-      socket.disconnect();
-      socketRef.current = null;
+      socket.off("reservationCreated", handleReservationCreated);
+      socket.off("reservationUpdated", handleReservationUpdated);
+      socket.off("messageReceived", handleMessageReceived);
     };
-  }, [isAuthenticated, role, userId]);
+  }, [socket, isAuthenticated, role, userId]);
 
   useEffect(() => {
-    const socket = socketRef.current;
     if (!socket || !selectedRes) {
       setMessages([]);
       return;
@@ -306,7 +304,7 @@ export function usePhotographerDashboard() {
       socket.emit("leaveReservation", { reservationId: selectedRes.id });
       socket.off("message", handleMessage);
     };
-  }, [selectedRes]);
+  }, [socket, selectedRes]);
 
   const scrollToBottom = () => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);

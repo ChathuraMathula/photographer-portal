@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { UserTable } from "@/components/users/UserTable";
 import { CreateUserModal } from "@/components/users/CreateUserModal";
 import { UserPlus } from "lucide-react";
+import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 export default function UserManagementPage() {
   const dispatch = useDispatch();
   const router   = useRouter();
+  const { start } = useTopLoadingBar();
 
   const { firstName, role: authRole } = useSelector(
     (state: RootState) => state.auth
@@ -53,6 +55,7 @@ export default function UserManagementPage() {
   };
 
   const handleTabChange = (tab: string) => {
+    start();
     if (tab === "overview") router.push("/dashboard");
     else router.push("/dashboard/users");
   };
