@@ -83,18 +83,48 @@ export class PaymentsService {
       errorMsg = 'Payment Gateway Timeout: Connection lost';
     }
 
+    // Determine Sri Lankan Bank if matched, else fallback
+    const getSriLankanBankName = (cardNum: string): string | null => {
+      if (cardNum.startsWith('453285')) return 'Sampath Bank (Visa)';
+      if (cardNum.startsWith('543788')) return 'Sampath Bank (Mastercard)';
+      if (cardNum.startsWith('405659')) return 'Commercial Bank (Visa)';
+      if (cardNum.startsWith('525496')) return 'Commercial Bank (Mastercard)';
+      if (cardNum.startsWith('490822')) return 'Hatton National Bank (Visa)';
+      if (cardNum.startsWith('510526')) return 'Hatton National Bank (Mastercard)';
+      if (cardNum.startsWith('400586')) return 'Bank of Ceylon (Visa)';
+      if (cardNum.startsWith('549040')) return 'Bank of Ceylon (Mastercard)';
+      if (cardNum.startsWith('415668')) return 'Seylan Bank (Visa)';
+      if (cardNum.startsWith('520448')) return 'Seylan Bank (Mastercard)';
+      return null;
+    };
+
+    const lkBankName = getSriLankanBankName(normalizedCard);
+    const resolvedCardBrand = lkBankName || (normalizedCard.startsWith('4')
+      ? 'Visa'
+      : normalizedCard.startsWith('5')
+        ? 'Mastercard'
+        : 'Generic Sandbox');
+
+    // Calculate dynamic deposit amount based on selected package deposit policy
+    let depositAmountInCents = reservation.advancePaymentPriceInCents || 0;
+    if (selectedPkg) {
+      if (selectedPkg.depositType === 'fixed') {
+        depositAmountInCents = selectedPkg.depositValue || 0;
+      } else if (selectedPkg.depositType === 'percentage') {
+        depositAmountInCents = Math.round(
+          (selectedPkg.priceInCents * (selectedPkg.depositValue || 0)) / 100,
+        );
+      }
+    }
+
     // Log the transaction
     const transactionId = 'ch_mock_' + crypto.randomBytes(8).toString('hex');
     const payment = this.paymentRepository.create({
       reservationId: reservation.id,
-      amountInCents: reservation.advancePaymentPriceInCents || 0,
+      amountInCents: depositAmountInCents,
       status,
       transactionId,
-      cardBrand: normalizedCard.startsWith('4')
-        ? 'Visa'
-        : normalizedCard.startsWith('5')
-          ? 'Mastercard'
-          : 'Generic Sandbox',
+      cardBrand: resolvedCardBrand,
       cardLast4: normalizedCard.slice(-4),
       errorMessage: errorMsg,
     });
@@ -108,6 +138,7 @@ export class PaymentsService {
     reservation.status = ReservationStatus.CONFIRMED;
     reservation.clientSelectedPackageId = dto.packageId;
     reservation.totalAmountInCents = selectedPkg.priceInCents;
+    reservation.advancePaymentPriceInCents = depositAmountInCents;
     reservation.paymentDeadline = undefined; // Clear the lock deadline
 
     await this.reservationRepository.save(reservation);
@@ -134,5 +165,23 @@ export class PaymentsService {
       transactionId,
       message: 'Payment processed and reservation confirmed successfully',
     };
+  }
+
+  async getPhotographerTransactions(photographerId: string) {
+    return this.paymentRepository.find({
+      where: {
+        reservation: {
+          photographerId,
+        },
+      },
+      relations: {
+        reservation: {
+          customer: true,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 }

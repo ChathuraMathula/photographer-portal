@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsNumber,
   Matches,
 } from 'class-validator';
 
@@ -21,5 +22,9 @@ export class CreateManualBookingDto {
   @IsString() @IsNotEmpty() eventType!: string;
 
   @IsOptional() @IsString() location?: string;
+  @IsOptional() @IsString() locationMapLink?: string;
   @IsOptional() @IsString() notes?: string;
+  @IsOptional() @IsString() packageId?: string;
+  @IsOptional() @IsNumber() advancePaymentPriceInCents?: number;
+  @IsOptional() @IsNumber() totalAmountInCents?: number;
 }

@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { TimeSelect } from "@/components/booking/TimeSelect";
 import { EventTypeSelect } from "@/components/booking/EventTypeSelect";
+import { type Package } from "@/types";
 
 export type ManualBookingValues = {
   firstName: string;
@@ -18,7 +19,11 @@ export type ManualBookingValues = {
   endTime: string;
   eventType: string;
   location: string;
+  locationMapLink: string;
   notes: string;
+  packageId: string;
+  advancePaymentLkr: string | number;
+  totalAmountLkr: string | number;
 };
 
 type Props = {
@@ -26,6 +31,9 @@ type Props = {
   onClose: () => void;
   allowedEventTypes?: string[];
   allowCustomEventTypes?: boolean;
+  packages?: Package[];
+  universalDepositType?: string;
+  universalDepositValue?: number;
 };
 
 export function ManualBookingModal({
@@ -33,6 +41,9 @@ export function ManualBookingModal({
   onClose,
   allowedEventTypes = [],
   allowCustomEventTypes = true,
+  packages = [],
+  universalDepositType = "fixed",
+  universalDepositValue = 5000,
 }: Props) {
   const today = new Date().toISOString().split("T")[0];
 
@@ -155,8 +166,90 @@ export function ManualBookingModal({
                 id="mb-location"
                 placeholder="e.g. Colombo 03"
                 {...formik.getFieldProps("location")}
-                className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mb-locationMapLink" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Google Maps Location Link (optional)</Label>
+              <Input
+                id="mb-locationMapLink"
+                placeholder="e.g. https://maps.google.com/?q=..."
+                {...formik.getFieldProps("locationMapLink")}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              />
+              <FieldError msg={formik.touched.locationMapLink ? formik.errors.locationMapLink : undefined} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mb-packageId" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Package (optional)</Label>
+              <select
+                id="mb-packageId"
+                value={formik.values.packageId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  formik.setFieldValue("packageId", val);
+                  if (val) {
+                    const selected = packages.find((p) => p.id === val);
+                    if (selected) {
+                      const priceLkr = selected.priceInCents / 100;
+                      formik.setFieldValue("totalAmountLkr", priceLkr);
+                      let depositLkr = 0;
+                      const depType = selected.depositType || "universal";
+                      if (depType === "fixed") {
+                        depositLkr = (selected.depositValue ?? 0) / 100;
+                      } else if (depType === "percentage") {
+                        depositLkr = (priceLkr * (selected.depositValue ?? 0)) / 100;
+                      } else {
+                        if (universalDepositType === "fixed") {
+                          depositLkr = universalDepositValue;
+                        } else {
+                          depositLkr = (priceLkr * universalDepositValue) / 100;
+                        }
+                      }
+                      formik.setFieldValue("advancePaymentLkr", Math.round(depositLkr));
+                    }
+                  } else {
+                    formik.setFieldValue("totalAmountLkr", "");
+                    formik.setFieldValue("advancePaymentLkr", "");
+                  }
+                }}
+                className="w-full h-11 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-body-small text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-transparent transition-all"
+              >
+                <option value="">-- No Package --</option>
+                {packages.map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.name} (LKR {(pkg.priceInCents / 100).toLocaleString()})
+                  </option>
+                ))}
+              </select>
+              <FieldError msg={formik.touched.packageId ? formik.errors.packageId : undefined} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mb-totalAmountLkr" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Total Price (LKR)</Label>
+              <Input
+                id="mb-totalAmountLkr"
+                type="number"
+                placeholder="e.g. 25000"
+                {...formik.getFieldProps("totalAmountLkr")}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              />
+              <FieldError msg={formik.touched.totalAmountLkr ? formik.errors.totalAmountLkr : undefined} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mb-advancePaymentLkr" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Advance Paid (LKR)</Label>
+              <Input
+                id="mb-advancePaymentLkr"
+                type="number"
+                placeholder="e.g. 5000"
+                {...formik.getFieldProps("advancePaymentLkr")}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              />
+              <FieldError msg={formik.touched.advancePaymentLkr ? formik.errors.advancePaymentLkr : undefined} />
             </div>
           </div>
 

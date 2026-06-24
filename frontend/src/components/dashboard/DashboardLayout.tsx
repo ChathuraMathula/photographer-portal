@@ -13,6 +13,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  CreditCard,
 } from "lucide-react";
 import { LogoutConfirmModal } from "@/components/common/LogoutConfirmModal";
 
@@ -43,6 +44,7 @@ const PHOTOGRAPHER_MENU: MenuItem[] = [
   { id: "reservations", label: "Reservations", icon: CalendarCheck },
   { id: "calendar",     label: "Calendar",     icon: CalendarDays },
   { id: "packages",     label: "Packages",     icon: Layers },
+  { id: "transactions", label: "Transactions", icon: CreditCard },
   { id: "profile",      label: "My Profile",   icon: User },
 ];
 

@@ -55,6 +55,9 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     setCalendarSelectedRes,
     handleLogout,
     handleSendChatMessage,
+    packages,
+    universalDepositType,
+    universalDepositValue,
   } = context;
 
   const activeTab = pathname.split("/").pop() as any;
@@ -116,6 +119,9 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
           onClose={() => setShowManualModal(false)}
           allowedEventTypes={allowedEventTypes}
           allowCustomEventTypes={allowCustomEventTypes}
+          packages={packages}
+          universalDepositType={universalDepositType}
+          universalDepositValue={universalDepositValue}
         />
       )}
       {showPackageModal && (

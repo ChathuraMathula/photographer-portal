@@ -13,6 +13,7 @@ import { User, UserRole } from '../entities/user.entity';
 import { Package } from '../entities/package.entity';
 import { Message } from '../entities/message.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { Payment, PaymentStatus } from '../entities/payment.entity';
 import { CreateManualBookingDto } from './dto/create-manual-booking.dto';
 import { ProposeQuotationDto } from './dto/propose-quotation.dto';
 import { RejectReservationDto } from './dto/reject-reservation.dto';
@@ -41,6 +42,8 @@ export class ReservationsService {
     private messageRepository: Repository<Message>,
     @InjectRepository(PhotographerProfile)
     private profileRepository: Repository<PhotographerProfile>,
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
     private chatGateway: ChatGateway,
     private emailService: EmailService,
   ) {}
@@ -136,6 +139,25 @@ export class ReservationsService {
       await this.customerRepository.save(customer);
     }
 
+    let selectedPackagesSnap: any = null;
+    if (dto.packageId) {
+      const pkg = await this.packageRepository.findOneBy({ id: dto.packageId });
+      if (pkg) {
+        selectedPackagesSnap = [
+          {
+            id: pkg.id,
+            name: pkg.name,
+            description: pkg.description,
+            priceInCents: pkg.priceInCents,
+            durationHours: pkg.durationHours,
+            includes: pkg.includes,
+            depositType: pkg.depositType,
+            depositValue: pkg.depositValue,
+          },
+        ];
+      }
+    }
+
     const reservation = this.reservationRepository.create({
       customerId: customer.id,
       photographerId: user.userId,
@@ -144,12 +166,30 @@ export class ReservationsService {
       endTime: dto.endTime,
       eventType: dto.eventType,
       location: dto.location,
+      locationMapLink: dto.locationMapLink,
       customerNotes: dto.notes,
       status: ReservationStatus.CONFIRMED, // Manual offline bookings are pre-confirmed
       reservationToken: crypto.randomBytes(32).toString('hex'),
+      advancePaymentPriceInCents: dto.advancePaymentPriceInCents,
+      totalAmountInCents: dto.totalAmountInCents,
+      clientSelectedPackageId: dto.packageId,
+      selectedPackages: selectedPackagesSnap,
     });
 
     await this.reservationRepository.save(reservation);
+
+    // Save payment log if deposit is provided
+    if (dto.advancePaymentPriceInCents && dto.advancePaymentPriceInCents > 0) {
+      const payment = this.paymentRepository.create({
+        reservationId: reservation.id,
+        amountInCents: dto.advancePaymentPriceInCents,
+        status: PaymentStatus.SUCCESS,
+        transactionId: 'ch_manual_' + crypto.randomBytes(8).toString('hex'),
+        cardBrand: 'Offline Payment',
+        cardLast4: 'Cash',
+      });
+      await this.paymentRepository.save(payment);
+    }
 
     // Populate customer relation for the socket broadcast
     reservation.customer = customer;
@@ -201,6 +241,8 @@ export class ReservationsService {
       priceInCents: p.priceInCents,
       durationHours: p.durationHours,
       includes: p.includes,
+      depositType: p.depositType,
+      depositValue: p.depositValue,
     }));
     // 24-hour deadline from now
     reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);

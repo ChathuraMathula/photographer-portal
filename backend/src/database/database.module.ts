@@ -6,6 +6,7 @@ import { Package } from '../entities/package.entity';
 import { Customer } from '../entities/customer.entity';
 import { Reservation } from '../entities/reservation.entity';
 import { Message } from '../entities/message.entity';
+import { Payment } from '../entities/payment.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Message } from '../entities/message.entity';
       Customer,
       Reservation,
       Message,
+      Payment,
     ]),
   ],
   exports: [TypeOrmModule],

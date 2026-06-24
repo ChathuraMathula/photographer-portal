@@ -54,8 +54,12 @@ const ManualBookingSchema = Yup.object().shape({
       return !v || v > this.parent.startTime;
     }),
   eventType: Yup.string().required("Event type is required"),
-  location: Yup.string(),
-  notes: Yup.string(),
+  location: Yup.string().optional().nullable(),
+  locationMapLink: Yup.string().url("Must be a valid URL").optional().nullable(),
+  notes: Yup.string().optional().nullable(),
+  packageId: Yup.string().optional().nullable(),
+  advancePaymentLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
+  totalAmountLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
 });
 
 const PackageSchema = Yup.object().shape({
@@ -125,6 +129,18 @@ export function usePhotographerDashboard() {
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
+
+  const loadTransactions = async () => {
+    try {
+      const res = await authFetch(`${API}/payments/photographer`, { credentials: "include" });
+      if (res.ok) {
+        setTransactions(await res.json());
+      }
+    } catch (err) {
+      console.error("Error loading transactions:", err);
+    }
+  };
 
   // ── Auth guard ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -165,6 +181,7 @@ export function usePhotographerDashboard() {
         );
         setOfflineMessage(profData.offlineMessage || "");
       }
+      loadTransactions();
     } catch (err) {
       console.error("Error loading photographer data:", err);
     }
@@ -488,15 +505,40 @@ export function usePhotographerDashboard() {
       endTime: "",
       eventType: "",
       location: "",
+      locationMapLink: "",
       notes: "",
+      packageId: "",
+      advancePaymentLkr: "",
+      totalAmountLkr: "",
     },
     validationSchema: ManualBookingSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
+        const payload = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phone: values.phone,
+          date: values.date,
+          startTime: values.startTime,
+          endTime: values.endTime,
+          eventType: values.eventType,
+          location: values.location || undefined,
+          locationMapLink: values.locationMapLink || undefined,
+          notes: values.notes || undefined,
+          packageId: values.packageId || undefined,
+          advancePaymentPriceInCents: values.advancePaymentLkr
+            ? Math.round(Number(values.advancePaymentLkr) * 100)
+            : undefined,
+          totalAmountInCents: values.totalAmountLkr
+            ? Math.round(Number(values.totalAmountLkr) * 100)
+            : undefined,
+        };
+
         const res = await authFetch(`${API}/reservations`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
+          body: JSON.stringify(payload),
           credentials: "include",
         });
         const data = await res.json();
@@ -689,5 +731,7 @@ export function usePhotographerDashboard() {
     setCalendarSelectedRes,
     offlineMessage,
     setOfflineMessage,
+    transactions,
+    loadTransactions,
   };
 }

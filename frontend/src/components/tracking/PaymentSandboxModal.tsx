@@ -24,7 +24,10 @@ type Props = {
 };
 
 const TEST_CARDS = [
-  { label: "Success (Visa)", number: "4242 4242 4242 4242", desc: "Simulates successful confirmation" },
+  { label: "Sampath Bank (Visa)", number: "4532 8511 2233 4455", desc: "Sri Lankan Sampath Bank Visa Success" },
+  { label: "Commercial Bank (MC)", number: "5254 9622 3344 5566", desc: "Sri Lankan Commercial Bank Mastercard Success" },
+  { label: "Bank of Ceylon (Visa)", number: "4005 8611 2233 4455", desc: "Sri Lankan BOC Visa Success" },
+  { label: "Success (Visa Sandbox)", number: "4242 4242 4242 4242", desc: "Standard sandbox visa card" },
   { label: "Insufficient Funds", number: "4000 0000 0000 0002", desc: "Simulates card declined error" },
   { label: "Card Expired", number: "4000 0000 0000 0005", desc: "Simulates expired card rejection" },
   { label: "Suspected Fraud", number: "4000 0000 0000 0008", desc: "Simulates bank fraud guard alert" },
@@ -48,12 +51,28 @@ export function PaymentSandboxModal({
   const [processingStep, setProcessingStep] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Determine card brand dynamically
-  const cardBrand = cardNumber.startsWith("4")
+  // Determine card brand / bank dynamically
+  const getSriLankanBankName = (num: string): string | null => {
+    const clean = num.replace(/\s+/g, "");
+    if (clean.startsWith("453285")) return "Sampath Bank (Visa)";
+    if (clean.startsWith("543788")) return "Sampath Bank (Mastercard)";
+    if (clean.startsWith("405659")) return "Commercial Bank (Visa)";
+    if (clean.startsWith("525496")) return "Commercial Bank (Mastercard)";
+    if (clean.startsWith("490822")) return "HNB (Visa)";
+    if (clean.startsWith("510526")) return "HNB (Mastercard)";
+    if (clean.startsWith("400586")) return "BOC (Visa)";
+    if (clean.startsWith("549040")) return "BOC (Mastercard)";
+    if (clean.startsWith("415668")) return "Seylan Bank (Visa)";
+    if (clean.startsWith("520448")) return "Seylan Bank (Mastercard)";
+    return null;
+  };
+
+  const lkBank = getSriLankanBankName(cardNumber);
+  const cardBrand = lkBank || (cardNumber.replace(/\s+/g, "").startsWith("4")
     ? "Visa"
-    : cardNumber.startsWith("5")
+    : cardNumber.replace(/\s+/g, "").startsWith("5")
       ? "Mastercard"
-      : "";
+      : "");
 
   // Auto-format card number as xxxx xxxx xxxx xxxx
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +173,21 @@ export function PaymentSandboxModal({
     }
   }, [open]);
 
-  const depositLkr = (reservation.advancePaymentPriceInCents ?? 0) / 100;
+  const getDepositAmountInCents = () => {
+    if (!packageId || !reservation.selectedPackages) {
+      return reservation.advancePaymentPriceInCents ?? 0;
+    }
+    const pkg = reservation.selectedPackages.find((p: any) => p.id === packageId);
+    if (!pkg) return reservation.advancePaymentPriceInCents ?? 0;
+    if (pkg.depositType === "fixed") {
+      return pkg.depositValue ?? 0;
+    }
+    if (pkg.depositType === "percentage") {
+      return Math.round((pkg.priceInCents * (pkg.depositValue ?? 0)) / 100);
+    }
+    return reservation.advancePaymentPriceInCents ?? 0;
+  };
+  const depositLkr = getDepositAmountInCents() / 100;
 
   return (
     <AlertDialog open={open} onOpenChange={(v) => !v && paymentStatus !== "processing" && onClose()}>

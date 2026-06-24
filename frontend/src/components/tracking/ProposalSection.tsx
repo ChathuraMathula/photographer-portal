@@ -25,6 +25,21 @@ export function ProposalSection({
   if (!reservation.selectedPackages) return null;
   if (reservation.status !== "PROPOSED" && reservation.status !== "CONFIRMED") return null;
 
+  const getActiveDeposit = () => {
+    if (!selectedPkgId || !reservation.selectedPackages) {
+      return reservation.advancePaymentPriceInCents ?? 0;
+    }
+    const pkg = reservation.selectedPackages.find((p) => p.id === selectedPkgId);
+    if (!pkg) return reservation.advancePaymentPriceInCents ?? 0;
+    if (pkg.depositType === "fixed") {
+      return pkg.depositValue ?? 0;
+    }
+    if (pkg.depositType === "percentage") {
+      return Math.round((pkg.priceInCents * (pkg.depositValue ?? 0)) / 100);
+    }
+    return reservation.advancePaymentPriceInCents ?? 0;
+  };
+
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
@@ -67,9 +82,7 @@ export function ProposalSection({
                 <p className="text-body-caption text-zinc-550">Required Advance Deposit</p>
                 <p className="text-title-medium text-primary-dark dark:text-white mt-0.5">
                   LKR{" "}
-                  {(
-                    (reservation.advancePaymentPriceInCents ?? 0) / 100
-                  ).toLocaleString()}
+                  {(getActiveDeposit() / 100).toLocaleString()}
                 </p>
               </div>
               <Button

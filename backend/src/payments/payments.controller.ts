@@ -1,6 +1,21 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../entities/user.entity';
+import type { Request } from 'express';
+
+interface RequestWithUser extends Request {
+  user: {
+    userId: string;
+    email: string;
+    role: UserRole;
+    firstName?: string;
+    lastName?: string;
+  };
+}
 
 @Controller('payments')
 export class PaymentsController {
@@ -9,5 +24,12 @@ export class PaymentsController {
   @Post('charge')
   charge(@Body() dto: ProcessPaymentDto) {
     return this.paymentsService.processPayment(dto);
+  }
+
+  @Get('photographer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PHOTOGRAPHER)
+  getTransactions(@Req() req: RequestWithUser) {
+    return this.paymentsService.getPhotographerTransactions(req.user.userId);
   }
 }
