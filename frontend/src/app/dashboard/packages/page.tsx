@@ -1,7 +1,33 @@
 "use client";
 
-import { PhotographerDashboard } from "@/components/dashboard/PhotographerDashboard";
+import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
+import { PackageGrid } from "@/components/dashboard/PackageGrid";
 
 export default function PackagesPage() {
-  return <PhotographerDashboard activeTab="packages" />;
+  const context = usePhotographerDashboardContext();
+  if (!context) return null;
+
+  const {
+    packages,
+    packageFormik,
+    setEditingPkg,
+    setPackageIncludesText,
+    setShowPackageModal,
+    handleEditPackage,
+    handleDeletePackage,
+  } = context;
+
+  return (
+    <PackageGrid
+      packages={packages}
+      onAddPackage={() => {
+        setEditingPkg(null);
+        packageFormik.resetForm();
+        setPackageIncludesText("");
+        setShowPackageModal(true);
+      }}
+      onEditPackage={handleEditPackage}
+      onDeletePackage={handleDeletePackage}
+    />
+  );
 }

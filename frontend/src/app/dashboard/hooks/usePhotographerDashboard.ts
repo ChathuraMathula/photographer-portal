@@ -119,6 +119,7 @@ export function usePhotographerDashboard() {
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarSelectedRes, setCalendarSelectedRes] = useState<Reservation | null>(null);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -683,5 +684,7 @@ export function usePhotographerDashboard() {
     handleMarkAsRead,
     handleMarkAllAsRead,
     handleClearAllNotifications,
+    calendarSelectedRes,
+    setCalendarSelectedRes,
   };
 }
