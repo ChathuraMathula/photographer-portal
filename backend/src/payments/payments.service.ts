@@ -108,7 +108,9 @@ export class PaymentsService {
     // Calculate dynamic deposit amount based on selected package deposit policy
     let depositAmountInCents = reservation.advancePaymentPriceInCents || 0;
     if (selectedPkg) {
-      if (selectedPkg.depositType === 'fixed') {
+      if (selectedPkg.customDepositAmountInCents !== undefined && selectedPkg.customDepositAmountInCents !== null) {
+        depositAmountInCents = selectedPkg.customDepositAmountInCents;
+      } else if (selectedPkg.depositType === 'fixed') {
         depositAmountInCents = selectedPkg.depositValue || 0;
       } else if (selectedPkg.depositType === 'percentage') {
         depositAmountInCents = Math.round(

@@ -130,6 +130,7 @@ export function usePhotographerDashboard() {
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [packageDeposits, setPackageDeposits] = useState<Record<string, string>>({});
 
   const loadTransactions = async () => {
     try {
@@ -231,6 +232,7 @@ export function usePhotographerDashboard() {
         },
         ...prev,
       ]);
+      loadTransactions();
       toast.info(`New booking request from ${newRes.customer?.firstName ?? "Client"}!`);
     };
 
@@ -241,6 +243,7 @@ export function usePhotographerDashboard() {
       setSelectedRes((prev) =>
         prev && prev.id === updatedRes.id ? updatedRes : prev
       );
+      loadTransactions();
     };
 
     const handleMessageReceived = ({ reservationId, message }: any) => {
@@ -372,6 +375,14 @@ export function usePhotographerDashboard() {
   const handleProposeQuotation = async () => {
     if (!selectedRes || selectedPkgIds.length === 0) return;
     try {
+      const centsDeposits: Record<string, number> = {};
+      Object.entries(packageDeposits).forEach(([pkgId, val]) => {
+        const numVal = Number(val);
+        if (!isNaN(numVal)) {
+          centsDeposits[pkgId] = Math.round(numVal * 100);
+        }
+      });
+
       const res = await authFetch(`${API}/reservations/${selectedRes.id}/propose`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -379,6 +390,7 @@ export function usePhotographerDashboard() {
           packageIds: selectedPkgIds,
           advancePaymentPriceInCents: advanceAmount * 100,
           quotationNotes,
+          packageDeposits: centsDeposits,
         }),
         credentials: "include",
       });
@@ -611,8 +623,41 @@ export function usePhotographerDashboard() {
     }
   };
 
-  // Automatically calculate the default advanceAmount when selectedPkgIds changes
+  // Automatically calculate default deposits and update packageDeposits when selectedPkgIds changes
   useEffect(() => {
+    setPackageDeposits((prev) => {
+      const updated = { ...prev };
+      // Remove any that are no longer selected
+      Object.keys(updated).forEach((id) => {
+        if (!selectedPkgIds.includes(id)) {
+          delete updated[id];
+        }
+      });
+      // Add defaults for new selections
+      selectedPkgIds.forEach((id) => {
+        if (updated[id] === undefined) {
+          const selected = packages.find((p) => p.id === id);
+          if (selected) {
+            let depositLkr = 0;
+            const depType = selected.depositType || "universal";
+            if (depType === "fixed") {
+              depositLkr = (selected.depositValue ?? 0) / 100;
+            } else if (depType === "percentage") {
+              depositLkr = ((selected.priceInCents / 100) * (selected.depositValue ?? 0)) / 100;
+            } else {
+              if (universalDepositType === "fixed") {
+                depositLkr = universalDepositValue;
+              } else {
+                depositLkr = ((selected.priceInCents / 100) * universalDepositValue) / 100;
+              }
+            }
+            updated[id] = String(Math.round(depositLkr));
+          }
+        }
+      });
+      return updated;
+    });
+
     if (selectedPkgIds.length === 0) {
       setAdvanceAmount(0);
       return;
@@ -631,7 +676,6 @@ export function usePhotographerDashboard() {
       const priceLkr = pkg.priceInCents / 100;
       computedDeposit = (priceLkr * (pkg.depositValue ?? 0)) / 100;
     } else {
-      // Inherit universal
       if (universalDepositType === "fixed") {
         computedDeposit = universalDepositValue;
       } else {
@@ -733,5 +777,7 @@ export function usePhotographerDashboard() {
     setOfflineMessage,
     transactions,
     loadTransactions,
+    packageDeposits,
+    setPackageDeposits,
   };
 }

@@ -12,6 +12,7 @@ export type Package = {
   isActive: boolean;
   depositType?: string;
   depositValue?: number;
+  customDepositAmountInCents?: number | null;
 };
 
 export type Customer = {

@@ -24,6 +24,8 @@ export default function ReservationsPage() {
     setShowRejectForm,
     handleProposeQuotation,
     handleRejectRequest,
+    packageDeposits,
+    setPackageDeposits,
   } = context;
 
   return (
@@ -44,6 +46,8 @@ export default function ReservationsPage() {
       setShowRejectForm={setShowRejectForm}
       handleProposeQuotation={handleProposeQuotation}
       handleRejectRequest={handleRejectRequest}
+      packageDeposits={packageDeposits}
+      setPackageDeposits={setPackageDeposits}
     />
   );
 }

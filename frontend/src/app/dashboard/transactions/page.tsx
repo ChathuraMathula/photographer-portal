@@ -11,6 +11,11 @@ export default function TransactionsPage() {
 
   const { transactions } = context;
 
+  // Filter States
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState("ALL"); // ALL, SUCCESS, FAILED
+  const [methodFilter, setMethodFilter] = React.useState("ALL"); // ALL, CARD, CASH
+
   // Compute stats
   const successfulTransactions = transactions.filter((t) => t.status === "SUCCESS");
 
@@ -24,6 +29,33 @@ export default function TransactionsPage() {
   const cashPaymentsCount = successfulTransactions.filter(
     (t) => t.cardBrand === "Offline Payment"
   ).length;
+
+  // Filter logic
+  const filteredTransactions = transactions.filter((txn) => {
+    const custName = txn.reservation?.customer
+      ? `${txn.reservation.customer.firstName} ${txn.reservation.customer.lastName}`.toLowerCase()
+      : "manual client";
+    const email = (txn.reservation?.customer?.email || "").toLowerCase();
+    const txnId = (txn.transactionId || "").toLowerCase();
+    const cardBrand = (txn.cardBrand || "").toLowerCase();
+    
+    const matchesSearch = 
+      custName.includes(searchTerm.toLowerCase()) ||
+      email.includes(searchTerm.toLowerCase()) ||
+      txnId.includes(searchTerm.toLowerCase()) ||
+      cardBrand.includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "ALL" || txn.status === statusFilter;
+
+    const isOffline = txn.cardBrand === "Offline Payment";
+    const matchesMethod =
+      methodFilter === "ALL" ||
+      (methodFilter === "CASH" && isOffline) ||
+      (methodFilter === "CARD" && !isOffline);
+
+    return matchesSearch && matchesStatus && matchesMethod;
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -87,6 +119,43 @@ export default function TransactionsPage() {
         </Card>
       </div>
 
+      {/* Filters Bar */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex-1 w-full">
+          <input
+            type="text"
+            placeholder="Search by customer name, email, transaction ID or method..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all text-zinc-700 dark:text-zinc-300 placeholder-zinc-400"
+          />
+        </div>
+        <div className="w-full sm:w-auto flex gap-3">
+          <div className="flex-1 sm:flex-initial">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer"
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="SUCCESS">Success</option>
+              <option value="FAILED">Declined</option>
+            </select>
+          </div>
+          <div className="flex-1 sm:flex-initial">
+            <select
+              value={methodFilter}
+              onChange={(e) => setMethodFilter(e.target.value)}
+              className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer"
+            >
+              <option value="ALL">All Methods</option>
+              <option value="CARD">Card Payments</option>
+              <option value="CASH">Offline Cash</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Transactions Table */}
       <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
         <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-850">
@@ -104,6 +173,12 @@ export default function TransactionsPage() {
                 No transactions recorded yet.
               </p>
             </div>
+          ) : filteredTransactions.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-body-small text-zinc-400 italic">
+                No transactions match the selected filters.
+              </p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-body-small border-collapse">
@@ -118,7 +193,7 @@ export default function TransactionsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
-                  {transactions.map((txn) => {
+                  {filteredTransactions.map((txn) => {
                     const custName = txn.reservation?.customer
                       ? `${txn.reservation.customer.firstName} ${txn.reservation.customer.lastName}`
                       : "Manual Client";
@@ -130,7 +205,7 @@ export default function TransactionsPage() {
                         className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/20 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-semibold text-zinc-850 dark:text-zinc-200">{custName}</div>
+                          <div className="font-semibold text-zinc-855 dark:text-zinc-200">{custName}</div>
                           <div className="text-[10px] text-zinc-400 mt-0.5">
                             {txn.reservation?.customer?.email || "No email"}
                           </div>

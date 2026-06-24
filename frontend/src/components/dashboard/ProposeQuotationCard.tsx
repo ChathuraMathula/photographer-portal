@@ -26,6 +26,8 @@ type Props = {
   onRejectionReasonChange: (reason: string) => void;
   onPropose: () => void;
   onReject: () => void;
+  packageDeposits: Record<string, string>;
+  setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 };
 
 export function ProposeQuotationCard({
@@ -43,6 +45,8 @@ export function ProposeQuotationCard({
   onRejectionReasonChange,
   onPropose,
   onReject,
+  packageDeposits,
+  setPackageDeposits,
 }: Props) {
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
@@ -58,28 +62,48 @@ export function ProposeQuotationCard({
         {/* Packages Multi-select */}
         <div className="space-y-2">
           <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Choose Package Recommendations</Label>
-          <div className="space-y-1.5 max-h-[160px] overflow-y-auto border border-zinc-200 dark:border-zinc-850 p-2.5 rounded-xl bg-zinc-50/20">
+          <div className="space-y-1.5 max-h-[220px] overflow-y-auto border border-zinc-200 dark:border-zinc-850 p-2.5 rounded-xl bg-zinc-50/20">
             {packages.length === 0 ? (
               <p className="text-body-small italic text-zinc-400">
                 No packages. Create them in Packages tab first.
               </p>
             ) : (
               packages.map((pkg) => (
-                <label
+                <div
                   key={pkg.id}
-                  className="flex items-center gap-2 text-body-small-s p-1.5 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors space-y-1"
                 >
-                  <input
-                    type="checkbox"
-                    checked={selectedPkgIds.includes(pkg.id)}
-                    onChange={(e) => onTogglePackage(pkg.id, e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-300 text-primary-dark focus:ring-primary-dark dark:border-zinc-700 dark:bg-zinc-950"
-                  />
-                  <span className="text-zinc-700 dark:text-zinc-300 font-medium">
-                    {pkg.name} - LKR{" "}
-                    {(pkg.priceInCents / 100).toLocaleString()}
-                  </span>
-                </label>
+                  <label className="flex items-center gap-2 text-body-small-s cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedPkgIds.includes(pkg.id)}
+                      onChange={(e) => onTogglePackage(pkg.id, e.target.checked)}
+                      className="h-4 w-4 rounded border-zinc-300 text-primary-dark focus:ring-primary-dark dark:border-zinc-700 dark:bg-zinc-950"
+                    />
+                    <span className="text-zinc-700 dark:text-zinc-300 font-medium">
+                      {pkg.name} - LKR{" "}
+                      {(pkg.priceInCents / 100).toLocaleString()}
+                    </span>
+                  </label>
+                  {selectedPkgIds.includes(pkg.id) && (
+                    <div className="ml-6 flex items-center gap-2">
+                      <span className="text-[11px] text-zinc-500 font-medium">Custom Deposit (LKR):</span>
+                      <input
+                        type="number"
+                        value={packageDeposits[pkg.id] ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setPackageDeposits((prev) => ({
+                            ...prev,
+                            [pkg.id]: val,
+                          }));
+                        }}
+                        className="w-28 h-7 px-2 text-xs rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-primary-dark text-zinc-700 dark:text-zinc-300"
+                        placeholder="Deposit LKR"
+                      />
+                    </div>
+                  )}
+                </div>
               ))
             )}
           </div>

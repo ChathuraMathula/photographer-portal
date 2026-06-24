@@ -62,7 +62,11 @@ export function ProposalPackageCard({
             {(pkg.priceInCents / 100).toLocaleString()}
           </span>
         </div>
-        {pkg.depositType && pkg.depositType !== "universal" && (
+        {pkg.customDepositAmountInCents !== undefined && pkg.customDepositAmountInCents !== null ? (
+          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-450 px-2 py-0.5 rounded border border-emerald-200/50 dark:border-emerald-900/50">
+            LKR {((pkg.customDepositAmountInCents ?? 0) / 100).toLocaleString()} Proposed Deposit
+          </span>
+        ) : pkg.depositType && pkg.depositType !== "universal" && (
           <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-700/50">
             {pkg.depositType === "fixed"
               ? `LKR ${((pkg.depositValue ?? 0) / 100).toLocaleString()} Deposit`

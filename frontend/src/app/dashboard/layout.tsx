@@ -62,6 +62,10 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
 
   const activeTab = pathname.split("/").pop() as any;
 
+  React.useEffect(() => {
+    setSelectedRes(null);
+  }, [pathname, setSelectedRes]);
+
   const handleTabChange = (tab: string) => {
     start();
     router.push(`/dashboard/${tab}`);

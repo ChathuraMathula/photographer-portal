@@ -234,16 +234,22 @@ export class ReservationsService {
     reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
     reservation.quotationNotes = dto.quotationNotes;
     // Snapshot packages
-    reservation.selectedPackages = pkgs.map((p) => ({
-      id: p.id,
-      name: p.name,
-      description: p.description,
-      priceInCents: p.priceInCents,
-      durationHours: p.durationHours,
-      includes: p.includes,
-      depositType: p.depositType,
-      depositValue: p.depositValue,
-    }));
+    reservation.selectedPackages = pkgs.map((p) => {
+      const customDeposit = dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
+        ? dto.packageDeposits[p.id]
+        : null;
+      return {
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        priceInCents: p.priceInCents,
+        durationHours: p.durationHours,
+        includes: p.includes,
+        depositType: p.depositType,
+        depositValue: p.depositValue,
+        customDepositAmountInCents: customDeposit,
+      };
+    });
     // 24-hour deadline from now
     reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
 

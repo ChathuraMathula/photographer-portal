@@ -19,4 +19,7 @@ export class ProposeQuotationDto {
   @IsString()
   @IsOptional()
   quotationNotes?: string;
+
+  @IsOptional()
+  packageDeposits?: Record<string, number>;
 }

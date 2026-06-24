@@ -31,6 +31,9 @@ export function ProposalSection({
     }
     const pkg = reservation.selectedPackages.find((p) => p.id === selectedPkgId);
     if (!pkg) return reservation.advancePaymentPriceInCents ?? 0;
+    if (pkg.customDepositAmountInCents !== undefined && pkg.customDepositAmountInCents !== null) {
+      return pkg.customDepositAmountInCents;
+    }
     if (pkg.depositType === "fixed") {
       return pkg.depositValue ?? 0;
     }

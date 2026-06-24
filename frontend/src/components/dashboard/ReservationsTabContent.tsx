@@ -21,6 +21,8 @@ type Props = {
   setShowRejectForm: (show: boolean) => void;
   handleProposeQuotation: () => void;
   handleRejectRequest: () => void;
+  packageDeposits: Record<string, string>;
+  setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 };
 
 export function ReservationsTabContent({
@@ -40,6 +42,8 @@ export function ReservationsTabContent({
   setShowRejectForm,
   handleProposeQuotation,
   handleRejectRequest,
+  packageDeposits,
+  setPackageDeposits,
 }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -72,11 +76,13 @@ export function ReservationsTabContent({
                 quotationNotes={quotationNotes}
                 showRejectForm={showRejectForm}
                 rejectionReason={rejectionReason}
-                onTogglePackage={(id, checked) =>
-                  setSelectedPkgIds((prev) =>
-                    checked ? [...prev, id] : prev.filter((x) => x !== id)
-                  )
-                }
+                onTogglePackage={(id, checked) => {
+                  if (checked) {
+                    setSelectedPkgIds((prev) => [...prev, id]);
+                  } else {
+                    setSelectedPkgIds((prev) => prev.filter((x) => x !== id));
+                  }
+                }}
                 onAdvanceChange={setAdvanceAmount}
                 onNotesChange={setQuotationNotes}
                 onShowRejectForm={() => setShowRejectForm(true)}
@@ -84,6 +90,8 @@ export function ReservationsTabContent({
                 onRejectionReasonChange={setRejectionReason}
                 onPropose={handleProposeQuotation}
                 onReject={handleRejectRequest}
+                packageDeposits={packageDeposits}
+                setPackageDeposits={setPackageDeposits}
               />
             )}
 

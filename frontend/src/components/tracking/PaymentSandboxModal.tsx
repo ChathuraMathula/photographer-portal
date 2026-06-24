@@ -179,6 +179,9 @@ export function PaymentSandboxModal({
     }
     const pkg = reservation.selectedPackages.find((p: any) => p.id === packageId);
     if (!pkg) return reservation.advancePaymentPriceInCents ?? 0;
+    if (pkg.customDepositAmountInCents !== undefined && pkg.customDepositAmountInCents !== null) {
+      return pkg.customDepositAmountInCents;
+    }
     if (pkg.depositType === "fixed") {
       return pkg.depositValue ?? 0;
     }

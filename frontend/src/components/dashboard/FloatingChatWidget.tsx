@@ -46,6 +46,26 @@ export function FloatingChatWidget({
     }
   }, [selectedRes]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (
+        showFloatingChat &&
+        chatRef.current &&
+        !chatRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setShowFloatingChat(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showFloatingChat]);
+
   // Draggable logic for floating button - Direct DOM manipulations with requestAnimationFrame for 60FPS smooth dragging
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.button !== 0) return;
