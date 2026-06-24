@@ -14,6 +14,13 @@ export function proxy(request: NextRequest) {
 
   if (isPublic) {
     if (token && pathname === '/login') {
+      const decodedToken = decodeJwtPayload(token);
+      const isExpired = decodedToken ? decodedToken.exp * 1000 < Date.now() : true;
+      if (!decodedToken || isExpired) {
+        const response = NextResponse.next();
+        response.cookies.delete('access_token');
+        return response;
+      }
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     return NextResponse.next();
@@ -24,9 +31,12 @@ export function proxy(request: NextRequest) {
   }
 
   const decodedToken = decodeJwtPayload(token);
-  if (!decodedToken) {
-    request.cookies.delete('access_token');
-    return NextResponse.redirect(new URL(REDIRECTS.unauthenticated, request.url));
+  const isExpired = decodedToken ? decodedToken.exp * 1000 < Date.now() : true;
+
+  if (!decodedToken || isExpired) {
+    const response = NextResponse.redirect(new URL(REDIRECTS.unauthenticated, request.url));
+    response.cookies.delete('access_token');
+    return response;
   }
 
   const userRole = decodedToken.role as UserRole;

@@ -15,13 +15,44 @@ interface UserState {
   isAuthenticated: boolean;
 }
 
-const initialState: UserState = {
-  id: null,
-  email: null,
-  role: null,
-  firstName: null,
-  isAuthenticated: false,
+const isClient = typeof window !== "undefined";
+
+const getInitialState = (): UserState => {
+  if (!isClient) {
+    return {
+      id: null,
+      email: null,
+      role: null,
+      firstName: null,
+      isAuthenticated: false,
+    };
+  }
+
+  try {
+    const serializedState = localStorage.getItem("auth_user");
+    if (serializedState === null) {
+      return {
+        id: null,
+        email: null,
+        role: null,
+        firstName: null,
+        isAuthenticated: false,
+      };
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error("Failed to load auth state from localStorage", err);
+    return {
+      id: null,
+      email: null,
+      role: null,
+      firstName: null,
+      isAuthenticated: false,
+    };
+  }
 };
+
+const initialState: UserState = getInitialState();
 
 const authSlice = createSlice({
   name: "auth",
@@ -37,6 +68,19 @@ const authSlice = createSlice({
       state.role = action.payload.role;
       state.firstName = action.payload.firstName;
       state.isAuthenticated = true;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("auth_user", JSON.stringify({
+            id: state.id,
+            email: state.email,
+            role: state.role,
+            firstName: state.firstName,
+            isAuthenticated: true,
+          }));
+        } catch (err) {
+          console.error("Failed to save auth state to localStorage", err);
+        }
+      }
     },
     // Action to wipe user on logout
     logout: (state) => {
@@ -45,6 +89,13 @@ const authSlice = createSlice({
       state.role = null;
       state.firstName = null;
       state.isAuthenticated = false;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("auth_user");
+        } catch (err) {
+          console.error("Failed to remove auth state from localStorage", err);
+        }
+      }
     },
   },
 });

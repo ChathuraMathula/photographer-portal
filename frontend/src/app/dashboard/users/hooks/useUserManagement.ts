@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "sonner";
 
 import { RootState } from "@/store/store";
-import { UserRole } from "@/store/slices/authSlice";
+import { UserRole, logout } from "@/store/slices/authSlice";
 import { type UserAccount } from "@/types";
 import { type CreateUserValues } from "@/components/users/CreateUserModal";
 
@@ -30,9 +30,32 @@ const CreateUserSchema = Yup.object().shape({
 });
 
 export function useUserManagement() {
+  const dispatch = useDispatch();
   const { role: loggedInRole, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Backend logout error:", err);
+    }
+    dispatch(logout());
+    window.location.href = "/login";
+  };
+
+  const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const res = await fetch(input, init);
+    if (res.status === 401) {
+      handleLogout();
+      throw new Error("Unauthorized");
+    }
+    return res;
+  };
 
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +68,7 @@ export function useUserManagement() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/users`, { credentials: "include" });
+      const res = await authFetch(`${API}/users`, { credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load users");
       setUsers(data);
@@ -67,7 +90,7 @@ export function useUserManagement() {
 
   const handleToggleActive = async (userId: string) => {
     try {
-      const res = await fetch(`${API}/users/${userId}/toggle-active`, {
+      const res = await authFetch(`${API}/users/${userId}/toggle-active`, {
         method: "PATCH",
         credentials: "include",
       });
@@ -102,7 +125,7 @@ export function useUserManagement() {
           specializations:
             values.role === UserRole.PHOTOGRAPHER ? specsList : undefined,
         };
-        const res = await fetch(`${API}/users`, {
+        const res = await authFetch(`${API}/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),

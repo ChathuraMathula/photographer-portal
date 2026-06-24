@@ -134,9 +134,9 @@ export function usePhotographerDashboard() {
     if (!userId || userId === "null" || userId === "undefined") return;
     try {
       const [resRes, pkgRes, profRes] = await Promise.all([
-        fetch(`${API}/reservations`, { credentials: "include" }),
-        fetch(`${API}/packages`, { credentials: "include" }),
-        fetch(`${API}/photographers/${userId}`, { credentials: "include" }),
+        authFetch(`${API}/reservations`, { credentials: "include" }),
+        authFetch(`${API}/packages`, { credentials: "include" }),
+        authFetch(`${API}/photographers/${userId}`, { credentials: "include" }),
       ]);
 
       if (resRes.ok) {
@@ -284,7 +284,7 @@ export function usePhotographerDashboard() {
       return;
     }
 
-    fetch(`${API}/reservations/${selectedRes.id}/messages`, { credentials: "include" })
+    authFetch(`${API}/reservations/${selectedRes.id}/messages`, { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         setMessages(data);
@@ -325,13 +325,22 @@ export function usePhotographerDashboard() {
     window.location.href = "/login";
   };
 
+  const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const res = await fetch(input, init);
+    if (res.status === 401) {
+      handleLogout();
+      throw new Error("Unauthorized");
+    }
+    return res;
+  };
+
   const handleSendChatMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageText.trim() || !selectedRes) return;
     try {
       const text = messageText;
       setMessageText("");
-      await fetch(`${API}/reservations/${selectedRes.id}/messages`, {
+      await authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: text }),
@@ -345,7 +354,7 @@ export function usePhotographerDashboard() {
   const handleProposeQuotation = async () => {
     if (!selectedRes || selectedPkgIds.length === 0) return;
     try {
-      const res = await fetch(`${API}/reservations/${selectedRes.id}/propose`, {
+      const res = await authFetch(`${API}/reservations/${selectedRes.id}/propose`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -370,7 +379,7 @@ export function usePhotographerDashboard() {
   const handleRejectRequest = async () => {
     if (!selectedRes || !rejectionReason.trim()) return;
     try {
-      const res = await fetch(`${API}/reservations/${selectedRes.id}/reject`, {
+      const res = await authFetch(`${API}/reservations/${selectedRes.id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rejectionReason }),
@@ -391,7 +400,7 @@ export function usePhotographerDashboard() {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API}/photographers/${userId}/profile`, {
+      const res = await authFetch(`${API}/photographers/${userId}/profile`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -423,7 +432,7 @@ export function usePhotographerDashboard() {
 
   const handleToggleAvailability = async () => {
     try {
-      const res = await fetch(`${API}/photographers/${userId}/toggle-availability`, {
+      const res = await authFetch(`${API}/photographers/${userId}/toggle-availability`, {
         method: "PATCH",
         credentials: "include",
       });
@@ -456,7 +465,7 @@ export function usePhotographerDashboard() {
   const handleDeletePackage = async (pkgId: string) => {
     if (!confirm("Are you sure you want to delete this package?")) return;
     try {
-      const res = await fetch(`${API}/packages/${pkgId}`, {
+      const res = await authFetch(`${API}/packages/${pkgId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -482,7 +491,7 @@ export function usePhotographerDashboard() {
     validationSchema: ManualBookingSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        const res = await fetch(`${API}/reservations`, {
+        const res = await authFetch(`${API}/reservations`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
@@ -529,7 +538,7 @@ export function usePhotographerDashboard() {
         };
         const url = editingPkg ? `${API}/packages/${editingPkg.id}` : `${API}/packages`;
         const method = editingPkg ? "PATCH" : "POST";
-        const res = await fetch(url, {
+        const res = await authFetch(url, {
           method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
