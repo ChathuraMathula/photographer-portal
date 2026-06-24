@@ -133,6 +133,10 @@ export class PaymentsService {
     await this.paymentRepository.save(payment);
 
     if (status === PaymentStatus.FAILED) {
+      // Notify photographer of the declined attempt in real-time
+      this.chatGateway.server
+        .to(`photographer_${reservation.photographerId}`)
+        .emit('transactionLogged', { reservationId: reservation.id });
       throw new BadRequestException(errorMsg);
     }
 
@@ -145,13 +149,16 @@ export class PaymentsService {
 
     await this.reservationRepository.save(reservation);
 
-    // Broadcast updated reservation
+    // Broadcast updated reservation + transaction log refresh
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)
       .emit('reservationUpdated', reservation);
     this.chatGateway.server
       .to(`reservation_${reservation.id}`)
       .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('transactionLogged', { reservationId: reservation.id });
 
     // Send confirmation email to photographer
     await this.emailService.sendReservationConfirmed(

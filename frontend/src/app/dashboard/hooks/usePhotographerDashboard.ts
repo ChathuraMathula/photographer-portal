@@ -288,14 +288,20 @@ export function usePhotographerDashboard() {
       }
     };
 
+    const handleTransactionLogged = () => {
+      loadTransactions();
+    };
+
     socket.on("reservationCreated", handleReservationCreated);
     socket.on("reservationUpdated", handleReservationUpdated);
     socket.on("messageReceived", handleMessageReceived);
+    socket.on("transactionLogged", handleTransactionLogged);
 
     return () => {
       socket.off("reservationCreated", handleReservationCreated);
       socket.off("reservationUpdated", handleReservationUpdated);
       socket.off("messageReceived", handleMessageReceived);
+      socket.off("transactionLogged", handleTransactionLogged);
     };
   }, [socket, isAuthenticated, role, userId]);
 
