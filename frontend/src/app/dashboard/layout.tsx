@@ -144,7 +144,20 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
 }
 
 export default function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
   const { role, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="animate-pulse text-zinc-500 font-medium">Loading...</div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <>{children}</>;
