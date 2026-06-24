@@ -62,8 +62,14 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
 
   const activeTab = pathname.split("/").pop() as any;
 
+  // Track previous pathname so we only clear selectedRes on actual navigation,
+  // not on initial mount or re-renders caused by context reference changes.
+  const prevPathnameRef = React.useRef(pathname);
   React.useEffect(() => {
-    setSelectedRes(null);
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
+      setSelectedRes(null);
+    }
   }, [pathname, setSelectedRes]);
 
   const handleTabChange = (tab: string) => {
