@@ -3,6 +3,7 @@ import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, X, Copy, Check } from "lucide-react";
+import { CountdownTimer } from "@/components/tracking/CountdownTimer";
 
 type Props = {
   reservation: Reservation;
@@ -65,7 +66,7 @@ export function BookingDetailsModal({
             </h2>
             <div className="flex items-center gap-2">
               <span className="text-body-caption text-zinc-400 font-semibold">Status:</span>
-              <StatusBadge status={reservation.status} />
+              <StatusBadge status={reservation.status} paymentDeadline={reservation.paymentDeadline} />
             </div>
           </div>
           <Button
@@ -219,6 +220,11 @@ export function BookingDetailsModal({
               <h3 className="text-body-base-bold text-primary-dark dark:text-white font-semibold">
                 Proposal &amp; Package Details
               </h3>
+              {reservation.status === "PROPOSED" && reservation.paymentDeadline && (
+                <div className="mb-2">
+                  <CountdownTimer deadline={reservation.paymentDeadline} />
+                </div>
+              )}
               <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
                 {reservation.clientSelectedPackageId && reservation.selectedPackages && (
                   <div>

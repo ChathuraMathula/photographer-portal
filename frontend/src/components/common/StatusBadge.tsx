@@ -43,8 +43,16 @@ const statusConfig: Record<
   },
 };
 
-export function StatusBadge({ status }: { status: ReservationStatus }) {
-  const cfg = statusConfig[status];
+export function StatusBadge({ status, paymentDeadline }: { status: ReservationStatus; paymentDeadline?: string }) {
+  const isExpired = status === "PROPOSED" && paymentDeadline && new Date(paymentDeadline) < new Date();
+  const cfg = isExpired
+    ? {
+        label: "Expired",
+        className: "bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400",
+        Icon: XCircle,
+      }
+    : statusConfig[status];
+
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-body-caption font-semibold ${cfg.className}`}
@@ -56,7 +64,17 @@ export function StatusBadge({ status }: { status: ReservationStatus }) {
 }
 
 /** Compact pill for use inside tables / lists */
-export function StatusPill({ status }: { status: ReservationStatus }) {
+export function StatusPill({ status, paymentDeadline }: { status: ReservationStatus; paymentDeadline?: string }) {
+  const isExpired = status === "PROPOSED" && paymentDeadline && new Date(paymentDeadline) < new Date();
+  
+  if (isExpired) {
+    return (
+      <span className="rounded-full px-2 py-0.5 text-body-caption font-medium uppercase bg-red-100 text-red-800 dark:bg-red-950/20 dark:text-red-400">
+        EXPIRED
+      </span>
+    );
+  }
+
   const map: Record<ReservationStatus, string> = {
     PENDING:
       "bg-amber-100 text-amber-800 dark:bg-amber-950/20 dark:text-amber-400",

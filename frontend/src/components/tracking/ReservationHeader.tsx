@@ -15,7 +15,7 @@ export function ReservationHeader({ reservation }: { reservation: TrackingReserv
           </span>
         </p>
       </div>
-      <StatusBadge status={reservation.status} />
+      <StatusBadge status={reservation.status} paymentDeadline={reservation.paymentDeadline} />
     </header>
   );
 }

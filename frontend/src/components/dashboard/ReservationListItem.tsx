@@ -45,7 +45,7 @@ export function ReservationListItem({ reservation: res, isSelected, onSelect }: 
       </div>
       <div className="flex justify-between items-center mt-2">
         <span className="text-body-caption text-zinc-500">{res.eventType}</span>
-        <StatusPill status={res.status} />
+        <StatusPill status={res.status} paymentDeadline={res.paymentDeadline} />
       </div>
     </div>
   );

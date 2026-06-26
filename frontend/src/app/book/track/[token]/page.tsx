@@ -84,6 +84,11 @@ export default function TrackingPage() {
     );
   }
 
+  const isExpired =
+    reservation.status === "PROPOSED" &&
+    reservation.paymentDeadline &&
+    new Date(reservation.paymentDeadline) < new Date();
+
   const chatDisabled =
     reservation.status === "CANCELLED" || reservation.status === "REJECTED";
 
@@ -99,7 +104,7 @@ export default function TrackingPage() {
             {reservation.status === "REJECTED" && (
               <RejectionNotice reason={reservation.rejectionReason} />
             )}
-            {reservation.status === "CANCELLED" && <CancelledNotice />}
+            {(reservation.status === "CANCELLED" || isExpired) && <CancelledNotice />}
             <ProposalSection
               reservation={reservation}
               selectedPkgId={selectedPkgId}
