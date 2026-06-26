@@ -83,16 +83,16 @@ export function ProposalSection({
         <div className="grid gap-4 sm:grid-cols-2">
           {reservation.selectedPackages!.map((pkg) => (
             <ProposalPackageCard
-               key={pkg.id}
-               pkg={pkg}
-               isSelected={selectedPkgId === pkg.id}
-               isConfirmed={reservation.status === "CONFIRMED" || !!isExpired}
-               isMySelection={
-                 reservation.status === "CONFIRMED" &&
-                 reservation.clientSelectedPackageId === pkg.id
-               }
-               onSelect={onSelectPackage}
-             />
+              key={pkg.id}
+              pkg={pkg}
+              isSelected={selectedPkgId === pkg.id}
+              isConfirmed={reservation.status === "CONFIRMED" || !!isExpired}
+              isMySelection={
+                reservation.status === "CONFIRMED" &&
+                reservation.clientSelectedPackageId === pkg.id
+              }
+              onSelect={onSelectPackage}
+            />
           ))}
         </div>
 
@@ -174,14 +174,14 @@ export function ProposalSection({
               }}
               className="btn btn-danger btn-modal text-body-small-s h-11 cursor-pointer bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium shadow-sm transition-all"
             >
-              Yes, cancel booking
+              Yes, cancel
             </button>
             <button
               type="button"
               onClick={() => setShowCancelConfirm(false)}
               className="btn btn-outline btn-modal text-body-small-s h-11 cursor-pointer border border-zinc-200 hover:bg-zinc-50 rounded-xl font-medium transition-all"
             >
-              Back
+              No
             </button>
           </div>
         </AlertDialogContent>
