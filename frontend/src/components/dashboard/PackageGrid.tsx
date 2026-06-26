@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { type Package } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PackageCard } from "./PackageCard";
+import { DeletePackageConfirmModal } from "./DeletePackageConfirmModal";
 
 type Props = {
   packages: Package[];
@@ -16,6 +18,15 @@ export function PackageGrid({
   onEditPackage,
   onDeletePackage,
 }: Props) {
+  const [packageToDelete, setPackageToDelete] = useState<Package | null>(null);
+
+  const handleConfirmDelete = () => {
+    if (packageToDelete) {
+      onDeletePackage(packageToDelete.id);
+      setPackageToDelete(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -44,11 +55,17 @@ export function PackageGrid({
               key={pkg.id}
               pkg={pkg}
               onEdit={onEditPackage}
-              onDelete={onDeletePackage}
+              onDelete={() => setPackageToDelete(pkg)}
             />
           ))
         )}
       </div>
+
+      <DeletePackageConfirmModal
+        pkg={packageToDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPackageToDelete(null)}
+      />
     </div>
   );
 }

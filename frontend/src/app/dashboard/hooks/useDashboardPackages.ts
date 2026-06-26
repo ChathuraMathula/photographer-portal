@@ -112,7 +112,6 @@ export function useDashboardPackages({ authFetch, loadPhotographerData }: UseDas
   };
 
   const handleDeletePackage = async (pkgId: string) => {
-    if (!confirm("Are you sure you want to delete this package?")) return;
     try {
       const res = await authFetch(`${API}/packages/${pkgId}`, {
         method: "DELETE",
