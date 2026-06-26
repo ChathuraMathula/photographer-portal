@@ -1,148 +1,89 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import * as Yup from "yup";
-import { io, Socket } from "socket.io-client";
-
-import { RootState } from "@/store/store";
-import { UserRole, logout } from "@/store/slices/authSlice";
-import { type Reservation, type Package, type ChatMessage, type NotificationItem } from "@/types";
-import { type ManualBookingValues } from "@/components/dashboard/ManualBookingModal";
-import { type PackageFormValues } from "@/components/dashboard/PackageFormModal";
 import { useSocket } from "@/context/SocketContext";
+import { UserRole } from "@/store/slices/authSlice";
+import { type Reservation } from "@/types";
+
+// Import custom sub-hooks
+import { useDashboardAuth } from "./useDashboardAuth";
+import { useDashboardNotifications } from "./useDashboardNotifications";
+import { useDashboardProfile } from "./useDashboardProfile";
+import { useDashboardPackages } from "./useDashboardPackages";
+import { useDashboardReservations } from "./useDashboardReservations";
+import { useDashboardManualBooking } from "./useDashboardManualBooking";
+import { useDashboardChat } from "./useDashboardChat";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-
 type Tab = "reservations" | "calendar" | "packages" | "profile";
 
-const ManualBookingSchema = Yup.object().shape({
-  firstName: Yup.string().required("First name is required"),
-  lastName: Yup.string().required("Last name is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  phone: Yup.string().required("Phone is required"),
-  date: Yup.string()
-    .required("Date is required")
-    .test("not-past", "Date cannot be in the past", function (value) {
-      if (!value) return false;
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const selected = new Date(value);
-      selected.setHours(0, 0, 0, 0);
-      return selected >= today;
-    }),
-  startTime: Yup.string()
-    .required("Start time is required")
-    .test("not-past-time", "Start time cannot be in the past", function (value) {
-      if (!value) return false;
-      const { date } = this.parent;
-      if (!date) return true;
-      const today = new Date();
-      const todayStr = today.toLocaleDateString("en-CA");
-      if (date === todayStr) {
-        const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
-        return value >= currentTime;
-      }
-      return true;
-    }),
-  endTime: Yup.string()
-    .required("End time is required")
-    .test("after-start", "End time must be after start time", function (v) {
-      return !v || v > this.parent.startTime;
-    }),
-  eventType: Yup.string().required("Event type is required"),
-  location: Yup.string().optional().nullable(),
-  locationMapLink: Yup.string().url("Must be a valid URL").optional().nullable(),
-  notes: Yup.string().optional().nullable(),
-  packageId: Yup.string().optional().nullable(),
-  advancePaymentLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
-  totalAmountLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
-});
-
-const PackageSchema = Yup.object().shape({
-  name: Yup.string().required("Package name is required"),
-  description: Yup.string(),
-  price: Yup.number()
-    .positive("Price must be positive")
-    .required("Price is required"),
-  durationHours: Yup.number()
-    .integer("Hours must be integer")
-    .positive("Hours must be positive")
-    .required("Duration is required"),
-  depositType: Yup.string(),
-  depositValue: Yup.number()
-    .min(0, "Cannot be negative")
-    .test("max-deposit", "Invalid deposit value", function (value) {
-      const { depositType, price } = this.parent;
-      if (depositType === "fixed") {
-        if (value === undefined || value === null) return this.createError({ message: "Deposit value is required" });
-        if (value > price) return this.createError({ message: "Deposit cannot exceed package price" });
-      } else if (depositType === "percentage") {
-        if (value === undefined || value === null) return this.createError({ message: "Deposit value is required" });
-        if (value > 100) return this.createError({ message: "Percentage cannot exceed 100%" });
-      }
-      return true;
-    }),
-});
-
 export function usePhotographerDashboard() {
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const { socket } = useSocket();
+
+  // 1. Auth Hook
   const {
     firstName,
     role,
-    id: userId,
+    userId,
     isAuthenticated,
-  } = useSelector((state: RootState) => state.auth);
+    handleLogout,
+    authFetch,
+  } = useDashboardAuth();
 
+  // States managed in main hook for coordination
   const [activeTab, setActiveTab] = useState<Tab>("reservations");
-
-  // Photographer states
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
-
-  // Chat states
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [messageText, setMessageText] = useState("");
-  const { socket } = useSocket();
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
-
-  const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);
-  const [quotationNotes, setQuotationNotes] = useState("");
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [showRejectForm, setShowRejectForm] = useState(false);
-
-  // Modal states
-  const [showManualModal, setShowManualModal] = useState(false);
-  const [showPackageModal, setShowPackageModal] = useState(false);
-  const [editingPkg, setEditingPkg] = useState<Package | null>(null);
-  const [packageIncludesText, setPackageIncludesText] = useState("");
-
-  // Profile states
-  const [profileBio, setProfileBio] = useState("");
-  const [profileLocation, setProfileLocation] = useState("");
-  const [profilePortfolio, setProfilePortfolio] = useState("");
-  const [profileAvailability, setProfileAvailability] = useState(true);
-  const [bookingSlug, setBookingSlug] = useState("");
-  const [profileImageUrl, setProfileImageUrl] = useState("");
-  const [allowedEventTypes, setAllowedEventTypes] = useState<string[]>([]);
-  const [allowCustomEventTypes, setAllowCustomEventTypes] = useState(true);
-  const [universalDepositType, setUniversalDepositType] = useState("fixed");
-  const [universalDepositValue, setUniversalDepositValue] = useState(5000);
-  const [offlineMessage, setOfflineMessage] = useState("");
-
-  // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarSelectedRes, setCalendarSelectedRes] = useState<Reservation | null>(null);
-
-  // Notifications state
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [packageDeposits, setPackageDeposits] = useState<Record<string, string>>({});
+  const [showManualModal, setShowManualModal] = useState(false);
+
+  // 2. Notifications Hook
+  const {
+    notifications,
+    setNotifications,
+    handleMarkAsRead,
+    handleMarkAllAsRead,
+    handleClearAllNotifications,
+  } = useDashboardNotifications();
+
+  // 3. Profile Hook
+  const profile = useDashboardProfile({ userId, authFetch });
+
+  // 4. Packages Hook
+  const packagesState = useDashboardPackages({
+    authFetch,
+    loadPhotographerData: async () => {
+      await loadPhotographerData();
+    },
+  });
+
+  // 5. Reservations Hook
+  const reservationsState = useDashboardReservations({
+    authFetch,
+    loadPhotographerData: async () => {
+      await loadPhotographerData();
+    },
+    packages: packagesState.packages,
+    universalDepositType: profile.universalDepositType,
+    universalDepositValue: profile.universalDepositValue,
+  });
+
+  // 6. Manual Booking Hook
+  const manualBooking = useDashboardManualBooking({
+    authFetch,
+    loadPhotographerData: async () => {
+      await loadPhotographerData();
+    },
+    setShowManualModal,
+  });
+
+  // 7. Chat Hook
+  const chat = useDashboardChat({
+    socket,
+    selectedRes: reservationsState.selectedRes,
+    authFetch,
+  });
 
   const loadTransactions = async () => {
     try {
@@ -155,12 +96,6 @@ export function usePhotographerDashboard() {
     }
   };
 
-  // ── Auth guard ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!isAuthenticated) router.push("/login");
-  }, [isAuthenticated, router]);
-
-  // ── Data loading ──────────────────────────────────────────────────────────
   const loadPhotographerData = async () => {
     if (role !== UserRole.PHOTOGRAPHER) return;
     if (!userId || userId === "null" || userId === "undefined") return;
@@ -173,28 +108,30 @@ export function usePhotographerDashboard() {
 
       if (resRes.ok) {
         const resData = await resRes.json();
-        setReservations(resData);
+        reservationsState.setReservations(resData);
       }
-      if (pkgRes.ok) setPackages(await pkgRes.json());
+      if (pkgRes.ok) {
+        packagesState.setPackages(await pkgRes.json());
+      }
       if (profRes.ok) {
         const profData = await profRes.json();
-        setProfileBio(profData.bio || "");
-        setProfileLocation(profData.baseLocation || "");
-        setProfilePortfolio(profData.portfolioUrl || "");
-        setProfileAvailability(profData.isAvailableForBooking);
-        setBookingSlug(profData.bookingSlug || "");
-        setProfileImageUrl(profData.profileImageUrl || "");
-        setAllowedEventTypes(profData.allowedEventTypes || []);
-        setAllowCustomEventTypes(profData.allowCustomEventTypes !== false);
-        setUniversalDepositType(profData.universalDepositType || "fixed");
-        setUniversalDepositValue(
+        profile.setProfileBio(profData.bio || "");
+        profile.setProfileLocation(profData.baseLocation || "");
+        profile.setProfilePortfolio(profData.portfolioUrl || "");
+        profile.setProfileAvailability(profData.isAvailableForBooking);
+        profile.setBookingSlug(profData.bookingSlug || "");
+        profile.setProfileImageUrl(profData.profileImageUrl || "");
+        profile.setAllowedEventTypes(profData.allowedEventTypes || []);
+        profile.setAllowCustomEventTypes(profData.allowCustomEventTypes !== false);
+        profile.setUniversalDepositType(profData.universalDepositType || "fixed");
+        profile.setUniversalDepositValue(
           profData.universalDepositType === "percentage"
             ? profData.universalDepositValue ?? 10
             : (profData.universalDepositValue ?? 500000) / 100
         );
-        setOfflineMessage(profData.offlineMessage || "");
+        profile.setOfflineMessage(profData.offlineMessage || "");
       }
-      loadTransactions();
+      await loadTransactions();
     } catch (err) {
       console.error("Error loading photographer data:", err);
     }
@@ -210,16 +147,16 @@ export function usePhotographerDashboard() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const resId = params.get("id");
-      if (resId && reservations.length > 0) {
-        const found = reservations.find((r) => r.id === resId);
+      if (resId && reservationsState.reservations.length > 0) {
+        const found = reservationsState.reservations.find((r) => r.id === resId);
         if (found) {
-          setSelectedRes(found);
+          reservationsState.setSelectedRes(found);
         }
       }
     }
-  }, [reservations]);
+  }, [reservationsState.reservations]);
 
-  // ── Chat / Socket.io ──────────────────────────────────────────────────────
+  // Socket Dashboard Realtime Listeners
   useEffect(() => {
     if (!socket || !isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {
       return;
@@ -228,7 +165,7 @@ export function usePhotographerDashboard() {
     socket.emit("joinPhotographerDashboard", { photographerId: userId });
 
     const handleReservationCreated = (newRes: Reservation) => {
-      setReservations((prev) => {
+      reservationsState.setReservations((prev) => {
         if (prev.some((r) => r.id === newRes.id)) return prev;
         return [newRes, ...prev];
       });
@@ -249,17 +186,17 @@ export function usePhotographerDashboard() {
     };
 
     const handleReservationUpdated = (updatedRes: Reservation) => {
-      setReservations((prev) =>
+      reservationsState.setReservations((prev) =>
         prev.map((r) => (r.id === updatedRes.id ? updatedRes : r))
       );
-      setSelectedRes((prev) =>
+      reservationsState.setSelectedRes((prev) =>
         prev && prev.id === updatedRes.id ? updatedRes : prev
       );
       loadTransactions();
     };
 
     const handleMessageReceived = ({ reservationId, message }: any) => {
-      setReservations((prev) =>
+      reservationsState.setReservations((prev) =>
         prev.map((r) => {
           if (r.id === reservationId) {
             const currentMessages = r.messages || [];
@@ -273,9 +210,9 @@ export function usePhotographerDashboard() {
         })
       );
 
-      setSelectedRes((prev) => {
+      reservationsState.setSelectedRes((prev) => {
         if (prev && prev.id === reservationId) {
-          setMessages((msgs) => {
+          chat.setMessages((msgs) => {
             if (msgs.some((m) => m.id === message.id)) return msgs;
             return [...msgs, message];
           });
@@ -317,410 +254,9 @@ export function usePhotographerDashboard() {
     };
   }, [socket, isAuthenticated, role, userId]);
 
-  useEffect(() => {
-    if (!socket || !selectedRes) {
-      setMessages([]);
-      return;
-    }
-
-    authFetch(`${API}/reservations/${selectedRes.id}/messages`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
-        setMessages(data);
-        scrollToBottom();
-      })
-      .catch(console.error);
-
-    socket.emit("joinReservation", { reservationId: selectedRes.id });
-
-    const handleMessage = (msg: ChatMessage) => {
-      setMessages((prev) => [...prev, msg]);
-      scrollToBottom();
-    };
-
-    socket.on("message", handleMessage);
-
-    return () => {
-      socket.emit("leaveReservation", { reservationId: selectedRes.id });
-      socket.off("message", handleMessage);
-    };
-  }, [socket, selectedRes]);
-
-  const scrollToBottom = () => {
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-  };
-
-  // ── Actions ───────────────────────────────────────────────────────────────
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Backend logout error:", err);
-    }
-    dispatch(logout());
-    window.location.href = "/login";
-  };
-
-  const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const res = await fetch(input, init);
-    if (res.status === 401) {
-      handleLogout();
-      throw new Error("Unauthorized");
-    }
-    return res;
-  };
-
-  const handleSendChatMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!messageText.trim() || !selectedRes) return;
-    try {
-      const text = messageText;
-      setMessageText("");
-      await authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: text }),
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleProposeQuotation = async () => {
-    if (!selectedRes || selectedPkgIds.length === 0) return;
-    try {
-      const centsDeposits: Record<string, number> = {};
-      Object.entries(packageDeposits).forEach(([pkgId, val]) => {
-        const numVal = Number(val);
-        if (!isNaN(numVal)) {
-          centsDeposits[pkgId] = Math.round(numVal * 100);
-        }
-      });
-
-      const res = await authFetch(`${API}/reservations/${selectedRes.id}/propose`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          packageIds: selectedPkgIds,
-          advancePaymentPriceInCents: 0,
-          quotationNotes,
-          packageDeposits: centsDeposits,
-        }),
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to propose packages");
-      setSelectedPkgIds([]);
-      setQuotationNotes("");
-      loadPhotographerData();
-      setSelectedRes(null);
-      toast.success("Proposal sent successfully to customer email!");
-    } catch (err: any) {
-      toast.error(err.message || "Error sending proposal");
-    }
-  };
-
-  const handleRejectRequest = async () => {
-    if (!selectedRes || !rejectionReason.trim()) return;
-    try {
-      const res = await authFetch(`${API}/reservations/${selectedRes.id}/reject`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rejectionReason }),
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to reject");
-      setRejectionReason("");
-      setShowRejectForm(false);
-      loadPhotographerData();
-      setSelectedRes(null);
-      toast.success("Request rejected professionally.");
-    } catch (err: any) {
-      toast.error(err.message || "Error rejecting request");
-    }
-  };
-
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await authFetch(`${API}/photographers/${userId}/profile`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bio: profileBio,
-          baseLocation: profileLocation,
-          portfolioUrl: profilePortfolio,
-          profileImageUrl,
-          allowedEventTypes,
-          allowCustomEventTypes,
-          universalDepositType,
-          universalDepositValue:
-            universalDepositType === "fixed"
-              ? Math.round(universalDepositValue * 100)
-              : Math.round(universalDepositValue),
-          offlineMessage,
-        }),
-        credentials: "include",
-      });
-      if (res.ok) {
-        toast.success("Profile updated successfully!");
-      } else {
-        const data = await res.json();
-        toast.error(data.message || "Failed to update profile.");
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Error updating profile.");
-    }
-  };
-
-  const handleToggleAvailability = async () => {
-    try {
-      const res = await authFetch(`${API}/photographers/${userId}/toggle-availability`, {
-        method: "PATCH",
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProfileAvailability(data.isAvailableForBooking);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleEditPackage = (pkg: Package) => {
-    setEditingPkg(pkg);
-    packageFormik.setValues({
-      name: pkg.name,
-      description: pkg.description || "",
-      price: pkg.priceInCents / 100,
-      durationHours: pkg.durationHours,
-      depositType: (pkg.depositType as any) || "universal",
-      depositValue:
-        pkg.depositType === "fixed"
-          ? (pkg.depositValue ?? 0) / 100
-          : pkg.depositValue ?? 0,
-    });
-    setPackageIncludesText(pkg.includes.join(", "));
-    setShowPackageModal(true);
-  };
-
-  const handleDeletePackage = async (pkgId: string) => {
-    if (!confirm("Are you sure you want to delete this package?")) return;
-    try {
-      const res = await authFetch(`${API}/packages/${pkgId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.ok) loadPhotographerData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const manualFormik = useFormik<ManualBookingValues>({
-    initialValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      eventType: "",
-      location: "",
-      locationMapLink: "",
-      notes: "",
-      packageId: "",
-      advancePaymentLkr: "",
-      totalAmountLkr: "",
-    },
-    validationSchema: ManualBookingSchema,
-    onSubmit: async (values, { resetForm }) => {
-      try {
-        const payload = {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          phone: values.phone,
-          date: values.date,
-          startTime: values.startTime,
-          endTime: values.endTime,
-          eventType: values.eventType,
-          location: values.location || undefined,
-          locationMapLink: values.locationMapLink || undefined,
-          notes: values.notes || undefined,
-          packageId: values.packageId || undefined,
-          advancePaymentPriceInCents: values.advancePaymentLkr
-            ? Math.round(Number(values.advancePaymentLkr) * 100)
-            : undefined,
-          totalAmountInCents: values.totalAmountLkr
-            ? Math.round(Number(values.totalAmountLkr) * 100)
-            : undefined,
-        };
-
-        const res = await authFetch(`${API}/reservations`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to book manual reservation");
-        setShowManualModal(false);
-        resetForm();
-        loadPhotographerData();
-        toast.success("Manual offline booking registered successfully!");
-      } catch (err: any) {
-        toast.error(err.message || "Manual booking failed");
-      }
-    },
-  });
-
-  const packageFormik = useFormik<PackageFormValues>({
-    initialValues: {
-      name: "",
-      description: "",
-      price: 0,
-      durationHours: 1,
-      depositType: "universal",
-      depositValue: 0,
-    },
-    validationSchema: PackageSchema,
-    onSubmit: async (values, { resetForm }) => {
-      try {
-        const body = {
-          name: values.name,
-          description: values.description,
-          priceInCents: values.price * 100,
-          durationHours: values.durationHours,
-          includes: packageIncludesText
-            .split(",")
-            .map((i) => i.trim())
-            .filter((i) => i.length > 0),
-          depositType: values.depositType,
-          depositValue:
-            values.depositType === "fixed"
-              ? Math.round(values.depositValue * 100)
-              : Math.round(values.depositValue),
-        };
-        const url = editingPkg ? `${API}/packages/${editingPkg.id}` : `${API}/packages`;
-        const method = editingPkg ? "PATCH" : "POST";
-        const res = await authFetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Failed to save package");
-        setShowPackageModal(false);
-        resetForm();
-        setEditingPkg(null);
-        setPackageIncludesText("");
-        loadPhotographerData();
-        toast.success(editingPkg ? "Package updated successfully!" : "Package created successfully!");
-      } catch (err) {
-        toast.error("Error saving package details");
-      }
-    },
-  });
-
-  const handleSetSelectedRes = (res: Reservation | null) => {
-    setSelectedRes(res);
-    if (res) {
-      const key = `chat_last_viewed_photographer_${res.id}`;
-      localStorage.setItem(key, new Date().toISOString());
-      // Force trigger state update to re-render the list items
-      setReservations((prev) => [...prev]);
-    }
-  };
-
-  // Automatically calculate default deposits and update packageDeposits when selectedPkgIds changes
-  useEffect(() => {
-    setPackageDeposits((prev) => {
-      const updated = { ...prev };
-      // Remove any that are no longer selected
-      Object.keys(updated).forEach((id) => {
-        if (!selectedPkgIds.includes(id)) {
-          delete updated[id];
-        }
-      });
-      // Add defaults for new selections
-      selectedPkgIds.forEach((id) => {
-        if (updated[id] === undefined) {
-          const selected = packages.find((p) => p.id === id);
-          if (selected) {
-            let depositLkr = 0;
-            const depType = selected.depositType || "universal";
-            if (depType === "fixed") {
-              depositLkr = (selected.depositValue ?? 0) / 100;
-            } else if (depType === "percentage") {
-              depositLkr = ((selected.priceInCents / 100) * (selected.depositValue ?? 0)) / 100;
-            } else {
-              if (universalDepositType === "fixed") {
-                depositLkr = universalDepositValue;
-              } else {
-                depositLkr = ((selected.priceInCents / 100) * universalDepositValue) / 100;
-              }
-            }
-            updated[id] = String(Math.round(depositLkr));
-          }
-        }
-      });
-      return updated;
-    });
-
-    if (selectedPkgIds.length === 0) {
-      setAdvanceAmount(0);
-      return;
-    }
-
-    const firstPkgId = selectedPkgIds[0];
-    const pkg = packages.find((p) => p.id === firstPkgId);
-    if (!pkg) return;
-
-    let computedDeposit = 0;
-    const depType = pkg.depositType || "universal";
-    
-    if (depType === "fixed") {
-      computedDeposit = (pkg.depositValue ?? 0) / 100;
-    } else if (depType === "percentage") {
-      const priceLkr = pkg.priceInCents / 100;
-      computedDeposit = (priceLkr * (pkg.depositValue ?? 0)) / 100;
-    } else {
-      if (universalDepositType === "fixed") {
-        computedDeposit = universalDepositValue;
-      } else {
-        const priceLkr = pkg.priceInCents / 100;
-        computedDeposit = (priceLkr * universalDepositValue) / 100;
-      }
-    }
-
-    setAdvanceAmount(Math.round(computedDeposit));
-  }, [selectedPkgIds, packages, universalDepositType, universalDepositValue]);
-
-  const handleMarkAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
-
-  const handleMarkAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const handleClearAllNotifications = () => {
-    setNotifications([]);
-  };
-
   const chatDisabled =
-    selectedRes?.status === "CANCELLED" || selectedRes?.status === "REJECTED";
+    reservationsState.selectedRes?.status === "CANCELLED" ||
+    reservationsState.selectedRes?.status === "REJECTED";
 
   return {
     firstName,
@@ -728,72 +264,72 @@ export function usePhotographerDashboard() {
     isAuthenticated,
     activeTab,
     setActiveTab,
-    reservations,
-    packages,
-    selectedRes,
-    setSelectedRes: handleSetSelectedRes,
-    messages,
-    messageText,
-    setMessageText,
-    chatEndRef,
-    selectedPkgIds,
-    setSelectedPkgIds,
-    quotationNotes,
-    setQuotationNotes,
-    rejectionReason,
-    setRejectionReason,
-    showRejectForm,
-    setShowRejectForm,
+    reservations: reservationsState.reservations,
+    packages: packagesState.packages,
+    selectedRes: reservationsState.selectedRes,
+    setSelectedRes: reservationsState.selectReservation,
+    messages: chat.messages,
+    messageText: chat.messageText,
+    setMessageText: chat.setMessageText,
+    chatEndRef: chat.chatEndRef,
+    selectedPkgIds: reservationsState.selectedPkgIds,
+    setSelectedPkgIds: reservationsState.setSelectedPkgIds,
+    quotationNotes: reservationsState.quotationNotes,
+    setQuotationNotes: reservationsState.setQuotationNotes,
+    rejectionReason: reservationsState.rejectionReason,
+    setRejectionReason: reservationsState.setRejectionReason,
+    showRejectForm: reservationsState.showRejectForm,
+    setShowRejectForm: reservationsState.setShowRejectForm,
     showManualModal,
     setShowManualModal,
-    showPackageModal,
-    setShowPackageModal,
-    editingPkg,
-    setEditingPkg,
-    packageIncludesText,
-    setPackageIncludesText,
-    profileBio,
-    setProfileBio,
-    profileLocation,
-    setProfileLocation,
-    profilePortfolio,
-    setProfilePortfolio,
-    profileAvailability,
-    bookingSlug,
+    showPackageModal: packagesState.showPackageModal,
+    setShowPackageModal: packagesState.setShowPackageModal,
+    editingPkg: packagesState.editingPkg,
+    setEditingPkg: packagesState.setEditingPkg,
+    packageIncludesText: packagesState.packageIncludesText,
+    setPackageIncludesText: packagesState.setPackageIncludesText,
+    profileBio: profile.profileBio,
+    setProfileBio: profile.setProfileBio,
+    profileLocation: profile.profileLocation,
+    setProfileLocation: profile.setProfileLocation,
+    profilePortfolio: profile.profilePortfolio,
+    setProfilePortfolio: profile.setProfilePortfolio,
+    profileAvailability: profile.profileAvailability,
+    bookingSlug: profile.bookingSlug,
     currentDate,
     setCurrentDate,
     handleLogout,
-    handleSendChatMessage,
-    handleProposeQuotation,
-    handleRejectRequest,
-    handleSaveProfile,
-    handleToggleAvailability,
-    handleEditPackage,
-    handleDeletePackage,
-    manualFormik,
-    packageFormik,
+    handleSendChatMessage: chat.handleSendChatMessage,
+    handleProposeQuotation: reservationsState.handleProposeQuotation,
+    handleRejectRequest: reservationsState.handleRejectRequest,
+    handleSaveProfile: profile.handleSaveProfile,
+    handleToggleAvailability: profile.handleToggleAvailability,
+    handleEditPackage: packagesState.handleEditPackage,
+    handleDeletePackage: packagesState.handleDeletePackage,
+    manualFormik: manualBooking.manualFormik,
+    packageFormik: packagesState.packageFormik,
     chatDisabled,
-    profileImageUrl,
-    setProfileImageUrl,
-    allowedEventTypes,
-    setAllowedEventTypes,
-    allowCustomEventTypes,
-    setAllowCustomEventTypes,
-    universalDepositType,
-    setUniversalDepositType,
-    universalDepositValue,
-    setUniversalDepositValue,
+    profileImageUrl: profile.profileImageUrl,
+    setProfileImageUrl: profile.setProfileImageUrl,
+    allowedEventTypes: profile.allowedEventTypes,
+    setAllowedEventTypes: profile.setAllowedEventTypes,
+    allowCustomEventTypes: profile.allowCustomEventTypes,
+    setAllowCustomEventTypes: profile.setAllowCustomEventTypes,
+    universalDepositType: profile.universalDepositType,
+    setUniversalDepositType: profile.setUniversalDepositType,
+    universalDepositValue: profile.universalDepositValue,
+    setUniversalDepositValue: profile.setUniversalDepositValue,
     notifications,
     handleMarkAsRead,
     handleMarkAllAsRead,
     handleClearAllNotifications,
     calendarSelectedRes,
     setCalendarSelectedRes,
-    offlineMessage,
-    setOfflineMessage,
+    offlineMessage: profile.offlineMessage,
+    setOfflineMessage: profile.setOfflineMessage,
     transactions,
     loadTransactions,
-    packageDeposits,
-    setPackageDeposits,
+    packageDeposits: reservationsState.packageDeposits,
+    setPackageDeposits: reservationsState.setPackageDeposits,
   };
 }
