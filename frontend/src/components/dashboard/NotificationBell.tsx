@@ -10,7 +10,7 @@ type Props = {
   onMarkAsRead: (id: string) => void;
   onMarkAllAsRead: () => void;
   onClearAll: () => void;
-  onSelectReservation: (resId: string) => void;
+  onSelectReservation: (resId: string, type?: "chat" | "booking") => void;
 };
 
 export function NotificationBell({
@@ -39,7 +39,7 @@ export function NotificationBell({
 
   const handleNotificationClick = (item: NotificationItem) => {
     onMarkAsRead(item.id);
-    onSelectReservation(item.referenceId);
+    onSelectReservation(item.referenceId, item.type);
     setIsOpen(false);
   };
 

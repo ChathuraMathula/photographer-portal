@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
 import { UserRole } from "@/store/slices/authSlice";
 import { type Reservation } from "@/types";
@@ -30,6 +31,9 @@ export function usePhotographerDashboard() {
     handleLogout,
     authFetch,
   } = useDashboardAuth();
+
+  const router = useRouter();
+  const [forceOpenChat, setForceOpenChat] = useState(0);
 
   // States managed in main hook for coordination
   const [activeTab, setActiveTab] = useState<Tab>("reservations");
@@ -233,7 +237,23 @@ export function usePhotographerDashboard() {
           },
           ...prev,
         ]);
-        toast.success(`Message from ${message.senderName}: "${message.content.substring(0, 40)}${message.content.length > 40 ? "..." : ""}"`);
+        toast.success(
+          `Message from ${message.senderName}: "${message.content.substring(0, 40)}${message.content.length > 40 ? "..." : ""}"`,
+          {
+            action: {
+              label: "Reply",
+              onClick: () => {
+                const res = reservationsState.reservations.find((r) => r.id === reservationId);
+                if (res) {
+                  reservationsState.setSelectedRes(res);
+                  setForceOpenChat((prev) => prev + 1);
+                  router.push(`/dashboard/reservations?id=${reservationId}`);
+                }
+              }
+            },
+            duration: 6000,
+          }
+        );
       }
     };
 
@@ -337,5 +357,7 @@ export function usePhotographerDashboard() {
     setCustomPackageDeposit: reservationsState.setCustomPackageDeposit,
     isCustomPackageSelected: reservationsState.isCustomPackageSelected,
     setIsCustomPackageSelected: reservationsState.setIsCustomPackageSelected,
+    forceOpenChat,
+    setForceOpenChat,
   };
 }

@@ -10,6 +10,7 @@ type Props = {
   onMessageChange: (text: string) => void;
   onSend: (e: React.FormEvent) => void;
   chatDisabled: boolean;
+  forceOpen?: number;
 };
 
 export function FloatingChatWidget({
@@ -19,6 +20,7 @@ export function FloatingChatWidget({
   onMessageChange,
   onSend,
   chatDisabled,
+  forceOpen,
 }: Props) {
   const [showFloatingChat, setShowFloatingChat] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
@@ -45,6 +47,12 @@ export function FloatingChatWidget({
       setShowFloatingChat(false);
     }
   }, [selectedRes]);
+
+  useEffect(() => {
+    if (forceOpen) {
+      setShowFloatingChat(true);
+    }
+  }, [forceOpen]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {

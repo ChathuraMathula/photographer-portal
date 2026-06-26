@@ -58,6 +58,8 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     packages,
     universalDepositType,
     universalDepositValue,
+    forceOpenChat,
+    setForceOpenChat,
   } = context;
 
   const activeTab = pathname.split("/").pop() as any;
@@ -91,10 +93,13 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
           onMarkAsRead={handleMarkAsRead}
           onMarkAllAsRead={handleMarkAllAsRead}
           onClearAll={handleClearAllNotifications}
-          onSelectReservation={(resId) => {
+          onSelectReservation={(resId, type) => {
             const res = reservations.find((r) => r.id === resId);
             if (res) {
               setSelectedRes(res);
+              if (type === "chat") {
+                setForceOpenChat((prev) => prev + 1);
+              }
               router.push(`/dashboard/reservations?id=${resId}`);
             }
           }}
@@ -153,6 +158,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
           onMessageChange={setMessageText}
           onSend={handleSendChatMessage}
           chatDisabled={chatDisabled}
+          forceOpen={forceOpenChat}
         />
       )}
     </DashboardLayout>
