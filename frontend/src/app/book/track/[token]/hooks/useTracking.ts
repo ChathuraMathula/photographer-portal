@@ -165,6 +165,31 @@ export function useTracking() {
     }
   };
 
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelReservation = async () => {
+    if (!verifiedEmail || !token) return;
+    if (!confirm("Are you sure you want to cancel this reservation request? This action cannot be undone.")) return;
+    setCancelling(true);
+    try {
+      const res = await fetch(`${API}/bookings/track/${token}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verifiedEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Cancellation failed");
+      setReservation((prev) =>
+        prev ? { ...prev, status: "CANCELLED" } : null
+      );
+      setCancelling(false);
+      toast.success("Reservation cancelled successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to cancel reservation");
+      setCancelling(false);
+    }
+  };
+
   const getDeadlineText = (deadlineStr?: string) => {
     if (!deadlineStr) return "";
     const deadline = new Date(deadlineStr);
@@ -194,9 +219,11 @@ export function useTracking() {
     selectedPkgId,
     setSelectedPkgId,
     confirming,
+    cancelling,
     handleVerifyEmail,
     handleSendMessage,
     handleConfirmReservation,
+    handleCancelReservation,
     getDeadlineText,
     setReservation,
   };

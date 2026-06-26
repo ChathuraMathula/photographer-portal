@@ -338,4 +338,33 @@ export class BookingsService {
       message: 'Reservation confirmed successfully',
     };
   }
+
+  async cancelBooking(token: string, email: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true },
+    });
+    if (!reservation) throw new NotFoundException('Reservation not found');
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    if (reservation.status !== ReservationStatus.PROPOSED && reservation.status !== ReservationStatus.PENDING) {
+      throw new BadRequestException('Cannot cancel reservation in this state');
+    }
+
+    reservation.status = ReservationStatus.CANCELLED;
+    reservation.paymentDeadline = undefined; // unlock slot
+
+    await this.reservationRepository.save(reservation);
+
+    // Broadcast updated reservation
+    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
+
+    return {
+      status: reservation.status,
+      message: 'Reservation cancelled successfully',
+    };
+  }
 }

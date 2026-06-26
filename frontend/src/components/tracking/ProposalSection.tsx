@@ -12,6 +12,8 @@ type Props = {
   onSelectPackage: (id: string) => void;
   onConfirm: () => void;
   getDeadlineText: (deadline?: string) => string;
+  onCancel: () => void;
+  cancelling: boolean;
 };
 
 export function ProposalSection({
@@ -21,6 +23,8 @@ export function ProposalSection({
   onSelectPackage,
   onConfirm,
   getDeadlineText,
+  onCancel,
+  cancelling,
 }: Props) {
   if (!reservation.selectedPackages) return null;
   if (reservation.status !== "PROPOSED" && reservation.status !== "CONFIRMED") return null;
@@ -119,6 +123,21 @@ export function ProposalSection({
               (reservation.advancePaymentPriceInCents ?? 0) / 100
             ).toLocaleString()}{" "}
             has been simulated/paid. The photographer is booked.
+          </div>
+        )}
+
+        {reservation.status === "PROPOSED" && !isExpired && (
+          <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-4 flex justify-between items-center text-body-caption">
+            <span className="text-zinc-550">No longer need this booking?</span>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={cancelling}
+              onClick={onCancel}
+              className="text-red-500 border-red-200 dark:border-zinc-850 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs px-3 h-8 cursor-pointer"
+            >
+              {cancelling ? "Cancelling..." : "Cancel Reservation"}
+            </Button>
           </div>
         )}
       </CardContent>

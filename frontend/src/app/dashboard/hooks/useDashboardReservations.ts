@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { type Reservation, type Package } from "@/types";
 
+import { type CustomPackageValues } from "@/components/dashboard/CustomPackageModal";
+
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 interface UseDashboardReservationsProps {
@@ -30,6 +32,11 @@ export function useDashboardReservations({
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [packageDeposits, setPackageDeposits] = useState<Record<string, string>>({});
+
+  // Custom package states
+  const [customPackage, setCustomPackage] = useState<CustomPackageValues | null>(null);
+  const [customPackageDeposit, setCustomPackageDeposit] = useState("");
+  const [isCustomPackageSelected, setIsCustomPackageSelected] = useState(false);
 
   const selectReservation = (res: Reservation | null) => {
     setSelectedRes(res);
@@ -77,8 +84,32 @@ export function useDashboardReservations({
     });
   }, [selectedPkgIds, packages, universalDepositType, universalDepositValue]);
 
+  // Set default custom package deposit value when custom package is created
+  useEffect(() => {
+    if (customPackage) {
+      let depositLkr = 0;
+      const depType = customPackage.depositType || "universal";
+      if (depType === "fixed") {
+        depositLkr = customPackage.depositValue;
+      } else if (depType === "percentage") {
+        depositLkr = (customPackage.price * customPackage.depositValue) / 100;
+      } else {
+        if (universalDepositType === "fixed") {
+          depositLkr = universalDepositValue;
+        } else {
+          depositLkr = (customPackage.price * universalDepositValue) / 100;
+        }
+      }
+      setCustomPackageDeposit(String(Math.round(depositLkr)));
+    } else {
+      setCustomPackageDeposit("");
+    }
+  }, [customPackage, universalDepositType, universalDepositValue]);
+
   const handleProposeQuotation = async () => {
-    if (!selectedRes || selectedPkgIds.length === 0) return;
+    if (!selectedRes) return;
+    if (selectedPkgIds.length === 0 && !(customPackage && isCustomPackageSelected)) return;
+    
     try {
       const centsDeposits: Record<string, number> = {};
       Object.entries(packageDeposits).forEach(([pkgId, val]) => {
@@ -88,6 +119,13 @@ export function useDashboardReservations({
         }
       });
 
+      if (customPackage && isCustomPackageSelected && customPackageDeposit) {
+        const numVal = Number(customPackageDeposit);
+        if (!isNaN(numVal)) {
+          centsDeposits['custom'] = Math.round(numVal * 100);
+        }
+      }
+
       const res = await authFetch(`${API}/reservations/${selectedRes.id}/propose`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +134,15 @@ export function useDashboardReservations({
           advancePaymentPriceInCents: 0,
           quotationNotes,
           packageDeposits: centsDeposits,
+          customPackage: (customPackage && isCustomPackageSelected) ? {
+            name: customPackage.name,
+            description: customPackage.description,
+            priceInCents: customPackage.price * 100,
+            durationHours: customPackage.durationHours,
+            includes: customPackage.includes,
+            depositType: customPackage.depositType,
+            depositValue: customPackage.depositValue,
+          } : undefined,
         }),
         credentials: "include",
       });
@@ -103,6 +150,8 @@ export function useDashboardReservations({
       if (!res.ok) throw new Error(data.message || "Failed to propose packages");
       setSelectedPkgIds([]);
       setQuotationNotes("");
+      setCustomPackage(null);
+      setIsCustomPackageSelected(false);
       await loadPhotographerData();
       setSelectedRes(null);
       toast.success("Proposal sent successfully to customer email!");
@@ -150,5 +199,11 @@ export function useDashboardReservations({
     setPackageDeposits,
     handleProposeQuotation,
     handleRejectRequest,
+    customPackage,
+    setCustomPackage,
+    customPackageDeposit,
+    setCustomPackageDeposit,
+    isCustomPackageSelected,
+    setIsCustomPackageSelected,
   };
 }

@@ -10,6 +10,7 @@ import {
 export class ProposeQuotationDto {
   @IsArray()
   @IsString({ each: true })
+  @IsOptional()
   packageIds!: string[];
 
   @IsInt()
@@ -25,4 +26,15 @@ export class ProposeQuotationDto {
 
   @IsOptional()
   usePackageWiseDeposit?: boolean;
+
+  @IsOptional()
+  customPackage?: {
+    name: string;
+    description?: string;
+    priceInCents: number;
+    durationHours: number;
+    includes: string[];
+    depositType: 'universal' | 'fixed' | 'percentage';
+    depositValue: number;
+  };
 }

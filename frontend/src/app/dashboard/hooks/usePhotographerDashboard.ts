@@ -331,5 +331,11 @@ export function usePhotographerDashboard() {
     loadTransactions,
     packageDeposits: reservationsState.packageDeposits,
     setPackageDeposits: reservationsState.setPackageDeposits,
+    customPackage: reservationsState.customPackage,
+    setCustomPackage: reservationsState.setCustomPackage,
+    customPackageDeposit: reservationsState.customPackageDeposit,
+    setCustomPackageDeposit: reservationsState.setCustomPackageDeposit,
+    isCustomPackageSelected: reservationsState.isCustomPackageSelected,
+    setIsCustomPackageSelected: reservationsState.setIsCustomPackageSelected,
   };
 }

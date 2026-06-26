@@ -3,6 +3,7 @@ import { ReservationList } from "./ReservationList";
 import { CustomerDetailsCard } from "./CustomerDetailsCard";
 import { ProposeQuotationCard } from "./ProposeQuotationCard";
 import { ProposalStatusCard } from "./ProposalStatusCard";
+import { type CustomPackageValues } from "./CustomPackageModal";
 
 type Props = {
   reservations: Reservation[];
@@ -21,6 +22,12 @@ type Props = {
   handleRejectRequest: () => void;
   packageDeposits: Record<string, string>;
   setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  customPackage: CustomPackageValues | null;
+  setCustomPackage: (val: CustomPackageValues | null) => void;
+  customPackageDeposit: string;
+  setCustomPackageDeposit: (val: string) => void;
+  isCustomPackageSelected: boolean;
+  setIsCustomPackageSelected: (val: boolean) => void;
 };
 
 export function ReservationsTabContent({
@@ -40,6 +47,12 @@ export function ReservationsTabContent({
   handleRejectRequest,
   packageDeposits,
   setPackageDeposits,
+  customPackage,
+  setCustomPackage,
+  customPackageDeposit,
+  setCustomPackageDeposit,
+  isCustomPackageSelected,
+  setIsCustomPackageSelected,
 }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -86,6 +99,12 @@ export function ReservationsTabContent({
                 onReject={handleRejectRequest}
                 packageDeposits={packageDeposits}
                 setPackageDeposits={setPackageDeposits}
+                customPackage={customPackage}
+                setCustomPackage={setCustomPackage}
+                customPackageDeposit={customPackageDeposit}
+                setCustomPackageDeposit={setCustomPackageDeposit}
+                isCustomPackageSelected={isCustomPackageSelected}
+                setIsCustomPackageSelected={setIsCustomPackageSelected}
               />
             )}
 

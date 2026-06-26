@@ -221,12 +221,19 @@ export class ReservationsService {
     }
 
     // Find packages
-    const pkgs = await this.packageRepository.find({
-      where: { id: In(dto.packageIds), photographerId: user.userId },
-    });
+    const packageIds = dto.packageIds || [];
+    const pkgs = packageIds.length > 0
+      ? await this.packageRepository.find({
+          where: { id: In(packageIds), photographerId: user.userId },
+        })
+      : [];
 
-    if (pkgs.length === 0 && dto.packageIds.length > 0) {
+    if (pkgs.length === 0 && packageIds.length > 0) {
       throw new BadRequestException('Invalid package IDs selected');
+    }
+
+    if (pkgs.length === 0 && !dto.customPackage) {
+      throw new BadRequestException('Must select at least one package or include a custom package');
     }
 
     // Update reservation
@@ -234,8 +241,9 @@ export class ReservationsService {
     reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
     reservation.quotationNotes = dto.quotationNotes;
     reservation.usePackageWiseDeposit = dto.usePackageWiseDeposit ?? false;
+
     // Snapshot packages
-    reservation.selectedPackages = pkgs.map((p) => {
+    const selectedPkgsMapped = pkgs.map((p) => {
       const customDeposit = dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
         ? dto.packageDeposits[p.id]
         : null;
@@ -249,8 +257,32 @@ export class ReservationsService {
         depositType: p.depositType,
         depositValue: p.depositValue,
         customDepositAmountInCents: customDeposit,
+        isCustom: false,
       };
     });
+
+    if (dto.customPackage) {
+      const cp = dto.customPackage;
+      const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const customDeposit = dto.packageDeposits && dto.packageDeposits['custom'] !== undefined
+        ? dto.packageDeposits['custom']
+        : null;
+
+      selectedPkgsMapped.push({
+        id: customId,
+        name: cp.name,
+        description: cp.description,
+        priceInCents: cp.priceInCents,
+        durationHours: cp.durationHours,
+        includes: cp.includes,
+        depositType: cp.depositType,
+        depositValue: cp.depositValue,
+        customDepositAmountInCents: customDeposit,
+        isCustom: true,
+      });
+    }
+
+    reservation.selectedPackages = selectedPkgsMapped;
     // 24-hour deadline from now
     reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
 

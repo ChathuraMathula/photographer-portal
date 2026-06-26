@@ -72,4 +72,12 @@ export class BookingsController {
   ) {
     return this.bookingsService.confirmBooking(token, email, packageId);
   }
+
+  @Post('track/:token/cancel')
+  cancel(
+    @Param('token') token: string,
+    @Body('email') email: string,
+  ) {
+    return this.bookingsService.cancelBooking(token, email);
+  }
 }

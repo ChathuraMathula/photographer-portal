@@ -24,6 +24,12 @@ export default function ReservationsPage() {
     handleRejectRequest,
     packageDeposits,
     setPackageDeposits,
+    customPackage,
+    setCustomPackage,
+    customPackageDeposit,
+    setCustomPackageDeposit,
+    isCustomPackageSelected,
+    setIsCustomPackageSelected,
   } = context;
 
   return (
@@ -44,6 +50,12 @@ export default function ReservationsPage() {
       handleRejectRequest={handleRejectRequest}
       packageDeposits={packageDeposits}
       setPackageDeposits={setPackageDeposits}
+      customPackage={customPackage}
+      setCustomPackage={setCustomPackage}
+      customPackageDeposit={customPackageDeposit}
+      setCustomPackageDeposit={setCustomPackageDeposit}
+      isCustomPackageSelected={isCustomPackageSelected}
+      setIsCustomPackageSelected={setIsCustomPackageSelected}
     />
   );
 }

@@ -31,13 +31,21 @@ export function ProposalPackageCard({
       <div>
         <div className="flex justify-between items-start gap-2">
           <h4 className="text-body-base-bold text-zinc-950 dark:text-white group-hover:text-zinc-900 dark:group-hover:text-zinc-100">
+            {pkg.isCustom && <span className="text-amber-500 mr-1">⭐</span>}
             {pkg.name}
           </h4>
-          {isMySelection && (
-            <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-body-caption font-semibold text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
-              Selected
-            </span>
-          )}
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {pkg.isCustom && (
+              <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-850 dark:bg-amber-950/30 dark:text-amber-400">
+                Custom
+              </span>
+            )}
+            {isMySelection && (
+              <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-body-caption font-semibold text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
+                Selected
+              </span>
+            )}
+          </div>
         </div>
         {pkg.description && (
           <p className="text-body-small-s text-zinc-500 mt-1.5 line-clamp-3 leading-relaxed">

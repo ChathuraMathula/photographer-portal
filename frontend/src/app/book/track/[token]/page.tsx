@@ -33,9 +33,11 @@ export default function TrackingPage() {
     selectedPkgId,
     setSelectedPkgId,
     confirming,
+    cancelling,
     handleVerifyEmail,
     handleSendMessage,
     handleConfirmReservation,
+    handleCancelReservation,
     getDeadlineText,
     setReservation,
   } = useTracking();
@@ -112,6 +114,8 @@ export default function TrackingPage() {
               onSelectPackage={setSelectedPkgId}
               onConfirm={() => setShowPaymentModal(true)}
               getDeadlineText={getDeadlineText}
+              onCancel={handleCancelReservation}
+              cancelling={cancelling}
             />
           </div>
 
