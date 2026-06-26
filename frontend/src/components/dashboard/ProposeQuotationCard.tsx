@@ -14,12 +14,10 @@ import {
 type Props = {
   packages: Package[];
   selectedPkgIds: string[];
-  advanceAmount: number;
   quotationNotes: string;
   showRejectForm: boolean;
   rejectionReason: string;
   onTogglePackage: (id: string, checked: boolean) => void;
-  onAdvanceChange: (amount: number) => void;
   onNotesChange: (notes: string) => void;
   onShowRejectForm: () => void;
   onCancelReject: () => void;
@@ -33,12 +31,10 @@ type Props = {
 export function ProposeQuotationCard({
   packages,
   selectedPkgIds,
-  advanceAmount,
   quotationNotes,
   showRejectForm,
   rejectionReason,
   onTogglePackage,
-  onAdvanceChange,
   onNotesChange,
   onShowRejectForm,
   onCancelReject,
@@ -109,17 +105,7 @@ export function ProposeQuotationCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="advance" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Advance Payment (LKR)</Label>
-            <Input
-              id="advance"
-              type="number"
-              value={advanceAmount}
-              onChange={(e) => onAdvanceChange(Number(e.target.value))}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-4">
           <div className="space-y-2">
             <Label htmlFor="propNotes" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Quotation Note</Label>
             <Input

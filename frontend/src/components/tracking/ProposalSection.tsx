@@ -73,7 +73,7 @@ export function ProposalSection({
                key={pkg.id}
                pkg={pkg}
                isSelected={selectedPkgId === pkg.id}
-               isConfirmed={reservation.status === "CONFIRMED" || isExpired}
+               isConfirmed={reservation.status === "CONFIRMED" || !!isExpired}
                isMySelection={
                  reservation.status === "CONFIRMED" &&
                  reservation.clientSelectedPackageId === pkg.id
@@ -91,7 +91,7 @@ export function ProposalSection({
           </div>
         )}
 
-        {reservation.status === "PROPOSED" && !isExpired && (
+        {reservation.status === "PROPOSED" && !isExpired && selectedPkgId && (
           <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-4 space-y-3">
             <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-100 dark:border-zinc-800/40 p-4 rounded-xl">
               <div>

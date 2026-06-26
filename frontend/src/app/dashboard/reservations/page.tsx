@@ -14,8 +14,6 @@ export default function ReservationsPage() {
     setSelectedRes,
     selectedPkgIds,
     setSelectedPkgIds,
-    advanceAmount,
-    setAdvanceAmount,
     quotationNotes,
     setQuotationNotes,
     rejectionReason,
@@ -36,8 +34,6 @@ export default function ReservationsPage() {
       setSelectedRes={setSelectedRes}
       selectedPkgIds={selectedPkgIds}
       setSelectedPkgIds={setSelectedPkgIds}
-      advanceAmount={advanceAmount}
-      setAdvanceAmount={setAdvanceAmount}
       quotationNotes={quotationNotes}
       setQuotationNotes={setQuotationNotes}
       rejectionReason={rejectionReason}

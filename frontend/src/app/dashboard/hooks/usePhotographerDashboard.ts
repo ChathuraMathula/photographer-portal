@@ -72,6 +72,20 @@ const PackageSchema = Yup.object().shape({
     .integer("Hours must be integer")
     .positive("Hours must be positive")
     .required("Duration is required"),
+  depositType: Yup.string(),
+  depositValue: Yup.number()
+    .min(0, "Cannot be negative")
+    .test("max-deposit", "Invalid deposit value", function (value) {
+      const { depositType, price } = this.parent;
+      if (depositType === "fixed") {
+        if (value === undefined || value === null) return this.createError({ message: "Deposit value is required" });
+        if (value > price) return this.createError({ message: "Deposit cannot exceed package price" });
+      } else if (depositType === "percentage") {
+        if (value === undefined || value === null) return this.createError({ message: "Deposit value is required" });
+        if (value > 100) return this.createError({ message: "Percentage cannot exceed 100%" });
+      }
+      return true;
+    }),
 });
 
 export function usePhotographerDashboard() {
@@ -97,9 +111,7 @@ export function usePhotographerDashboard() {
   const { socket } = useSocket();
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Proposal / rejection form states
   const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);
-  const [advanceAmount, setAdvanceAmount] = useState<number>(5000);
   const [quotationNotes, setQuotationNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -394,7 +406,7 @@ export function usePhotographerDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           packageIds: selectedPkgIds,
-          advancePaymentPriceInCents: advanceAmount * 100,
+          advancePaymentPriceInCents: 0,
           quotationNotes,
           packageDeposits: centsDeposits,
         }),
@@ -726,8 +738,6 @@ export function usePhotographerDashboard() {
     chatEndRef,
     selectedPkgIds,
     setSelectedPkgIds,
-    advanceAmount,
-    setAdvanceAmount,
     quotationNotes,
     setQuotationNotes,
     rejectionReason,

@@ -11,8 +11,6 @@ type Props = {
   setSelectedRes: (res: Reservation | null) => void;
   selectedPkgIds: string[];
   setSelectedPkgIds: React.Dispatch<React.SetStateAction<string[]>>;
-  advanceAmount: number;
-  setAdvanceAmount: (amount: number) => void;
   quotationNotes: string;
   setQuotationNotes: (notes: string) => void;
   rejectionReason: string;
@@ -32,8 +30,6 @@ export function ReservationsTabContent({
   setSelectedRes,
   selectedPkgIds,
   setSelectedPkgIds,
-  advanceAmount,
-  setAdvanceAmount,
   quotationNotes,
   setQuotationNotes,
   rejectionReason,
@@ -72,7 +68,6 @@ export function ReservationsTabContent({
               <ProposeQuotationCard
                 packages={packages}
                 selectedPkgIds={selectedPkgIds}
-                advanceAmount={advanceAmount}
                 quotationNotes={quotationNotes}
                 showRejectForm={showRejectForm}
                 rejectionReason={rejectionReason}
@@ -83,7 +78,6 @@ export function ReservationsTabContent({
                     setSelectedPkgIds((prev) => prev.filter((x) => x !== id));
                   }
                 }}
-                onAdvanceChange={setAdvanceAmount}
                 onNotesChange={setQuotationNotes}
                 onShowRejectForm={() => setShowRejectForm(true)}
                 onCancelReject={() => setShowRejectForm(false)}
