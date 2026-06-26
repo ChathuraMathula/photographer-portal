@@ -359,7 +359,7 @@
   }
 
   .btn:hover {
-    @apply shadow-[0px_1px_1px_0px_#00000008, 0px_2px_2px_0px_#00000008, 0px_5px_3px_0px_#00000005, 0px_10px_4px_0px_#00000003, 0px_15px_4px_0px_#00000000];
+    @apply shadow-[0px_1px_1px_0px_#00000008,0px_2px_2px_0px_#00000008,0px_5px_3px_0px_#00000005,0px_10px_4px_0px_#00000003,0px_15px_4px_0px_#00000000];
   }
 
   .btn-primary {
