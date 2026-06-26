@@ -22,4 +22,7 @@ export class ProposeQuotationDto {
 
   @IsOptional()
   packageDeposits?: Record<string, number>;
+
+  @IsOptional()
+  usePackageWiseDeposit?: boolean;
 }

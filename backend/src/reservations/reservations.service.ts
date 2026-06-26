@@ -233,6 +233,7 @@ export class ReservationsService {
     reservation.status = ReservationStatus.PROPOSED;
     reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
     reservation.quotationNotes = dto.quotationNotes;
+    reservation.usePackageWiseDeposit = dto.usePackageWiseDeposit ?? false;
     // Snapshot packages
     reservation.selectedPackages = pkgs.map((p) => {
       const customDeposit = dto.packageDeposits && dto.packageDeposits[p.id] !== undefined

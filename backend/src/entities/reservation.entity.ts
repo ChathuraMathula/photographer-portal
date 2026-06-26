@@ -86,6 +86,9 @@ export class Reservation {
   @Column({ type: 'text', nullable: true })
   quotationNotes?: string;
 
+  @Column({ type: 'boolean', default: false })
+  usePackageWiseDeposit!: boolean;
+
   @Column({ nullable: true })
   clientSelectedPackageId?: string;
 
