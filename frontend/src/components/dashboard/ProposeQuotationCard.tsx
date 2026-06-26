@@ -42,6 +42,7 @@ type Props = {
   setCustomPackageDeposit: (val: string) => void;
   isCustomPackageSelected: boolean;
   setIsCustomPackageSelected: (val: boolean) => void;
+  isEdit?: boolean;
 };
 
 export function ProposeQuotationCard({
@@ -65,6 +66,7 @@ export function ProposeQuotationCard({
   setCustomPackageDeposit,
   isCustomPackageSelected,
   setIsCustomPackageSelected,
+  isEdit = false,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
@@ -72,10 +74,13 @@ export function ProposeQuotationCard({
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
       <CardHeader className="pb-2">
         <CardTitle className="text-title-medium text-primary-dark dark:text-white">
-          Propose Quotation &amp; Lock Slot
+          {isEdit ? "Update Proposal & Reset Expiry" : "Propose Quotation & Lock Slot"}
         </CardTitle>
         <CardDescription className="text-body-small text-zinc-500 mt-1">
-          Select packages to propose to this client. This locks the date for 24h.
+          {isEdit 
+            ? "Update proposed package recommendations. This resets the 24-hour expiration lock."
+            : "Select packages to propose to this client. This locks the date for 24h."
+          }
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -232,7 +237,7 @@ export function ProposeQuotationCard({
               disabled={selectedPkgIds.length === 0 && !(customPackage && isCustomPackageSelected)}
               className="btn btn-primary h-10 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s shadow-sm"
             >
-              Send Proposal
+              {isEdit ? "Update Proposal" : "Send Proposal"}
             </Button>
           </>
         )}

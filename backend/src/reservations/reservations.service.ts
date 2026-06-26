@@ -216,8 +216,8 @@ export class ReservationsService {
   ) {
     const reservation = await this.findOne(id, user);
 
-    if (reservation.status !== ReservationStatus.PENDING) {
-      throw new BadRequestException('Can only propose quotation for pending requests');
+    if (reservation.status !== ReservationStatus.PENDING && reservation.status !== ReservationStatus.PROPOSED) {
+      throw new BadRequestException('Can only propose quotation for pending or proposed requests');
     }
 
     // Find packages

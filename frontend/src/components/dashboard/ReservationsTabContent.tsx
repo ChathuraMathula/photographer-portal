@@ -77,7 +77,7 @@ export function ReservationsTabContent({
           <div className="max-w-3xl mx-auto space-y-4">
             <CustomerDetailsCard reservation={selectedRes} />
 
-            {selectedRes.status === "PENDING" && (
+            {(selectedRes.status === "PENDING" || selectedRes.status === "PROPOSED") && (
               <ProposeQuotationCard
                 packages={packages}
                 selectedPkgIds={selectedPkgIds}
@@ -105,6 +105,7 @@ export function ReservationsTabContent({
                 setCustomPackageDeposit={setCustomPackageDeposit}
                 isCustomPackageSelected={isCustomPackageSelected}
                 setIsCustomPackageSelected={setIsCustomPackageSelected}
+                isEdit={selectedRes.status === "PROPOSED"}
               />
             )}
 
