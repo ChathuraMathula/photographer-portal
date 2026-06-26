@@ -3,6 +3,7 @@ import { type Package } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AlertTriangle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,6 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CustomPackageModal, type CustomPackageValues } from "./CustomPackageModal";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Props = {
   packages: Package[];
@@ -59,6 +67,7 @@ export function ProposeQuotationCard({
   setIsCustomPackageSelected,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
       <CardHeader className="pb-2">
@@ -201,7 +210,7 @@ export function ProposeQuotationCard({
               </Button>
               <Button
                 variant="destructive"
-                onClick={onReject}
+                onClick={() => setShowRejectConfirm(true)}
                 disabled={!rejectionReason.trim()}
                 className="btn h-9 px-4 py-0 min-w-0 md:min-w-0 text-body-small-s bg-destructive text-white hover:bg-destructive/90 border border-destructive shadow-sm"
               >
@@ -237,6 +246,42 @@ export function ProposeQuotationCard({
           setIsCustomPackageSelected(true);
         }}
       />
+
+      <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <div className="h-11 w-11 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-1">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+            </div>
+            <AlertDialogTitle className="text-title-base text-zinc-900">
+              Reject Reservation Request?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-body-small text-zinc-500 leading-relaxed">
+              Are you sure you want to reject this reservation request? This action will cancel the request and notify the customer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="w-full grid grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowRejectConfirm(false);
+                onReject();
+              }}
+              className="btn btn-danger btn-modal text-body-small-s h-11 cursor-pointer bg-red-650 hover:bg-red-750 text-white rounded-xl font-medium shadow-sm transition-all"
+            >
+              Yes, reject
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRejectConfirm(false)}
+              className="btn btn-outline btn-modal text-body-small-s h-11 cursor-pointer border border-zinc-200 hover:bg-zinc-50 rounded-xl font-medium transition-all"
+            >
+              Cancel
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

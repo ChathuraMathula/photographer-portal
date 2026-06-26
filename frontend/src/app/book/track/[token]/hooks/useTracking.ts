@@ -169,7 +169,6 @@ export function useTracking() {
 
   const handleCancelReservation = async () => {
     if (!verifiedEmail || !token) return;
-    if (!confirm("Are you sure you want to cancel this reservation request? This action cannot be undone.")) return;
     setCancelling(true);
     try {
       const res = await fetch(`${API}/bookings/track/${token}/cancel`, {
