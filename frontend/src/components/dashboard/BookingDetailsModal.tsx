@@ -57,7 +57,7 @@ export function BookingDetailsModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4 bg-white dark:bg-zinc-900 dark:border-zinc-800 shrink-0">
           <div className="space-y-1">
@@ -81,7 +81,7 @@ export function BookingDetailsModal({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 text-zinc-655 dark:text-zinc-400 custom-scrollbar">
-          
+
           {/* Reservation ID & Tracking Link Section */}
           <div className="space-y-3">
             <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80 space-y-3">
@@ -302,7 +302,7 @@ export function BookingDetailsModal({
             onClick={() => onNavigateToReservation(reservation)}
             className="btn btn-primary btn-modal h-11 px-6 text-body-small-s shadow-sm font-semibold cursor-pointer animate-in fade-in duration-100"
           >
-            View Reservation &amp; Chat
+            View Reservation
           </Button>
         </div>
 
