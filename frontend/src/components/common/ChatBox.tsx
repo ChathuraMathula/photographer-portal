@@ -14,6 +14,7 @@ type Props = {
   title?: string;
   description?: string;
   reservationId?: string;
+  photographerFirstName?: string;
 };
 
 export function ChatBox({
@@ -26,6 +27,7 @@ export function ChatBox({
   title = "Live Chat",
   description = "Negotiate event details directly",
   reservationId,
+  photographerFirstName,
 }: Props) {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const lastResIdRef = useRef<string | null>(null);
@@ -96,7 +98,10 @@ export function ChatBox({
         ) : (
           messages.map((msg, index) => {
             const isMe = msg.sender === myRole;
-            const displayName = isMe ? "You" : msg.senderName.split(" ")[0];
+            let displayName = isMe ? "You" : msg.senderName.split(" ")[0];
+            if (!isMe && msg.sender === "PHOTOGRAPHER" && photographerFirstName) {
+              displayName = photographerFirstName;
+            }
             const isFirstUnread = index === firstUnreadIndex;
 
             return (

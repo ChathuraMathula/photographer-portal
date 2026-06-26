@@ -131,6 +131,7 @@ export default function TrackingPage() {
               title="Negotiation Chat"
               description="Have questions about custom pricing or timing? Chat here."
               reservationId={reservation.id}
+              photographerFirstName={reservation.photographer.firstName}
             />
           </div>
         </div>
