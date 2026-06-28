@@ -226,32 +226,8 @@ export function BookingCalendar({
             </div>
           </div>
           
-          {/* Calendar Month & Day Navigation Options */}
+          {/* Calendar Month Navigation Options */}
           <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-            {/* Day Navigators */}
-            <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-200/40">
-              <Button
-                size="sm"
-                variant="ghost"
-                type="button"
-                onClick={handlePrevDay}
-                className="h-8 px-2.5 text-zinc-700 dark:text-zinc-350 cursor-pointer text-[10px] font-bold"
-              >
-                <ArrowLeft className="h-3 w-3 mr-1" />
-                Prev Day
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                type="button"
-                onClick={handleNextDay}
-                className="h-8 px-2.5 text-zinc-700 dark:text-zinc-350 cursor-pointer text-[10px] font-bold"
-              >
-                Next Day
-                <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-
             {/* Month Navigators */}
             <div className="flex items-center gap-1">
               <Button
@@ -462,31 +438,10 @@ export function BookingCalendar({
         <div className="space-y-3 pt-2">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
             
-            {/* Mobile day-by-day navigators */}
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-1.5">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={handlePrevDay}
-                  className="h-8 w-8 cursor-pointer rounded-lg border-zinc-200"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <h4 className="text-body-small-s font-extrabold text-zinc-900 dark:text-white text-left">
-                  {selectedDay.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}
-                </h4>
-  
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={handleNextDay}
-                  className="h-8 w-8 cursor-pointer rounded-lg border-zinc-200"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <h4 className="text-body-small-s font-extrabold text-zinc-900 dark:text-white text-left">
+                Agenda: {selectedDay.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}
+              </h4>
 
               <Button
                 size="sm"
@@ -494,7 +449,7 @@ export function BookingCalendar({
                 className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold h-8 rounded-lg text-[10px] flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
-                Add
+                Add Booking
               </Button>
             </div>
 
