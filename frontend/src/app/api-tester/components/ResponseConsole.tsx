@@ -63,7 +63,7 @@ export function ResponseConsole({
           )}
 
           {/* Body Scroll area */}
-          <pre className="max-h-[350px] overflow-auto rounded-xl border border-zinc-150 dark:border-zinc-850 bg-zinc-950 p-4 font-mono text-body-caption text-zinc-350 select-all leading-normal font-medium">
+          <pre className="max-h-[350px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950 p-4 font-mono text-body-caption text-zinc-100 select-all leading-relaxed font-medium whitespace-pre-wrap break-words">
             {responseData || "{}"}
           </pre>
         </div>
