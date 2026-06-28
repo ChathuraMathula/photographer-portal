@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import {
   Card,
@@ -9,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Search, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Calendar as CalendarIcon, MapPin, Clock, Plus, Tag } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { StatusBadge } from "@/components/common/StatusBadge";
 
 type Props = {
   reservations: Reservation[];
@@ -103,8 +106,19 @@ export function BookingCalendar({
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
 
   const days = generateCalendarDays(currentDate);
+
+  // Sync selectedDay with month transitions
+  useEffect(() => {
+    const today = new Date();
+    if (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() === today.getMonth()) {
+      setSelectedDay(today);
+    } else {
+      setSelectedDay(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+    }
+  }, [currentDate]);
 
   const formatDateLocal = (d: Date) => {
     const year = d.getFullYear();
@@ -138,7 +152,7 @@ export function BookingCalendar({
       // Event Type Filter
       if (eventTypeFilter !== "ALL" && r.eventType !== eventTypeFilter) return false;
 
-      // Search Query (Customer Name or Location or Notes)
+      // Search Query
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         const firstName = r.customer?.firstName?.toLowerCase() ?? "";
@@ -160,6 +174,10 @@ export function BookingCalendar({
     });
   };
 
+  // Get active days of month (excluding null padding)
+  const activeMonthDays = days.filter((d): d is Date => d !== null);
+  const selectedDayReservations = getReservationsForDay(selectedDay);
+
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900 transition-all duration-300">
       <CardHeader className="flex flex-col gap-4 border-b border-zinc-150 dark:border-zinc-800/80 pb-5 bg-zinc-50/15">
@@ -168,7 +186,7 @@ export function BookingCalendar({
             <div className="p-2.5 bg-[#0e2d5c]/10 dark:bg-white/10 rounded-xl text-[#0e2d5c] dark:text-white">
               <CalendarIcon className="h-5 w-5" />
             </div>
-            <div>
+            <div className="text-left">
               <CardTitle className="text-title-medium text-primary-dark dark:text-white">Visual Bookings Grid</CardTitle>
               <CardDescription className="text-body-caption text-zinc-500 mt-0.5">
                 Click a day cell to register an offline booking or inspect existing reservations.
@@ -176,8 +194,8 @@ export function BookingCalendar({
             </div>
           </div>
           
-          {/* Calendar month/year navigation select dropdowns */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
+          {/* Calendar Month Navigation */}
+          <div className="flex items-center gap-2 self-start md:self-auto">
             <Button
               size="icon"
               variant="outline"
@@ -188,10 +206,7 @@ export function BookingCalendar({
               <ChevronLeft className="h-4 w-4" />
             </Button>
             
-            <Select
-              value={currentDate.getMonth().toString()}
-              onValueChange={handleMonthChange}
-            >
+            <Select value={currentDate.getMonth().toString()} onValueChange={handleMonthChange}>
               <SelectTrigger className="h-9 min-w-[120px] bg-white dark:bg-zinc-950 font-medium text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
@@ -203,11 +218,8 @@ export function BookingCalendar({
                 ))}
               </SelectContent>
             </Select>
-
-            <Select
-              value={currentDate.getFullYear().toString()}
-              onValueChange={handleYearChange}
-            >
+ 
+            <Select value={currentDate.getFullYear().toString()} onValueChange={handleYearChange}>
               <SelectTrigger className="h-9 min-w-[90px] bg-white dark:bg-zinc-950 font-medium text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
@@ -219,7 +231,7 @@ export function BookingCalendar({
                 ))}
               </SelectContent>
             </Select>
-
+ 
             <Button
               size="icon"
               variant="outline"
@@ -231,11 +243,11 @@ export function BookingCalendar({
             </Button>
           </div>
         </div>
-
+ 
         {/* Filter bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 mt-2 bg-zinc-50/50 dark:bg-zinc-950/30 border border-zinc-150/70 dark:border-zinc-850/70 rounded-xl">
           {/* Status Select */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 text-left">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Status Filter</span>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
@@ -250,9 +262,9 @@ export function BookingCalendar({
               </SelectContent>
             </Select>
           </div>
-
+ 
           {/* Event Type Select */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 text-left">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Event Type</span>
             <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
               <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
@@ -267,9 +279,9 @@ export function BookingCalendar({
               </SelectContent>
             </Select>
           </div>
-
+ 
           {/* Search Input */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 text-left">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Search Bookings</span>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
@@ -285,14 +297,15 @@ export function BookingCalendar({
         </div>
       </CardHeader>
       
-      <CardContent className="pt-6">
+      {/* ── DESKTOP MONTH VIEW ────────────────────────────────────────────────── */}
+      <CardContent className="pt-6 hidden sm:block">
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 text-center font-bold text-body-caption text-zinc-500 mb-3 uppercase tracking-wider">
           {DAYS.map((d) => (
             <span key={d} className="title-font text-[11px] font-bold text-zinc-450">{d}</span>
           ))}
         </div>
-
+ 
         {/* Day cells */}
         <div className="grid grid-cols-7 gap-2 min-h-[350px]">
           {days.map((day, idx) => {
@@ -304,10 +317,10 @@ export function BookingCalendar({
                 />
               );
             }
-
+ 
             const dayRes = getReservationsForDay(day);
             const isToday = day.toDateString() === new Date().toDateString();
-
+ 
             return (
               <div
                 key={day.toISOString()}
@@ -366,6 +379,102 @@ export function BookingCalendar({
               </div>
             );
           })}
+        </div>
+      </CardContent>
+
+      {/* ── MOBILE AGENDA VIEW ────────────────────────────────────────────────── */}
+      <CardContent className="pt-4 block sm:hidden px-4 space-y-4">
+        {/* Horizontal Scrollable Days Slider */}
+        <div className="flex gap-2 overflow-x-auto py-2 shrink-0 select-none no-scrollbar snap-x">
+          {activeMonthDays.map((day) => {
+            const isSelected = day.toDateString() === selectedDay.toDateString();
+            const isToday = day.toDateString() === new Date().toDateString();
+            const dayRes = getReservationsForDay(day);
+
+            return (
+              <button
+                key={day.toISOString()}
+                onClick={() => setSelectedDay(day)}
+                className={`snap-center flex flex-col items-center justify-center min-w-[50px] h-14 rounded-xl border transition-all cursor-pointer ${
+                  isSelected
+                    ? "bg-[#0e2d5c] text-white border-[#0e2d5c] dark:bg-white dark:text-zinc-950 dark:border-white shadow-md scale-105"
+                    : isToday
+                      ? "bg-zinc-50 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                      : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-900 text-zinc-500"
+                }`}
+              >
+                <span className="text-[9px] uppercase font-bold tracking-wider opacity-75">
+                  {DAYS[day.getDay()]}
+                </span>
+                <span className="text-body-base-bold font-bold mt-0.5">
+                  {day.getDate()}
+                </span>
+                {dayRes.length > 0 && (
+                  <span className={`h-1 w-1 rounded-full mt-1 ${isSelected ? 'bg-white dark:bg-zinc-950' : 'bg-blue-600'}`} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected Date Agenda Listing */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+            <h4 className="text-body-small-s font-extrabold text-zinc-900 dark:text-white text-left">
+              Agenda: {selectedDay.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+            </h4>
+            <Button
+              size="sm"
+              onClick={() => onDayClick(selectedDay)}
+              className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold h-7 rounded-lg text-[10px] flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add Booking
+            </Button>
+          </div>
+
+          <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+            {selectedDayReservations.length > 0 ? (
+              selectedDayReservations.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => onDayReservationClick(r)}
+                  className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-3.5 rounded-xl shadow-sm space-y-2.5 text-left cursor-pointer hover:border-zinc-300 transition-all flex items-start justify-between gap-4"
+                >
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                        {r.customer?.firstName} {r.customer?.lastName}
+                      </span>
+                      <StatusBadge status={r.status} />
+                    </div>
+
+                    <div className="flex items-center gap-3 text-[10px] text-zinc-500 dark:text-zinc-400">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 shrink-0" />
+                        <span>{r.startTime} - {r.endTime}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Tag className="h-3 w-3 shrink-0" />
+                        <span>{r.eventType}</span>
+                      </div>
+                    </div>
+
+                    {r.location && (
+                      <div className="flex items-center gap-1 text-[10px] text-zinc-450 truncate">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{r.location}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 bg-zinc-50/20 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+                <p className="text-[11px] text-zinc-400 italic">No bookings scheduled for this date.</p>
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
