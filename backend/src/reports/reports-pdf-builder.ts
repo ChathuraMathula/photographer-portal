@@ -83,16 +83,20 @@ function drawVectorLineChart(
 }
 
 // Header template
-function drawReportHeader(doc: any, title: string, period: string) {
+function drawReportHeader(doc: any, title: string, data: any) {
   doc.fillColor(primaryColor)
     .fontSize(20)
     .font('Helvetica-Bold')
     .text(title, 50, 40);
 
+  const rangeLabel = data.startDateStr && data.endDateStr
+    ? `${data.startDateStr} to ${data.endDateStr}`
+    : data.period.toUpperCase();
+
   doc.fillColor(textColor)
     .fontSize(9)
     .font('Helvetica')
-    .text(`Interval Scope: ${period.toUpperCase()} | Generated: ${new Date().toLocaleDateString()}`, 50, 65);
+    .text(`Interval Scope: ${rangeLabel} | Generated: ${new Date().toLocaleDateString()}`, 50, 65);
 
   doc.moveTo(50, 75)
     .lineTo(545, 75)
@@ -102,10 +106,10 @@ function drawReportHeader(doc: any, title: string, period: string) {
 }
 
 // ── Financial PDF builder ─────────────────────────────────────────────────────
-export function buildFinancialReportPdf(data: any, period: 'weekly' | 'monthly' | 'yearly'): any {
+export function buildFinancialReportPdf(data: any, period: 'weekly' | 'monthly' | 'yearly' | 'custom'): any {
   const doc = new PDFDocument({ size: 'A4', margin: 50, bufferPages: true });
 
-  drawReportHeader(doc, 'Photographer Portal - Financial Analytics', period);
+  drawReportHeader(doc, 'Photographer Portal - Financial Analytics', data);
 
   // Summary Metrics Grid
   doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('Earnings & Collections Summary', 50, 95);
@@ -173,10 +177,10 @@ export function buildFinancialReportPdf(data: any, period: 'weekly' | 'monthly' 
 }
 
 // ── Bookings Analytics PDF builder ────────────────────────────────────────────
-export function buildBookingsReportPdf(data: any, period: 'weekly' | 'monthly' | 'yearly'): any {
+export function buildBookingsReportPdf(data: any, period: 'weekly' | 'monthly' | 'yearly' | 'custom'): any {
   const doc = new PDFDocument({ size: 'A4', margin: 50, bufferPages: true });
 
-  drawReportHeader(doc, 'Photographer Portal - Booking & Traffic Analytics', period);
+  drawReportHeader(doc, 'Photographer Portal - Booking & Traffic Analytics', data);
 
   // Booking Counts Metrics Grid
   doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('Customer Engagement Summary', 50, 95);

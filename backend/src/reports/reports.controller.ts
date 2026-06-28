@@ -23,18 +23,22 @@ export class ReportsController {
   @Get('data')
   async getReportData(
     @Req() req: RequestWithUser,
-    @Query('period') period: 'weekly' | 'monthly' | 'yearly',
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    return this.reportsService.generateReportData(req.user.userId, period);
+    return this.reportsService.generateReportData(req.user.userId, period, startDate, endDate);
   }
 
   @Get('pdf/financial')
   async downloadFinancialReportPdf(
     @Req() req: RequestWithUser,
-    @Query('period') period: 'weekly' | 'monthly' | 'yearly',
     @Res() res: express.Response,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    const pdfDoc = await this.reportsService.generateFinancialReportPdf(req.user.userId, period);
+    const pdfDoc = await this.reportsService.generateFinancialReportPdf(req.user.userId, period, startDate, endDate);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=photographer_financial_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -46,10 +50,12 @@ export class ReportsController {
   @Get('pdf/bookings')
   async downloadBookingsReportPdf(
     @Req() req: RequestWithUser,
-    @Query('period') period: 'weekly' | 'monthly' | 'yearly',
     @Res() res: express.Response,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    const pdfDoc = await this.reportsService.generateBookingsReportPdf(req.user.userId, period);
+    const pdfDoc = await this.reportsService.generateBookingsReportPdf(req.user.userId, period, startDate, endDate);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=photographer_bookings_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);

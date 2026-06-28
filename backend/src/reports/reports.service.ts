@@ -14,23 +14,34 @@ export class ReportsService {
     private readonly paymentRepository: Repository<Payment>,
   ) {}
 
-  async generateReportData(photographerId: string, period: 'weekly' | 'monthly' | 'yearly') {
+  async generateReportData(
+    photographerId: string,
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    customStartDate?: string,
+    customEndDate?: string,
+  ) {
     const today = new Date();
     let startDate = new Date();
+    let endDate = new Date();
 
     if (period === 'weekly') {
       startDate.setDate(today.getDate() - 7);
     } else if (period === 'monthly') {
       startDate.setDate(today.getDate() - 30);
-    } else {
+    } else if (period === 'yearly') {
       startDate.setDate(today.getDate() - 365);
+    } else if (period === 'custom' && customStartDate && customEndDate) {
+      startDate = new Date(customStartDate);
+      endDate = new Date(customEndDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
     }
 
     // Fetch all reservations for this photographer in the period
     const reservations = await this.reservationRepository.find({
       where: {
         photographerId,
-        date: Between(startDate, today),
+        date: Between(startDate, endDate),
       },
       relations: {
         customer: true,
@@ -41,12 +52,12 @@ export class ReportsService {
     });
 
     // Fetch all successful payments for this photographer's reservations in the period
-    // To do this reliably, we'll fetch payments that belong to this photographer's reservations
     const payments = await this.paymentRepository.createQueryBuilder('payment')
       .leftJoinAndSelect('payment.reservation', 'reservation')
       .where('reservation.photographerId = :photographerId', { photographerId })
       .andWhere('payment.status = :status', { status: PaymentStatus.SUCCESS })
       .andWhere('payment.createdAt >= :startDate', { startDate })
+      .andWhere('payment.createdAt <= :endDate', { endDate })
       .getMany();
 
     // Calculations
@@ -119,12 +130,23 @@ export class ReportsService {
 
     // Timeline Coordinates
     const timelineMap: Record<string, { bookings: number; revenueLkr: number }> = {};
+    const diffMs = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-    if (period === 'weekly') {
-      // 7 Days timeline
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
+    let timelineType: 'daily' | 'monthly' | 'yearly' = 'monthly';
+    if (diffDays <= 8) {
+      timelineType = 'daily';
+    } else if (diffDays <= 45) {
+      timelineType = 'monthly';
+    } else {
+      timelineType = 'yearly';
+    }
+
+    if (timelineType === 'daily') {
+      // Create bucket labels day-by-day
+      for (let i = diffDays - 1; i >= 0; i--) {
+        const d = new Date(endDate);
+        d.setDate(endDate.getDate() - i);
         const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
@@ -141,11 +163,12 @@ export class ReportsService {
           timelineMap[label].revenueLkr += pay.amountInCents / 100;
         }
       });
-    } else if (period === 'monthly') {
-      // 30 Days timeline aggregated weekly or in 5-day buckets
-      for (let i = 25; i >= 0; i -= 5) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
+    } else if (timelineType === 'monthly') {
+      // Aggregated weekly or in 5-day buckets
+      const steps = Math.min(6, Math.max(4, Math.ceil(diffDays / 6)));
+      for (let i = diffDays - 5; i >= 0; i -= steps) {
+        const d = new Date(endDate);
+        d.setDate(endDate.getDate() - i);
         const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
@@ -154,7 +177,6 @@ export class ReportsService {
       
       reservations.forEach(res => {
         const resDate = new Date(res.date);
-        // Find closest bucket
         let closest = keys[0];
         let minDiff = Infinity;
         keys.forEach(k => {
@@ -183,8 +205,8 @@ export class ReportsService {
     } else {
       // 12 Months timeline
       for (let i = 11; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(today.getMonth() - i);
+        const d = new Date(endDate);
+        d.setMonth(endDate.getMonth() - i);
         const label = d.toLocaleDateString('en-US', { month: 'short' });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
@@ -211,6 +233,8 @@ export class ReportsService {
 
     return {
       period,
+      startDateStr: startDate.toISOString().split('T')[0],
+      endDateStr: endDate.toISOString().split('T')[0],
       summary: {
         totalBookings,
         potentialRevenueLkr,
@@ -233,13 +257,23 @@ export class ReportsService {
     };
   }
 
-  async generateFinancialReportPdf(photographerId: string, period: 'weekly' | 'monthly' | 'yearly'): Promise<any> {
-    const data = await this.generateReportData(photographerId, period);
+  async generateFinancialReportPdf(
+    photographerId: string,
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    customStartDate?: string,
+    customEndDate?: string,
+  ): Promise<any> {
+    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
     return buildFinancialReportPdf(data, period);
   }
 
-  async generateBookingsReportPdf(photographerId: string, period: 'weekly' | 'monthly' | 'yearly'): Promise<any> {
-    const data = await this.generateReportData(photographerId, period);
+  async generateBookingsReportPdf(
+    photographerId: string,
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    customStartDate?: string,
+    customEndDate?: string,
+  ): Promise<any> {
+    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
     return buildBookingsReportPdf(data, period);
   }
 }
