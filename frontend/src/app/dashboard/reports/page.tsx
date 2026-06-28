@@ -51,7 +51,9 @@ export default function ReportsPage() {
     async function loadStats() {
       setLoading(true);
       try {
-        const res = await authFetch(`${API}/reports/data?period=${period}`);
+        const res = await authFetch(`${API}/reports/data?period=${period}`, {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to fetch report data");
         const json = await res.json();
         setReportData(json);
@@ -68,7 +70,9 @@ export default function ReportsPage() {
   const handleDownloadPdf = async () => {
     setDownloading(true);
     try {
-      const response = await fetch(`${API}/reports/pdf?period=${period}`);
+      const response = await fetch(`${API}/reports/pdf?period=${period}`, {
+        credentials: "include",
+      });
       if (response.status === 401) {
         toast.error("You are unauthorized. Please log in again.");
         return;
