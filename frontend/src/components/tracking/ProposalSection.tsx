@@ -3,7 +3,7 @@ import { type TrackingReservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, AlertTriangle } from "lucide-react";
-import { ProposalPackageCard } from "./ProposalPackageCard";
+import { ProposalPackagesGrid } from "./components/ProposalPackagesGrid";
 import { CountdownTimer } from "./CountdownTimer";
 import {
   AlertDialog,
@@ -80,21 +80,14 @@ export function ProposalSection({
         <h3 className="text-body-small-s font-semibold text-zinc-900 dark:text-white">
           Recommended Packages:
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {reservation.selectedPackages!.map((pkg) => (
-            <ProposalPackageCard
-              key={pkg.id}
-              pkg={pkg}
-              isSelected={selectedPkgId === pkg.id}
-              isConfirmed={reservation.status === "CONFIRMED" || !!isExpired}
-              isMySelection={
-                reservation.status === "CONFIRMED" &&
-                reservation.clientSelectedPackageId === pkg.id
-              }
-              onSelect={onSelectPackage}
-            />
-          ))}
-        </div>
+        <ProposalPackagesGrid
+          packages={reservation.selectedPackages!}
+          selectedPkgId={selectedPkgId}
+          status={reservation.status}
+          isExpired={!!isExpired}
+          clientSelectedPackageId={reservation.clientSelectedPackageId}
+          onSelectPackage={onSelectPackage}
+        />
 
         {reservation.status === "PROPOSED" && isExpired && (
           <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-4 text-center">

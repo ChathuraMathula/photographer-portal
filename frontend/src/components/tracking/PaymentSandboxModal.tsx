@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { CreditCard, ShieldCheck, X, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { ShieldCheck, X, CheckCircle2, Loader2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { type TrackingReservation } from "@/types";
+import { TestCardsGrid } from "./components/TestCardsGrid";
+import { CardFormFields } from "./components/CardFormFields";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -22,17 +23,6 @@ type Props = {
   onSuccess: (updatedStatus: string, selectedPkgId: string) => void;
   onClose: () => void;
 };
-
-const TEST_CARDS = [
-  { label: "Sampath Bank (Visa)", number: "4532 8511 2233 4455", desc: "Sri Lankan Sampath Bank Visa Success" },
-  { label: "Commercial Bank (MC)", number: "5254 9622 3344 5566", desc: "Sri Lankan Commercial Bank Mastercard Success" },
-  { label: "Bank of Ceylon (Visa)", number: "4005 8611 2233 4455", desc: "Sri Lankan BOC Visa Success" },
-  { label: "Success (Visa Sandbox)", number: "4242 4242 4242 4242", desc: "Standard sandbox visa card" },
-  { label: "Insufficient Funds", number: "4000 0000 0000 0002", desc: "Simulates card declined error" },
-  { label: "Card Expired", number: "4000 0000 0000 0005", desc: "Simulates expired card rejection" },
-  { label: "Suspected Fraud", number: "4000 0000 0000 0008", desc: "Simulates bank fraud guard alert" },
-  { label: "Gateway Timeout", number: "5555 5555 5555 5555", desc: "Simulates 2s server timeout response" },
-];
 
 export function PaymentSandboxModal({
   open,
@@ -72,28 +62,7 @@ export function PaymentSandboxModal({
     ? "Visa"
     : cardNumber.replace(/\s+/g, "").startsWith("5")
       ? "Mastercard"
-      : "");
-
-  // Auto-format card number as xxxx xxxx xxxx xxxx
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawVal = e.target.value.replace(/\D/g, "").slice(0, 16);
-    const matches = rawVal.match(/.{1,4}/g);
-    setCardNumber(matches ? matches.join(" ") : rawVal);
-  };
-
-  // Auto-format expiry as MM/YY
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawVal = e.target.value.replace(/\D/g, "").slice(0, 4);
-    if (rawVal.length >= 2) {
-      setExpiryDate(`${rawVal.slice(0, 2)}/${rawVal.slice(2)}`);
-    } else {
-      setExpiryDate(rawVal);
-    }
-  };
-
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCvv(e.target.value.replace(/\D/g, "").slice(0, 3));
-  };
+      : null);
 
   const fillTestCard = (number: string) => {
     setCardNumber(number);
@@ -113,7 +82,6 @@ export function PaymentSandboxModal({
     setPaymentStatus("processing");
     setErrorMsg("");
 
-    // Simulate standard transaction step animations for sandbox realism
     setProcessingStep("Securing connection to bank...");
     await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -270,92 +238,22 @@ export function PaymentSandboxModal({
               </div>
             )}
 
-            {/* Sandbox Quick-Fill Simulator */}
-            <div className="space-y-2">
-              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide flex items-center gap-1">
-                <Sparkles className="h-3 w-3 text-amber-500" /> Sandbox Quick Fill Test Cards
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[140px] overflow-y-auto pr-1">
-                {TEST_CARDS.map((card) => (
-                  <button
-                    key={card.number}
-                    type="button"
-                    onClick={() => fillTestCard(card.number)}
-                    className="flex flex-col text-left p-2.5 rounded-lg border border-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 bg-zinc-50/30 hover:bg-zinc-50 dark:bg-zinc-950/20 dark:hover:bg-zinc-950/50 cursor-pointer transition-all"
-                  >
-                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-205">{card.label}</span>
-                    <span className="text-[10px] text-zinc-400 mt-0.5 font-mono">{card.number}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Sandbox Cards Helper */}
+            <TestCardsGrid onSelect={fillTestCard} />
 
-            {/* Card form */}
-            <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-650 dark:text-zinc-300 uppercase tracking-wide">
-                  Cardholder Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. John Doe"
-                  value={cardholderName}
-                  onChange={(e) => setCardholderName(e.target.value)}
-                  className="w-full h-11 px-3 text-body-small bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-dark dark:focus:ring-zinc-700 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-650 dark:text-zinc-300 uppercase tracking-wide flex justify-between">
-                  <span>Card Number</span>
-                  {cardBrand && (
-                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase">
-                      {cardBrand}
-                    </span>
-                  )}
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    placeholder="4242 4242 4242 4242"
-                    value={cardNumber}
-                    onChange={handleCardNumberChange}
-                    className="w-full h-11 pl-10 pr-3 text-body-small bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-dark dark:focus:ring-zinc-700 focus:border-transparent transition-all font-mono"
-                  />
-                  <CreditCard className="absolute left-3.5 top-3.5 h-4 w-4 text-zinc-400 shrink-0" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-300 uppercase tracking-wide">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="MM/YY"
-                    value={expiryDate}
-                    onChange={handleExpiryChange}
-                    className="w-full h-11 px-3 text-body-small bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-dark dark:focus:ring-zinc-700 focus:border-transparent transition-all font-mono text-center"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-300 uppercase tracking-wide">
-                    CVV
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="123"
-                    value={cvv}
-                    onChange={handleCvvChange}
-                    className="w-full h-11 px-3 text-body-small bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-dark dark:focus:ring-zinc-700 focus:border-transparent transition-all font-mono text-center"
-                  />
-                </div>
-              </div>
+            {/* Billing Inputs Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <CardFormFields
+                cardNumber={cardNumber}
+                setCardNumber={setCardNumber}
+                expiryDate={expiryDate}
+                setExpiryDate={setExpiryDate}
+                cvv={cvv}
+                setCvv={setCvv}
+                cardholderName={cardholderName}
+                setCardholderName={setCardholderName}
+                cardBrand={cardBrand}
+              />
 
               <button
                 type="submit"
