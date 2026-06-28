@@ -91,6 +91,7 @@ export type TrackingReservation = {
   customerNotes?: string;
   advancePaymentPriceInCents?: number;
   totalAmountInCents?: number;
+  totalPaidInCents?: number;
   quotationNotes?: string;
   clientSelectedPackageId?: string;
   selectedPackages?: Package[];

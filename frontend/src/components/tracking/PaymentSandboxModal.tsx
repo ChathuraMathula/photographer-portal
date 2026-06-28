@@ -142,9 +142,10 @@ export function PaymentSandboxModal({
         throw new Error(data.message || "Payment authorization failed");
       }
 
+      const isBalancePayment = reservation.status === "CONFIRMED";
       setPaymentStatus("success");
-      setProcessingStep("Payment approved! Booking confirmed.");
-      toast.success("Deposit paid and slot confirmed!");
+      setProcessingStep(isBalancePayment ? "Payment approved! Balance settled." : "Payment approved! Booking confirmed.");
+      toast.success(isBalancePayment ? "Remaining balance paid successfully!" : "Deposit paid and slot confirmed!");
 
       // Wait briefly for checkmark success animations, then confirm success state
       setTimeout(() => {
@@ -190,7 +191,15 @@ export function PaymentSandboxModal({
     }
     return reservation.advancePaymentPriceInCents ?? 0;
   };
-  const depositLkr = getDepositAmountInCents() / 100;
+
+  const isBalancePayment = reservation.status === "CONFIRMED";
+  const getChargeAmountInCents = () => {
+    if (isBalancePayment) {
+      return (reservation.totalAmountInCents ?? 0) - (reservation.totalPaidInCents ?? 0);
+    }
+    return getDepositAmountInCents();
+  };
+  const chargeLkr = getChargeAmountInCents() / 100;
 
   return (
     <AlertDialog open={open} onOpenChange={(v) => !v && paymentStatus !== "processing" && onClose()}>
@@ -231,7 +240,7 @@ export function PaymentSandboxModal({
                   Payment Confirmed!
                 </p>
                 <p className="text-body-small text-zinc-500 dark:text-zinc-400">
-                  Your reservation slot is locked. Redirecting...
+                  {isBalancePayment ? "Your remaining balance is settled." : "Your reservation slot is locked. Redirecting..."}
                 </p>
               </div>
             )}
@@ -241,9 +250,9 @@ export function PaymentSandboxModal({
             {/* Summary Details */}
             <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
               <div>
-                <p className="text-xs text-zinc-400 font-semibold">Advance Payment Deposit</p>
+                <p className="text-xs text-zinc-400 font-semibold">{isBalancePayment ? "Remaining Balance" : "Advance Payment Deposit"}</p>
                 <p className="font-bold text-title-medium text-zinc-900 dark:text-white mt-0.5">
-                  LKR {depositLkr.toLocaleString()}
+                  LKR {chargeLkr.toLocaleString()}
                 </p>
               </div>
               <div className="text-right">
@@ -352,7 +361,7 @@ export function PaymentSandboxModal({
                 type="submit"
                 className="w-full h-12 mt-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 rounded-xl font-bold cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all flex items-center justify-center gap-1.5 shadow-md text-body-small-s"
               >
-                Pay LKR {depositLkr.toLocaleString()} &amp; Confirm
+                Pay LKR {chargeLkr.toLocaleString()} &amp; {isBalancePayment ? "Settle Balance" : "Confirm Booking"}
               </button>
             </form>
           </div>

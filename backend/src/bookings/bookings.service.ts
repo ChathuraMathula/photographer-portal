@@ -13,6 +13,7 @@ import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
 import { Package } from '../entities/package.entity';
 import { Message } from '../entities/message.entity';
+import { Payment, PaymentStatus } from '../entities/payment.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { ChatGateway } from '../reservations/chat.gateway';
 import { EmailService } from '../email/email.service';
@@ -30,6 +31,8 @@ export class BookingsService {
     private reservationRepository: Repository<Reservation>,
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
     private chatGateway: ChatGateway,
     private emailService: EmailService,
   ) {}
@@ -196,6 +199,16 @@ export class BookingsService {
   }
 
   async trackReservation(token: string, email: string) {
+    // Auto-complete reservations whose dates have passed
+    const todayStr = new Date().toISOString().split('T')[0];
+    await this.reservationRepository
+      .createQueryBuilder()
+      .update(Reservation)
+      .set({ status: ReservationStatus.COMPLETED })
+      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .andWhere('date < :todayStr', { todayStr })
+      .execute();
+
     const reservation = await this.reservationRepository.findOne({
       where: { reservationToken: token },
       relations: { customer: true, photographer: true },
@@ -206,6 +219,11 @@ export class BookingsService {
     if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
       throw new ForbiddenException('Access denied. Verification required.');
     }
+
+    const successfulPayments = await this.paymentRepository.find({
+      where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
+    });
+    const totalPaidInCents = successfulPayments.reduce((sum, p) => sum + p.amountInCents, 0);
 
     return {
       id: reservation.id,
@@ -218,6 +236,8 @@ export class BookingsService {
       locationMapLink: reservation.locationMapLink,
       customerNotes: reservation.customerNotes,
       advancePaymentPriceInCents: reservation.advancePaymentPriceInCents,
+      totalAmountInCents: reservation.totalAmountInCents,
+      totalPaidInCents,
       quotationNotes: reservation.quotationNotes,
       clientSelectedPackageId: reservation.clientSelectedPackageId,
       selectedPackages: reservation.selectedPackages,

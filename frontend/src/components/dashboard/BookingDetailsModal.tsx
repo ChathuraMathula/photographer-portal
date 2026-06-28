@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, X, Copy, Check } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, X, Copy, Check, Download } from "lucide-react";
 import { CountdownTimer } from "@/components/tracking/CountdownTimer";
+import { usePhotographerDashboardContext } from "@/app/dashboard/context/PhotographerDashboardContext";
+import { toast } from "sonner";
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 type Props = {
   reservation: Reservation;
@@ -18,6 +22,80 @@ export function BookingDetailsModal({
 }: Props) {
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  const context = usePhotographerDashboardContext();
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [fulfilling, setFulfilling] = useState(false);
+
+  const fetchPayments = async () => {
+    if (!context || !reservation.id) return;
+    setLoadingPayments(true);
+    try {
+      const res = await context.authFetch(`${API}/payments/${reservation.id}`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPayments(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  useEffect(() => {
+    if (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") {
+      fetchPayments();
+    }
+  }, [reservation.id, reservation.status]);
+
+  const handleLogCashPayment = async () => {
+    if (!context || !reservation.id) return;
+    setFulfilling(true);
+    try {
+      const res = await context.authFetch(`${API}/payments/${reservation.id}/manual-fulfill`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        toast.success("Cash payment logged and invoice emailed successfully!");
+        fetchPayments();
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Failed to log cash payment.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Error logging cash payment.");
+    } finally {
+      setFulfilling(false);
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    try {
+      const response = await fetch(`${API}/invoices/${reservation.id}/download`, {
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to download PDF invoice");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice_${reservation.id.slice(0, 8).toUpperCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Invoice PDF downloaded successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to download invoice PDF.");
+    }
+  };
 
   useEffect(() => {
     if (reservation) {
@@ -255,15 +333,46 @@ export function BookingDetailsModal({
                       </p>
                     </div>
                   )}
-                  {reservation.advancePaymentPriceInCents && (
-                    <div>
-                      <p className="text-body-caption font-semibold text-zinc-400">Advance Requested</p>
-                      <p className="text-body-small-s font-bold text-zinc-950 dark:text-white">
-                        LKR {(reservation.advancePaymentPriceInCents / 100).toLocaleString()}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-body-caption font-semibold text-zinc-400">Total Paid</p>
+                    <p className="text-body-small-s font-bold text-emerald-600 dark:text-emerald-500">
+                      LKR {(payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
+
+                {reservation.status === "CONFIRMED" && 
+                 (reservation.totalAmountInCents || 0) > payments.reduce((sum, p) => sum + p.amountInCents, 0) && (
+                  <div className="border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2 flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-body-caption font-semibold text-zinc-400">Remaining Balance</p>
+                        <p className="text-body-small-s font-bold text-amber-600">
+                          LKR {(((reservation.totalAmountInCents || 0) - payments.reduce((sum, p) => sum + p.amountInCents, 0)) / 100).toLocaleString()}
+                        </p>
+                      </div>
+                      <Button
+                        onClick={handleLogCashPayment}
+                        disabled={fulfilling}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold h-8 rounded-lg cursor-pointer"
+                      >
+                        {fulfilling ? "Logging..." : "Log Cash Payment"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {payments.reduce((sum, p) => sum + p.amountInCents, 0) >= (reservation.totalAmountInCents ?? 1) && (
+                  <div className="border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2">
+                    <Button
+                      onClick={handleDownloadInvoice}
+                      className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download PDF Invoice
+                    </Button>
+                  </div>
+                )}
                 {reservation.quotationNotes && (
                   <div className="border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2">
                     <p className="text-body-caption font-semibold text-zinc-400">Quotation Notes</p>

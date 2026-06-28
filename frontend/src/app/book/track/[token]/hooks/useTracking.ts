@@ -89,6 +89,8 @@ export function useTracking() {
           ...prev,
           status: updatedRes.status,
           advancePaymentPriceInCents: updatedRes.advancePaymentPriceInCents,
+          totalAmountInCents: updatedRes.totalAmountInCents,
+          totalPaidInCents: updatedRes.totalPaidInCents,
           quotationNotes: updatedRes.quotationNotes,
           clientSelectedPackageId: updatedRes.clientSelectedPackageId,
           selectedPackages: updatedRes.selectedPackages,
@@ -96,6 +98,18 @@ export function useTracking() {
           rejectionReason: updatedRes.rejectionReason,
         };
       });
+    });
+
+    socket.on("transactionLogged", () => {
+      fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Could not refetch");
+          return res.json() as Promise<TrackingReservation>;
+        })
+        .then((data) => {
+          setReservation(data);
+        })
+        .catch(console.error);
     });
 
     return () => {

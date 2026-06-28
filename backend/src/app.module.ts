@@ -14,6 +14,7 @@ import { PhotographersModule } from './photographers/photographers.module';
 import { PackagesModule } from './packages/packages.module';
 import { EmailModule } from './email/email.module';
 import { ReportsModule } from './reports/reports.module';
+import { InvoicesModule } from './reports/invoices.module';
 import { User } from './entities/user.entity';
 import { PhotographerProfile } from './entities/photographer-profile.entity';
 import { Package } from './entities/package.entity';
@@ -58,6 +59,7 @@ if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function'
     PhotographersModule,
     PackagesModule,
     ReportsModule,
+    InvoicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

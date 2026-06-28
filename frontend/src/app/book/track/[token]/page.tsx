@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaymentSandboxModal } from "@/components/tracking/PaymentSandboxModal";
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+
 export default function TrackingPage() {
   const {
     token,
@@ -103,6 +105,52 @@ export default function TrackingPage() {
           {/* Main info column */}
           <div className="md:col-span-2 space-y-6">
             <BookingSummaryCard reservation={reservation} />
+
+            {reservation.status === "CONFIRMED" && (reservation.totalAmountInCents ?? 0) > (reservation.totalPaidInCents ?? 0) && (
+              <Card className="border border-zinc-200/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+                <CardHeader>
+                  <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Complete Remaining Balance</CardTitle>
+                  <CardDescription className="text-xs">
+                    Your deposit was paid successfully. Please settle the remaining balance of <strong>LKR {(((reservation.totalAmountInCents ?? 0) - (reservation.totalPaidInCents ?? 0)) / 100).toLocaleString()}</strong>.
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <Button 
+                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold" 
+                    onClick={() => {
+                      if (reservation.clientSelectedPackageId) {
+                        setSelectedPkgId(reservation.clientSelectedPackageId);
+                        setShowPaymentModal(true);
+                      }
+                    }}
+                  >
+                    Pay Remaining Balance (LKR {(((reservation.totalAmountInCents ?? 0) - (reservation.totalPaidInCents ?? 0)) / 100).toLocaleString()})
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
+
+            {reservation.status === "CONFIRMED" && (reservation.totalPaidInCents ?? 0) >= (reservation.totalAmountInCents ?? 1) && (
+              <Card className="border border-green-200/50 shadow-sm rounded-xl overflow-hidden bg-green-50/10 dark:bg-green-950/10">
+                <CardHeader>
+                  <CardTitle className="text-body-base-bold font-bold text-green-700 dark:text-green-400">Booking Fully Paid</CardTitle>
+                  <CardDescription className="text-xs">
+                    All payments for this reservation are completed. You can download your official system-generated invoice below.
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <a 
+                    href={`${API}/invoices/public/${token}/download`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-green-600 hover:bg-green-700 text-white text-body-caption font-bold shadow-md cursor-pointer transition-all"
+                  >
+                    Download PDF Invoice
+                  </a>
+                </CardFooter>
+              </Card>
+            )}
+
             {reservation.status === "REJECTED" && (
               <RejectionNotice reason={reservation.rejectionReason} />
             )}

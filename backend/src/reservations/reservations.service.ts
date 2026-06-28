@@ -49,6 +49,16 @@ export class ReservationsService {
   ) {}
 
   async findAll(user: JwtUser) {
+    // Auto-complete reservations whose dates have passed
+    const todayStr = new Date().toISOString().split('T')[0];
+    await this.reservationRepository
+      .createQueryBuilder()
+      .update(Reservation)
+      .set({ status: ReservationStatus.COMPLETED })
+      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .andWhere('date < :todayStr', { todayStr })
+      .execute();
+
     const query = this.reservationRepository.createQueryBuilder('res')
       .leftJoinAndSelect('res.customer', 'customer')
       .leftJoinAndSelect('res.photographer', 'photographer')
@@ -64,6 +74,16 @@ export class ReservationsService {
   }
 
   async findOne(id: string, user: JwtUser) {
+    // Auto-complete reservations whose dates have passed
+    const todayStr = new Date().toISOString().split('T')[0];
+    await this.reservationRepository
+      .createQueryBuilder()
+      .update(Reservation)
+      .set({ status: ReservationStatus.COMPLETED })
+      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .andWhere('date < :todayStr', { todayStr })
+      .execute();
+
     const reservation = await this.reservationRepository.findOne({
       where: { id },
       relations: { customer: true, photographer: true, messages: true },

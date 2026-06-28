@@ -57,6 +57,18 @@ export class PhotographerProfile {
   @Column({ type: 'integer', default: 500000 })
   universalDepositValue!: number;
 
+  @Column({ default: 'INVOICE' })
+  invoiceTitle!: string;
+
+  @Column({ default: '#2563eb' })
+  invoiceColor!: string;
+
+  @Column({ type: 'text', default: 'Thank you for booking with us! We appreciate your trust.' })
+  invoiceNotes!: string;
+
+  @Column({ nullable: true })
+  invoiceLogoText?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

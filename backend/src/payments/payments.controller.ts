@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -26,10 +26,30 @@ export class PaymentsController {
     return this.paymentsService.processPayment(dto);
   }
 
+  @Post(':reservationId/manual-fulfill')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PHOTOGRAPHER)
+  manualFulfill(
+    @Param('reservationId') reservationId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.paymentsService.manualFulfillPayment(reservationId, req.user.userId);
+  }
+
   @Get('photographer')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PHOTOGRAPHER)
   getTransactions(@Req() req: RequestWithUser) {
     return this.paymentsService.getPhotographerTransactions(req.user.userId);
+  }
+
+  @Get(':reservationId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PHOTOGRAPHER)
+  async getPaymentsByReservation(
+    @Param('reservationId') reservationId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.paymentsService.getReservationPayments(reservationId, req.user.userId);
   }
 }

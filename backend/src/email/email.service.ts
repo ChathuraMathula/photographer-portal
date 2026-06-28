@@ -105,4 +105,31 @@ export class EmailService {
       html,
     });
   }
+
+  async sendInvoice(
+    customerEmail: string,
+    customerName: string,
+    invoiceNumber: string,
+    pdfBuffer: Buffer,
+  ) {
+    const html = `
+      <h2>Invoice Issued: ${invoiceNumber}</h2>
+      <p>Dear ${customerName},</p>
+      <p>Your payment has been successfully received, and your booking is fully settled. Please find your system-generated invoice attached to this email.</p>
+      <p>Thank you for choosing our services!</p>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: customerEmail,
+      subject: `Invoice - ${invoiceNumber}`,
+      html,
+      attachments: [
+        {
+          filename: `invoice_${invoiceNumber}.pdf`,
+          content: pdfBuffer,
+        },
+      ],
+    });
+  }
 }

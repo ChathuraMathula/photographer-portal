@@ -7,11 +7,12 @@ import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { Reservation } from '../entities/reservation.entity';
 import { Payment } from '../entities/payment.entity';
+import { PhotographerProfile } from '../entities/photographer-profile.entity';
 
 @Module({
   imports: [
     DatabaseModule,
-    TypeOrmModule.forFeature([Reservation, Payment]),
+    TypeOrmModule.forFeature([Reservation, Payment, PhotographerProfile]),
     ReservationsModule,
     EmailModule,
   ],
