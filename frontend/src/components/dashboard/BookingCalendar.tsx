@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type Reservation } from "@/types";
 import {
   Card,
@@ -11,14 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Search, Calendar as CalendarIcon, MapPin, Clock, Plus, Tag } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ChevronLeft, ChevronRight, Search, Calendar as CalendarIcon, MapPin, Clock, Plus, Tag, ArrowLeft, ArrowRight } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { StatusBadge } from "@/components/common/StatusBadge";
 
 type Props = {
@@ -107,6 +101,8 @@ export function BookingCalendar({
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
+  
+  const mobileSliderRef = useRef<HTMLDivElement>(null);
 
   const days = generateCalendarDays(currentDate);
 
@@ -119,6 +115,20 @@ export function BookingCalendar({
       setSelectedDay(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
     }
   }, [currentDate]);
+
+  // Center selected active day in horizontal mobile strip scroll
+  useEffect(() => {
+    if (mobileSliderRef.current) {
+      const activeBtn = mobileSliderRef.current.querySelector('[data-active="true"]');
+      if (activeBtn) {
+        activeBtn.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+    }
+  }, [selectedDay]);
 
   const formatDateLocal = (d: Date) => {
     const year = d.getFullYear();
@@ -136,6 +146,29 @@ export function BookingCalendar({
   const handleYearChange = (val: string) => {
     if (onDateChange) {
       onDateChange(new Date(parseInt(val), currentDate.getMonth(), 1));
+    }
+  };
+
+  // Day navigation controls
+  const handlePrevDay = () => {
+    const prev = new Date(selectedDay);
+    prev.setDate(selectedDay.getDate() - 1);
+    setSelectedDay(prev);
+    if (prev.getMonth() !== currentDate.getMonth() || prev.getFullYear() !== currentDate.getFullYear()) {
+      if (onDateChange) {
+        onDateChange(new Date(prev.getFullYear(), prev.getMonth(), 1));
+      }
+    }
+  };
+
+  const handleNextDay = () => {
+    const next = new Date(selectedDay);
+    next.setDate(selectedDay.getDate() + 1);
+    setSelectedDay(next);
+    if (next.getMonth() !== currentDate.getMonth() || next.getFullYear() !== currentDate.getFullYear()) {
+      if (onDateChange) {
+        onDateChange(new Date(next.getFullYear(), next.getMonth(), 1));
+      }
     }
   };
 
@@ -174,7 +207,6 @@ export function BookingCalendar({
     });
   };
 
-  // Get active days of month (excluding null padding)
   const activeMonthDays = days.filter((d): d is Date => d !== null);
   const selectedDayReservations = getReservationsForDay(selectedDay);
 
@@ -187,97 +219,101 @@ export function BookingCalendar({
               <CalendarIcon className="h-5 w-5" />
             </div>
             <div className="text-left">
-              <CardTitle className="text-title-medium text-primary-dark dark:text-white">Visual Bookings Grid</CardTitle>
-              <CardDescription className="text-body-caption text-zinc-500 mt-0.5">
-                Click a day cell to register an offline booking or inspect existing reservations.
+              <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white leading-none">Visual Bookings Grid</CardTitle>
+              <CardDescription className="text-body-caption text-zinc-500 mt-1.5">
+                Navigate months or days, adjust search criteria, and configure settings.
               </CardDescription>
             </div>
           </div>
           
-          {/* Calendar Month Navigation */}
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <Button
-              size="icon"
-              variant="outline"
-              type="button"
-              onClick={onPrevMonth}
-              className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Select value={currentDate.getMonth().toString()} onValueChange={handleMonthChange}>
-              <SelectTrigger className="h-9 min-w-[120px] bg-white dark:bg-zinc-950 font-medium text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                {MONTHS.map((m) => (
-                  <SelectItem key={m.value} value={m.value} className="cursor-pointer">
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
- 
-            <Select value={currentDate.getFullYear().toString()} onValueChange={handleYearChange}>
-              <SelectTrigger className="h-9 min-w-[90px] bg-white dark:bg-zinc-950 font-medium text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                {YEARS.map((y) => (
-                  <SelectItem key={y} value={y} className="cursor-pointer">
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
- 
-            <Button
-              size="icon"
-              variant="outline"
-              type="button"
-              onClick={onNextMonth}
-              className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          {/* Calendar Month & Day Navigation Options */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+            {/* Day Navigators */}
+            <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-200/40">
+              <Button
+                size="sm"
+                variant="ghost"
+                type="button"
+                onClick={handlePrevDay}
+                className="h-8 px-2.5 text-zinc-700 dark:text-zinc-350 cursor-pointer text-[10px] font-bold"
+              >
+                <ArrowLeft className="h-3 w-3 mr-1" />
+                Prev Day
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                type="button"
+                onClick={handleNextDay}
+                className="h-8 px-2.5 text-zinc-700 dark:text-zinc-350 cursor-pointer text-[10px] font-bold"
+              >
+                Next Day
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+
+            {/* Month Navigators */}
+            <div className="flex items-center gap-1">
+              <Button
+                size="icon"
+                variant="outline"
+                type="button"
+                onClick={onPrevMonth}
+                className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Searchable dropdowns with 50px height for Month/Year */}
+              <div className="w-[110px]">
+                <SearchableSelect
+                  options={MONTHS}
+                  value={currentDate.getMonth().toString()}
+                  onValueChange={handleMonthChange}
+                />
+              </div>
+   
+              <div className="w-[85px]">
+                <SearchableSelect
+                  options={YEARS.map((y) => ({ name: y, value: y }))}
+                  value={currentDate.getFullYear().toString()}
+                  onValueChange={handleYearChange}
+                />
+              </div>
+   
+              <Button
+                size="icon"
+                variant="outline"
+                type="button"
+                onClick={onNextMonth}
+                className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
  
-        {/* Filter bar */}
+        {/* Filter bar: now using premium 50px Searchable Selects */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 mt-2 bg-zinc-50/50 dark:bg-zinc-950/30 border border-zinc-150/70 dark:border-zinc-850/70 rounded-xl">
           {/* Status Select */}
           <div className="flex flex-col gap-1.5 text-left">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Status Filter</span>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                {STATUSES.map((s) => (
-                  <SelectItem key={s.value} value={s.value} className="cursor-pointer">
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={STATUSES}
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+            />
           </div>
  
           {/* Event Type Select */}
           <div className="flex flex-col gap-1.5 text-left">
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Event Type</span>
-            <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
-              <SelectTrigger className="h-10 bg-white dark:bg-zinc-950 text-body-caption border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                {EVENT_TYPES.map((e) => (
-                  <SelectItem key={e.value} value={e.value} className="cursor-pointer">
-                    {e.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={EVENT_TYPES}
+              value={eventTypeFilter}
+              onValueChange={setEventTypeFilter}
+            />
           </div>
  
           {/* Search Input */}
@@ -285,12 +321,12 @@ export function BookingCalendar({
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Search Bookings</span>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
-              <Input
+              <input
                 type="text"
                 placeholder="Search by client or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 pl-9 text-body-caption bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-lg focus-visible:ring-1 focus-visible:ring-[#0e2d5c] dark:focus-visible:ring-white"
+                className="h-[50px] w-full pl-9 pr-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 font-medium text-body-small focus:outline-none focus:ring-2 focus:ring-zinc-900"
               />
             </div>
           </div>
@@ -299,14 +335,12 @@ export function BookingCalendar({
       
       {/* ── DESKTOP MONTH VIEW ────────────────────────────────────────────────── */}
       <CardContent className="pt-6 hidden sm:block">
-        {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 text-center font-bold text-body-caption text-zinc-500 mb-3 uppercase tracking-wider">
           {DAYS.map((d) => (
             <span key={d} className="title-font text-[11px] font-bold text-zinc-450">{d}</span>
           ))}
         </div>
  
-        {/* Day cells */}
         <div className="grid grid-cols-7 gap-2 min-h-[350px]">
           {days.map((day, idx) => {
             if (!day) {
@@ -320,15 +354,21 @@ export function BookingCalendar({
  
             const dayRes = getReservationsForDay(day);
             const isToday = day.toDateString() === new Date().toDateString();
+            const isSelected = day.toDateString() === selectedDay.toDateString();
  
             return (
               <div
                 key={day.toISOString()}
-                onClick={() => onDayClick(day)}
+                onClick={() => {
+                  setSelectedDay(day);
+                  onDayClick(day);
+                }}
                 className={`border p-2 rounded-xl min-h-[85px] text-left relative flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
-                  isToday
-                    ? "border-[#0e2d5c] bg-[#0e2d5c]/5 dark:border-white dark:bg-zinc-900/50 hover:bg-[#0e2d5c]/10 dark:hover:bg-zinc-800/80 shadow-inner"
-                    : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700 hover:bg-zinc-50/30 dark:hover:bg-zinc-950/20"
+                  isSelected
+                    ? "border-zinc-900 bg-zinc-50/50 dark:border-white dark:bg-zinc-900/50 shadow-sm"
+                    : isToday
+                      ? "border-[#0e2d5c]/60 bg-[#0e2d5c]/5 dark:border-zinc-700/60 dark:bg-zinc-900/10"
+                      : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700 hover:bg-zinc-50/30"
                 }`}
               >
                 <span
@@ -341,7 +381,7 @@ export function BookingCalendar({
                   {day.getDate()}
                 </span>
                 
-                {/* Bookings wrapper */}
+                {/* Bookings list */}
                 <div className="space-y-1 mt-2 flex-1 flex flex-col justify-end">
                   {dayRes.slice(0, 3).map((r) => (
                     <div
@@ -384,8 +424,8 @@ export function BookingCalendar({
 
       {/* ── MOBILE AGENDA VIEW ────────────────────────────────────────────────── */}
       <CardContent className="pt-4 block sm:hidden px-4 space-y-4">
-        {/* Horizontal Scrollable Days Slider */}
-        <div className="flex gap-2 overflow-x-auto py-2 shrink-0 select-none no-scrollbar snap-x">
+        {/* Horizontal Days Strip Slider */}
+        <div ref={mobileSliderRef} className="flex gap-2 overflow-x-auto py-2 shrink-0 select-none no-scrollbar snap-x">
           {activeMonthDays.map((day) => {
             const isSelected = day.toDateString() === selectedDay.toDateString();
             const isToday = day.toDateString() === new Date().toDateString();
@@ -394,6 +434,7 @@ export function BookingCalendar({
             return (
               <button
                 key={day.toISOString()}
+                data-active={isSelected ? "true" : "false"}
                 onClick={() => setSelectedDay(day)}
                 className={`snap-center flex flex-col items-center justify-center min-w-[50px] h-14 rounded-xl border transition-all cursor-pointer ${
                   isSelected
@@ -417,20 +458,46 @@ export function BookingCalendar({
           })}
         </div>
 
-        {/* Selected Date Agenda Listing */}
+        {/* Selected Date Agenda with Date-by-Date Navs */}
         <div className="space-y-3 pt-2">
-          <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            <h4 className="text-body-small-s font-extrabold text-zinc-900 dark:text-white text-left">
-              Agenda: {selectedDay.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-            </h4>
-            <Button
-              size="sm"
-              onClick={() => onDayClick(selectedDay)}
-              className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold h-7 rounded-lg text-[10px] flex items-center gap-1 cursor-pointer"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Add Booking
-            </Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+            
+            {/* Mobile day-by-day navigators */}
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={handlePrevDay}
+                  className="h-8 w-8 cursor-pointer rounded-lg border-zinc-200"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <h4 className="text-body-small-s font-extrabold text-zinc-900 dark:text-white text-left">
+                  {selectedDay.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}
+                </h4>
+  
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={handleNextDay}
+                  className="h-8 w-8 cursor-pointer rounded-lg border-zinc-200"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <Button
+                size="sm"
+                onClick={() => onDayClick(selectedDay)}
+                className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold h-8 rounded-lg text-[10px] flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add
+              </Button>
+            </div>
+
           </div>
 
           <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
