@@ -30,8 +30,8 @@ export function NavItem({ item, collapsed, activeTab, onClick }: NavItemProps) {
     >
       <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
       <span
-        className={`truncate transition-all duration-200 ${
-          collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+        className={`truncate ${
+          collapsed ? "opacity-0 w-0 overflow-hidden transition-all duration-200" : "opacity-100"
         }`}
       >
         {item.label}

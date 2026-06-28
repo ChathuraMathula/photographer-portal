@@ -37,7 +37,7 @@ export function DesktopSidebar({
           <div className="h-9 w-9 rounded-full bg-primary-dark shrink-0 flex items-center justify-center text-white shadow-inner">
             <Camera className="h-5 w-5" aria-hidden="true" />
           </div>
-          <div className={`flex flex-col truncate transition-all duration-200 ${isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+          <div className={`flex flex-col truncate ${isCollapsed ? "opacity-0 w-0 overflow-hidden transition-all duration-200" : "opacity-100"}`}>
               <span className="font-bold text-body-small-s leading-none title-font tracking-tight">
                 Photographer Portal
               </span>
@@ -76,8 +76,8 @@ export function DesktopSidebar({
         >
           <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span
-            className={`truncate transition-all duration-200 ${
-              isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+            className={`truncate ${
+              isCollapsed ? "opacity-0 w-0 overflow-hidden transition-all duration-200" : "opacity-100"
             }`}
           >
             Log out
