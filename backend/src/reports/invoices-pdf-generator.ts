@@ -23,12 +23,17 @@ export type InvoiceData = {
   }>;
   totalPaidLkr: number;
   balanceDueLkr: number;
+  taxRate: number;
+  taxAmountLkr: number;
+  grandTotalLkr: number;
   // Customizations
   settings: {
     invoiceTitle?: string;
     invoiceColor?: string;
     invoiceNotes?: string;
     invoiceLogoText?: string;
+    invoicePhone?: string;
+    invoiceInstructions?: string;
   };
 };
 
@@ -53,11 +58,12 @@ export function generateInvoicePdf(data: InvoiceData): any {
     .font('Helvetica-Bold')
     .text(logoText, 50, 50);
 
+  const phoneText = settings.invoicePhone || data.photographerPhone || '';
   doc.fillColor(textColor)
     .fontSize(9)
     .font('Helvetica')
     .text(data.photographerEmail, 50, 72)
-    .text(data.photographerPhone || '', 50, 84);
+    .text(phoneText, 50, 84);
 
   // Invoice Title Right Aligned
   const invTitle = settings.invoiceTitle || 'INVOICE';
@@ -82,32 +88,32 @@ export function generateInvoicePdf(data: InvoiceData): any {
   doc.fillColor(darkTextColor)
     .fontSize(11)
     .font('Helvetica-Bold')
-    .text('Billed To:', 50, 130)
-    .text('Event Summary:', 300, 130);
+    .text('Billed To:', 50, 125)
+    .text('Event Summary:', 300, 125);
 
   doc.fillColor(textColor)
     .fontSize(9)
     .font('Helvetica')
-    .text(data.clientName, 50, 148)
-    .text(data.clientEmail, 50, 160)
-    .text(data.clientPhone, 50, 172);
+    .text(data.clientName, 50, 140)
+    .text(data.clientEmail, 50, 150)
+    .text(data.clientPhone, 50, 160);
 
   doc.fillColor(textColor)
     .fontSize(9)
     .font('Helvetica')
-    .text(`Date: ${data.eventDate}`, 300, 148)
-    .text(`Time: ${data.eventTime}`, 300, 160)
-    .text(`Type: ${data.eventType}`, 300, 172)
-    .text(`Venue: ${data.location}`, 300, 184, { width: 245 });
+    .text(`Date: ${data.eventDate}`, 300, 140)
+    .text(`Time: ${data.eventTime}`, 300, 150)
+    .text(`Type: ${data.eventType}`, 300, 160)
+    .text(`Venue: ${data.location}`, 300, 170, { width: 245 });
 
-  doc.moveTo(50, 210)
-    .lineTo(545, 210)
+  doc.moveTo(50, 195)
+    .lineTo(545, 195)
     .strokeColor(borderColor)
     .lineWidth(1)
     .stroke();
 
   // 3. Line Items Table
-  let y = 230;
+  let y = 210;
   doc.rect(50, y, 495, 20).fill(primaryColor);
   doc.fillColor('#ffffff')
     .fontSize(9)
@@ -126,20 +132,32 @@ export function generateInvoicePdf(data: InvoiceData): any {
 
   y += 22;
 
+  // Tax Row (if tax > 0)
+  if (data.taxRate > 0) {
+    doc.rect(50, y, 495, 22).fillAndStroke('#ffffff', borderColor);
+    doc.fillColor(textColor)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(`Taxes & VAT (${data.taxRate}%)`, 60, y + 7);
+    doc.fillColor(darkTextColor)
+      .text(`${data.taxAmountLkr.toLocaleString()}`, 430, y + 7, { align: 'right', width: 100 });
+    y += 22;
+  }
+
   // Payments History List
   doc.fillColor(darkTextColor)
     .fontSize(10)
     .font('Helvetica-Bold')
-    .text('Payment Transactions History:', 50, y + 20);
+    .text('Payment Transactions History:', 50, y + 15);
 
-  y += 35;
+  y += 30;
   doc.rect(50, y, 495, 18).fill(lightBg);
   doc.fillColor(textColor)
     .fontSize(8)
     .font('Helvetica-Bold')
     .text('Txn Date', 60, y + 5)
-    .text('Method', 150, y + 5)
-    .text('Transaction ID', 250, y + 5)
+    .text('Method', 140, y + 5)
+    .text('Transaction ID', 240, y + 5)
     .text('Paid Amount (LKR)', 430, y + 5, { align: 'right', width: 100 });
 
   y += 18;
@@ -149,8 +167,8 @@ export function generateInvoicePdf(data: InvoiceData): any {
       .fontSize(8)
       .font('Helvetica')
       .text(pay.date, 60, y + 5)
-      .text(pay.method, 150, y + 5)
-      .text(pay.transactionId, 250, y + 5)
+      .text(pay.method, 140, y + 5)
+      .text(pay.transactionId, 240, y + 5)
       .text(`${pay.amountLkr.toLocaleString()}`, 430, y + 5, { align: 'right', width: 100 });
     y += 18;
   });
@@ -165,18 +183,24 @@ export function generateInvoicePdf(data: InvoiceData): any {
   }
 
   // 4. Summaries Right Side
-  y += 15;
+  y += 12;
   doc.fillColor(textColor)
-    .fontSize(9)
+    .fontSize(8.5)
     .font('Helvetica')
-    .text('Total Package Value:', 300, y, { align: 'right', width: 130 })
+    .text('Subtotal:', 300, y, { align: 'right', width: 130 })
     .text(`${data.packagePriceLkr.toLocaleString()} LKR`, 430, y, { align: 'right', width: 100 });
 
-  y += 15;
+  if (data.taxRate > 0) {
+    y += 14;
+    doc.text(`VAT/Tax (${data.taxRate}%):`, 300, y, { align: 'right', width: 130 })
+      .text(`${data.taxAmountLkr.toLocaleString()} LKR`, 430, y, { align: 'right', width: 100 });
+  }
+
+  y += 14;
   doc.text('Total Amount Settled:', 300, y, { align: 'right', width: 130 })
     .text(`${data.totalPaidLkr.toLocaleString()} LKR`, 430, y, { align: 'right', width: 100 });
 
-  y += 15;
+  y += 14;
   doc.moveTo(350, y)
     .lineTo(545, y)
     .strokeColor(borderColor)
@@ -189,18 +213,35 @@ export function generateInvoicePdf(data: InvoiceData): any {
     .text('Balance Due (LKR):', 300, y, { align: 'right', width: 130 })
     .text(`${data.balanceDueLkr.toLocaleString()}`, 430, y, { align: 'right', width: 100 });
 
-  // 5. Notes / Terms
-  y += 45;
+  // 5. Special Instructions & Next Steps
+  if (settings.invoiceInstructions) {
+    y += 35;
+    doc.fillColor(darkTextColor)
+      .fontSize(9.5)
+      .font('Helvetica-Bold')
+      .text('Fulfillment Instructions & Next Steps:', 50, y);
+    y += 12;
+    doc.fillColor(textColor)
+      .fontSize(8)
+      .font('Helvetica')
+      .text(settings.invoiceInstructions, 50, y, { width: 495 });
+    // calculate instructions height roughly (8pt font * 1.2 line height * lines)
+    const lines = Math.ceil(settings.invoiceInstructions.length / 110);
+    y += Math.max(25, lines * 10);
+  }
+
+  // 6. Notes / Terms
+  y += 25;
   const notesText = settings.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.';
-  doc.rect(50, y, 495, 55).fillAndStroke(lightBg, borderColor);
+  doc.rect(50, y, 495, 45).fillAndStroke(lightBg, borderColor);
   doc.fillColor(darkTextColor)
-    .fontSize(9)
+    .fontSize(8.5)
     .font('Helvetica-Bold')
-    .text('Important Booking Terms & Notes:', 60, y + 10);
+    .text('Important Booking Terms & Notes:', 60, y + 8);
   doc.fillColor(textColor)
     .fontSize(8)
     .font('Helvetica')
-    .text(notesText, 60, y + 23, { width: 475 });
+    .text(notesText, 60, y + 20, { width: 475 });
 
   return doc;
 }

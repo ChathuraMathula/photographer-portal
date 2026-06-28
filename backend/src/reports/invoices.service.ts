@@ -72,6 +72,9 @@ export class InvoicesService {
       invoiceColor: profile.invoiceColor || '#2563eb',
       invoiceNotes: profile.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
       invoiceLogoText: profile.invoiceLogoText || '',
+      invoicePhone: profile.invoicePhone || '',
+      invoiceTaxRate: profile.invoiceTaxRate || 0,
+      invoiceInstructions: profile.invoiceInstructions || '',
     };
   }
 
@@ -88,6 +91,9 @@ export class InvoicesService {
     if (body.invoiceColor !== undefined) profile.invoiceColor = body.invoiceColor;
     if (body.invoiceNotes !== undefined) profile.invoiceNotes = body.invoiceNotes;
     if (body.invoiceLogoText !== undefined) profile.invoiceLogoText = body.invoiceLogoText;
+    if (body.invoicePhone !== undefined) profile.invoicePhone = body.invoicePhone;
+    if (body.invoiceTaxRate !== undefined) profile.invoiceTaxRate = Number(body.invoiceTaxRate || 0);
+    if (body.invoiceInstructions !== undefined) profile.invoiceInstructions = body.invoiceInstructions;
 
     await this.profileRepository.save(profile);
     return this.getSettings(photographerId);
@@ -123,6 +129,8 @@ export class InvoicesService {
       invoiceColor: profile?.invoiceColor || '#2563eb',
       invoiceNotes: profile?.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
       invoiceLogoText: profile?.invoiceLogoText || reservation.photographer.firstName,
+      invoicePhone: profile?.invoicePhone || '',
+      invoiceInstructions: profile?.invoiceInstructions || '',
     };
 
     const packages = reservation.selectedPackages || [];
@@ -131,9 +139,12 @@ export class InvoicesService {
       priceInCents: reservation.totalAmountInCents || 0,
     };
 
+    const taxRate = profile?.invoiceTaxRate || 0;
     const packagePriceLkr = (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
+    const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
+    const grandTotalLkr = packagePriceLkr + taxAmountLkr;
     const totalPaidLkr = payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
-    const balanceDueLkr = Math.max(0, packagePriceLkr - totalPaidLkr);
+    const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
 
     const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
 
@@ -160,6 +171,9 @@ export class InvoicesService {
       })),
       totalPaidLkr,
       balanceDueLkr,
+      taxRate,
+      taxAmountLkr,
+      grandTotalLkr,
       settings,
     };
 

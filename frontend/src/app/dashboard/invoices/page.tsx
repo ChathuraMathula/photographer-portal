@@ -5,6 +5,7 @@ import { usePhotographerDashboardContext } from "../context/PhotographerDashboar
 import { InvoicesListTable } from "./components/InvoicesListTable";
 import { InvoiceCustomizerCard } from "./components/InvoiceCustomizerCard";
 import { toast } from "sonner";
+import { Search, DollarSign, CheckCircle2, AlertCircle } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -21,6 +22,7 @@ type InvoiceItem = {
   };
   totalPaidLkr: number;
   totalValueLkr: number;
+  isFullyPaid: boolean;
 };
 
 type InvoiceSettings = {
@@ -28,6 +30,9 @@ type InvoiceSettings = {
   invoiceColor: string;
   invoiceNotes: string;
   invoiceLogoText: string;
+  invoicePhone: string;
+  invoiceTaxRate: number;
+  invoiceInstructions: string;
 };
 
 export default function InvoicesPage() {
@@ -36,19 +41,18 @@ export default function InvoicesPage() {
   const [settings, setSettings] = useState<InvoiceSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   if (!context) return null;
   const { authFetch } = context;
 
   const loadData = async () => {
     try {
-      // Load invoices list
       const invRes = await authFetch(`${API}/invoices`, { credentials: "include" });
       if (!invRes.ok) throw new Error("Failed to load invoices list");
       const invData = await invRes.json();
       setInvoices(invData);
 
-      // Load customization settings
       const settingsRes = await authFetch(`${API}/invoices/settings`, { credentials: "include" });
       if (!settingsRes.ok) throw new Error("Failed to load invoice settings");
       const settingsData = await settingsRes.json();
@@ -69,9 +73,6 @@ export default function InvoicesPage() {
   const handleDownload = async (resId: string) => {
     try {
       const response = await fetch(`${API}/invoices/${resId}/download`, {
-        headers: {
-          // Include authorization credentials if needed, standard sandbox uses endpoint directly
-        },
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to download PDF invoice");
@@ -124,6 +125,20 @@ export default function InvoicesPage() {
     setSettings(data);
   };
 
+  // KPIs
+  const totalInvoiced = invoices.reduce((sum, item) => sum + item.totalValueLkr, 0);
+  const totalSettled = invoices.reduce((sum, item) => sum + item.totalPaidLkr, 0);
+  const outstanding = Math.max(0, totalInvoiced - totalSettled);
+
+  // Filtered List
+  const filteredInvoices = invoices.filter((item) => {
+    const fullName = `${item.reservation.customer.firstName} ${item.reservation.customer.lastName}`.toLowerCase();
+    const email = item.reservation.customer.email.toLowerCase();
+    const eventType = item.reservation.eventType.toLowerCase();
+    const query = searchTerm.toLowerCase();
+    return fullName.includes(query) || email.includes(query) || eventType.includes(query);
+  });
+
   if (loading || !settings) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
@@ -144,17 +159,68 @@ export default function InvoicesPage() {
         </div>
       </div>
 
+      {/* KPI Cards Grid */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {/* KPI 1 */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-zinc-405 dark:text-zinc-500 uppercase tracking-wider">Total Value Invoiced</p>
+            <p className="text-body-base-bold font-bold text-zinc-900 dark:text-white">LKR {totalInvoiced.toLocaleString()}</p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-950/20 flex items-center justify-center text-blue-600 dark:text-blue-500">
+            <DollarSign className="h-5 w-5" />
+          </div>
+        </div>
+
+        {/* KPI 2 */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-zinc-405 dark:text-zinc-500 uppercase tracking-wider">Payments Collected</p>
+            <p className="text-body-base-bold font-bold text-emerald-600 dark:text-emerald-500">LKR {totalSettled.toLocaleString()}</p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center text-emerald-600 dark:text-emerald-500">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+        </div>
+
+        {/* KPI 3 */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-zinc-405 dark:text-zinc-500 uppercase tracking-wider">Outstanding Balances</p>
+            <p className="text-body-base-bold font-bold text-amber-600">LKR {outstanding.toLocaleString()}</p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-amber-50 dark:bg-amber-950/20 flex items-center justify-center text-amber-600 dark:text-amber-500">
+            <AlertCircle className="h-5 w-5" />
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Customizer sidebar */}
         <div className="lg:col-span-1">
           <InvoiceCustomizerCard settings={settings} onSave={handleSaveSettings} />
         </div>
 
-        {/* Invoices List Table */}
+        {/* Invoices List Table & Filter */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-body-base-bold font-bold text-zinc-850 dark:text-zinc-200">Generated Ledger Statements</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h3 className="text-body-base-bold font-bold text-zinc-850 dark:text-zinc-200">Generated Ledger Statements</h3>
+            
+            {/* Search Filter Input */}
+            <div className="relative max-w-xs w-full">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by client or event..."
+                className="w-full h-9 pl-9 pr-3 text-xs border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium"
+              />
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-400" />
+            </div>
+          </div>
+
           <InvoicesListTable
-            invoices={invoices}
+            invoices={filteredInvoices}
             onDownload={handleDownload}
             onResend={handleResend}
             resendingId={resendingId}

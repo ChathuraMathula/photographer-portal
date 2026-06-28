@@ -284,6 +284,8 @@ export class PaymentsService {
       invoiceColor: profile?.invoiceColor || '#2563eb',
       invoiceNotes: profile?.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
       invoiceLogoText: profile?.invoiceLogoText || reservation.photographer.firstName,
+      invoicePhone: profile?.invoicePhone || '',
+      invoiceInstructions: profile?.invoiceInstructions || '',
     };
 
     // Construct InvoiceData
@@ -293,9 +295,12 @@ export class PaymentsService {
       priceInCents: reservation.totalAmountInCents || 0,
     };
 
+    const taxRate = profile?.invoiceTaxRate || 0;
     const packagePriceLkr = (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
+    const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
+    const grandTotalLkr = packagePriceLkr + taxAmountLkr;
     const totalPaidLkr = allPayments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
-    const balanceDueLkr = Math.max(0, packagePriceLkr - totalPaidLkr);
+    const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
 
     const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
     
@@ -324,6 +329,9 @@ export class PaymentsService {
       payments: mappedPayments,
       totalPaidLkr,
       balanceDueLkr,
+      taxRate,
+      taxAmountLkr,
+      grandTotalLkr,
       settings,
     };
 

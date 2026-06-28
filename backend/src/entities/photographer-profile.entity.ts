@@ -69,6 +69,15 @@ export class PhotographerProfile {
   @Column({ nullable: true })
   invoiceLogoText?: string;
 
+  @Column({ nullable: true })
+  invoicePhone?: string;
+
+  @Column({ type: 'float', default: 0 })
+  invoiceTaxRate!: number;
+
+  @Column({ type: 'text', nullable: true })
+  invoiceInstructions?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 
