@@ -70,7 +70,11 @@ export function DesktopSidebar({
           onClick={onLogoutRequest}
           title={isCollapsed ? "Log out" : undefined}
           aria-label="Log out"
-          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
+          className={`flex items-center transition-all duration-200 cursor-pointer rounded-xl text-body-small-s font-medium text-red-600 hover:bg-red-50 ${
+            isCollapsed
+              ? "w-10 h-10 mx-auto justify-center p-0"
+              : "w-full gap-3.5 px-3.5 py-2.5"
+          }`}
         >
           <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
           {!isCollapsed && <span className="truncate">Log out</span>}

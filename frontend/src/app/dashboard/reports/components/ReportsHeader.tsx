@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FileDown } from "lucide-react";
+import { DatePickerInput } from "@/components/ui/DatePickerInput";
 
 type ReportsHeaderProps = {
   period: "weekly" | "monthly" | "yearly" | "custom";
@@ -55,27 +56,22 @@ export function ReportsHeader({
           ))}
         </div>
 
-        {/* Custom Date Inputs (appears when period === 'custom') */}
+        {/* Custom Date Inputs with premium calendar pickers */}
         {period === "custom" && (
           <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] uppercase font-bold text-zinc-400">From</span>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => onStartDateChange(e.target.value)}
-                className="h-8 px-2 text-body-caption border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none"
-              />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] uppercase font-bold text-zinc-400">To</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => onEndDateChange(e.target.value)}
-                className="h-8 px-2 text-body-caption border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none"
-              />
-            </div>
+            <DatePickerInput
+              label="From"
+              value={startDate}
+              onChange={onStartDateChange}
+              maxDate={endDate || undefined}
+            />
+            <span className="text-zinc-300 dark:text-zinc-700 text-sm font-light">—</span>
+            <DatePickerInput
+              label="To"
+              value={endDate}
+              onChange={onEndDateChange}
+              minDate={startDate || undefined}
+            />
           </div>
         )}
 

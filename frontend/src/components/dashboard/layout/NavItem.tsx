@@ -18,7 +18,11 @@ export function NavItem({ item, collapsed, activeTab, onClick }: NavItemProps) {
       onClick={onClick}
       title={collapsed ? item.label : undefined}
       aria-current={isActive ? "page" : undefined}
-      className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium transition-all duration-200 cursor-pointer ${
+      className={`flex items-center transition-all duration-200 cursor-pointer rounded-xl font-medium text-body-small-s ${
+        collapsed
+          ? "w-10 h-10 mx-auto justify-center p-0"
+          : "w-full gap-3.5 px-3.5 py-2.5"
+      } ${
         isActive
           ? "bg-primary-dark text-white shadow-sm"
           : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
