@@ -31,8 +31,11 @@ export function MobileSidebarDrawer({
   useEffect(() => {
     if (isOpen) {
       setMounted(true);
-      // Small tick to trigger CSS enter transition after mount
-      requestAnimationFrame(() => setAnimating(true));
+      // Double RAF ensures browser paints the initial hidden state before transitioning
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimating(true));
+      });
+      return () => cancelAnimationFrame(id);
     } else {
       // Trigger exit animation then unmount after it completes
       setAnimating(false);
