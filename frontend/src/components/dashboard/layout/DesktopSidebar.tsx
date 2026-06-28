@@ -26,25 +26,27 @@ export function DesktopSidebar({
 }: DesktopSidebarProps) {
   return (
     <aside
-      className={`hidden lg:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-all duration-300 ease-in-out shrink-0 h-full z-30 ${
+      className={`hidden lg:flex flex-col justify-between bg-white border-r border-zinc-200/80 transition-[width] duration-300 ease-in-out shrink-0 h-full z-30 overflow-hidden ${
         isCollapsed ? "w-16" : "w-64"
       }`}
       aria-label="Desktop Sidebar"
     >
       <div className="flex flex-col">
         {/* Sidebar Header */}
-        <div className="h-16 flex items-center px-4 border-b border-zinc-200/30 gap-3 overflow-hidden select-none">
+        <div className="h-16 flex items-center px-4 border-b border-zinc-200/30 gap-3 select-none">
           <div className="h-9 w-9 rounded-full bg-primary-dark shrink-0 flex items-center justify-center text-white shadow-inner">
             <Camera className="h-5 w-5" aria-hidden="true" />
           </div>
-          <div className={`flex flex-col truncate ${isCollapsed ? "opacity-0 w-0 overflow-hidden transition-all duration-200" : "opacity-100"}`}>
-              <span className="font-bold text-body-small-s leading-none title-font tracking-tight">
+          {!isCollapsed && (
+            <div className="flex flex-col truncate">
+              <span className="font-bold text-body-small-s leading-none title-font tracking-tight whitespace-nowrap">
                 Photographer Portal
               </span>
               <span className="text-body-caption text-zinc-400 font-medium mt-1 truncate">
                 {userName ? `${userName} · ${userRole}` : userRole}
               </span>
             </div>
+          )}
         </div>
 
         {/* Navigation Links */}
@@ -75,13 +77,7 @@ export function DesktopSidebar({
           }`}
         >
           <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span
-            className={`truncate ${
-              isCollapsed ? "opacity-0 w-0 overflow-hidden transition-all duration-200" : "opacity-100"
-            }`}
-          >
-            Log out
-          </span>
+          {!isCollapsed && <span className="truncate whitespace-nowrap">Log out</span>}
         </button>
       </div>
     </aside>

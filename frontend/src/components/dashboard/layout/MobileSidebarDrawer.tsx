@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Camera, LogOut, X } from "lucide-react";
 import { MenuItem } from "../DashboardLayout";
 import { NavItem } from "./NavItem";
@@ -24,20 +24,41 @@ export function MobileSidebarDrawer({
   onTabChange,
   onLogoutRequest,
 }: MobileSidebarDrawerProps) {
-  if (!isOpen) return null;
+  // Track whether to keep the drawer mounted during close animation
+  const [mounted, setMounted] = useState(isOpen);
+  const [animating, setAnimating] = useState(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      // Small tick to trigger CSS enter transition after mount
+      requestAnimationFrame(() => setAnimating(true));
+    } else {
+      // Trigger exit animation then unmount after it completes
+      setAnimating(false);
+      const timer = setTimeout(() => setMounted(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 z-50 lg:hidden flex" role="dialog" aria-modal="true">
-      {/* Backdrop */}
+      {/* Backdrop — fades in/out */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ${
+          animating ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Drawer */}
+      {/* Drawer — slides in/out */}
       <aside
-        className="relative flex flex-col justify-between w-64 max-w-xs bg-white border-r border-zinc-200 h-full p-4 shadow-2xl z-10 animate-in slide-in-from-left duration-300"
+        className={`relative flex flex-col justify-between w-64 max-w-xs bg-white border-r border-zinc-200 h-full p-4 shadow-2xl z-10 transition-transform duration-300 ease-in-out ${
+          animating ? "translate-x-0" : "-translate-x-full"
+        }`}
         aria-label="Mobile Navigation Drawer"
       >
         <div>
