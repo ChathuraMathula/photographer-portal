@@ -42,7 +42,8 @@ export default function ReportsPage() {
   const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const [downloadingFinancial, setDownloadingFinancial] = useState(false);
+  const [downloadingBookings, setDownloadingBookings] = useState(false);
 
   if (!context) return null;
   const { authFetch } = context;
@@ -67,33 +68,63 @@ export default function ReportsPage() {
     loadStats();
   }, [period, authFetch]);
 
-  const handleDownloadPdf = async () => {
-    setDownloading(true);
+  const handleDownloadFinancial = async () => {
+    setDownloadingFinancial(true);
     try {
-      const response = await fetch(`${API}/reports/pdf?period=${period}`, {
+      const response = await fetch(`${API}/reports/pdf/financial?period=${period}`, {
         credentials: "include",
       });
       if (response.status === 401) {
         toast.error("You are unauthorized. Please log in again.");
         return;
       }
-      if (!response.ok) throw new Error("PDF generation failed");
+      if (!response.ok) throw new Error("Financial PDF generation failed");
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `photographer_analytics_${period}_report.pdf`;
+      a.download = `photographer_financial_report_${period}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-      toast.success("PDF report downloaded successfully!");
+      toast.success("Financial PDF report downloaded successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to download PDF report. Try again later.");
+      toast.error("Failed to download Financial PDF report.");
     } finally {
-      setDownloading(false);
+      setDownloadingFinancial(false);
+    }
+  };
+
+  const handleDownloadBookings = async () => {
+    setDownloadingBookings(true);
+    try {
+      const response = await fetch(`${API}/reports/pdf/bookings?period=${period}`, {
+        credentials: "include",
+      });
+      if (response.status === 401) {
+        toast.error("You are unauthorized. Please log in again.");
+        return;
+      }
+      if (!response.ok) throw new Error("Bookings PDF generation failed");
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `photographer_bookings_report_${period}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Bookings PDF report downloaded successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to download Bookings PDF report.");
+    } finally {
+      setDownloadingBookings(false);
     }
   };
 
@@ -120,8 +151,10 @@ export default function ReportsPage() {
       <ReportsHeader
         period={period}
         onPeriodChange={handlePeriodChange}
-        downloading={downloading}
-        onDownloadPdf={handleDownloadPdf}
+        downloadingFinancial={downloadingFinancial}
+        downloadingBookings={downloadingBookings}
+        onDownloadFinancial={handleDownloadFinancial}
+        onDownloadBookings={handleDownloadBookings}
       />
 
       {/* KPI Cards Grid */}

@@ -28,16 +28,31 @@ export class ReportsController {
     return this.reportsService.generateReportData(req.user.userId, period);
   }
 
-  @Get('pdf')
-  async downloadReportPdf(
+  @Get('pdf/financial')
+  async downloadFinancialReportPdf(
     @Req() req: RequestWithUser,
     @Query('period') period: 'weekly' | 'monthly' | 'yearly',
     @Res() res: express.Response,
   ) {
-    const pdfDoc = await this.reportsService.generateReportPdf(req.user.userId, period);
+    const pdfDoc = await this.reportsService.generateFinancialReportPdf(req.user.userId, period);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=photographer_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename=photographer_financial_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  }
+
+  @Get('pdf/bookings')
+  async downloadBookingsReportPdf(
+    @Req() req: RequestWithUser,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly',
+    @Res() res: express.Response,
+  ) {
+    const pdfDoc = await this.reportsService.generateBookingsReportPdf(req.user.userId, period);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=photographer_bookings_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
 
     pdfDoc.pipe(res);
     pdfDoc.end();
