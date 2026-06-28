@@ -220,5 +220,6 @@ export function usePhotographerDashboard() {
     setIsCustomPackageSelected: reservationsState.setIsCustomPackageSelected,
     forceOpenChat,
     setForceOpenChat,
+    authFetch,
   };
 }

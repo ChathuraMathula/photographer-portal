@@ -7,6 +7,7 @@ import {
   Layers,
   User,
   CreditCard,
+  BarChart3,
 } from "lucide-react";
 import { LogoutConfirmModal } from "@/components/common/LogoutConfirmModal";
 import { DesktopSidebar } from "./layout/DesktopSidebar";
@@ -41,6 +42,7 @@ const PHOTOGRAPHER_MENU: MenuItem[] = [
   { id: "calendar",     label: "Calendar",     icon: CalendarDays },
   { id: "packages",     label: "Packages",     icon: Layers },
   { id: "transactions", label: "Transactions", icon: CreditCard },
+  { id: "reports",      label: "Reports & Analytics", icon: BarChart3 },
   { id: "profile",      label: "My Profile",   icon: User },
 ];
 
