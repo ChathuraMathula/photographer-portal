@@ -97,7 +97,7 @@ export type TrackingReservation = {
   selectedPackages?: Package[];
   paymentDeadline?: string;
   rejectionReason?: string;
-  photographer: { firstName: string; lastName: string };
+  photographer: { firstName: string; lastName: string; bookingSlug?: string };
 };
 
 export type UserProfile = {

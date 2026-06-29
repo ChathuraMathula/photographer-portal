@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, ExternalLink } from "lucide-react";
 
 type Props = {
   photographerFirstName: string;
@@ -62,6 +62,16 @@ export function BookingConfirmed({ photographerFirstName, trackingToken, origin 
             </button>
           </div>
         </div>
+
+        <a
+          href={trackUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-body-small-s font-semibold shadow-md cursor-pointer transition-all mt-4"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Open Tracking Page
+        </a>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,6 +114,15 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
         >
           {formik.isSubmitting ? "Signing in..." : "Login"}
         </Button>
+
+        <div className="pt-4 text-center">
+          <Link
+            href="/test-accounts"
+            className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:underline transition-colors"
+          >
+            Looking for sandbox credentials? View Test Accounts
+          </Link>
+        </div>
       </form>
     </div>
   );

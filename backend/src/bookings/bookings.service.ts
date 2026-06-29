@@ -211,7 +211,7 @@ export class BookingsService {
 
     const reservation = await this.reservationRepository.findOne({
       where: { reservationToken: token },
-      relations: { customer: true, photographer: true },
+      relations: { customer: true, photographer: { profile: true } },
     });
 
     if (!reservation) throw new NotFoundException('Reservation not found');
@@ -246,6 +246,7 @@ export class BookingsService {
       photographer: {
         firstName: reservation.photographer.firstName,
         lastName: reservation.photographer.lastName,
+        bookingSlug: reservation.photographer.profile?.bookingSlug,
       },
     };
   }
