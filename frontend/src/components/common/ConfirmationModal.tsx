@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/components/ui/button";
 import { AlertTriangle, AlertCircle, Info, X, Loader2 } from "lucide-react";
 
 type Variant = "danger" | "warning" | "default";
@@ -38,21 +37,21 @@ const variantConfig: Record<
     iconBg: "bg-red-100 dark:bg-red-950/30",
     iconColor: "text-red-600 dark:text-red-400",
     confirmClass:
-      "bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white border-0 shadow-sm",
+      "bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white border-0 shadow-sm rounded-xl",
   },
   warning: {
     icon: <AlertCircle className="h-6 w-6" />,
     iconBg: "bg-amber-100 dark:bg-amber-950/30",
     iconColor: "text-amber-600 dark:text-amber-400",
     confirmClass:
-      "bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white border-0 shadow-sm",
+      "bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white border-0 shadow-sm rounded-xl",
   },
   default: {
     icon: <Info className="h-6 w-6" />,
     iconBg: "bg-blue-100 dark:bg-blue-950/30",
     iconColor: "text-blue-600 dark:text-blue-400",
     confirmClass:
-      "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white border-0 shadow-sm",
+      "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white border-0 shadow-sm rounded-xl",
   },
 };
 
@@ -88,7 +87,7 @@ export function ConfirmationModal({
         {!loading && (
           <button
             onClick={onCancel}
-            className="absolute top-3.5 right-3.5 h-7 w-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+            className="absolute top-3.5 right-3.5 h-7 w-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -117,22 +116,21 @@ export function ConfirmationModal({
 
         {/* Footer */}
         <div className="px-6 pb-6 flex gap-3">
-          <Button
+          <button
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 h-10 text-body-small-s font-semibold cursor-pointer flex items-center justify-center gap-2 ${confirmClass}`}
+            className={`flex-1 h-11 text-xs font-semibold cursor-pointer flex items-center justify-center gap-2 transition-all hover:opacity-90 disabled:opacity-50 ${confirmClass}`}
           >
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {loading ? "Processing..." : confirmLabel}
-          </Button>
-          <Button
-            variant="outline"
+          </button>
+          <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 h-10 btn btn-secondary text-body-small-s font-semibold cursor-pointer"
+            className="flex-1 h-11 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold cursor-pointer transition-all disabled:opacity-50"
           >
             {cancelLabel}
-          </Button>
+          </button>
         </div>
       </div>
     </div>,
