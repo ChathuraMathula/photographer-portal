@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, AlertCircle, Info, X, Loader2 } from "lucide-react";
 
@@ -66,8 +67,16 @@ export function ConfirmationModal({
   onCancel,
 }: ConfirmationModalProps) {
   const { icon, iconBg, iconColor, confirmClass } = variantConfig[variant];
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
       onClick={(e) => {
@@ -126,6 +135,7 @@ export function ConfirmationModal({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { RevenueAreaChart, BookingStatusDonut, PackagePerformanceBar } from "../../app/dashboard/reports/charts";
-import { KpiCardsGrid } from "../../app/dashboard/reports/components/KpiCardsGrid";
+import { RevenueAreaChart, BookingStatusDonut, PackagePerformanceBar } from "@/app/dashboard/reports/charts";
+import { KpiCardsGrid } from "@/app/dashboard/reports/components/KpiCardsGrid";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
