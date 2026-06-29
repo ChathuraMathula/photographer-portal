@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { type NotificationItem } from "@/types";
-import { Bell, BellRing, MessageSquare, Calendar, X, CheckCheck, Trash2 } from "lucide-react";
+import { Bell, BellRing, BellOff, MessageSquare, Calendar, X, CheckCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -11,6 +11,7 @@ type Props = {
   onMarkAllAsRead: () => void;
   onClearAll: () => void;
   onSelectReservation: (resId: string, type?: "chat" | "booking") => void;
+  inAppNotificationsEnabled?: boolean;
 };
 
 export function NotificationBell({
@@ -19,6 +20,7 @@ export function NotificationBell({
   onMarkAllAsRead,
   onClearAll,
   onSelectReservation,
+  inAppNotificationsEnabled = true,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,19 @@ export function NotificationBell({
       return "";
     }
   };
+
+  // When in-app notifications are disabled, render a static disabled bell
+  if (!inAppNotificationsEnabled) {
+    return (
+      <button
+        disabled
+        className="relative h-9 w-9 flex items-center justify-center rounded-full text-zinc-300 dark:text-zinc-600 cursor-not-allowed opacity-50"
+        title="In-app notifications are disabled"
+      >
+        <BellOff className="h-5 w-5" />
+      </button>
+    );
+  }
 
   return (
     <div className="relative inline-block text-left" ref={containerRef}>

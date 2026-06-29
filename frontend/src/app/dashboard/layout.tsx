@@ -15,7 +15,7 @@ import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
 import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
-import { Settings, ClipboardList, LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
 
 function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -76,6 +76,18 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     }
   }, [pathname, setSelectedRes]);
 
+  const [inAppNotificationsEnabled, setInAppNotificationsEnabled] = React.useState(true);
+
+  React.useEffect(() => {
+    const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+    fetch(`${API}/users/settings`, { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data) setInAppNotificationsEnabled(data.inAppNotificationsEnabled ?? true);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleTabChange = (tab: string) => {
     start();
     router.push(`/dashboard/${tab}`);
@@ -95,6 +107,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
           onMarkAsRead={handleMarkAsRead}
           onMarkAllAsRead={handleMarkAllAsRead}
           onClearAll={handleClearAllNotifications}
+          inAppNotificationsEnabled={inAppNotificationsEnabled}
           onSelectReservation={(resId, type) => {
             const res = reservations.find((r) => r.id === resId);
             if (res) {
@@ -204,7 +217,6 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
     { id: "users", label: "User Management", icon: Users },
     { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
     { id: "profile", label: "Profile Details", icon: UserCog },
-    { id: "settings", label: "User Settings", icon: Settings },
   ];
 
   if (role === UserRole.SUPER_ADMIN) {
