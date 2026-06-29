@@ -6,6 +6,16 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
+  @Get('resolve-map-link')
+  async resolveMapLink(@Query('url') url: string) {
+    try {
+      const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+      return { expandedUrl: response.url };
+    } catch (err) {
+      return { expandedUrl: url };
+    }
+  }
+
   @Get(':slug')
   getPhotographerProfile(@Param('slug') slug: string) {
     return this.bookingsService.getPhotographerProfile(slug);

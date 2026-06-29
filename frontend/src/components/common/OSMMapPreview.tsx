@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, MapPin } from "lucide-react";
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+
 type Props = {
   location?: string;
   city?: string;
@@ -34,14 +36,33 @@ export function OSMMapPreview({
       setCoords(null);
 
       try {
+        let targetLink = locationMapLink;
+
+        // If it's a shortened URL, resolve it via backend
+        if (locationMapLink && (locationMapLink.includes("maps.app.goo.gl") || locationMapLink.includes("goo.gl/maps"))) {
+          try {
+            const apiRes = await fetch(
+              `${API}/bookings/resolve-map-link?url=${encodeURIComponent(locationMapLink)}`
+            );
+            if (apiRes.ok) {
+              const apiJson = await apiRes.json();
+              if (apiJson.expandedUrl) {
+                targetLink = apiJson.expandedUrl;
+              }
+            }
+          } catch (e) {
+            console.error("Failed resolving map link redirect", e);
+          }
+        }
+
         // 1. Check if we can parse coordinates from the Google Maps link directly
-        if (locationMapLink) {
-          // Patterns: @9.1234,80.1234 or q=9.1234,80.1234
-          const atMatch = locationMapLink.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-          const qMatch = locationMapLink.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (targetLink) {
+          const atMatch = targetLink.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+          const qMatch = targetLink.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+          const placeMatch = targetLink.match(/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
           
-          const latStr = atMatch?.[1] || qMatch?.[1];
-          const lonStr = atMatch?.[2] || qMatch?.[2];
+          const latStr = atMatch?.[1] || qMatch?.[1] || placeMatch?.[1];
+          const lonStr = atMatch?.[2] || qMatch?.[2] || placeMatch?.[2];
 
           if (latStr && lonStr) {
             const lat = parseFloat(latStr);
@@ -52,6 +73,28 @@ export function OSMMapPreview({
               return;
             }
           }
+
+          // Fallback: If no coordinates in URL, try extracting place name
+          const placeNameMatch = targetLink.match(/\/place\/([^/]+)/);
+          if (placeNameMatch?.[1]) {
+            const placeName = decodeURIComponent(placeNameMatch[1].replace(/\+/g, " "));
+            const nominatimRes = await fetch(
+              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(placeName)}&format=json&limit=1`,
+              { headers: { "Accept-Language": "en" } }
+            );
+            if (nominatimRes.ok) {
+              const nomData = await nominatimRes.json();
+              if (nomData && nomData.length > 0) {
+                const lat = parseFloat(nomData[0].lat);
+                const lon = parseFloat(nomData[0].lon);
+                if (!isNaN(lat) && !isNaN(lon) && active) {
+                  setCoords({ lat, lon });
+                  setLoading(false);
+                  return;
+                }
+              }
+            }
+          }
         }
 
         // 2. Geocode using Nominatim API based on address, city, and district
@@ -59,9 +102,7 @@ export function OSMMapPreview({
         if (location) queryParts.push(location);
         if (city) queryParts.push(city);
         if (district) queryParts.push(district);
-        if (queryParts.length === 0 && locationMapLink) {
-          // If only a link was provided and parsing coords failed, try searching the URL or location name from it
-          // Simple fallback search query
+        if (queryParts.length === 0 && targetLink) {
           queryParts.push("Sri Lanka");
         }
 

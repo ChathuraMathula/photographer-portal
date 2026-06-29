@@ -121,6 +121,16 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
               {reservation.city && `, ${reservation.city}`}
               {reservation.district && `, ${reservation.district}`}
             </p>
+            {reservation.locationMapLink && (
+              <a
+                href={reservation.locationMapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-1 text-[11px] font-semibold text-blue-650 hover:text-blue-700 dark:text-blue-400 hover:underline transition-all"
+              >
+                🗺️ View on Google Maps
+              </a>
+            )}
           </div>
           <div>
             <p className="text-body-caption font-semibold text-zinc-400">Event</p>
