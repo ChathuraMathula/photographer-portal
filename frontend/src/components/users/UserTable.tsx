@@ -5,9 +5,10 @@ import { UserTableRow } from "./UserTableRow";
 type Props = {
   users: UserAccount[];
   onToggleActive: (id: string) => Promise<void> | void;
+  loggedInUserId: string;
 };
 
-export function UserTable({ users, onToggleActive }: Props) {
+export function UserTable({ users, onToggleActive, loggedInUserId }: Props) {
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
       <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/20">
@@ -32,6 +33,7 @@ export function UserTable({ users, onToggleActive }: Props) {
                   key={user.id}
                   user={user}
                   onToggleActive={onToggleActive}
+                  loggedInUserId={loggedInUserId}
                 />
               ))}
             </tbody>

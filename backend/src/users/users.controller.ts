@@ -26,23 +26,37 @@ interface RequestWithUser extends Request {
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('me')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  getMe(@Req() req: RequestWithUser) {
+    return this.usersService.getProfile(req.user.userId);
+  }
+
+  @Patch('me')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  updateMe(@Body() body: any, @Req() req: RequestWithUser) {
+    return this.usersService.updateProfile(req.user.userId, body);
+  }
+
   @Post()
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   create(@Body() dto: CreateUserDto, @Req() req: RequestWithUser) {
     const callerRole = req.user.role;
     return this.usersService.create(dto, callerRole);
   }
 
   @Get()
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   findAll(@Req() req: RequestWithUser) {
     const callerRole = req.user.role;
     return this.usersService.findAll(callerRole);
   }
 
   @Patch(':id/toggle-active')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   toggleActive(@Param('id') id: string, @Req() req: RequestWithUser) {
     const callerRole = req.user.role;
     return this.usersService.toggleActive(id, callerRole);

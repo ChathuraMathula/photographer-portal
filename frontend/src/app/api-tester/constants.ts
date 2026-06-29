@@ -343,8 +343,8 @@ export const ENDPOINTS: Endpoint[] = [
   {
     method: "GET",
     path: "/reports/data",
-    description: "Fetch aggregated report data (revenue, bookings, charts) for a given period.",
-    access: "Photographer Only",
+    description: "Fetch aggregated report data (revenue, bookings, charts) for a given period. Super Admins & Admins get system-wide metrics unless a photographerId query is passed.",
+    access: "Super Admin, Admin & Photographer",
     category: "Reports",
     defaultQuery: [
       { key: "period", value: "monthly" }
@@ -354,7 +354,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/reports/pdf/financial",
     description: "Download the Financial Analytics PDF report as an attachment for the selected period.",
-    access: "Photographer Only",
+    access: "Super Admin, Admin & Photographer",
     category: "Reports",
     defaultQuery: [
       { key: "period", value: "monthly" }
@@ -364,7 +364,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/reports/pdf/bookings",
     description: "Download the Bookings Analytics PDF report as an attachment for the selected period.",
-    access: "Photographer Only",
+    access: "Super Admin, Admin & Photographer",
     category: "Reports",
     defaultQuery: [
       { key: "period", value: "monthly" }
@@ -422,6 +422,26 @@ export const ENDPOINTS: Endpoint[] = [
   },
 
   // ── Users ────────────────────────────────────────────────────────────────────
+  {
+    method: "GET",
+    path: "/users/me",
+    description: "Retrieve the authenticated user's profile information.",
+    access: "Super Admin, Admin & Photographer",
+    category: "Users"
+  },
+  {
+    method: "PATCH",
+    path: "/users/me",
+    description: "Update the authenticated user's profile details (first name, last name, phone, and password).",
+    access: "Super Admin, Admin & Photographer",
+    category: "Users",
+    defaultBody: JSON.stringify({
+      firstName: "Kamal",
+      lastName: "Perera",
+      phone: "+94777777777",
+      password: "NewSecurePassword123!"
+    }, null, 2)
+  },
   {
     method: "GET",
     path: "/users",

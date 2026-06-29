@@ -8,6 +8,7 @@ import { ConfirmationModal } from "@/components/common/ConfirmationModal";
 type Props = {
   user: UserAccount;
   onToggleActive: (id: string) => void;
+  loggedInUserId: string;
 };
 
 function RoleBadge({ role }: { role: UserRole }) {
@@ -30,12 +31,13 @@ function RoleBadge({ role }: { role: UserRole }) {
   );
 }
 
-export function UserTableRow({ user, onToggleActive }: Props) {
+export function UserTableRow({ user, onToggleActive, loggedInUserId }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [toggling, setToggling] = useState(false);
 
   const isDeactivating = user.isActive;
   const fullName = `${user.firstName} ${user.lastName}`;
+  const isSelf = user.id === loggedInUserId;
 
   const handleConfirm = async () => {
     setToggling(true);
@@ -76,11 +78,14 @@ export function UserTableRow({ user, onToggleActive }: Props) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowConfirm(true)}
+            onClick={() => !isSelf && setShowConfirm(true)}
+            disabled={isSelf}
             className={`btn btn-secondary h-8 px-3 py-0 min-w-0 md:min-w-0 text-body-caption shadow-none gap-1 border ${
-              user.isActive
+              isSelf
+                ? "opacity-50 cursor-not-allowed text-zinc-400 bg-zinc-50 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800"
+                : user.isActive
                 ? "text-emerald-700 border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-950/30 dark:bg-emerald-950/10"
-                : "text-zinc-550 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-700"
+                : "text-zinc-555 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-700"
             }`}
           >
             {user.isActive ? (

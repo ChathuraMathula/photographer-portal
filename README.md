@@ -46,16 +46,20 @@ photographer-portal/
 │   │   ├── seed.ts          # npm run seed entry point
 │   │   └── reset.ts         # npm run db:reset entry point
 │   └── package.json
-└── frontend/                # Next.js app (port 4000)
-    └── src/
-        ├── app/
-        │   ├── login/       # Login page
-        │   ├── dashboard/   # Role-based collapsible dashboard
-        │   ├── api-tester/  # Interactive developer API Docs & Tester Console
-        │   └── book/[slug]/ # Public booking page
-        ├── config/routes.ts # Route permissions + prefixes
-        ├── proxy.ts         # Next.js middleware (auth guard)
-        └── store/           # Redux store + authSlice
+     └── src/
+         ├── app/
+         │   ├── login/       # Login page
+         │   ├── dashboard/   # Role-based collapsible dashboard
+         │   ├── api-tester/  # Interactive developer API Docs & Tester Console
+         │   └── book/[slug]/ # Public booking page
+         ├── components/
+         │   ├── dashboard/
+         │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
+         │   │   ├── reports/ # [NEW] AdminReportsPage.tsx - Admin reports & analytics with graphs
+         │   │   └── ...
+         ├── config/routes.ts # Route permissions + prefixes
+         ├── proxy.ts         # Next.js middleware (auth guard)
+         └── store/           # Redux store + authSlice
 ```
 
 ---

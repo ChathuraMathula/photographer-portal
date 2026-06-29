@@ -15,7 +15,7 @@ export class ReportsService {
   ) {}
 
   async generateReportData(
-    photographerId: string,
+    photographerId: string | undefined,
     period: 'weekly' | 'monthly' | 'yearly' | 'custom',
     customStartDate?: string,
     customEndDate?: string,
@@ -37,34 +37,42 @@ export class ReportsService {
       endDate.setHours(23, 59, 59, 999);
     }
 
-    // Fetch all reservations for this photographer in the period
+    // Build query conditions
+    const whereClause: any = {
+      date: Between(startDate, endDate),
+    };
+    if (photographerId) {
+      whereClause.photographerId = photographerId;
+    }
+
+    // Fetch reservations in the period
     const reservations = await this.reservationRepository.find({
-      where: {
-        photographerId,
-        date: Between(startDate, endDate),
-      },
+      where: whereClause,
       relations: {
         customer: true,
+        photographer: true,
       },
       order: {
         date: 'ASC',
       },
     });
 
-    // Fetch all successful payments for this photographer's reservations in the period
-    const payments = await this.paymentRepository.createQueryBuilder('payment')
+    // Fetch all successful payments in the period
+    const paymentsQuery = this.paymentRepository.createQueryBuilder('payment')
       .leftJoinAndSelect('payment.reservation', 'reservation')
-      .where('reservation.photographerId = :photographerId', { photographerId })
-      .andWhere('payment.status = :status', { status: PaymentStatus.SUCCESS })
+      .where('payment.status = :status', { status: PaymentStatus.SUCCESS })
       .andWhere('payment.createdAt >= :startDate', { startDate })
-      .andWhere('payment.createdAt <= :endDate', { endDate })
-      .getMany();
+      .andWhere('payment.createdAt <= :endDate', { endDate });
+
+    if (photographerId) {
+      paymentsQuery.andWhere('reservation.photographerId = :photographerId', { photographerId });
+    }
+    const payments = await paymentsQuery.getMany();
 
     // Calculations
     const totalBookings = reservations.length;
     
     // Revenue calculations (in cents, then convert to LKR)
-    // Potential Revenue: Sum of totalAmountInCents of non-cancelled/non-rejected bookings
     const potentialRevenueCents = reservations
       .filter(res => res.status !== ReservationStatus.CANCELLED && res.status !== ReservationStatus.REJECTED)
       .reduce((sum, res) => sum + (res.totalAmountInCents || 0), 0);
@@ -143,7 +151,6 @@ export class ReportsService {
     }
 
     if (timelineType === 'daily') {
-      // Create bucket labels day-by-day
       for (let i = diffDays - 1; i >= 0; i--) {
         const d = new Date(endDate);
         d.setDate(endDate.getDate() - i);
@@ -164,7 +171,6 @@ export class ReportsService {
         }
       });
     } else if (timelineType === 'monthly') {
-      // Aggregated weekly or in 5-day buckets
       const steps = Math.min(6, Math.max(4, Math.ceil(diffDays / 6)));
       for (let i = diffDays - 5; i >= 0; i -= steps) {
         const d = new Date(endDate);
@@ -203,7 +209,6 @@ export class ReportsService {
         timelineMap[closest].revenueLkr += pay.amountInCents / 100;
       });
     } else {
-      // 12 Months timeline
       for (let i = 11; i >= 0; i--) {
         const d = new Date(endDate);
         d.setMonth(endDate.getMonth() - i);
@@ -231,6 +236,47 @@ export class ReportsService {
       revenueLkr: data.revenueLkr,
     }));
 
+    // System-wide leaderboard and users metrics
+    let photographerLeaderboard: any[] = [];
+    let systemStats: any = null;
+
+    if (!photographerId) {
+      const manager = this.reservationRepository.manager;
+      const totalPhotographers = await manager.count('User', { where: { role: 'PHOTOGRAPHER', isActive: true } });
+      const totalAdmins = await manager.count('User', { where: { role: 'ADMIN', isActive: true } });
+      const totalSuspended = await manager.count('User', { where: { isActive: false } });
+
+      systemStats = {
+        totalPhotographers,
+        totalAdmins,
+        totalSuspended,
+      };
+
+      const photographerStats: Record<string, { name: string; email: string; bookings: number; revenueCents: number }> = {};
+      
+      reservations
+        .filter(res => res.status !== ReservationStatus.CANCELLED && res.status !== ReservationStatus.REJECTED)
+        .forEach(res => {
+          const photoId = res.photographerId;
+          const photoName = res.photographer ? `${res.photographer.firstName} ${res.photographer.lastName}` : 'Unknown';
+          const photoEmail = res.photographer ? res.photographer.email : '';
+          
+          if (!photographerStats[photoId]) {
+            photographerStats[photoId] = { name: photoName, email: photoEmail, bookings: 0, revenueCents: 0 };
+          }
+          photographerStats[photoId].bookings++;
+          photographerStats[photoId].revenueCents += res.totalAmountInCents || 0;
+        });
+
+      photographerLeaderboard = Object.entries(photographerStats).map(([id, stats]) => ({
+        id,
+        name: stats.name,
+        email: stats.email,
+        bookingsCount: stats.bookings,
+        revenueLkr: stats.revenueCents / 100,
+      })).sort((a, b) => b.revenueLkr - a.revenueLkr);
+    }
+
     return {
       period,
       startDateStr: startDate.toISOString().split('T')[0],
@@ -246,9 +292,12 @@ export class ReportsService {
       eventTypes,
       packages,
       timeline,
+      photographerLeaderboard,
+      systemStats,
       rawBookings: reservations.map(res => ({
         id: res.id,
         clientName: res.customer ? `${res.customer.firstName} ${res.customer.lastName}` : 'Manual Client',
+        photographerName: res.photographer ? `${res.photographer.firstName} ${res.photographer.lastName}` : 'Unknown',
         date: res.date,
         eventType: res.eventType,
         totalLkr: (res.totalAmountInCents || 0) / 100,
@@ -258,7 +307,7 @@ export class ReportsService {
   }
 
   async generateFinancialReportPdf(
-    photographerId: string,
+    photographerId: string | undefined,
     period: 'weekly' | 'monthly' | 'yearly' | 'custom',
     customStartDate?: string,
     customEndDate?: string,
@@ -268,7 +317,7 @@ export class ReportsService {
   }
 
   async generateBookingsReportPdf(
-    photographerId: string,
+    photographerId: string | undefined,
     period: 'weekly' | 'monthly' | 'yearly' | 'custom',
     customStartDate?: string,
     customEndDate?: string,

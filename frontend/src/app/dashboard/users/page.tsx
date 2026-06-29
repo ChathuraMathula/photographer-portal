@@ -18,7 +18,7 @@ export default function UserManagementPage() {
   const router   = useRouter();
   const { start } = useTopLoadingBar();
 
-  const { firstName, role: authRole } = useSelector(
+  const { firstName, role: authRole, id: loggedInUserId } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -57,6 +57,8 @@ export default function UserManagementPage() {
   const handleTabChange = (tab: string) => {
     start();
     if (tab === "overview") router.push("/dashboard");
+    else if (tab === "reports") router.push("/dashboard/reports");
+    else if (tab === "profile") router.push("/dashboard/profile");
     else router.push("/dashboard/users");
   };
 
@@ -112,7 +114,7 @@ export default function UserManagementPage() {
         ) : error ? (
           <div className="text-center py-12 text-red-500">{error}</div>
         ) : (
-          <UserTable users={users} onToggleActive={handleToggleActive} />
+          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
         )}
 
         {/* Create user modal */}

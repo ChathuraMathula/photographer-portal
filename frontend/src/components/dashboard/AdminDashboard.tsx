@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout, type MenuItem } from "@/components/dashboard/DashboardLayout";
-import { LayoutDashboard, Users } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
 
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
@@ -13,6 +13,8 @@ import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 export const ADMIN_MENU: MenuItem[] = [
   { id: "overview", label: "Overview",         icon: LayoutDashboard },
   { id: "users",    label: "User Management",  icon: Users },
+  { id: "reports",  label: "Reports & Analytics", icon: BarChart3 },
+  { id: "profile",  label: "Profile Settings",   icon: UserCog },
 ];
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -44,6 +46,10 @@ export function AdminDashboard({
     }
     if (tab === "users") {
       router.push("/dashboard/users");
+    } else if (tab === "reports") {
+      router.push("/dashboard/reports");
+    } else if (tab === "profile") {
+      router.push("/dashboard/profile");
     } else {
       router.push("/dashboard");
     }

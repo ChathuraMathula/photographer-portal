@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, startTransition } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { RootState } from "@/store/store";
+import { UserRole, logout } from "@/store/slices/authSlice";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RevenueAreaChart, BookingStatusDonut, PackagePerformanceBar } from "./charts";
@@ -8,6 +12,10 @@ import { ReportsHeader } from "./components/ReportsHeader";
 import { KpiCardsGrid } from "./components/KpiCardsGrid";
 import { BusinessAdvisoryCard } from "./components/BusinessAdvisoryCard";
 import { BookingsLogTable } from "./components/BookingsLogTable";
+import { AdminReportsPage } from "@/components/dashboard/reports/AdminReportsPage";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
+import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -41,6 +49,11 @@ type ReportData = {
 };
 
 export default function ReportsPage() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { start } = useTopLoadingBar();
+  const { role, firstName } = useSelector((state: RootState) => state.auth);
+
   const context = usePhotographerDashboardContext();
   const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly" | "custom">("monthly");
   
@@ -60,10 +73,30 @@ export default function ReportsPage() {
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
 
-  if (!context) return null;
-  const { authFetch } = context;
+  const handleLogout = async () => {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Backend logout error:", err);
+    }
+    dispatch(logout());
+    window.location.href = "/login";
+  };
+
+  const handleTabChange = (tab: string) => {
+    start();
+    if (tab === "overview") router.push("/dashboard");
+    else if (tab === "reports") router.push("/dashboard/reports");
+    else if (tab === "profile") router.push("/dashboard/profile");
+    else router.push("/dashboard/users");
+  };
 
   const loadStats = async (showMainSpinner: boolean) => {
+    if (!context) return;
     if (showMainSpinner) {
       setLoading(true);
     } else {
@@ -75,7 +108,7 @@ export default function ReportsPage() {
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
       }
-      const res = await authFetch(url, { credentials: "include" });
+      const res = await context.authFetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch report data");
       const json = await res.json();
       setReportData(json);
@@ -88,12 +121,32 @@ export default function ReportsPage() {
     }
   };
 
-  // Fetch when period or custom date range changes
   useEffect(() => {
-    // Only load stats if we have valid date values for custom ranges
-    if (period === "custom" && (!startDate || !endDate)) return;
-    loadStats(reportData === null);
-  }, [period, startDate, endDate, authFetch]);
+    if (role === UserRole.PHOTOGRAPHER) {
+      if (period === "custom" && (!startDate || !endDate)) return;
+      loadStats(reportData === null);
+    }
+  }, [period, startDate, endDate, context, role]);
+
+  // If Admin or Super Admin, render Admin reports wrapped in DashboardLayout
+  if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
+    return (
+      <DashboardLayout
+        activeTab="reports"
+        onTabChange={handleTabChange}
+        onLogout={handleLogout}
+        userName={firstName ?? ""}
+        userRole={role ?? ""}
+        menuItems={ADMIN_MENU}
+      >
+        <AdminReportsPage />
+      </DashboardLayout>
+    );
+  }
+
+  // Fallback for Photographer role
+  if (!context) return null;
+  const { authFetch } = context;
 
   const handleDownloadFinancial = async () => {
     setDownloadingFinancial(true);
@@ -102,26 +155,21 @@ export default function ReportsPage() {
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
       }
-      const response = await fetch(url, { credentials: "include" });
-      if (response.status === 401) {
-        toast.error("You are unauthorized. Please log in again.");
-        return;
-      }
-      if (!response.ok) throw new Error("Financial PDF generation failed");
-      
+      const response = await authFetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to download PDF report");
       const blob = await response.blob();
-      const urlBlob = window.URL.createObjectURL(blob);
+      const blobUrl = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = urlBlob;
-      a.download = `photographer_financial_report_${period}.pdf`;
+      a.href = blobUrl;
+      a.download = `financial_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(urlBlob);
-      toast.success("Financial PDF report downloaded successfully!");
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Financial report PDF downloaded successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to download Financial PDF report.");
+      toast.error("Failed to download report PDF");
     } finally {
       setDownloadingFinancial(false);
     }
@@ -134,126 +182,96 @@ export default function ReportsPage() {
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
       }
-      const response = await fetch(url, { credentials: "include" });
-      if (response.status === 401) {
-        toast.error("You are unauthorized. Please log in again.");
-        return;
-      }
-      if (!response.ok) throw new Error("Bookings PDF generation failed");
-      
+      const response = await authFetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to download PDF report");
       const blob = await response.blob();
-      const urlBlob = window.URL.createObjectURL(blob);
+      const blobUrl = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = urlBlob;
-      a.download = `photographer_bookings_report_${period}.pdf`;
+      a.href = blobUrl;
+      a.download = `bookings_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(urlBlob);
-      toast.success("Bookings PDF report downloaded successfully!");
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Bookings report PDF downloaded successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to download Bookings PDF report.");
+      toast.error("Failed to download report PDF");
     } finally {
       setDownloadingBookings(false);
     }
   };
 
-  const handlePeriodChange = (newPeriod: "weekly" | "monthly" | "yearly" | "custom") => {
-    startTransition(() => {
-      setPeriod(newPeriod);
-    });
-  };
-
-  if (loading || !reportData) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-dark"></div>
-        <p className="text-zinc-500 font-medium text-body-small">Assembling analytics dashboard...</p>
-      </div>
-    );
-  }
-
-  const { summary, statusDistribution, packages, timeline, rawBookings } = reportData;
-
   return (
-    <div className="space-y-6 relative">
-      {/* Header period selector and download button */}
+    <div className="space-y-6 animate-in fade-in duration-300">
       <ReportsHeader
         period={period}
-        onPeriodChange={handlePeriodChange}
         startDate={startDate}
         endDate={endDate}
+        onPeriodChange={setPeriod}
         onStartDateChange={setStartDate}
         onEndDateChange={setEndDate}
-        downloadingFinancial={downloadingFinancial}
-        downloadingBookings={downloadingBookings}
         onDownloadFinancial={handleDownloadFinancial}
         onDownloadBookings={handleDownloadBookings}
+        downloadingFinancial={downloadingFinancial}
+        downloadingBookings={downloadingBookings}
+        refreshing={refreshing}
+        onRefresh={() => loadStats(false)}
       />
 
-      {/* Smooth Opacity Refreshing Loader overlay to prevent UI jumps */}
-      <div className={`space-y-6 transition-all duration-300 ${refreshing ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
-        {/* KPI Cards Grid */}
-        <KpiCardsGrid summary={summary} />
-
-        {/* Main Charts Row */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Revenue Timeline Area Chart */}
-          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900 p-4">
-            <CardHeader className="p-0 pb-4 text-left">
-              <CardTitle className="text-body-base-bold text-zinc-900 dark:text-white font-bold">Revenue Timeline</CardTitle>
-              <CardDescription className="text-xs">Cumulative paid deposits over time.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <RevenueAreaChart data={timeline} />
-            </CardContent>
-          </Card>
-
-          {/* Booking Status Distribution */}
-          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900 p-4">
-            <CardHeader className="p-0 pb-4 text-left">
-              <CardTitle className="text-body-base-bold text-zinc-900 dark:text-white font-bold">Booking Status distribution</CardTitle>
-              <CardDescription className="text-xs">Visual breakdown of status types in this range.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 flex items-center justify-center">
-              <BookingStatusDonut data={statusDistribution} />
-            </CardContent>
-          </Card>
+      {loading ? (
+        <div className="flex h-64 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
         </div>
+      ) : reportData ? (
+        <>
+          {/* KPI Summary Cards */}
+          <KpiCardsGrid summary={reportData.summary} />
 
-        {/* Package Performance & Business Advisory */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Packages Performance Bar Chart */}
-          <Card className="lg:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900 p-4">
-            <CardHeader className="p-0 pb-4 text-left">
-              <CardTitle className="text-body-base-bold text-zinc-900 dark:text-white font-bold">Package Performance</CardTitle>
-              <CardDescription className="text-xs">Packages ranked by total generated volume.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <PackagePerformanceBar data={packages} />
-            </CardContent>
-          </Card>
+          {/* Business Advisory Widget */}
+          <BusinessAdvisoryCard summary={reportData.summary} />
 
-          {/* Business Advice Recommendation Box */}
-          <BusinessAdvisoryCard
-            conversionRate={summary.conversionRate}
-            totalBookings={summary.totalBookings}
-          />
-        </div>
+          {/* Charts section */}
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="md:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+              <CardHeader>
+                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white font-bold">Revenue Timeline</CardTitle>
+                <CardDescription className="text-xs">Your financial timeline representation</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RevenueAreaChart data={reportData.timeline} />
+              </CardContent>
+            </Card>
 
-        {/* Bookings log table in range */}
-        <BookingsLogTable rawBookings={rawBookings} />
-      </div>
-
-      {/* Floating loading spinner overlay when refreshing to prevent UI jump */}
-      {refreshing && (
-        <div className="absolute inset-0 flex items-center justify-center bg-transparent pointer-events-none z-10 animate-in fade-in duration-200">
-          <div className="bg-white/80 dark:bg-zinc-900/80 p-4 rounded-full shadow-lg border border-zinc-200/30 flex items-center gap-2">
-            <Loader2 className="h-5 w-5 text-blue-600 dark:text-blue-500 animate-spin" />
-            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Refreshing calculations...</span>
+            <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+              <CardHeader>
+                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white font-bold">Booking Status</CardTitle>
+                <CardDescription className="text-xs">Current reservation statuses conversion</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center">
+                <BookingStatusDonut data={reportData.statusDistribution} />
+              </CardContent>
+            </Card>
           </div>
-        </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Package Performance */}
+            <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+              <CardHeader>
+                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white font-bold">Popular Packages</CardTitle>
+                <CardDescription className="text-xs">Your packages ranked by earnings and bookings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PackagePerformanceBar data={reportData.packages} />
+              </CardContent>
+            </Card>
+
+            {/* Bookings log table */}
+            <BookingsLogTable bookings={reportData.rawBookings} />
+          </div>
+        </>
+      ) : (
+        <div className="text-center py-12 text-zinc-500">No report data loaded.</div>
       )}
     </div>
   );

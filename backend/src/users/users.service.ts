@@ -81,6 +81,51 @@ export class UsersService {
     };
   }
 
+  async getProfile(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || '',
+    };
+  }
+
+  async updateProfile(userId: string, updates: any) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updates.firstName !== undefined) user.firstName = updates.firstName;
+    if (updates.lastName !== undefined) user.lastName = updates.lastName;
+    if (updates.phone !== undefined) user.phone = updates.phone;
+
+    if (updates.password) {
+      user.passwordHash = await bcrypt.hash(updates.password, 10);
+    }
+
+    await this.userRepository.save(user);
+
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || '',
+    };
+  }
+
   async findAll(callerRole: UserRole) {
     if (callerRole === UserRole.SUPER_ADMIN) {
       // Super admin can see all users
