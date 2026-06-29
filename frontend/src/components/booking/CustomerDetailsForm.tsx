@@ -24,6 +24,7 @@ export type CustomerDetailsValues = {
   city: string;
   district: string;
   locationMapLink: string;
+  coordinates: string;
   notes: string;
 };
 
@@ -174,8 +175,35 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="coordinates" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Coordinates <span className="text-zinc-400 font-normal">(optional, e.g. 7.2905715, 80.6337262)</span>
+            </Label>
+            <Input
+              id="coordinates"
+              placeholder="Paste exact coordinates (latitude, longitude)..."
+              value={formik.values.coordinates}
+              onChange={(e) => {
+                const val = e.target.value;
+                formik.setFieldValue("coordinates", val);
+                const match = val.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
+                if (match) {
+                  const lat = parseFloat(match[1]);
+                  const lon = parseFloat(match[2]);
+                  if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+                    formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
+                  }
+                }
+              }}
+              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+            />
+            <FieldError
+              msg={formik.touched.coordinates ? formik.errors.coordinates : undefined}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-              Pin Venue Location (Map Picker) <span className="text-red-500">*</span>
+              Venue Location Map Preview <span className="text-red-500">*</span>
             </Label>
             <OSMMapPicker
               lat={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || undefined : undefined}
@@ -184,12 +212,13 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
               district={formik.values.district}
               onChange={(lat, lon) => {
                 formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
+                formik.setFieldValue("coordinates", `${lat.toFixed(7)}, ${lon.toFixed(7)}`);
               }}
               height="250px"
             />
             {formik.values.locationMapLink && (
               <p className="text-[10px] text-zinc-400 font-medium truncate mt-1">
-                Generated Coordinates Link: <span className="text-zinc-600 dark:text-zinc-400 font-mono">{formik.values.locationMapLink}</span>
+                Generated Coordinates Link: <span className="text-zinc-650 dark:text-zinc-400 font-mono">{formik.values.locationMapLink}</span>
               </p>
             )}
             <FieldError

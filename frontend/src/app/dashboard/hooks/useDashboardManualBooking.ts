@@ -48,6 +48,21 @@ const ManualBookingSchema = Yup.object().shape({
   city: Yup.string().required("City is required"),
   district: Yup.string().required("District is required"),
   locationMapLink: Yup.string().url("Must be a valid URL").required("Map pin location is required"),
+  coordinates: Yup.string()
+    .nullable()
+    .optional()
+    .test(
+      "valid-coords",
+      "Invalid coordinates. Format: 'latitude, longitude' (e.g. 7.2905, 80.6337)",
+      (val) => {
+        if (!val) return true;
+        const match = val.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
+        if (!match) return false;
+        const lat = parseFloat(match[1]);
+        const lon = parseFloat(match[2]);
+        return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+      }
+    ),
   notes: Yup.string().optional().nullable(),
   packageId: Yup.string().optional().nullable(),
   advancePaymentLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
@@ -79,6 +94,7 @@ export function useDashboardManualBooking({
       city: "",
       district: "",
       locationMapLink: "",
+      coordinates: "",
       notes: "",
       packageId: "",
       advancePaymentLkr: "",

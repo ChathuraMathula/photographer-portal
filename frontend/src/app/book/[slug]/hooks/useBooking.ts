@@ -57,6 +57,21 @@ const DetailsSchema = Yup.object({
   city: Yup.string().required("City is required"),
   district: Yup.string().required("District is required"),
   locationMapLink: Yup.string().url("Must be a valid URL").required("Map pin location is required"),
+  coordinates: Yup.string()
+    .nullable()
+    .optional()
+    .test(
+      "valid-coords",
+      "Invalid coordinates. Format: 'latitude, longitude' (e.g. 7.2905, 80.6337)",
+      (val) => {
+        if (!val) return true;
+        const match = val.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
+        if (!match) return false;
+        const lat = parseFloat(match[1]);
+        const lon = parseFloat(match[2]);
+        return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+      }
+    ),
   notes: Yup.string(),
 });
 
@@ -138,14 +153,15 @@ export function useBooking() {
   });
 
   const detailsFormik = useFormik({
-    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", city: "", district: "", locationMapLink: "", notes: "" },
+    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", city: "", district: "", locationMapLink: "", coordinates: "", notes: "" },
     validationSchema: DetailsSchema,
     onSubmit: async (values, { setStatus }) => {
       if (!availabilityChecked) return;
+      const { coordinates, ...payload } = values;
       const res = await fetch(`${API}/bookings/${slug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, ...availabilityChecked }),
+        body: JSON.stringify({ ...payload, ...availabilityChecked }),
       });
       const data = await res.json();
       if (!res.ok) {
