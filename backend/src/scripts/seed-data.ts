@@ -663,21 +663,24 @@ export async function seedDatabase(
     return shuffled.slice(0, count);
   };
 
-  const numPhotographers = 1000;
-  const numCustomers = 1000;
-  const numReservations = 2000;
+  const numPhotographers = 10000;
+  const numCustomers = 10000;
+  const numReservations = 100000;
 
   // 1. Generate Photographers
   const bulkPhotographers: User[] = [];
   const bulkProfiles: PhotographerProfile[] = [];
   const bulkPackages: Package[] = [];
 
+  console.log(`  Generating ${numPhotographers} photographers & profiles...`);
   for (let i = 0; i < numPhotographers; i++) {
     const first = pick(lkFirstNames);
     const last = pick(lkLastNames);
     const email = `photographer_${i}_${Date.now()}@photoportal.com`;
+    const userId = crypto.randomUUID();
 
     const user = manager.create(User, {
+      id: userId,
       firstName: first,
       lastName: last,
       email: email,
@@ -687,23 +690,13 @@ export async function seedDatabase(
       phone: `+9477${Math.floor(1000000 + Math.random() * 9000000)}`,
     });
     bulkPhotographers.push(user);
-  }
 
-  // Save users in chunks
-  const chunkSize = 200;
-  for (let i = 0; i < bulkPhotographers.length; i += chunkSize) {
-    const chunk = bulkPhotographers.slice(i, i + chunkSize);
-    await manager.save(User, chunk);
-  }
-
-  // Create profiles and packages for saved users
-  for (let i = 0; i < bulkPhotographers.length; i++) {
-    const user = bulkPhotographers[i];
     const location = pick(lkLocations);
-    const slug = `${user.firstName.toLowerCase()}-${user.lastName.toLowerCase()}-${i}`;
+    const slug = `${first.toLowerCase()}-${last.toLowerCase()}-${i}-${Math.floor(Math.random() * 10000)}`;
 
     const profile = manager.create(PhotographerProfile, {
-      userId: user.id,
+      id: crypto.randomUUID(),
+      userId: userId,
       bookingSlug: slug,
       bio: pick(lkBios),
       specializations: pickMultiple(specsList, 2),
@@ -715,7 +708,8 @@ export async function seedDatabase(
 
     // Create 2 packages per photographer
     const pkg1 = manager.create(Package, {
-      photographerId: user.id,
+      id: crypto.randomUUID(),
+      photographerId: userId,
       name: 'Standard Session',
       description: 'Standard session covering key highlights.',
       priceInCents: 2000000 + Math.floor(Math.random() * 10000000),
@@ -727,7 +721,8 @@ export async function seedDatabase(
     });
 
     const pkg2 = manager.create(Package, {
-      photographerId: user.id,
+      id: crypto.randomUUID(),
+      photographerId: userId,
       name: 'Elite Package',
       description: 'Comprehensive coverage with premium albums and drones.',
       priceInCents: 12000000 + Math.floor(Math.random() * 20000000),
@@ -741,15 +736,23 @@ export async function seedDatabase(
     bulkPackages.push(pkg1, pkg2);
   }
 
-  // Save profiles & packages in chunks
-  for (let i = 0; i < bulkProfiles.length; i += chunkSize) {
-    await manager.save(PhotographerProfile, bulkProfiles.slice(i, i + chunkSize));
+  // Save users, profiles & packages in chunks using insert (much faster than save)
+  const insertChunkSize = 1000;
+  console.log('  Inserting photographers into database...');
+  for (let i = 0; i < bulkPhotographers.length; i += insertChunkSize) {
+    await manager.insert(User, bulkPhotographers.slice(i, i + insertChunkSize));
   }
-  for (let i = 0; i < bulkPackages.length; i += chunkSize) {
-    await manager.save(Package, bulkPackages.slice(i, i + chunkSize));
+  console.log('  Inserting photographer profiles into database...');
+  for (let i = 0; i < bulkProfiles.length; i += insertChunkSize) {
+    await manager.insert(PhotographerProfile, bulkProfiles.slice(i, i + insertChunkSize));
+  }
+  console.log('  Inserting packages into database...');
+  for (let i = 0; i < bulkPackages.length; i += insertChunkSize) {
+    await manager.insert(Package, bulkPackages.slice(i, i + insertChunkSize));
   }
 
   // 2. Generate Customers
+  console.log(`  Generating ${numCustomers} customers...`);
   const bulkCustomers: Customer[] = [];
   for (let i = 0; i < numCustomers; i++) {
     const first = pick(lkFirstNames);
@@ -758,6 +761,7 @@ export async function seedDatabase(
     const email = `customer_${i}_${Date.now()}@example.com`;
 
     const customer = manager.create(Customer, {
+      id: crypto.randomUUID(),
       firstName: first,
       lastName: last,
       email: email,
@@ -767,8 +771,9 @@ export async function seedDatabase(
     bulkCustomers.push(customer);
   }
 
-  for (let i = 0; i < bulkCustomers.length; i += chunkSize) {
-    await manager.save(Customer, bulkCustomers.slice(i, i + chunkSize));
+  console.log('  Inserting customers into database...');
+  for (let i = 0; i < bulkCustomers.length; i += insertChunkSize) {
+    await manager.insert(Customer, bulkCustomers.slice(i, i + insertChunkSize));
   }
 
   // Map packages to their photographers for quick lookups
@@ -792,6 +797,7 @@ export async function seedDatabase(
 
   const eventTypes = ['Wedding', 'Portrait', 'Corporate Event', 'Conference', 'Maternity', 'Newborn'];
 
+  console.log(`  Generating ${numReservations} reservations...`);
   const bulkReservations: Reservation[] = [];
   const bulkPayments: Payment[] = [];
 
@@ -807,8 +813,10 @@ export async function seedDatabase(
     const dateOffset = Math.floor(Math.random() * 150) - 60; // -60 to +90 days
     const totalAmount = pkg.priceInCents;
     const advanceAmount = Math.round(totalAmount * (pkg.depositValue / 100));
+    const reservationId = crypto.randomUUID();
 
     const reservation = manager.create(Reservation, {
+      id: reservationId,
       customerId: customer.id,
       photographerId: photographer.id,
       date: daysFromNow(dateOffset),
@@ -819,7 +827,7 @@ export async function seedDatabase(
       district: location.district,
       city: location.city,
       status: status,
-      reservationToken: tok(),
+      reservationToken: crypto.randomUUID(),
       totalAmountInCents: totalAmount,
       advancePaymentPriceInCents: advanceAmount,
       paymentDeadline: status === ReservationStatus.PROPOSED ? daysFromNow(2) : undefined,
@@ -828,50 +836,51 @@ export async function seedDatabase(
     });
 
     bulkReservations.push(reservation);
-  }
 
-  // Save reservations in chunks
-  for (let i = 0; i < bulkReservations.length; i += chunkSize) {
-    const chunk = bulkReservations.slice(i, i + chunkSize);
-    await manager.save(Reservation, chunk);
-
-    // After saving, chunk contains generated IDs; generate payments for confirmed/completed statuses
-    for (const res of chunk) {
-      if (res.status === ReservationStatus.CONFIRMED) {
-        const pay = manager.create(Payment, {
-          reservationId: res.id,
-          amountInCents: res.advancePaymentPriceInCents,
-          status: PaymentStatus.SUCCESS,
-          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
-          cardBrand: pick(['Visa', 'Mastercard']),
-          cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
-        });
-        bulkPayments.push(pay);
-      } else if (res.status === ReservationStatus.COMPLETED) {
-        const pay1 = manager.create(Payment, {
-          reservationId: res.id,
-          amountInCents: res.advancePaymentPriceInCents,
-          status: PaymentStatus.SUCCESS,
-          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
-          cardBrand: pick(['Visa', 'Mastercard']),
-          cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
-        });
-        const pay2 = manager.create(Payment, {
-          reservationId: res.id,
-          amountInCents: res.totalAmountInCents! - res.advancePaymentPriceInCents!,
-          status: PaymentStatus.SUCCESS,
-          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
-          cardBrand: 'Offline Payment',
-          cardLast4: 'Cash',
-        });
-        bulkPayments.push(pay1, pay2);
-      }
+    // Generate payments for confirmed/completed statuses
+    if (status === ReservationStatus.CONFIRMED) {
+      const pay = manager.create(Payment, {
+        id: crypto.randomUUID(),
+        reservationId: reservationId,
+        amountInCents: advanceAmount,
+        status: PaymentStatus.SUCCESS,
+        transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+        cardBrand: pick(['Visa', 'Mastercard']),
+        cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
+      });
+      bulkPayments.push(pay);
+    } else if (status === ReservationStatus.COMPLETED) {
+      const pay1 = manager.create(Payment, {
+        id: crypto.randomUUID(),
+        reservationId: reservationId,
+        amountInCents: advanceAmount,
+        status: PaymentStatus.SUCCESS,
+        transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+        cardBrand: pick(['Visa', 'Mastercard']),
+        cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
+      });
+      const pay2 = manager.create(Payment, {
+        id: crypto.randomUUID(),
+        reservationId: reservationId,
+        amountInCents: totalAmount - advanceAmount,
+        status: PaymentStatus.SUCCESS,
+        transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+        cardBrand: 'Offline Payment',
+        cardLast4: 'Cash',
+      });
+      bulkPayments.push(pay1, pay2);
     }
   }
 
-  // Save payments in chunks
-  for (let i = 0; i < bulkPayments.length; i += chunkSize) {
-    await manager.save(Payment, bulkPayments.slice(i, i + chunkSize));
+  console.log('  Inserting reservations into database...');
+  const resChunkSize = 2000;
+  for (let i = 0; i < bulkReservations.length; i += resChunkSize) {
+    await manager.insert(Reservation, bulkReservations.slice(i, i + resChunkSize));
+  }
+
+  console.log('  Inserting payments into database...');
+  for (let i = 0; i < bulkPayments.length; i += resChunkSize) {
+    await manager.insert(Payment, bulkPayments.slice(i, i + resChunkSize));
   }
 
   console.log(
