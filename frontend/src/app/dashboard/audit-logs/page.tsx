@@ -114,7 +114,7 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Filter panel */}
-      <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+      <Card className="overflow-visible border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
         <CardHeader className="pb-4">
           <CardTitle className="text-body-small-bold font-bold text-zinc-800 dark:text-white flex items-center gap-2">
             <Filter className="h-4 w-4 text-zinc-400" />
@@ -129,7 +129,7 @@ export default function AuditLogsPage() {
               id="actionFilter"
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="w-full h-10 px-3 rounded-lg border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-dark"
+              className="w-full h-[50px] px-3 rounded-lg border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-dark"
             >
               <option value="">All Actions</option>
               <option value="LOGIN_SUCCESS">LOGIN_SUCCESS</option>
@@ -150,7 +150,7 @@ export default function AuditLogsPage() {
                 placeholder="name@example.com"
                 value={emailSearch}
                 onChange={(e) => setEmailSearch(e.target.value)}
-                className="h-10 text-xs pr-8 rounded-lg dark:bg-zinc-950"
+                className="h-[50px] text-xs pr-8 rounded-lg dark:bg-zinc-950"
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
             </div>
@@ -162,6 +162,7 @@ export default function AuditLogsPage() {
               value={startDate}
               onChange={setStartDate}
               maxDate={endDate || undefined}
+              buttonClassName="h-[50px] w-full text-xs justify-between font-normal border-zinc-250 dark:border-zinc-850 dark:bg-zinc-950"
             />
           </div>
 
@@ -171,6 +172,7 @@ export default function AuditLogsPage() {
               value={endDate}
               onChange={setEndDate}
               minDate={startDate || undefined}
+              buttonClassName="h-[50px] w-full text-xs justify-between font-normal border-zinc-250 dark:border-zinc-850 dark:bg-zinc-950"
             />
           </div>
 

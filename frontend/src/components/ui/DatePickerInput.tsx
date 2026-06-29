@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -25,9 +26,10 @@ type DatePickerInputProps = {
   onChange: (val: string) => void;
   minDate?: string;
   maxDate?: string;
+  buttonClassName?: string;
 };
 
-export function DatePickerInput({ label, value, onChange, minDate, maxDate }: DatePickerInputProps) {
+export function DatePickerInput({ label, value, onChange, minDate, maxDate, buttonClassName }: DatePickerInputProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -70,13 +72,16 @@ export function DatePickerInput({ label, value, onChange, minDate, maxDate }: Da
     : "Pick a date";
 
   return (
-    <div ref={ref} className="relative">
-      <div className="flex items-center gap-1.5">
+    <div ref={ref} className="relative w-full">
+      <div className="flex items-center gap-1.5 w-full">
         <span className="text-[9px] uppercase font-bold text-zinc-400 whitespace-nowrap">{label}</span>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className="h-8 px-3 flex items-center gap-2 text-body-caption border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:outline-none transition-colors shadow-sm cursor-pointer whitespace-nowrap"
+          className={cn(
+            "h-8 px-3 flex items-center gap-2 text-body-caption border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:outline-none transition-colors shadow-sm cursor-pointer whitespace-nowrap",
+            buttonClassName
+          )}
         >
           <CalendarIcon className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
           <span>{displayValue}</span>
