@@ -55,6 +55,18 @@ export default function UserSettingsPage() {
       });
 
       if (!res.ok) throw new Error("Failed to update settings");
+
+      // Broadcast to listeners (e.g. NotificationBell in layout) for real-time update
+      window.dispatchEvent(
+        new CustomEvent("user-settings-saved", {
+          detail: {
+            emailNotificationsEnabled: emailNotifications,
+            reminderEmailsEnabled: reminderEmails,
+            inAppNotificationsEnabled: inAppNotifications,
+          },
+        })
+      );
+
       toast.success("Settings updated successfully!");
     } catch (err: any) {
       toast.error(err.message || "Failed to save settings");

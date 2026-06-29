@@ -16,6 +16,7 @@ import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
 import { ClipboardList, LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
+import { UserSettingsProvider, useUserSettings } from "@/context/UserSettingsContext";
 
 function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -76,17 +77,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     }
   }, [pathname, setSelectedRes]);
 
-  const [inAppNotificationsEnabled, setInAppNotificationsEnabled] = React.useState(true);
-
-  React.useEffect(() => {
-    const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-    fetch(`${API}/users/settings`, { credentials: "include" })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data) setInAppNotificationsEnabled(data.inAppNotificationsEnabled ?? true);
-      })
-      .catch(() => {});
-  }, []);
+  const { inAppNotificationsEnabled } = useUserSettings();
 
   const handleTabChange = (tab: string) => {
     start();
@@ -259,17 +250,21 @@ export default function DashboardLayoutWrapper({ children }: { children: React.R
 
   if (role === UserRole.PHOTOGRAPHER) {
     return (
-      <PhotographerDashboardProvider>
-        <PhotographerLayoutWrapper>{children}</PhotographerLayoutWrapper>
-      </PhotographerDashboardProvider>
+      <UserSettingsProvider>
+        <PhotographerDashboardProvider>
+          <PhotographerLayoutWrapper>{children}</PhotographerLayoutWrapper>
+        </PhotographerDashboardProvider>
+      </UserSettingsProvider>
     );
   }
 
   if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
     return (
-      <AdminLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
-        {children}
-      </AdminLayoutWrapper>
+      <UserSettingsProvider>
+        <AdminLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
+          {children}
+        </AdminLayoutWrapper>
+      </UserSettingsProvider>
     );
   }
 
