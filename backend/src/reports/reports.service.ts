@@ -213,6 +213,7 @@ export class ReportsService {
     } else {
       for (let i = 11; i >= 0; i--) {
         const d = new Date(endDate);
+        d.setDate(1); // Prevent date overflow for months with < 31 days
         d.setMonth(endDate.getMonth() - i);
         const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
@@ -344,36 +345,6 @@ export class ReportsService {
     customEndDate?: string,
   ): Promise<any> {
     const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
-    
-    // Fetch static map buffer
-    let mapImageBuffer: Buffer | null = null;
-    const bookings = data.rawBookings || [];
-    const validPoints = bookings.filter((b: any) => {
-      if (!b.locationMapLink) return false;
-      const atMatch = b.locationMapLink.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-      const qMatch = b.locationMapLink.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-      return !!(atMatch || qMatch);
-    });
-
-    if (validPoints.length > 0) {
-      try {
-        const coords = validPoints.map((b: any) => {
-          const atMatch = b.locationMapLink.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-          const qMatch = b.locationMapLink.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-          const match = atMatch || qMatch;
-          return { lat: match[1], lon: match[2] };
-        });
-        const ptString = coords.slice(0, 8).map(c => `${c.lon},${c.lat},pm2rdm`).join('~');
-        const staticMapUrl = `https://static-maps.yandex.ru/1.x/?l=map&size=450,220&pt=${ptString}`;
-        const res = await fetch(staticMapUrl);
-        if (res.ok) {
-          mapImageBuffer = Buffer.from(await res.arrayBuffer());
-        }
-      } catch (err) {
-        console.error('Failed to fetch static map image:', err);
-      }
-    }
-
-    return buildLocationReportPdf(data, period, mapImageBuffer);
+    return buildLocationReportPdf(data, period);
   }
 }

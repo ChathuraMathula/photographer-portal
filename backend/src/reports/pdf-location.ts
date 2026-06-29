@@ -1,4 +1,4 @@
-﻿import PDFDocument = require('pdfkit');
+import PDFDocument = require('pdfkit');
 import {
   primaryColor,
   accentColor,
@@ -11,7 +11,6 @@ import {
 export function buildLocationReportPdf(
   data: any,
   period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-  mapImageBuffer?: Buffer | null,
 ): any {
   const doc = new PDFDocument({ size: 'A4', margin: 50, bufferPages: true });
 
@@ -116,14 +115,6 @@ export function buildLocationReportPdf(
     doc.rect(50, y, 495, 18).fillAndStroke('#ffffff', borderColor);
     doc.fillColor(textColor).fontSize(8.5).font('Helvetica-Oblique').text('No city data recorded.', 60, y + 5);
     y += 18;
-  }
-
-  // Render static map image if available
-  if (mapImageBuffer) {
-    y += 15;
-    doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('Geographic Distribution Map Preview', 50, y);
-    y += 20;
-    doc.image(mapImageBuffer, 50, y, { width: 495, height: 220 });
   }
 
   // Add a new page for detailed location log

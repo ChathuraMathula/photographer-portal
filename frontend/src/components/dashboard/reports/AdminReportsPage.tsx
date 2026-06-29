@@ -9,6 +9,13 @@ import { toast } from "sonner";
 import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import { LocationAnalyticsSection } from "./location/LocationAnalyticsSection";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -248,51 +255,54 @@ export function AdminReportsPage() {
 
           {period === "yearly" && (
             <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-955 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
-              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Year</span>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer"
-              >
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-              </select>
+              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">Select Year</span>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="h-8 w-[100px] border-none bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:ring-0 cursor-pointer text-xs font-semibold text-zinc-800 dark:text-zinc-205">
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                  <SelectItem value="2024" className="cursor-pointer">2024</SelectItem>
+                  <SelectItem value="2025" className="cursor-pointer">2025</SelectItem>
+                  <SelectItem value="2026" className="cursor-pointer">2026</SelectItem>
+                  <SelectItem value="2027" className="cursor-pointer">2027</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           )}
 
           {period === "monthly" && (
             <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-955 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
-              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Month</span>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer border-r border-zinc-200 dark:border-zinc-700/50 mr-1"
-              >
-                <option value="01">January</option>
-                <option value="02">February</option>
-                <option value="03">March</option>
-                <option value="04">April</option>
-                <option value="05">May</option>
-                <option value="06">June</option>
-                <option value="07">July</option>
-                <option value="08">August</option>
-                <option value="09">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer"
-              >
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-              </select>
+              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">Select Month</span>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="h-8 w-[120px] border-none bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:ring-0 cursor-pointer border-r border-zinc-200 dark:border-zinc-700/50 rounded-none pr-4 text-xs font-semibold text-zinc-800 dark:text-zinc-205">
+                  <SelectValue placeholder="Month" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                  <SelectItem value="01" className="cursor-pointer">January</SelectItem>
+                  <SelectItem value="02" className="cursor-pointer">February</SelectItem>
+                  <SelectItem value="03" className="cursor-pointer">March</SelectItem>
+                  <SelectItem value="04" className="cursor-pointer">April</SelectItem>
+                  <SelectItem value="05" className="cursor-pointer">May</SelectItem>
+                  <SelectItem value="06" className="cursor-pointer">June</SelectItem>
+                  <SelectItem value="07" className="cursor-pointer">July</SelectItem>
+                  <SelectItem value="08" className="cursor-pointer">August</SelectItem>
+                  <SelectItem value="09" className="cursor-pointer">September</SelectItem>
+                  <SelectItem value="10" className="cursor-pointer">October</SelectItem>
+                  <SelectItem value="11" className="cursor-pointer">November</SelectItem>
+                  <SelectItem value="12" className="cursor-pointer">December</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="h-8 w-[100px] border-none bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:ring-0 cursor-pointer pl-2 text-xs font-semibold text-zinc-800 dark:text-zinc-205">
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                  <SelectItem value="2024" className="cursor-pointer">2024</SelectItem>
+                  <SelectItem value="2025" className="cursor-pointer">2025</SelectItem>
+                  <SelectItem value="2026" className="cursor-pointer">2026</SelectItem>
+                  <SelectItem value="2027" className="cursor-pointer">2027</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           )}
 
