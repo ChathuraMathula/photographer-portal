@@ -236,6 +236,8 @@ export class BookingsService {
       eventType: reservation.eventType,
       location: reservation.location,
       locationMapLink: reservation.locationMapLink,
+      city: reservation.city,
+      district: reservation.district,
       customerNotes: reservation.customerNotes,
       advancePaymentPriceInCents: reservation.advancePaymentPriceInCents,
       totalAmountInCents: reservation.totalAmountInCents,
