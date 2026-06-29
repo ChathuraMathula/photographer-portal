@@ -107,15 +107,12 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
           </span>
         </p>
 
-        {reservation.status === "PROPOSED" && (
-          <p className="text-zinc-655 dark:text-zinc-400">
-            <strong className="text-zinc-800 dark:text-zinc-200">Advance Requested:</strong> LKR{" "}
-            {((reservation.advancePaymentPriceInCents ?? 0) / 100).toLocaleString()}
-          </p>
-        )}
-
         {(reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") && (
           <div className="space-y-2 pt-1">
+            <p className="text-zinc-655 dark:text-zinc-400">
+              <strong className="text-zinc-800 dark:text-zinc-200">Advance Requested:</strong> LKR{" "}
+              {((reservation.advancePaymentPriceInCents ?? 0) / 100).toLocaleString()}
+            </p>
             <p className="text-zinc-655 dark:text-zinc-400">
               <strong className="text-zinc-800 dark:text-zinc-200">Total Price:</strong> LKR {(totalAmount / 100).toLocaleString()}
             </p>

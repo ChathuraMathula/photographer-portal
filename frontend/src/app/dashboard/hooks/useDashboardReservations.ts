@@ -153,7 +153,7 @@ export function useDashboardReservations({
       setCustomPackage(null);
       setIsCustomPackageSelected(false);
       await loadPhotographerData();
-      setSelectedRes(null);
+      setSelectedRes(data);
       toast.success("Proposal sent successfully to customer email!");
     } catch (err: any) {
       toast.error(err.message || "Error sending proposal");
@@ -174,7 +174,7 @@ export function useDashboardReservations({
       setRejectionReason("");
       setShowRejectForm(false);
       await loadPhotographerData();
-      setSelectedRes(null);
+      setSelectedRes(data);
       toast.success("Request rejected professionally.");
     } catch (err: any) {
       toast.error(err.message || "Error rejecting request");

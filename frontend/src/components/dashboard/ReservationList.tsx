@@ -22,7 +22,8 @@ export function ReservationList({ reservations, selectedId, onSelect }: Props) {
       const name = `${res.customer?.firstName ?? ""} ${res.customer?.lastName ?? ""}`.toLowerCase();
       const location = (res.location ?? "").toLowerCase();
       const eventType = (res.eventType ?? "").toLowerCase();
-      return name.includes(q) || location.includes(q) || eventType.includes(q);
+      const id = (res.id ?? "").toLowerCase();
+      return name.includes(q) || location.includes(q) || eventType.includes(q) || id.includes(q);
     }
     return true;
   });

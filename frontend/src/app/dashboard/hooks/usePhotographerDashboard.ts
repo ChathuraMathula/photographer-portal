@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
 import { UserRole } from "@/store/slices/authSlice";
 import { type Reservation } from "@/types";
@@ -22,6 +22,8 @@ type Tab = "reservations" | "calendar" | "packages" | "profile";
 export function usePhotographerDashboard() {
   const { socket } = useSocket();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resId = searchParams.get("id");
 
   // 1. Auth Hook
   const {
@@ -123,17 +125,15 @@ export function usePhotographerDashboard() {
   }, [isAuthenticated, role, userId]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const resId = params.get("id");
-      if (resId && reservationsState.reservations.length > 0) {
-        const found = reservationsState.reservations.find((r) => r.id === resId);
-        if (found) {
+    if (resId && reservationsState.reservations.length > 0) {
+      const found = reservationsState.reservations.find((r) => r.id === resId);
+      if (found) {
+        if (reservationsState.selectedRes?.id !== found.id) {
           reservationsState.setSelectedRes(found);
         }
       }
     }
-  }, [reservationsState.reservations]);
+  }, [resId, reservationsState.reservations, reservationsState.selectedRes]);
 
   const chatDisabled =
     reservationsState.selectedRes?.status === "CANCELLED" ||

@@ -511,3 +511,28 @@ Markers in the interactive map are colour-coded by event type:
 Markers are clustered by proximity using **Leaflet.MarkerCluster** (loaded via CDN inside an iframe `srcDoc`).
 
 ---
+
+## Offline Payments, Proposal Deadlines & Dashboard Navigation Fixes
+
+We implemented immediate real-time payment updates, persistent deadlines, and visual routing improvements on both backend and frontend.
+
+### 1. Real-Time Offline Cash Payments
+When offline cash payments are logged on the photographer's reservation panel, the updates are now broadcasted live to the customer's tracking page.
+- **Backend changes**: [`payments.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/payments/payments.service.ts) queries all successful payments, computes the total sum, and emits it as `totalPaidInCents` via the `reservationUpdated` and `transactionLogged` socket events to both photographer and customer rooms.
+- **Frontend changes**: [`useTracking.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/book/track/%5Btoken%5D/hooks/useTracking.ts) listens to `transactionLogged` and dynamically refetches tracking details, enabling immediate UI updates for remaining balances and invoice downloads.
+
+### 2. Persistent Proposal Expiration Deadlines
+- **Behavior**: Modifying packages or notes in a proposed reservation request no longer resets the initial 24-hour expiration window.
+- **Backend changes**: [`reservations.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reservations/reservations.service.ts) is modified so that the `paymentDeadline` is only set to 24 hours from the current time if it has not been defined previously.
+
+### 3. Display Logic: "Advance Requested"
+- **Photographer-end behavior**: "Advance Requested" is hidden when a quotation is proposed (`status === 'PROPOSED'`) to avoid visual redundancy. Once the customer completes the payment, the field appears on the photographer's panel under settled statistics.
+- **Frontend changes**: [`ProposalStatusCard.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/ProposalStatusCard.tsx) displays the field exclusively when the reservation status is `CONFIRMED` or `COMPLETED`.
+
+### 4. Interactive Selection & UUID Search
+- **Persistent Proposal Views**: [`useDashboardReservations.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/hooks/useDashboardReservations.ts) does not reset the selection to `null` on actions like proposal submission or rejection, keeping the user in place.
+- **Calendar Navigation Sync**: [`usePhotographerDashboard.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/hooks/usePhotographerDashboard.ts) listens to the URL's `id` search parameters with `useSearchParams()` to immediately highlight and display the selected reservation request.
+- **UUID Search**: [`ReservationList.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/ReservationList.tsx) matches search terms against the reservation `id` parameter.
+
+---
+

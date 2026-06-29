@@ -322,8 +322,10 @@ export class ReservationsService {
     }
 
     reservation.selectedPackages = selectedPkgsMapped;
-    // 24-hour deadline from now
-    reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // 24-hour deadline from now (only if not already set, e.g. when changing packages later)
+    if (!reservation.paymentDeadline) {
+      reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    }
 
     await this.reservationRepository.save(reservation);
 

@@ -272,15 +272,28 @@ export class PaymentsService {
     });
     await this.paymentRepository.save(payment);
 
-    // Broadcast updated reservation + transaction log refresh
+    // Broadcast updated reservation with totalPaidInCents + transaction log refresh
+    const updatedPayments = await this.paymentRepository.find({
+      where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
+    });
+    const updatedTotalPaidInCents = updatedPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+
+    const emitData = {
+      ...reservation,
+      totalPaidInCents: updatedTotalPaidInCents,
+    };
+
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)
-      .emit('reservationUpdated', reservation);
+      .emit('reservationUpdated', emitData);
     this.chatGateway.server
       .to(`reservation_${reservation.id}`)
-      .emit('reservationUpdated', reservation);
+      .emit('reservationUpdated', emitData);
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)
+      .emit('transactionLogged', { reservationId: reservation.id });
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
       .emit('transactionLogged', { reservationId: reservation.id });
 
     // Generate Invoice PDF and email it
