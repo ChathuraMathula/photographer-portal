@@ -116,11 +116,15 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
             <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
               {reservation.startTime} - {reservation.endTime}
             </p>
-            <p className="text-body-caption text-zinc-500 mt-0.5">
+            <p className="text-body-caption text-zinc-500 mt-0.5 font-medium">
               {reservation.location || "Location not given"}
-              {reservation.city && `, ${reservation.city}`}
-              {reservation.district && `, ${reservation.district}`}
             </p>
+            {(reservation.city || reservation.district) && (
+              <p className="text-[10px] text-zinc-400 dark:text-zinc-550 font-bold mt-0.5 uppercase tracking-wider">
+                {reservation.city && `City: ${reservation.city}`}
+                {reservation.district && ` | District: ${reservation.district}`}
+              </p>
+            )}
             {reservation.locationMapLink && (
               <a
                 href={reservation.locationMapLink}

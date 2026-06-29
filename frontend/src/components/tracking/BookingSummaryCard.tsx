@@ -37,11 +37,15 @@ export function BookingSummaryCard({ reservation }: { reservation: TrackingReser
             <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
               Location
             </p>
-            <p className="text-body-small mt-0.5 text-zinc-550 dark:text-zinc-450">
+            <p className="text-body-small mt-0.5 text-zinc-550 dark:text-zinc-450 font-medium">
               {reservation.location || "Not specified"}
-              {reservation.city && `, ${reservation.city}`}
-              {reservation.district && `, ${reservation.district}`}
             </p>
+            {(reservation.city || reservation.district) && (
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5 uppercase tracking-wider">
+                {reservation.city && `City: ${reservation.city}`}
+                {reservation.district && ` | District: ${reservation.district}`}
+              </p>
+            )}
             {reservation.locationMapLink && (
               <a
                 href={reservation.locationMapLink}
