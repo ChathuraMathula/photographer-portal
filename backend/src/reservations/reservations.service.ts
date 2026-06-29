@@ -147,7 +147,7 @@ export class ReservationsService {
       throw new BadRequestException('The requested time slot is not available');
     }
 
-    // Find or create customer
+    // Find or create customer — if email exists, keep the stored name/phone for consistency
     let customer = await this.customerRepository.findOneBy({ email: dto.email });
     if (!customer) {
       customer = this.customerRepository.create({
@@ -158,6 +158,8 @@ export class ReservationsService {
       });
       await this.customerRepository.save(customer);
     }
+    // NOTE: If customer already exists we intentionally keep their stored name/phone.
+    // The dto values are used only for display in this request but not persisted.
 
     let selectedPackagesSnap: any = null;
     if (dto.packageId) {

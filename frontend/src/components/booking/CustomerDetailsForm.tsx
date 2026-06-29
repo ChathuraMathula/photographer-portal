@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { type FormikProps } from "formik";
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,30 +38,6 @@ type Props = {
 export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Props) {
   const [geocodingStatus, setGeocodingStatus] = useState<string>("");
 
-  const emailValue = formik.values.email;
-  useEffect(() => {
-    if (!emailValue) return;
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-    if (!isValidEmail) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`${API}/bookings/customer-by-email?email=${encodeURIComponent(emailValue)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data) {
-            if (!formik.values.firstName) formik.setFieldValue("firstName", data.firstName);
-            if (!formik.values.lastName) formik.setFieldValue("lastName", data.lastName);
-            if (!formik.values.phone) formik.setFieldValue("phone", data.phone);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch customer details by email", err);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [emailValue]);
 
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
