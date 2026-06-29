@@ -41,20 +41,9 @@ export default function ProfilePage() {
     else router.push("/dashboard/users");
   };
 
-  // If Admin or Super Admin, render Admin profile wrapped in DashboardLayout
+  // If Admin or Super Admin, render Admin profile directly
   if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
-    return (
-      <DashboardLayout
-        activeTab="profile"
-        onTabChange={handleTabChange}
-        onLogout={handleLogout}
-        userName={firstName ?? ""}
-        userRole={role ?? ""}
-        menuItems={ADMIN_MENU}
-      >
-        <AdminProfilePage />
-      </DashboardLayout>
-    );
+    return <AdminProfilePage />;
   }
 
   // Fallback for Photographer role

@@ -51,20 +51,9 @@ export default function ReportsPage() {
     }
   }, [reportsHook.period, reportsHook.startDate, reportsHook.endDate, reportsHook.hasContext, role]);
 
-  // If Admin or Super Admin, render Admin reports wrapped in DashboardLayout
+  // If Admin or Super Admin, render Admin reports directly
   if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
-    return (
-      <DashboardLayout
-        activeTab="reports"
-        onTabChange={handleTabChange}
-        onLogout={handleLogout}
-        userName={firstName ?? ""}
-        userRole={role ?? ""}
-        menuItems={ADMIN_MENU}
-      >
-        <AdminReportsPage />
-      </DashboardLayout>
-    );
+    return <AdminReportsPage />;
   }
 
   // Fallback for Photographer role

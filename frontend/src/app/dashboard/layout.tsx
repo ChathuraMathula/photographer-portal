@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import { RootState } from "@/store/store";
-import { UserRole } from "@/store/slices/authSlice";
+import { UserRole, logout } from "@/store/slices/authSlice";
 import { PhotographerDashboardProvider, usePhotographerDashboardContext } from "./context/PhotographerDashboardContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PhotographerBanner } from "@/components/dashboard/PhotographerBanner";
@@ -14,6 +14,7 @@ import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal"
 import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
 import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
+import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
 
 function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -165,9 +166,53 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
   );
 }
 
+function AdminLayoutWrapper({ children, firstName, role }: { children: React.ReactNode; firstName: string; role: string }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const dispatch = useDispatch();
+  const { start } = useTopLoadingBar();
+
+  const activeTab = pathname.split("/").pop() as any;
+
+  const handleTabChange = (tab: string) => {
+    start();
+    if (tab === "overview") router.push("/dashboard");
+    else if (tab === "reports") router.push("/dashboard/reports");
+    else if (tab === "profile") router.push("/dashboard/profile");
+    else router.push("/dashboard/users");
+  };
+
+  const handleLogout = async () => {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Backend logout error:", err);
+    }
+    dispatch(logout());
+    window.location.href = "/login";
+  };
+
+  return (
+    <DashboardLayout
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+      onLogout={handleLogout}
+      userName={firstName}
+      userRole={role}
+      menuItems={ADMIN_MENU}
+    >
+      {children}
+    </DashboardLayout>
+  );
+}
+
 export default function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
-  const { role, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { role, isAuthenticated, firstName } = useSelector((state: RootState) => state.auth);
 
   React.useEffect(() => {
     setMounted(true);
@@ -190,6 +235,14 @@ export default function DashboardLayoutWrapper({ children }: { children: React.R
       <PhotographerDashboardProvider>
         <PhotographerLayoutWrapper>{children}</PhotographerLayoutWrapper>
       </PhotographerDashboardProvider>
+    );
+  }
+
+  if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
+    return (
+      <AdminLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
+        {children}
+      </AdminLayoutWrapper>
     );
   }
 

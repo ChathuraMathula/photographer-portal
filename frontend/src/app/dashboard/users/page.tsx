@@ -74,64 +74,55 @@ export default function UserManagementPage() {
   }
 
   return (
-    <DashboardLayout
-      activeTab="users"
-      onTabChange={handleTabChange}
-      onLogout={handleLogout}
-      userName={firstName ?? ""}
-      userRole={authRole ?? ""}
-      menuItems={ADMIN_MENU}
-    >
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-title-large text-primary-dark">
-              User Management
-            </h1>
-            <p className="text-body-small text-zinc-500 mt-1">
-              Logged in as{" "}
-              <span className="font-semibold text-zinc-800">{loggedInRole}</span>.{" "}
-              {loggedInRole === UserRole.SUPER_ADMIN
-                ? "Manage all system users, administrators, and photographers."
-                : "Manage and register new photographers."}
-            </p>
-          </div>
-          <Button
-            onClick={() => setShowModal(true)}
-            className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-body-small-s shadow-sm"
-          >
-            <UserPlus className="h-4 w-4" />
-            Create User
-          </Button>
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-title-large text-primary-dark">
+            User Management
+          </h1>
+          <p className="text-body-small text-zinc-500 mt-1">
+            Logged in as{" "}
+            <span className="font-semibold text-zinc-800">{loggedInRole}</span>.{" "}
+            {loggedInRole === UserRole.SUPER_ADMIN
+              ? "Manage all system users, administrators, and photographers."
+              : "Manage and register new photographers."}
+          </p>
         </div>
-
-        {/* Users list */}
-        {loading ? (
-          <div className="text-center py-12 text-zinc-500 animate-pulse">
-            Loading users...
-          </div>
-        ) : error ? (
-          <div className="text-center py-12 text-red-500">{error}</div>
-        ) : (
-          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
-        )}
-
-        {/* Create user modal */}
-        {showModal && (
-          <CreateUserModal
-            formik={formik}
-            loggedInRole={loggedInRole as UserRole}
-            submitError={submitError}
-            specsInput={specsInput}
-            specsList={specsList}
-            onSpecsInputChange={setSpecsInput}
-            onAddSpec={handleAddSpec}
-            onRemoveSpec={handleRemoveSpec}
-            onClose={() => setShowModal(false)}
-          />
-        )}
+        <Button
+          onClick={() => setShowModal(true)}
+          className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-body-small-s shadow-sm"
+        >
+          <UserPlus className="h-4 w-4" />
+          Create User
+        </Button>
       </div>
-    </DashboardLayout>
+
+      {/* Users list */}
+      {loading ? (
+        <div className="text-center py-12 text-zinc-500 animate-pulse">
+          Loading users...
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500">{error}</div>
+      ) : (
+        <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
+      )}
+
+      {/* Create user modal */}
+      {showModal && (
+        <CreateUserModal
+          formik={formik}
+          loggedInRole={loggedInRole as UserRole}
+          submitError={submitError}
+          specsInput={specsInput}
+          specsList={specsList}
+          onSpecsInputChange={setSpecsInput}
+          onAddSpec={handleAddSpec}
+          onRemoveSpec={handleRemoveSpec}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </div>
   );
 }

@@ -177,9 +177,9 @@ export function BookingStatusDonut({ data }: { data: DonutDataPoint[] }) {
   let currentOffset = 0;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
+    <div className="flex flex-col xl:flex-row items-center justify-center gap-6 w-full py-2">
       {/* SVG Ring */}
-      <div className="relative w-44 h-44">
+      <div className="relative w-40 h-40 shrink-0">
         <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
           <circle
             cx={center}
@@ -219,18 +219,20 @@ export function BookingStatusDonut({ data }: { data: DonutDataPoint[] }) {
       </div>
 
       {/* Legend */}
-      <div className="space-y-2">
+      <div className="space-y-1.5 w-full max-w-[200px]">
         {data.map((d, i) => {
           if (d.value === 0) return null;
           const percentage = Math.round((d.value / total) * 100);
           return (
-            <div key={i} className="flex items-center gap-3 text-body-small">
-              <span 
-                className="h-3 w-3 rounded-full shrink-0" 
-                style={{ backgroundColor: colors[d.name] || "#a1a1aa" }}
-              />
-              <span className="font-semibold text-zinc-700 dark:text-zinc-300 w-24 truncate">{d.name}</span>
-              <span className="text-zinc-500 font-medium">{d.value} ({percentage}%)</span>
+            <div key={i} className="flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <span 
+                  className="h-2.5 w-2.5 rounded-full shrink-0" 
+                  style={{ backgroundColor: colors[d.name] || "#a1a1aa" }}
+                />
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300 truncate">{d.name}</span>
+              </div>
+              <span className="text-zinc-500 font-medium shrink-0">{d.value} ({percentage}%)</span>
             </div>
           );
         })}
