@@ -9,6 +9,9 @@ export function ReservationHeader({ reservation }: { reservation: TrackingReserv
         <h1 className="text-title-large text-primary-dark dark:text-white">
           Reservation Tracking
         </h1>
+        <p className="text-[11px] font-mono text-zinc-450 dark:text-zinc-500 select-all mt-0.5">
+          Reservation ID: {reservation.id}
+        </p>
         <p className="text-body-small text-zinc-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
           <span>Photographer:</span>
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">

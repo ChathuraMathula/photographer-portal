@@ -534,5 +534,10 @@ When offline cash payments are logged on the photographer's reservation panel, t
 - **Calendar Navigation Sync**: [`usePhotographerDashboard.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/hooks/usePhotographerDashboard.ts) listens to the URL's `id` search parameters with `useSearchParams()` to immediately highlight and display the selected reservation request.
 - **UUID Search**: [`ReservationList.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/ReservationList.tsx) matches search terms against the reservation `id` parameter.
 
+### 5. Tracking Page Reservation ID Display
+- **Behavior**: The unique Reservation ID is now displayed on the customer's tracking page header for easy copying and referencing.
+- **Frontend changes**: [`ReservationHeader.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/tracking/ReservationHeader.tsx) renders the ID with selection-friendly font formatting under the header title.
+
 ---
+
 
