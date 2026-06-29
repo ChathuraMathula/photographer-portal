@@ -98,13 +98,12 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
+          <Link
+            href="/forgot-password"
             className="text-body-small-s font-semibold text-primary-dark hover:underline dark:text-primary-light transition-colors"
           >
             Forgot password?
-          </a>
+          </Link>
         </div>
 
         <Button

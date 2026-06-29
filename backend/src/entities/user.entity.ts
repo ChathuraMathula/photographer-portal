@@ -55,6 +55,12 @@ export class User {
   @OneToMany(() => Reservation, (reservation) => reservation.photographer)
   reservations?: Reservation[];
 
+  @Column({ nullable: true })
+  resetPasswordToken?: string;
+
+  @Column({ nullable: true })
+  resetPasswordExpires?: Date;
+
   @CreateDateColumn()
   createdAt!: Date;
 

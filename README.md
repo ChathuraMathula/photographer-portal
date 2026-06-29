@@ -50,6 +50,8 @@ photographer-portal/
           ├── app/
           │   ├── login/       # Login page
           │   ├── test-accounts/ # [NEW] TestAccountsPage credentials directory
+          │   ├── forgot-password/ # [NEW] ForgotPasswordPage component
+          │   ├── reset-password/  # [NEW] ResetPasswordPage component
           │   ├── dashboard/   # Role-based collapsible dashboard
           │   │   ├── reports/
           │   │   │   ├── hooks/

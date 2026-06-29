@@ -160,4 +160,32 @@ export class EmailService {
       html,
     });
   }
+
+  async sendResetPasswordEmail(
+    userEmail: string,
+    firstName: string,
+    resetLink: string,
+  ) {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>Reset Your Password</h2>
+        <p>Dear ${firstName},</p>
+        <p>You requested to reset your password for the <strong>Photographer Portal</strong>.</p>
+        <p style="margin: 20px 0;">
+          <a href="${resetLink}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            Reset Password
+          </a>
+        </p>
+        <p>If you did not request a password reset, please ignore this email. This link is valid for 1 hour.</p>
+        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
+      </div>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: userEmail,
+      subject: 'Password Reset Request',
+      html,
+    });
+  }
 }

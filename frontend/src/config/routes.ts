@@ -1,7 +1,7 @@
 import { UserRole } from "@/store/slices/authSlice";
 
 // Exact-match public routes
-export const PUBLIC_ROUTES = ["/", "/login", "/about"];
+export const PUBLIC_ROUTES = ["/", "/login", "/about", "/test-accounts", "/forgot-password", "/reset-password"];
 
 // Prefix-match public routes — /book/:slug and /book/track/:token are always public
 export const PUBLIC_PREFIXES = ["/book"];
