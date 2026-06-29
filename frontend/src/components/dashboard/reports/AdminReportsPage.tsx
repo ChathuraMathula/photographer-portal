@@ -7,6 +7,7 @@ import { KpiCardsGrid } from "@/app/dashboard/reports/components/KpiCardsGrid";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
+import { DatePickerInput } from "@/components/ui/DatePickerInput";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -183,19 +184,19 @@ export function AdminReportsPage() {
           </div>
 
           {period === "custom" && (
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
+            <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
+              <DatePickerInput
+                label="From"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="h-9 px-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg dark:bg-zinc-950"
+                onChange={setStartDate}
+                maxDate={endDate || undefined}
               />
-              <span className="text-xs text-zinc-400">to</span>
-              <input
-                type="date"
+              <span className="text-zinc-300 dark:text-zinc-700 text-xs font-light">—</span>
+              <DatePickerInput
+                label="To"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="h-9 px-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg dark:bg-zinc-950"
+                onChange={setEndDate}
+                minDate={startDate || undefined}
               />
             </div>
           )}

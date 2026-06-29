@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Camera, LogOut } from "lucide-react";
+import { Camera, LogOut, Settings } from "lucide-react";
 import { MenuItem } from "../DashboardLayout";
 import { NavItem } from "./NavItem";
 
@@ -65,6 +65,24 @@ export function DesktopSidebar({
 
       {/* Sidebar Footer */}
       <div className="p-3 border-t border-zinc-200/50 space-y-1.5">
+        <button
+          onClick={() => onTabChange("settings")}
+          title={isCollapsed ? "User Settings" : undefined}
+          aria-label="User Settings"
+          className={`flex items-center transition-all duration-300 cursor-pointer rounded-xl text-body-small-s font-medium ${
+            activeTab === "settings"
+              ? "bg-zinc-100 text-zinc-900"
+              : "text-zinc-600 hover:bg-zinc-50"
+          } ${
+            isCollapsed
+              ? "w-10 h-10 mx-auto justify-center p-0"
+              : "w-full gap-3.5 px-3.5 py-2.5"
+          }`}
+        >
+          <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />
+          {!isCollapsed && <span className="truncate whitespace-nowrap">Settings</span>}
+        </button>
+
         <button
           id="sidebar-logout-btn"
           onClick={onLogoutRequest}

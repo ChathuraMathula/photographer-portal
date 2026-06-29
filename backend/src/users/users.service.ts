@@ -241,6 +241,7 @@ export class UsersService {
     return {
       emailNotificationsEnabled: user.emailNotificationsEnabled,
       reminderEmailsEnabled: user.reminderEmailsEnabled,
+      inAppNotificationsEnabled: user.inAppNotificationsEnabled,
     };
   }
 
@@ -256,12 +257,15 @@ export class UsersService {
     if (updates.reminderEmailsEnabled !== undefined) {
       user.reminderEmailsEnabled = updates.reminderEmailsEnabled;
     }
+    if (updates.inAppNotificationsEnabled !== undefined) {
+      user.inAppNotificationsEnabled = updates.inAppNotificationsEnabled;
+    }
 
     await this.userRepository.save(user);
 
     await this.auditLogsService.logAction(
       'SETTINGS_UPDATED',
-      `User ${user.email} updated their settings (Notifications: ${user.emailNotificationsEnabled}, Reminders: ${user.reminderEmailsEnabled})`,
+      `User ${user.email} updated their settings (Email: ${user.emailNotificationsEnabled}, Reminders: ${user.reminderEmailsEnabled}, InApp: ${user.inAppNotificationsEnabled})`,
       user.id,
       user.email,
     );
@@ -269,6 +273,7 @@ export class UsersService {
     return {
       emailNotificationsEnabled: user.emailNotificationsEnabled,
       reminderEmailsEnabled: user.reminderEmailsEnabled,
+      inAppNotificationsEnabled: user.inAppNotificationsEnabled,
     };
   }
 }

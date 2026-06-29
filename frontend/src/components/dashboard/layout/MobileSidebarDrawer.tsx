@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Camera, LogOut, X } from "lucide-react";
+import { Camera, LogOut, X, Settings } from "lucide-react";
 import { MenuItem } from "../DashboardLayout";
 import { NavItem } from "./NavItem";
 
@@ -104,6 +104,22 @@ export function MobileSidebarDrawer({
 
         {/* Mobile Footer */}
         <div className="space-y-1.5 pt-4 border-t border-zinc-200/50">
+          <button
+            onClick={() => {
+              onTabChange("settings");
+              onClose();
+            }}
+            aria-label="User Settings"
+            className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium transition-all duration-200 cursor-pointer ${
+              activeTab === "settings"
+                ? "bg-zinc-100 text-zinc-900"
+                : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />
+            <span>Settings</span>
+          </button>
+
           <button
             id="mobile-sidebar-logout-btn"
             onClick={onLogoutRequest}

@@ -14,6 +14,7 @@ export default function UserSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [reminderEmails, setReminderEmails] = useState(true);
+  const [inAppNotifications, setInAppNotifications] = useState(true);
 
   // Fetch current user notification settings
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function UserSettingsPage() {
         const data = await res.json();
         setEmailNotifications(data.emailNotificationsEnabled);
         setReminderEmails(data.reminderEmailsEnabled);
+        setInAppNotifications(data.inAppNotificationsEnabled ?? true);
       } catch (err: any) {
         toast.error(err.message || "Could not fetch settings");
       } finally {
@@ -47,6 +49,7 @@ export default function UserSettingsPage() {
         body: JSON.stringify({
           emailNotificationsEnabled: emailNotifications,
           reminderEmailsEnabled: reminderEmails,
+          inAppNotificationsEnabled: inAppNotifications,
         }),
         credentials: "include",
       });
@@ -129,6 +132,24 @@ export default function UserSettingsPage() {
                   type="checkbox"
                   checked={reminderEmails}
                   onChange={(e) => setReminderEmails(e.target.checked)}
+                  className="h-5 w-5 rounded border-zinc-300 dark:border-zinc-800 text-primary-dark focus:ring-primary-dark cursor-pointer mt-1"
+                />
+              </div>
+
+              {/* Option 3: In App Notifications */}
+              <div className="flex items-start justify-between p-4 rounded-xl border border-zinc-150/40 bg-zinc-50/20 dark:bg-zinc-950/20 dark:border-zinc-850/60">
+                <div className="space-y-1 pr-4">
+                  <Label className="text-body-small-bold font-bold text-zinc-850 dark:text-zinc-200">
+                    In-App Alerts
+                  </Label>
+                  <p className="text-body-caption text-zinc-500 leading-normal">
+                    Enable the notification bell badge inside the dashboard toolbar to see real-time updates while active.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={inAppNotifications}
+                  onChange={(e) => setInAppNotifications(e.target.checked)}
                   className="h-5 w-5 rounded border-zinc-300 dark:border-zinc-800 text-primary-dark focus:ring-primary-dark cursor-pointer mt-1"
                 />
               </div>

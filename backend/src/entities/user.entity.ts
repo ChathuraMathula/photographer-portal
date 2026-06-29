@@ -67,6 +67,9 @@ export class User {
   @Column({ default: true })
   reminderEmailsEnabled!: boolean;
 
+  @Column({ default: true })
+  inAppNotificationsEnabled!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

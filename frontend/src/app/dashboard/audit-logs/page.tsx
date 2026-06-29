@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, RefreshCw, Filter, Search, ClipboardList } from "lucide-react";
+import { DatePickerInput } from "@/components/ui/DatePickerInput";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -155,25 +156,21 @@ export default function AuditLogsPage() {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="startDate" className="text-xs font-semibold text-zinc-650 dark:text-zinc-350">Start Date</Label>
-            <Input
-              id="startDate"
-              type="date"
+          <div className="space-y-1.5 flex flex-col justify-end">
+            <DatePickerInput
+              label="Start"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="h-10 text-xs dark:bg-zinc-950"
+              onChange={setStartDate}
+              maxDate={endDate || undefined}
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="endDate" className="text-xs font-semibold text-zinc-650 dark:text-zinc-350">End Date</Label>
-            <Input
-              id="endDate"
-              type="date"
+          <div className="space-y-1.5 flex flex-col justify-end">
+            <DatePickerInput
+              label="End"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="h-10 text-xs dark:bg-zinc-950"
+              onChange={setEndDate}
+              minDate={startDate || undefined}
             />
           </div>
 
