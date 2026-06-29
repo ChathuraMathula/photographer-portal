@@ -84,7 +84,9 @@ export function ManualBookingModal({
               <Input
                 id="mb-firstName"
                 {...formik.getFieldProps("firstName")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.firstName && formik.errors.firstName ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.firstName ? formik.errors.firstName : undefined} />
             </div>
@@ -93,7 +95,9 @@ export function ManualBookingModal({
               <Input
                 id="mb-lastName"
                 {...formik.getFieldProps("lastName")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.lastName && formik.errors.lastName ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.lastName ? formik.errors.lastName : undefined} />
             </div>
@@ -106,7 +110,9 @@ export function ManualBookingModal({
                 id="mb-email"
                 type="email"
                 {...formik.getFieldProps("email")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.email && formik.errors.email ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.email ? formik.errors.email : undefined} />
             </div>
@@ -115,7 +121,9 @@ export function ManualBookingModal({
               <Input
                 id="mb-phone"
                 {...formik.getFieldProps("phone")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.phone && formik.errors.phone ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.phone ? formik.errors.phone : undefined} />
             </div>
@@ -173,7 +181,9 @@ export function ManualBookingModal({
                 id="mb-location"
                 placeholder="e.g. Cinnamon Grand"
                 {...formik.getFieldProps("location")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.location && formik.errors.location ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.location ? formik.errors.location : undefined} />
             </div>
@@ -260,7 +270,9 @@ export function ManualBookingModal({
                   }
                 }
               }}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                formik.touched.coordinates && formik.errors.coordinates ? "border-red-500" : ""
+              }`}
             />
             {geocodingStatus && (
               <p className="text-[10px] text-zinc-550 dark:text-zinc-400 font-semibold animate-pulse mt-1">
@@ -381,7 +393,9 @@ export function ManualBookingModal({
                 type="number"
                 placeholder="e.g. 25000"
                 {...formik.getFieldProps("totalAmountLkr")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.totalAmountLkr && formik.errors.totalAmountLkr ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.totalAmountLkr ? formik.errors.totalAmountLkr : undefined} />
             </div>
@@ -392,7 +406,9 @@ export function ManualBookingModal({
                 type="number"
                 placeholder="e.g. 5000"
                 {...formik.getFieldProps("advancePaymentLkr")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+                className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                  formik.touched.advancePaymentLkr && formik.errors.advancePaymentLkr ? "border-red-500" : ""
+                }`}
               />
               <FieldError msg={formik.touched.advancePaymentLkr ? formik.errors.advancePaymentLkr : undefined} />
             </div>
