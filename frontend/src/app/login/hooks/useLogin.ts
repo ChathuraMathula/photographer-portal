@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
@@ -20,8 +20,17 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 export function useLogin() {
   const [apiError, setApiError] = useState("");
+  const [isDeactivated, setIsDeactivated] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
+
+  // Detect ?deactivated=true in URL
+  useEffect(() => {
+    if (searchParams.get("deactivated") === "true") {
+      setIsDeactivated(true);
+    }
+  }, [searchParams]);
 
   const formik = useFormik({
     initialValues: {
@@ -31,6 +40,7 @@ export function useLogin() {
     validationSchema: LoginSchema,
     onSubmit: async (values, { setSubmitting }) => {
       setApiError("");
+      setIsDeactivated(false);
 
       try {
         const response = await fetch(`${API}/auth/login`, {
@@ -67,5 +77,6 @@ export function useLogin() {
   return {
     formik,
     apiError,
+    isDeactivated,
   };
 }

@@ -10,6 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../entities/user.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ChatGateway } from '../reservations/chat.gateway';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +20,8 @@ export class UsersService {
     private userRepository: Repository<User>,
     @InjectRepository(PhotographerProfile)
     private profileRepository: Repository<PhotographerProfile>,
+    private readonly chatGateway: ChatGateway,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
@@ -109,8 +113,31 @@ export class UsersService {
       throw new ForbiddenException('Admins can only manage Photographers');
     }
 
+    const wasActive = user.isActive;
     user.isActive = !user.isActive;
     await this.userRepository.save(user);
+
+    // If user was just DEACTIVATED: emit real-time event + send email
+    if (wasActive && !user.isActive) {
+      // Emit WebSocket event to the user's personal room so they get logged out in real-time
+      try {
+        this.chatGateway.server
+          .to(`user_${id}`)
+          .emit('userDeactivated', {
+            userId: id,
+            message: 'Your account has been suspended by an administrator.',
+          });
+      } catch (err) {
+        console.error('Failed to emit userDeactivated event:', err);
+      }
+
+      // Send deactivation email
+      try {
+        await this.emailService.sendAccountDeactivated(user.email, user.firstName);
+      } catch (err) {
+        console.error('Failed to send account deactivated email:', err);
+      }
+    }
 
     return {
       id: user.id,

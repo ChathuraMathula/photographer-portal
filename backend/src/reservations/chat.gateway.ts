@@ -101,6 +101,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { status: 'joined' };
   }
 
+  // Personal user room: used for account-level events (e.g. deactivation)
+  @SubscribeMessage('joinUserRoom')
+  handleJoinUserRoom(
+    @MessageBody() data: { userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(`👤 User ${data.userId} joined personal room: user_${data.userId}`);
+    client.join(`user_${data.userId}`);
+    return { status: 'joined' };
+  }
+
   // Live slot status locking:
   @SubscribeMessage('joinBooking')
   handleJoinBooking(

@@ -132,4 +132,32 @@ export class EmailService {
       ],
     });
   }
+
+  async sendAccountDeactivated(
+    userEmail: string,
+    firstName: string,
+  ) {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #dc2626;">Account Suspended</h2>
+        <p>Dear ${firstName},</p>
+        <p>We are writing to inform you that your account on the <strong>Photographer Portal</strong> has been <strong>suspended</strong> by a system administrator.</p>
+        <p>As a result of this action:</p>
+        <ul>
+          <li>Your portal access has been immediately revoked.</li>
+          <li>Any active sessions have been terminated.</li>
+          <li>Your booking page is no longer accessible to clients.</li>
+        </ul>
+        <p>If you believe this is a mistake or would like to appeal this decision, please contact your system administrator directly.</p>
+        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
+      </div>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: userEmail,
+      subject: 'Your Account Has Been Suspended',
+      html,
+    });
+  }
 }

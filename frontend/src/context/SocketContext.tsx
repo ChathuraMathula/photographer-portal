@@ -1,9 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { io, Socket } from "socket.io-client";
 import { RootState } from "@/store/store";
+import { logout } from "@/store/slices/authSlice";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -16,6 +17,7 @@ const SocketContext = createContext<SocketContextType>({ socket: null, connected
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, id: userId, role } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
 
@@ -39,6 +41,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     socketInstance.on("connect", () => {
       setConnected(true);
       console.log(`🔌 Global WebSocket Connected: ${socketInstance.id} (User: ${userId}, Role: ${role})`);
+
+      // Join personal user room for account-level events
+      if (userId) {
+        socketInstance.emit("joinUserRoom", { userId });
+      }
     });
 
     socketInstance.on("disconnect", () => {
@@ -46,7 +53,34 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       console.log("🔌 Global WebSocket Disconnected");
     });
 
+    // Handle real-time account deactivation
+    const handleUserDeactivated = async () => {
+      console.log("🚫 Account deactivated — logging out...");
+
+      // Clear HTTP-only cookie on the backend
+      try {
+        await fetch(`${API}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (err) {
+        console.error("Backend logout error:", err);
+      }
+
+      // Clear Redux + localStorage
+      dispatch(logout());
+
+      // Disconnect socket cleanly
+      socketInstance.disconnect();
+
+      // Redirect to login with deactivation flag
+      window.location.href = "/login?deactivated=true";
+    };
+
+    socketInstance.on("userDeactivated", handleUserDeactivated);
+
     return () => {
+      socketInstance.off("userDeactivated", handleUserDeactivated);
       socketInstance.disconnect();
       setSocket(null);
       setConnected(false);

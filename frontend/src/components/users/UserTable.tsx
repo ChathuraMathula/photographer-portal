@@ -4,7 +4,7 @@ import { UserTableRow } from "./UserTableRow";
 
 type Props = {
   users: UserAccount[];
-  onToggleActive: (id: string) => void;
+  onToggleActive: (id: string) => Promise<void> | void;
 };
 
 export function UserTable({ users, onToggleActive }: Props) {

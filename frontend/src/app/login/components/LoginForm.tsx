@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { type FormikProps } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ShieldX } from "lucide-react";
 
 type Props = {
   formik: any;
   apiError: string;
+  isDeactivated?: boolean;
 };
 
-export function LoginForm({ formik, apiError }: Props) {
+export function LoginForm({ formik, apiError, isDeactivated }: Props) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -25,6 +25,22 @@ export function LoginForm({ formik, apiError }: Props) {
       </div>
 
       <form onSubmit={formik.handleSubmit} className="space-y-5">
+        {/* Account deactivated banner */}
+        {isDeactivated && (
+          <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 border border-red-200/60 dark:border-red-900/40 flex items-start gap-3">
+            <ShieldX className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-body-small-s font-bold text-red-700 dark:text-red-400">
+                Account Suspended
+              </p>
+              <p className="text-body-caption text-red-600 dark:text-red-500 mt-0.5">
+                Your account has been deactivated by an administrator. Please contact support for assistance.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* API error (e.g. wrong credentials) */}
         {apiError && (
           <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-4 text-body-small-s text-red-650 dark:text-red-400 border border-red-200/50 dark:border-red-900/30">
             {apiError}
