@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/store/slices/authSlice";
 import { User, Shield, Phone, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
@@ -21,6 +23,7 @@ const AdminProfileSchema = Yup.object().shape({
 });
 
 export function AdminProfilePage() {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +64,16 @@ export function AdminProfilePage() {
         if (!res.ok) {
           throw new Error("Failed to update profile");
         }
+
+        const data = await res.json();
+        dispatch(
+          setCredentials({
+            id: data.id,
+            email: data.email,
+            role: data.role,
+            firstName: data.firstName,
+          })
+        );
 
         toast.success("Profile settings updated successfully!");
         formik.setFieldValue("password", "");

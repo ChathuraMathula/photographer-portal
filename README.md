@@ -47,19 +47,25 @@ photographer-portal/
 │   │   └── reset.ts         # npm run db:reset entry point
 │   └── package.json
      └── src/
-         ├── app/
-         │   ├── login/       # Login page
-         │   ├── dashboard/   # Role-based collapsible dashboard
-         │   ├── api-tester/  # Interactive developer API Docs & Tester Console
-         │   └── book/[slug]/ # Public booking page
-         ├── components/
-         │   ├── dashboard/
-         │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
-         │   │   ├── reports/ # [NEW] AdminReportsPage.tsx - Admin reports & analytics with graphs
-         │   │   └── ...
-         ├── config/routes.ts # Route permissions + prefixes
-         ├── proxy.ts         # Next.js middleware (auth guard)
-         └── store/           # Redux store + authSlice
+          ├── app/
+          │   ├── login/       # Login page
+          │   ├── dashboard/   # Role-based collapsible dashboard
+          │   │   ├── reports/
+          │   │   │   ├── hooks/
+          │   │   │   │   └── useReports.ts # [NEW] Custom hook managing statistics & reports state
+          │   │   │   └── ...
+          │   ├── api-tester/  # Interactive developer API Docs & Tester Console
+          │   └── book/[slug]/ # Public booking page
+          ├── components/
+          │   ├── dashboard/
+          │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
+          │   │   ├── reports/ 
+          │   │   │   ├── AdminReportsPage.tsx       # [NEW] Admin analytics dashboard with graphs
+          │   │   │   └── PhotographerReportsView.tsx # [NEW] Photographer reports visualization component
+          │   │   └── ...
+          ├── config/routes.ts # Route permissions + prefixes
+          ├── proxy.ts         # Next.js middleware (auth guard)
+          └── store/           # Redux store + authSlice
 ```
 
 ---
