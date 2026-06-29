@@ -187,6 +187,8 @@ export class ReservationsService {
       eventType: dto.eventType,
       location: dto.location,
       locationMapLink: dto.locationMapLink,
+      city: dto.city,
+      district: dto.district,
       customerNotes: dto.notes,
       status: ReservationStatus.CONFIRMED, // Manual offline bookings are pre-confirmed
       reservationToken: crypto.randomBytes(32).toString('hex'),

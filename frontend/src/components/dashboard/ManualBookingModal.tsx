@@ -19,6 +19,8 @@ export type ManualBookingValues = {
   endTime: string;
   eventType: string;
   location: string;
+  city: string;
+  district: string;
   locationMapLink: string;
   notes: string;
   packageId: string;
@@ -161,13 +163,37 @@ export function ManualBookingModal({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mb-location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Location (optional)</Label>
+              <Label htmlFor="mb-location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Venue / Location <span className="text-red-500">*</span></Label>
               <Input
                 id="mb-location"
-                placeholder="e.g. Colombo 03"
+                placeholder="e.g. Cinnamon Grand"
                 {...formik.getFieldProps("location")}
                 className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
+              <FieldError msg={formik.touched.location ? formik.errors.location : undefined} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mb-city" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">City <span className="text-red-500">*</span></Label>
+              <Input
+                id="mb-city"
+                placeholder="e.g. Colombo 03"
+                {...formik.getFieldProps("city")}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              />
+              <FieldError msg={formik.touched.city ? formik.errors.city : undefined} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mb-district" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">District <span className="text-red-500">*</span></Label>
+              <Input
+                id="mb-district"
+                placeholder="e.g. Colombo"
+                {...formik.getFieldProps("district")}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              />
+              <FieldError msg={formik.touched.district ? formik.errors.district : undefined} />
             </div>
           </div>
 

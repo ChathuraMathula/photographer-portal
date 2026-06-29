@@ -54,8 +54,24 @@ const DetailsSchema = Yup.object({
     .required("Phone number is required")
     .matches(/^[+]?[0-9\s-]{7,15}$/, "Please enter a valid phone number"),
   location: Yup.string().test(
-    "at-least-one-location",
-    "Either location address or Google Maps link is required",
+    "venue-required",
+    "Venue is required if map link is not provided",
+    function (value) {
+      const { locationMapLink } = this.parent;
+      return !!(value?.trim() || locationMapLink?.trim());
+    }
+  ),
+  city: Yup.string().test(
+    "city-required",
+    "City is required if map link is not provided",
+    function (value) {
+      const { locationMapLink } = this.parent;
+      return !!(value?.trim() || locationMapLink?.trim());
+    }
+  ),
+  district: Yup.string().test(
+    "district-required",
+    "District is required if map link is not provided",
     function (value) {
       const { locationMapLink } = this.parent;
       return !!(value?.trim() || locationMapLink?.trim());
@@ -66,10 +82,10 @@ const DetailsSchema = Yup.object({
     .nullable()
     .test(
       "at-least-one-location-link",
-      "Either location address or Google Maps link is required",
+      "Either Venue details or Google Maps link is required",
       function (value) {
-        const { location } = this.parent;
-        return !!(value?.trim() || location?.trim());
+        const { location, city, district } = this.parent;
+        return !!(value?.trim() || (location?.trim() && city?.trim() && district?.trim()));
       }
     ),
   notes: Yup.string(),
@@ -153,7 +169,7 @@ export function useBooking() {
   });
 
   const detailsFormik = useFormik({
-    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", locationMapLink: "", notes: "" },
+    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", city: "", district: "", locationMapLink: "", notes: "" },
     validationSchema: DetailsSchema,
     onSubmit: async (values, { setStatus }) => {
       if (!availabilityChecked) return;

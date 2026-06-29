@@ -23,6 +23,8 @@ export class CreateManualBookingDto {
 
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() locationMapLink?: string;
+  @IsOptional() @IsString() city?: string;
+  @IsOptional() @IsString() district?: string;
   @IsOptional() @IsString() notes?: string;
   @IsOptional() @IsString() packageId?: string;
   @IsOptional() @IsNumber() advancePaymentPriceInCents?: number;

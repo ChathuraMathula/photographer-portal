@@ -30,6 +30,16 @@ export type ReportData = {
     eventType: string;
     totalLkr: number;
     status: string;
+    location?: string;
+    locationMapLink?: string;
+    city?: string;
+    district?: string;
+    customer?: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+    };
   }>;
 };
 

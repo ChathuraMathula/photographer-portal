@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { OSMMapPreview } from "@/components/common/OSMMapPreview";
 import { Calendar, Clock, MapPin, Phone, Mail, User, Tag, X, Copy, Check, Download } from "lucide-react";
 import { CountdownTimer } from "@/components/tracking/CountdownTimer";
 import { usePhotographerDashboardContext } from "@/app/dashboard/context/PhotographerDashboardContext";
@@ -267,7 +268,12 @@ export function BookingDetailsModal({
                 <div>
                   <p className="text-body-caption font-semibold text-zinc-400">Location</p>
                   <p className="text-body-small-s font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-zinc-400" /> {reservation.location || "Offline / Not Provided"}
+                    <MapPin className="h-3.5 w-3.5 text-zinc-400" /> 
+                    <span>
+                      {reservation.location || "Not specified"}
+                      {reservation.city && `, ${reservation.city}`}
+                      {reservation.district && `, ${reservation.district}`}
+                    </span>
                   </p>
                   {reservation.locationMapLink && (
                     <a
@@ -282,6 +288,18 @@ export function BookingDetailsModal({
                 </div>
               </div>
             </div>
+            {(reservation.location || reservation.locationMapLink || reservation.city || reservation.district) && (
+              <div className="mt-3.5">
+                <p className="text-body-caption font-semibold text-zinc-400 mb-2">Location Map Preview</p>
+                <OSMMapPreview
+                  location={reservation.location}
+                  city={reservation.city}
+                  district={reservation.district}
+                  locationMapLink={reservation.locationMapLink}
+                  height="180px"
+                />
+              </div>
+            )}
           </div>
 
           {/* Client Notes */}

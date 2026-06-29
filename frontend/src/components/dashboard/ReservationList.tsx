@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { type Reservation } from "@/types";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReservationListItem } from "./ReservationListItem";
+import { Search } from "lucide-react";
 
 type Props = {
   reservations: Reservation[];
@@ -11,10 +12,18 @@ type Props = {
 
 export function ReservationList({ reservations, selectedId, onSelect }: Props) {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const filteredReservations = reservations.filter((res) => {
-    if (statusFilter === "ALL") return true;
-    return res.status === statusFilter;
+    if (statusFilter !== "ALL" && res.status !== statusFilter) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const name = `${res.customer?.firstName ?? ""} ${res.customer?.lastName ?? ""}`.toLowerCase();
+      const location = (res.location ?? "").toLowerCase();
+      const eventType = (res.eventType ?? "").toLowerCase();
+      return name.includes(q) || location.includes(q) || eventType.includes(q);
+    }
+    return true;
   });
 
   return (
@@ -26,11 +35,21 @@ export function ReservationList({ reservations, selectedId, onSelect }: Props) {
             Count: {filteredReservations.length}
           </span>
         </div>
-        <div className="mt-2.5">
+        <div className="flex flex-col gap-2 mt-3">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Search request or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-[50px] pl-10 pr-3 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-1 focus:ring-primary-dark"
+            />
+          </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full h-9 px-3 rounded-lg border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-dark"
+            className="w-full h-[50px] px-3 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-dark"
           >
             <option value="ALL">All Statuses</option>
             <option value="PENDING">PENDING</option>

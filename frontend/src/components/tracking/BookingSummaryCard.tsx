@@ -1,6 +1,7 @@
 import { type TrackingReservation } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Tag, MapPin } from "lucide-react";
+import { OSMMapPreview } from "@/components/common/OSMMapPreview";
 
 export function BookingSummaryCard({ reservation }: { reservation: TrackingReservation }) {
   return (
@@ -36,7 +37,11 @@ export function BookingSummaryCard({ reservation }: { reservation: TrackingReser
             <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
               Location
             </p>
-            <p className="text-body-small mt-0.5 text-zinc-550 dark:text-zinc-450">{reservation.location || "Not specified"}</p>
+            <p className="text-body-small mt-0.5 text-zinc-550 dark:text-zinc-450">
+              {reservation.location || "Not specified"}
+              {reservation.city && `, ${reservation.city}`}
+              {reservation.district && `, ${reservation.district}`}
+            </p>
             {reservation.locationMapLink && (
               <a
                 href={reservation.locationMapLink}
@@ -49,6 +54,20 @@ export function BookingSummaryCard({ reservation }: { reservation: TrackingReser
             )}
           </div>
         </div>
+        {(reservation.location || reservation.locationMapLink || reservation.city || reservation.district) && (
+          <div className="sm:col-span-2 border-t pt-4 mt-2 dark:border-zinc-800">
+            <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+              Event Location Preview (OpenStreetMap)
+            </p>
+            <OSMMapPreview
+              location={reservation.location}
+              city={reservation.city}
+              district={reservation.district}
+              locationMapLink={reservation.locationMapLink}
+              height="260px"
+            />
+          </div>
+        )}
         {reservation.customerNotes && (
           <div className="sm:col-span-2 border-t pt-4 mt-2 dark:border-zinc-800">
             <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100 mb-1">

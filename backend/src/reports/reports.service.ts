@@ -302,6 +302,16 @@ export class ReportsService {
         eventType: res.eventType,
         totalLkr: (res.totalAmountInCents || 0) / 100,
         status: res.status,
+        location: res.location,
+        locationMapLink: res.locationMapLink,
+        city: res.city,
+        district: res.district,
+        customer: res.customer ? {
+          firstName: res.customer.firstName,
+          lastName: res.customer.lastName,
+          email: res.customer.email,
+          phone: res.customer.phone,
+        } : undefined,
       })),
     };
   }

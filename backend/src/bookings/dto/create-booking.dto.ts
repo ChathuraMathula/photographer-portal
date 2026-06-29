@@ -24,5 +24,7 @@ export class CreateBookingDto {
 
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() locationMapLink?: string;
+  @IsOptional() @IsString() city?: string;
+  @IsOptional() @IsString() district?: string;
   @IsOptional() @IsString() notes?: string;
 }

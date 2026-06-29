@@ -47,6 +47,7 @@ photographer-portal/
 │   │   ├── seed.ts          # npm run seed entry point
 │   │   └── reset.ts         # npm run db:reset entry point
 │   └── package.json
+└── frontend/                # Next.js App Router (port 4000)
      └── src/
           ├── app/
           │   ├── login/       # Login page
@@ -66,11 +67,14 @@ photographer-portal/
           │   ├── api-tester/  # Interactive developer API Docs & Tester Console
           │   └── book/[slug]/ # Public booking page
           ├── components/
+          │   ├── common/
+          │   │   └── OSMMapPreview.tsx # [NEW] Clean, sandboxed OpenStreetMap Leaflet component
           │   ├── dashboard/
           │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
           │   │   ├── reports/ 
           │   │   │   ├── AdminReportsPage.tsx       # [NEW] Admin analytics dashboard with graphs
-          │   │   │   └── PhotographerReportsView.tsx # [NEW] Photographer reports visualization component
+          │   │   │   ├── PhotographerReportsView.tsx # [NEW] Photographer reports visualization component
+          │   │   │   └── LocationAnalyticsMap.tsx  # [NEW] OpenStreetMap booking locations density heatmap
           │   │   └── ...
           ├── config/routes.ts # Route permissions + prefixes
           ├── proxy.ts         # Next.js middleware (auth guard)

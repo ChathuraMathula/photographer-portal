@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { type Reservation } from "@/types";
+import { OSMMapPreview } from "@/components/common/OSMMapPreview";
 import {
   Card,
   CardContent,
@@ -115,7 +116,11 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
             <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
               {reservation.startTime} - {reservation.endTime}
             </p>
-            <p className="text-body-caption text-zinc-500 mt-0.5">{reservation.location || "Location not given"}</p>
+            <p className="text-body-caption text-zinc-500 mt-0.5">
+              {reservation.location || "Location not given"}
+              {reservation.city && `, ${reservation.city}`}
+              {reservation.district && `, ${reservation.district}`}
+            </p>
           </div>
           <div>
             <p className="text-body-caption font-semibold text-zinc-400">Event</p>
@@ -127,7 +132,19 @@ export function CustomerDetailsCard({ reservation }: { reservation: Reservation 
         {reservation.customerNotes && (
           <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800">
             <p className="text-body-caption font-semibold text-zinc-400">Client Notes</p>
-            <p className="text-body-small italic text-zinc-500 mt-0.5">"{reservation.customerNotes}"</p>
+            <p className="text-body-small italic text-zinc-500 mt-0.5 font-medium">"{reservation.customerNotes}"</p>
+          </div>
+        )}
+        {(reservation.location || reservation.locationMapLink || reservation.city || reservation.district) && (
+          <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800">
+            <p className="text-body-caption font-semibold text-zinc-400 mb-2">Location Map Preview</p>
+            <OSMMapPreview
+              location={reservation.location}
+              city={reservation.city}
+              district={reservation.district}
+              locationMapLink={reservation.locationMapLink}
+              height="200px"
+            />
           </div>
         )}
       </CardContent>

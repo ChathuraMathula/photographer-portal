@@ -58,6 +58,12 @@ export class Reservation {
   @Column({ nullable: true })
   locationMapLink?: string;
 
+  @Column({ nullable: true })
+  city?: string;
+
+  @Column({ nullable: true })
+  district?: string;
+
   @Column({ type: 'text', nullable: true })
   customerNotes?: string;
 

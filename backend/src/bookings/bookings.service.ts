@@ -169,6 +169,8 @@ export class BookingsService {
       eventType: dto.eventType,
       location: dto.location,
       locationMapLink: dto.locationMapLink,
+      city: dto.city,
+      district: dto.district,
       customerNotes: dto.notes,
       status: ReservationStatus.PENDING,
       reservationToken: token,

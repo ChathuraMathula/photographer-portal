@@ -40,6 +40,8 @@ export type Reservation = {
   eventType: string;
   location?: string;
   locationMapLink?: string;
+  city?: string;
+  district?: string;
   customerNotes?: string;
   adminNotes?: string;
   totalAmountInCents?: number;
@@ -88,6 +90,8 @@ export type TrackingReservation = {
   eventType: string;
   location?: string;
   locationMapLink?: string;
+  city?: string;
+  district?: string;
   customerNotes?: string;
   advancePaymentPriceInCents?: number;
   totalAmountInCents?: number;

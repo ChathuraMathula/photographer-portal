@@ -8,6 +8,7 @@ import { PhotographerAnalyticsCharts } from "@/app/dashboard/reports/components/
 import { PhotographerPerformanceBreakdown } from "@/app/dashboard/reports/components/PhotographerPerformanceBreakdown";
 import { Loader2 } from "lucide-react";
 import { type ReportData } from "@/app/dashboard/reports/hooks/useReports";
+import { LocationAnalyticsMap } from "./LocationAnalyticsMap";
 
 type Props = {
   period: "weekly" | "monthly" | "yearly" | "custom";
@@ -77,6 +78,15 @@ export function PhotographerReportsView({
             timeline={reportData.timeline}
             statusDistribution={reportData.statusDistribution}
           />
+
+          {/* Event Locations Density map */}
+          <div className="space-y-3 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-6 shadow-sm">
+            <div className="text-left">
+              <h3 className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Event Location Analytics Density Map</h3>
+              <p className="text-body-caption text-zinc-500 mt-1">Geographic density clusters and mapping coordinates of your booked events.</p>
+            </div>
+            <LocationAnalyticsMap bookings={reportData.rawBookings} />
+          </div>
 
           {/* Performance Lists Section */}
           <PhotographerPerformanceBreakdown

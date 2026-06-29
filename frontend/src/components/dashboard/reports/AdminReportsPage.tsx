@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
+import { LocationAnalyticsMap } from "./LocationAnalyticsMap";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -42,6 +43,7 @@ type AdminReportData = {
   timeline: Array<{ label: string; bookings: number; revenueLkr: number }>;
   photographerLeaderboard: LeaderboardRow[];
   systemStats: SystemStats;
+  rawBookings: any[];
 };
 
 export function AdminReportsPage() {
@@ -374,6 +376,19 @@ export function AdminReportsPage() {
             </CardContent>
           </Card>
         </section>
+      )}
+
+      {/* Admin Location Analytics map */}
+      {reportData && (
+        <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">System-wide Booking Locations Map</CardTitle>
+            <CardDescription className="text-xs">Visual analytics map containing all platform confirmed event density regions.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LocationAnalyticsMap bookings={reportData.rawBookings as any} />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
