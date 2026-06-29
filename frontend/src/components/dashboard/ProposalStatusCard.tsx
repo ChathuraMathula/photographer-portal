@@ -8,6 +8,7 @@ import { CountdownTimer } from "@/components/tracking/CountdownTimer";
 import { usePhotographerDashboardContext } from "@/app/dashboard/context/PhotographerDashboardContext";
 import { toast } from "sonner";
 import { Download, Landmark } from "lucide-react";
+import { ConfirmationModal } from "@/components/common/ConfirmationModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -18,6 +19,7 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
   const [payments, setPayments] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [fulfilling, setFulfilling] = useState(false);
+  const [showCashConfirm, setShowCashConfirm] = useState(false);
 
   const fetchPayments = async () => {
     if (!context || !reservation.id) return;
@@ -130,7 +132,7 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
                   </p>
                 </div>
                 <Button
-                  onClick={handleLogCashPayment}
+                  onClick={() => setShowCashConfirm(true)}
                   disabled={fulfilling}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold h-8 rounded-lg cursor-pointer"
                 >
@@ -162,6 +164,23 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
           </div>
         )}
       </CardContent>
+
+      {/* Cash Payment Confirmation Modal */}
+      {showCashConfirm && (
+        <ConfirmationModal
+          title="Log Manual Cash Payment?"
+          description={`You are about to log an offline cash payment of LKR ${(remainingBalance / 100).toLocaleString()}. This will mark the booking as fully settled and email the invoice to the customer.`}
+          confirmLabel="Confirm Payment"
+          cancelLabel="Go Back"
+          variant="warning"
+          loading={fulfilling}
+          onConfirm={async () => {
+            await handleLogCashPayment();
+            setShowCashConfirm(false);
+          }}
+          onCancel={() => setShowCashConfirm(false)}
+        />
+      )}
     </Card>
   );
 }

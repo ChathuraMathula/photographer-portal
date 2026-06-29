@@ -13,6 +13,16 @@ import { ProposalSection } from "@/components/tracking/ProposalSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaymentSandboxModal } from "@/components/tracking/PaymentSandboxModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -45,6 +55,12 @@ export default function TrackingPage() {
   } = useTracking();
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
+  const [paymentConfirmDetails, setPaymentConfirmDetails] = useState<{
+    title: string;
+    description: string;
+    action: () => void;
+  } | null>(null);
 
   // ── Render gates ──────────────────────────────────────────────────────────
 
@@ -119,8 +135,15 @@ export default function TrackingPage() {
                     className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold" 
                     onClick={() => {
                       if (reservation.clientSelectedPackageId) {
-                        setSelectedPkgId(reservation.clientSelectedPackageId);
-                        setShowPaymentModal(true);
+                        setPaymentConfirmDetails({
+                          title: "Confirm Balance Payment?",
+                          description: `You are about to proceed to checkout to pay the remaining balance of LKR ${(((reservation.totalAmountInCents ?? 0) - (reservation.totalPaidInCents ?? 0)) / 100).toLocaleString()} using a simulated card payment.`,
+                          action: () => {
+                            setSelectedPkgId(reservation.clientSelectedPackageId!);
+                            setShowPaymentModal(true);
+                          }
+                        });
+                        setShowPaymentConfirm(true);
                       }
                     }}
                   >
@@ -160,7 +183,31 @@ export default function TrackingPage() {
               selectedPkgId={selectedPkgId}
               confirming={confirming}
               onSelectPackage={setSelectedPkgId}
-              onConfirm={() => setShowPaymentModal(true)}
+              onConfirm={() => {
+                const depositAmt = () => {
+                  if (!selectedPkgId || !reservation.selectedPackages) return 0;
+                  const pkg = reservation.selectedPackages.find((p) => p.id === selectedPkgId);
+                  if (!pkg) return 0;
+                  if (pkg.customDepositAmountInCents !== undefined && pkg.customDepositAmountInCents !== null) {
+                    return pkg.customDepositAmountInCents;
+                  }
+                  if (pkg.depositType === "fixed") {
+                    return pkg.depositValue ?? 0;
+                  }
+                  if (pkg.depositType === "percentage") {
+                    return Math.round((pkg.priceInCents * (pkg.depositValue ?? 0)) / 100);
+                  }
+                  return 0;
+                };
+                setPaymentConfirmDetails({
+                  title: "Confirm Deposit Payment?",
+                  description: `You are about to proceed to checkout to pay the advance deposit of LKR ${(depositAmt() / 100).toLocaleString()} to lock in this reservation request.`,
+                  action: () => {
+                    setShowPaymentModal(true);
+                  }
+                });
+                setShowPaymentConfirm(true);
+              }}
               getDeadlineText={getDeadlineText}
               onCancel={handleCancelReservation}
               cancelling={cancelling}
@@ -198,6 +245,36 @@ export default function TrackingPage() {
           }}
           onClose={() => setShowPaymentModal(false)}
         />
+      )}
+
+      {/* Nice shadcn Alert Dialog for Payment Confirmation */}
+      {showPaymentConfirm && paymentConfirmDetails && (
+        <AlertDialog open={showPaymentConfirm} onOpenChange={setShowPaymentConfirm}>
+          <AlertDialogContent className="max-w-sm rounded-xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-zinc-900 dark:text-zinc-100 font-bold">
+                {paymentConfirmDetails.title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-zinc-550 dark:text-zinc-400 text-xs">
+                {paymentConfirmDetails.description}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row sm:justify-end gap-2 pt-2">
+              <AlertDialogCancel className="rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-xs h-10 w-full sm:w-auto">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setShowPaymentConfirm(false);
+                  paymentConfirmDetails.action();
+                }}
+                className="bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-850 dark:hover:bg-zinc-100 font-semibold text-xs rounded-xl h-10 w-full sm:w-auto"
+              >
+                Proceed to Pay
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </main>
   );
