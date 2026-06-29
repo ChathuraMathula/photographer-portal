@@ -32,7 +32,7 @@ export function PhotographerPerformanceBreakdown({ packages, rawBookings }: Prop
       </Card>
 
       {/* Bookings log table */}
-      <BookingsLogTable bookings={rawBookings} />
+      <BookingsLogTable rawBookings={rawBookings} />
     </div>
   );
 }

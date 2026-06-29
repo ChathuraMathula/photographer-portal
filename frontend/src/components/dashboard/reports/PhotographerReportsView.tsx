@@ -55,8 +55,6 @@ export function PhotographerReportsView({
         onDownloadBookings={handleDownloadBookings}
         downloadingFinancial={downloadingFinancial}
         downloadingBookings={downloadingBookings}
-        refreshing={refreshing}
-        onRefresh={() => loadStats(false)}
       />
 
       {loading ? (
@@ -69,7 +67,10 @@ export function PhotographerReportsView({
           <KpiCardsGrid summary={reportData.summary} />
 
           {/* Business Advisory Widget */}
-          <BusinessAdvisoryCard summary={reportData.summary} />
+          <BusinessAdvisoryCard
+            conversionRate={reportData.summary.conversionRate}
+            totalBookings={reportData.summary.totalBookings}
+          />
 
           {/* Charts Section */}
           <PhotographerAnalyticsCharts
