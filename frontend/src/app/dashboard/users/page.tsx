@@ -38,6 +38,16 @@ export default function UserManagementPage() {
     formik,
     handleAddSpec,
     handleRemoveSpec,
+    page,
+    setPage,
+    totalPages,
+    total,
+    search,
+    setSearch,
+    roleFilter,
+    setRoleFilter,
+    statusFilter,
+    setStatusFilter,
   } = useUserManagement();
 
   const handleLogout = async () => {
@@ -98,6 +108,42 @@ export default function UserManagementPage() {
         </Button>
       </div>
 
+      {/* Filters Bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center bg-white dark:bg-zinc-900 p-4 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search by name, email or phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-10 px-3 bg-zinc-50 border border-zinc-250 rounded-lg text-body-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+          />
+        </div>
+        <div className="flex gap-3">
+          {loggedInRole === UserRole.SUPER_ADMIN && (
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="h-10 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-body-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+            >
+              <option value="ALL">All Roles</option>
+              <option value="SUPER_ADMIN">Super Admins</option>
+              <option value="ADMIN">Admins</option>
+              <option value="PHOTOGRAPHER">Photographers</option>
+            </select>
+          )}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-10 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-body-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
       {/* Users list */}
       {loading ? (
         <div className="text-center py-12 text-zinc-500 animate-pulse">
@@ -106,7 +152,35 @@ export default function UserManagementPage() {
       ) : error ? (
         <div className="text-center py-12 text-red-500">{error}</div>
       ) : (
-        <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
+        <div className="space-y-4">
+          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
+              <div className="text-body-caption text-zinc-500">
+                Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{page}</span> of{" "}
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{totalPages}</span> ({total} total users)
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </Button>
+                <Button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Create user modal */}

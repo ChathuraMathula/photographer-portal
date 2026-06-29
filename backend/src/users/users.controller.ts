@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -62,9 +63,22 @@ export class UsersController {
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-  findAll(@Req() req: RequestWithUser) {
+  findAll(
+    @Req() req: RequestWithUser,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('status') status?: string,
+  ) {
     const callerRole = req.user.role;
-    return this.usersService.findAll(callerRole);
+    return this.usersService.findAll(callerRole, {
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      search,
+      role,
+      status,
+    });
   }
 
   @Patch(':id/toggle-active')

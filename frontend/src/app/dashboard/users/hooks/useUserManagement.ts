@@ -65,13 +65,42 @@ export function useUserManagement() {
   const [specsInput, setSpecsInput] = useState("");
   const [specsList, setSpecsList] = useState<string[]>([]);
 
+  // Pagination & Filter States
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await authFetch(`${API}/users`, { credentials: "include" });
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+      if (debouncedSearch) params.append("search", debouncedSearch);
+      if (roleFilter !== "ALL") params.append("role", roleFilter);
+      if (statusFilter !== "ALL") params.append("status", statusFilter);
+
+      const res = await authFetch(`${API}/users?${params.toString()}`, { credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load users");
-      setUsers(data);
+      
+      setUsers(data.data || []);
+      setTotalPages(data.totalPages || 1);
+      setTotal(data.total || 0);
     } catch (err: any) {
       setError(err.message || "Error loading users");
     } finally {
@@ -86,7 +115,7 @@ export function useUserManagement() {
     ) {
       fetchUsers();
     }
-  }, [isAuthenticated, loggedInRole]);
+  }, [isAuthenticated, loggedInRole, page, limit, debouncedSearch, roleFilter, statusFilter]);
 
   const handleToggleActive = async (userId: string) => {
     try {
@@ -171,5 +200,15 @@ export function useUserManagement() {
     formik,
     handleAddSpec,
     handleRemoveSpec,
+    page,
+    setPage,
+    totalPages,
+    total,
+    search,
+    setSearch,
+    roleFilter,
+    setRoleFilter,
+    statusFilter,
+    setStatusFilter,
   };
 }

@@ -142,22 +142,60 @@ export class UsersService {
     };
   }
 
-  async findAll(callerRole: UserRole) {
-    if (callerRole === UserRole.SUPER_ADMIN) {
-      // Super admin can see all users
-      return this.userRepository.find({
-        order: { createdAt: 'DESC' },
-        relations: { profile: true },
-      });
-    } else if (callerRole === UserRole.ADMIN) {
-      // Admin can only see photographers
-      return this.userRepository.find({
-        where: { role: UserRole.PHOTOGRAPHER },
-        order: { createdAt: 'DESC' },
-        relations: { profile: true },
-      });
+  async findAll(
+    callerRole: UserRole,
+    query: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: string;
+      status?: string;
+    } = {},
+  ) {
+    if (callerRole !== UserRole.SUPER_ADMIN && callerRole !== UserRole.ADMIN) {
+      throw new ForbiddenException('Access denied');
     }
-    throw new ForbiddenException('Access denied');
+
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const qb = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .orderBy('user.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    // RBAC: Admins can only see Photographers
+    if (callerRole === UserRole.ADMIN) {
+      qb.andWhere('user.role = :role', { role: UserRole.PHOTOGRAPHER });
+    } else if (query.role) {
+      qb.andWhere('user.role = :role', { role: query.role });
+    }
+
+    if (query.status !== undefined && query.status !== '') {
+      const isActive = query.status === 'active';
+      qb.andWhere('user.isActive = :isActive', { isActive });
+    }
+
+    if (query.search) {
+      const searchPattern = `%${query.search.toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(user.firstName) LIKE :search OR LOWER(user.lastName) LIKE :search OR LOWER(user.email) LIKE :search OR LOWER(user.phone) LIKE :search)',
+        { search: searchPattern },
+      );
+    }
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async toggleActive(id: string, callerRole: UserRole) {

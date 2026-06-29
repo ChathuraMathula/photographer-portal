@@ -441,22 +441,56 @@ export class PaymentsService {
     }
   }
 
-  async getPhotographerTransactions(photographerId: string) {
-    return this.paymentRepository.find({
-      where: {
-        reservation: {
-          photographerId,
-        },
-      },
-      relations: {
-        reservation: {
-          customer: true,
-        },
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+  async getPhotographerTransactions(
+    photographerId: string,
+    query: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      method?: string;
+    } = {},
+  ) {
+    const page = query.page || 1;
+    const limit = query.limit || 15;
+    const skip = (page - 1) * limit;
+
+    const qb = this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoinAndSelect('payment.reservation', 'res')
+      .leftJoinAndSelect('res.customer', 'customer')
+      .where('res.photographerId = :photographerId', { photographerId })
+      .orderBy('payment.createdAt', 'DESC');
+
+    if (query.status && query.status !== 'ALL') {
+      qb.andWhere('payment.status = :status', { status: query.status });
+    }
+
+    if (query.method && query.method !== 'ALL') {
+      if (query.method === 'CASH') {
+        qb.andWhere('payment.cardBrand = :cardBrand', { cardBrand: 'Offline Payment' });
+      } else if (query.method === 'CARD') {
+        qb.andWhere('payment.cardBrand != :cardBrand', { cardBrand: 'Offline Payment' });
+      }
+    }
+
+    if (query.search) {
+      const searchPattern = `%${query.search.toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(customer.firstName) LIKE :search OR LOWER(customer.lastName) LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(payment.transactionId) LIKE :search OR LOWER(payment.cardBrand) LIKE :search)',
+        { search: searchPattern },
+      );
+    }
+
+    const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getReservationPayments(reservationId: string, userId: string) {

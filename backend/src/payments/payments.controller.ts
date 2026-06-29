@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
@@ -50,8 +51,21 @@ export class PaymentsController {
   @Get('photographer')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PHOTOGRAPHER)
-  getTransactions(@Req() req: RequestWithUser) {
-    return this.paymentsService.getPhotographerTransactions(req.user.userId);
+  getTransactions(
+    @Req() req: RequestWithUser,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('method') method?: string,
+  ) {
+    return this.paymentsService.getPhotographerTransactions(req.user.userId, {
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      search,
+      status,
+      method,
+    });
   }
 
   @Get(':reservationId')

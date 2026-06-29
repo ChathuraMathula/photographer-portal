@@ -48,7 +48,17 @@ export class ReservationsService {
     private emailService: EmailService,
   ) {}
 
-  async findAll(user: JwtUser) {
+  async findAll(
+    user: JwtUser,
+    queryOptions: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      startDate?: string;
+      endDate?: string;
+    } = {},
+  ) {
     // Auto-complete reservations whose dates have passed
     const todayStr = new Date().toISOString().split('T')[0];
     await this.reservationRepository
@@ -61,22 +71,61 @@ export class ReservationsService {
       .andWhere('date < :todayStr', { todayStr })
       .execute();
 
-    const query = this.reservationRepository
+    const qb = this.reservationRepository
       .createQueryBuilder('res')
       .leftJoinAndSelect('res.customer', 'customer')
-      .leftJoinAndSelect('res.photographer', 'photographer')
-      .leftJoinAndSelect('res.messages', 'messages');
+      .leftJoinAndSelect('res.photographer', 'photographer');
 
+    // Filter by photographer if logged in user is a photographer
     if (user.role === UserRole.PHOTOGRAPHER) {
-      query.where('res.photographerId = :photographerId', {
+      qb.andWhere('res.photographerId = :photographerId', {
         photographerId: user.userId,
       });
     }
 
-    return query
-      .orderBy('res.date', 'DESC')
-      .addOrderBy('res.startTime', 'ASC')
-      .getMany();
+    // Filter by status if provided
+    if (queryOptions.status && queryOptions.status !== 'ALL') {
+      qb.andWhere('res.status = :status', { status: queryOptions.status });
+    }
+
+    // Filter by date range (e.g. for calendar)
+    if (queryOptions.startDate && queryOptions.endDate) {
+      qb.andWhere('res.date >= :startDate AND res.date <= :endDate', {
+        startDate: queryOptions.startDate,
+        endDate: queryOptions.endDate,
+      });
+    }
+
+    // Filter by search term
+    if (queryOptions.search) {
+      const searchPattern = `%${queryOptions.search.toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(customer.firstName) LIKE :search OR LOWER(customer.lastName) LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(res.location) LIKE :search OR LOWER(res.eventType) LIKE :search OR LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search)',
+        { search: searchPattern },
+      );
+    }
+
+    qb.orderBy('res.date', 'DESC').addOrderBy('res.startTime', 'ASC');
+
+    // If date range is supplied, assume it is for the calendar view and return raw unpaginated results
+    if (queryOptions.startDate && queryOptions.endDate) {
+      return qb.getMany();
+    }
+
+    // Otherwise, apply pagination
+    const page = queryOptions.page || 1;
+    const limit = queryOptions.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string, user: JwtUser) {
