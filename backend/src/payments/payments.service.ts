@@ -189,6 +189,9 @@ export class PaymentsService {
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)
       .emit('transactionLogged', { reservationId: reservation.id });
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('transactionLogged', { reservationId: reservation.id });
 
     // Send confirmation or invoice email
     if (isBalancePayment) {

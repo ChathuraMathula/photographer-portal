@@ -203,6 +203,20 @@ export function useTracking() {
     }
   };
 
+  const refetchReservation = () => {
+    if (!token || !verifiedEmail) return;
+    fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Could not fetch reservation details");
+        return res.json() as Promise<TrackingReservation>;
+      })
+      .then((data) => {
+        setReservation(data);
+        if (data.clientSelectedPackageId) setSelectedPkgId(data.clientSelectedPackageId);
+      })
+      .catch(console.error);
+  };
+
   const getDeadlineText = (deadlineStr?: string) => {
     if (!deadlineStr) return "";
     const deadline = new Date(deadlineStr);
@@ -239,5 +253,6 @@ export function useTracking() {
     handleCancelReservation,
     getDeadlineText,
     setReservation,
+    refetchReservation,
   };
 }

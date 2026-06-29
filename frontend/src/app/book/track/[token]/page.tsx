@@ -52,6 +52,7 @@ export default function TrackingPage() {
     handleCancelReservation,
     getDeadlineText,
     setReservation,
+    refetchReservation,
   } = useTracking();
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -239,9 +240,7 @@ export default function TrackingPage() {
           token={token}
           packageId={selectedPkgId}
           onSuccess={(updatedStatus, pkgId) => {
-            setReservation((prev) =>
-              prev ? { ...prev, status: updatedStatus as any, clientSelectedPackageId: pkgId } : null
-            );
+            refetchReservation();
           }}
           onClose={() => setShowPaymentModal(false)}
         />
