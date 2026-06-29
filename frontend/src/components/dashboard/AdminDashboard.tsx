@@ -10,10 +10,10 @@ import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 // ── Admin nav items ───────────────────────────────────────────────────────────
 
 export const ADMIN_MENU: MenuItem[] = [
-  { id: "overview", label: "Overview",         icon: LayoutDashboard },
-  { id: "users",    label: "User Management",  icon: Users },
-  { id: "reports",  label: "Reports & Analytics", icon: BarChart3 },
-  { id: "profile",  label: "Profile Settings",   icon: UserCog },
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "users", label: "User Management", icon: Users },
+  { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
+  { id: "profile", label: "Profile Settings", icon: UserCog },
 ];
 
 type Props = {

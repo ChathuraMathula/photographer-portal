@@ -22,7 +22,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const { start } = useTopLoadingBar();
-  
+
   const context = usePhotographerDashboardContext();
   if (!context) return null;
 
@@ -181,7 +181,7 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
 
   const handleTabChange = (tab: string) => {
     start();
-    if (tab === "overview") router.push("/dashboard");
+    if (tab === "dashboard") router.push("/dashboard");
     else if (tab === "reports") router.push("/dashboard/reports");
     else if (tab === "profile") router.push("/dashboard/profile");
     else if (tab === "settings") router.push("/dashboard/settings");
@@ -204,7 +204,7 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
   };
 
   const menuItems = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "dashboard", label: "Overview", icon: LayoutDashboard },
     { id: "users", label: "User Management", icon: Users },
     { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
     { id: "profile", label: "Profile Details", icon: UserCog },
