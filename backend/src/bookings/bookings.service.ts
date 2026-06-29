@@ -383,6 +383,18 @@ export class BookingsService {
     this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', reservation);
     this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
 
+    // Broadcast availability change to unlock this slot on the calendar
+    const profile = await this.profileRepository.findOneBy({ userId: reservation.photographerId });
+    if (profile) {
+      this.chatGateway.broadcastAvailabilityChange(
+        profile.bookingSlug,
+        reservation.date as any,
+        reservation.startTime,
+        reservation.endTime,
+        true,
+      );
+    }
+
     return {
       status: reservation.status,
       message: 'Reservation cancelled successfully',

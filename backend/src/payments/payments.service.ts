@@ -170,6 +170,23 @@ export class PaymentsService {
 
     // Update reservation
     if (!isBalancePayment) {
+      // Check if this time slot is already booked and confirmed
+      const conflicts = await this.reservationRepository.createQueryBuilder('res')
+        .where('res.photographerId = :photographerId', { photographerId: reservation.photographerId })
+        .andWhere('res.date = :date', { date: reservation.date })
+        .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+        })
+        .andWhere('res.status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+        .getMany();
+
+      if (conflicts.length > 0) {
+        throw new BadRequestException(
+          'This time slot has already been booked and confirmed by another user in the meantime.',
+        );
+      }
+
       reservation.status = ReservationStatus.CONFIRMED;
       reservation.clientSelectedPackageId = dto.packageId;
       reservation.totalAmountInCents = selectedPkg.priceInCents;

@@ -51,7 +51,9 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">First Name</Label>
+              <Label htmlFor="firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                First Name <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="firstName"
                 placeholder="John"
@@ -69,7 +71,9 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Last Name</Label>
+              <Label htmlFor="lastName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                Last Name <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="lastName"
                 placeholder="Doe"
@@ -89,7 +93,9 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Email</Label>
+            <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Email <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -107,7 +113,9 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Phone</Label>
+            <Label htmlFor="phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Phone <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="phone"
               type="tel"
@@ -126,29 +134,40 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
 
           <div className="space-y-2">
             <Label htmlFor="location" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-              Venue / Location <span className="text-zinc-400 font-normal">(optional)</span>
+              Venue / Location <span className="text-red-500">*</span> <span className="text-[10px] text-zinc-400 font-normal">(Either Venue or Maps Link is required)</span>
             </Label>
             <Input
               id="location"
               placeholder="e.g. Cinnamon Grand, Colombo"
               {...formik.getFieldProps("location")}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                formik.touched.location && formik.errors.location
+                  ? "border-red-500"
+                  : ""
+              }`}
+            />
+            <FieldError
+              msg={formik.touched.location ? formik.errors.location : undefined}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="locationMapLink" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-              Google Maps Location Link <span className="text-zinc-400 font-normal">(optional)</span>
+              Google Maps Location Link <span className="text-red-500">*</span> <span className="text-[10px] text-zinc-400 font-normal">(Either Venue or Maps Link is required)</span>
             </Label>
             <Input
               id="locationMapLink"
               placeholder="e.g. https://maps.app.goo.gl/... or https://google.com/maps/..."
               {...formik.getFieldProps("locationMapLink")}
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
+                formik.touched.locationMapLink && formik.errors.locationMapLink
+                  ? "border-red-500"
+                  : ""
+              }`}
             />
-            {formik.touched.locationMapLink && formik.errors.locationMapLink && (
-              <p className="text-xs text-red-500 font-medium">{formik.errors.locationMapLink}</p>
-            )}
+            <FieldError
+              msg={formik.touched.locationMapLink ? formik.errors.locationMapLink : undefined}
+            />
           </div>
 
           <div className="space-y-2">

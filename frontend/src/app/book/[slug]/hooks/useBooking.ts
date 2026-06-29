@@ -47,12 +47,31 @@ const AvailabilitySchema = Yup.object({
 });
 
 const DetailsSchema = Yup.object({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  phone: Yup.string().required("Required"),
-  location: Yup.string(),
-  locationMapLink: Yup.string().url("Must be a valid URL").nullable(),
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string()
+    .required("Phone number is required")
+    .matches(/^[+]?[0-9\s-]{7,15}$/, "Please enter a valid phone number"),
+  location: Yup.string().test(
+    "at-least-one-location",
+    "Either location address or Google Maps link is required",
+    function (value) {
+      const { locationMapLink } = this.parent;
+      return !!(value?.trim() || locationMapLink?.trim());
+    }
+  ),
+  locationMapLink: Yup.string()
+    .url("Must be a valid URL")
+    .nullable()
+    .test(
+      "at-least-one-location-link",
+      "Either location address or Google Maps link is required",
+      function (value) {
+        const { location } = this.parent;
+        return !!(value?.trim() || location?.trim());
+      }
+    ),
   notes: Yup.string(),
 });
 

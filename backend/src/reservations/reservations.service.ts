@@ -256,6 +256,21 @@ export class ReservationsService {
       throw new BadRequestException('Must select at least one package or include a custom package');
     }
 
+    // Check if this time slot is already booked and confirmed
+    const conflicts = await this.reservationRepository.createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', { photographerId: reservation.photographerId })
+      .andWhere('res.date = :date', { date: reservation.date })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+        startTime: reservation.startTime,
+        endTime: reservation.endTime,
+      })
+      .andWhere('res.status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .getMany();
+
+    if (conflicts.length > 0) {
+      throw new BadRequestException('This time slot is already booked and confirmed.');
+    }
+
     // Update reservation
     reservation.status = ReservationStatus.PROPOSED;
     reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
