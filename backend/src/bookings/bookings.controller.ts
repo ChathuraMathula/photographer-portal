@@ -16,6 +16,11 @@ export class BookingsController {
     }
   }
 
+  @Get('customer-by-email')
+  findCustomerByEmail(@Query('email') email: string) {
+    return this.bookingsService.findCustomerByEmail(email);
+  }
+
   @Get(':slug')
   getPhotographerProfile(@Param('slug') slug: string) {
     return this.bookingsService.getPhotographerProfile(slug);

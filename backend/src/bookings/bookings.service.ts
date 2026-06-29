@@ -64,6 +64,20 @@ export class BookingsService {
     };
   }
 
+  async findCustomerByEmail(email: string) {
+    if (!email) return null;
+    const customer = await this.customerRepository
+      .createQueryBuilder('customer')
+      .where('LOWER(customer.email) = :email', { email: email.trim().toLowerCase() })
+      .getOne();
+    if (!customer) return null;
+    return {
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      phone: customer.phone,
+    };
+  }
+
   async checkAvailability(
     slug: string,
     date: string,
