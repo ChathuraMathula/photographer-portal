@@ -53,6 +53,9 @@ photographer-portal/
           │   │   ├── reports/
           │   │   │   ├── hooks/
           │   │   │   │   └── useReports.ts # [NEW] Custom hook managing statistics & reports state
+          │   │   │   ├── components/
+          │   │   │   │   ├── PhotographerAnalyticsCharts.tsx      # [NEW] Encapsulates revenue & status charts
+          │   │   │   │   └── PhotographerPerformanceBreakdown.tsx # [NEW] Encapsulates package & bookings lists
           │   │   │   └── ...
           │   ├── api-tester/  # Interactive developer API Docs & Tester Console
           │   └── book/[slug]/ # Public booking page

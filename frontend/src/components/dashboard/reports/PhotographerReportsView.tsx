@@ -1,12 +1,11 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { RevenueAreaChart, BookingStatusDonut, PackagePerformanceBar } from "@/app/dashboard/reports/charts";
 import { ReportsHeader } from "@/app/dashboard/reports/components/ReportsHeader";
 import { KpiCardsGrid } from "@/app/dashboard/reports/components/KpiCardsGrid";
 import { BusinessAdvisoryCard } from "@/app/dashboard/reports/components/BusinessAdvisoryCard";
-import { BookingsLogTable } from "@/app/dashboard/reports/components/BookingsLogTable";
+import { PhotographerAnalyticsCharts } from "@/app/dashboard/reports/components/PhotographerAnalyticsCharts";
+import { PhotographerPerformanceBreakdown } from "@/app/dashboard/reports/components/PhotographerPerformanceBreakdown";
 import { Loader2 } from "lucide-react";
 import { type ReportData } from "@/app/dashboard/reports/hooks/useReports";
 
@@ -44,7 +43,7 @@ export function PhotographerReportsView({
   handleDownloadBookings,
 }: Props) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <ReportsHeader
         period={period}
         startDate={startDate}
@@ -72,44 +71,17 @@ export function PhotographerReportsView({
           {/* Business Advisory Widget */}
           <BusinessAdvisoryCard summary={reportData.summary} />
 
-          {/* Charts section */}
-          <div className="grid gap-6 md:grid-cols-3">
-            <Card className="md:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
-              <CardHeader>
-                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Revenue Timeline</CardTitle>
-                <CardDescription className="text-xs">Your financial timeline representation</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RevenueAreaChart data={reportData.timeline} />
-              </CardContent>
-            </Card>
+          {/* Charts Section */}
+          <PhotographerAnalyticsCharts
+            timeline={reportData.timeline}
+            statusDistribution={reportData.statusDistribution}
+          />
 
-            <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
-              <CardHeader>
-                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Booking Status</CardTitle>
-                <CardDescription className="text-xs">Current reservation statuses conversion</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center">
-                <BookingStatusDonut data={reportData.statusDistribution} />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Package Performance */}
-            <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
-              <CardHeader>
-                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Popular Packages</CardTitle>
-                <CardDescription className="text-xs">Your packages ranked by earnings and bookings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PackagePerformanceBar data={reportData.packages} />
-              </CardContent>
-            </Card>
-
-            {/* Bookings log table */}
-            <BookingsLogTable bookings={reportData.rawBookings} />
-          </div>
+          {/* Performance Lists Section */}
+          <PhotographerPerformanceBreakdown
+            packages={reportData.packages}
+            rawBookings={reportData.rawBookings}
+          />
         </>
       ) : (
         <div className="text-center py-12 text-zinc-500">No report data loaded.</div>
