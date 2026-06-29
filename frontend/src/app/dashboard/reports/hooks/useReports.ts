@@ -57,12 +57,33 @@ export function useReports() {
     return new Date().toISOString().split("T")[0];
   });
 
+  // Specific Year and Month selection states
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState(() => (new Date().getMonth() + 1).toString().padStart(2, "0"));
+
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
   const [downloadingLocation, setDownloadingLocation] = useState(false);
+
+  // Helper to compute start & end date for the selected year or month
+  const getPeriodDateRange = () => {
+    if (period === "yearly") {
+      return {
+        start: `${selectedYear}-01-01`,
+        end: `${selectedYear}-12-31`,
+      };
+    } else if (period === "monthly") {
+      const lastDay = new Date(Number(selectedYear), Number(selectedMonth), 0).getDate().toString().padStart(2, "0");
+      return {
+        start: `${selectedYear}-${selectedMonth}-01`,
+        end: `${selectedYear}-${selectedMonth}-${lastDay}`,
+      };
+    }
+    return { start: startDate, end: endDate };
+  };
 
   const loadStats = async (showMainSpinner: boolean) => {
     if (!context) return;
@@ -76,6 +97,9 @@ export function useReports() {
       let url = `${API}/reports/data?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const res = await context.authFetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch report data");
@@ -97,6 +121,9 @@ export function useReports() {
       let url = `${API}/reports/pdf/financial?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await context.authFetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download PDF report");
@@ -125,6 +152,9 @@ export function useReports() {
       let url = `${API}/reports/pdf/bookings?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await context.authFetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download PDF report");
@@ -153,6 +183,9 @@ export function useReports() {
       let url = `${API}/reports/pdf/location?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await context.authFetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download PDF report");
@@ -181,6 +214,10 @@ export function useReports() {
     setStartDate,
     endDate,
     setEndDate,
+    selectedYear,
+    setSelectedYear,
+    selectedMonth,
+    setSelectedMonth,
     reportData,
     loading,
     refreshing,

@@ -11,6 +11,10 @@ type ReportsHeaderProps = {
   endDate: string;
   onStartDateChange: (val: string) => void;
   onEndDateChange: (val: string) => void;
+  selectedYear?: string;
+  setSelectedYear?: (y: string) => void;
+  selectedMonth?: string;
+  setSelectedMonth?: (m: string) => void;
   downloadingFinancial: boolean;
   downloadingBookings: boolean;
   downloadingLocation?: boolean;
@@ -26,6 +30,10 @@ export function ReportsHeader({
   endDate,
   onStartDateChange,
   onEndDateChange,
+  selectedYear = "",
+  setSelectedYear,
+  selectedMonth = "",
+  setSelectedMonth,
   downloadingFinancial,
   downloadingBookings,
   downloadingLocation = false,
@@ -59,6 +67,58 @@ export function ReportsHeader({
             </button>
           ))}
         </div>
+
+        {/* Yearly Range Selector */}
+        {period === "yearly" && setSelectedYear && (
+          <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
+            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Year</span>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none pr-2 cursor-pointer"
+            >
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        )}
+
+        {/* Monthly Range Selector */}
+        {period === "monthly" && setSelectedMonth && setSelectedYear && (
+          <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
+            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Month</span>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none pr-2 cursor-pointer border-r border-zinc-200 dark:border-zinc-700/50 mr-1"
+            >
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none pr-2 cursor-pointer"
+            >
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        )}
 
         {/* Custom Date Inputs with premium calendar pickers */}
         {period === "custom" && (

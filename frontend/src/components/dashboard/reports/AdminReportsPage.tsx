@@ -57,12 +57,33 @@ export function AdminReportsPage() {
     return new Date().toISOString().split("T")[0];
   });
 
+  // Specific Year and Month selection states for Admin
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState(() => (new Date().getMonth() + 1).toString().padStart(2, "0"));
+
   const [reportData, setReportData] = useState<AdminReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
   const [downloadingLocation, setDownloadingLocation] = useState(false);
+
+  // Helper to compute start & end date for the selected year or month
+  const getPeriodDateRange = () => {
+    if (period === "yearly") {
+      return {
+        start: `${selectedYear}-01-01`,
+        end: `${selectedYear}-12-31`,
+      };
+    } else if (period === "monthly") {
+      const lastDay = new Date(Number(selectedYear), Number(selectedMonth), 0).getDate().toString().padStart(2, "0");
+      return {
+        start: `${selectedYear}-${selectedMonth}-01`,
+        end: `${selectedYear}-${selectedMonth}-${lastDay}`,
+      };
+    }
+    return { start: startDate, end: endDate };
+  };
 
   const fetchStats = async (showMainSpinner: boolean) => {
     if (showMainSpinner) {
@@ -75,6 +96,9 @@ export function AdminReportsPage() {
       let url = `${API}/reports/data?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch admin report data");
@@ -92,7 +116,7 @@ export function AdminReportsPage() {
   useEffect(() => {
     if (period === "custom" && (!startDate || !endDate)) return;
     fetchStats(reportData === null);
-  }, [period, startDate, endDate]);
+  }, [period, startDate, endDate, selectedYear, selectedMonth]);
 
   const handleDownloadFinancial = async () => {
     setDownloadingFinancial(true);
@@ -100,6 +124,9 @@ export function AdminReportsPage() {
       let url = `${API}/reports/pdf/financial?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download financial report");
@@ -127,6 +154,9 @@ export function AdminReportsPage() {
       let url = `${API}/reports/pdf/bookings?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download bookings report");
@@ -154,6 +184,9 @@ export function AdminReportsPage() {
       let url = `${API}/reports/pdf/location?period=${period}`;
       if (period === "custom") {
         url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
       }
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to download location report");
@@ -212,6 +245,56 @@ export function AdminReportsPage() {
               </button>
             ))}
           </div>
+
+          {period === "yearly" && (
+            <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-955 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
+              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Year</span>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer"
+              >
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+          )}
+
+          {period === "monthly" && (
+            <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-955 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
+              <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase">Select Month</span>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer border-r border-zinc-200 dark:border-zinc-700/50 mr-1"
+              >
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="bg-transparent text-xs font-semibold text-zinc-800 dark:text-zinc-205 focus:outline-none pr-2 cursor-pointer"
+              >
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+          )}
 
           {period === "custom" && (
             <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800">

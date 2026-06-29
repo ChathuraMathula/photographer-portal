@@ -24,17 +24,19 @@ export class ReportsService {
     let startDate = new Date();
     let endDate = new Date();
 
-    if (period === 'weekly') {
-      startDate.setDate(today.getDate() - 7);
-    } else if (period === 'monthly') {
-      startDate.setDate(today.getDate() - 30);
-    } else if (period === 'yearly') {
-      startDate.setDate(today.getDate() - 365);
-    } else if (period === 'custom' && customStartDate && customEndDate) {
+    if (customStartDate && customEndDate) {
       startDate = new Date(customStartDate);
       endDate = new Date(customEndDate);
       startDate.setHours(0, 0, 0, 0);
       endDate.setHours(23, 59, 59, 999);
+    } else {
+      if (period === 'weekly') {
+        startDate.setDate(today.getDate() - 7);
+      } else if (period === 'monthly') {
+        startDate.setDate(today.getDate() - 30);
+      } else if (period === 'yearly') {
+        startDate.setDate(today.getDate() - 365);
+      }
     }
 
     // Build query conditions
@@ -212,18 +214,18 @@ export class ReportsService {
       for (let i = 11; i >= 0; i--) {
         const d = new Date(endDate);
         d.setMonth(endDate.getMonth() - i);
-        const label = d.toLocaleDateString('en-US', { month: 'short' });
+        const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
       
       reservations.forEach(res => {
-        const label = new Date(res.date).toLocaleDateString('en-US', { month: 'short' });
+        const label = new Date(res.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         if (timelineMap[label]) {
           timelineMap[label].bookings++;
         }
       });
       payments.forEach(pay => {
-        const label = new Date(pay.createdAt).toLocaleDateString('en-US', { month: 'short' });
+        const label = new Date(pay.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         if (timelineMap[label]) {
           timelineMap[label].revenueLkr += pay.amountInCents / 100;
         }
@@ -342,6 +344,36 @@ export class ReportsService {
     customEndDate?: string,
   ): Promise<any> {
     const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
-    return buildLocationReportPdf(data, period);
+    
+    // Fetch static map buffer
+    let mapImageBuffer: Buffer | null = null;
+    const bookings = data.rawBookings || [];
+    const validPoints = bookings.filter((b: any) => {
+      if (!b.locationMapLink) return false;
+      const atMatch = b.locationMapLink.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+      const qMatch = b.locationMapLink.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+      return !!(atMatch || qMatch);
+    });
+
+    if (validPoints.length > 0) {
+      try {
+        const coords = validPoints.map((b: any) => {
+          const atMatch = b.locationMapLink.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+          const qMatch = b.locationMapLink.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+          const match = atMatch || qMatch;
+          return { lat: match[1], lon: match[2] };
+        });
+        const ptString = coords.slice(0, 8).map(c => `${c.lon},${c.lat},pm2rdm`).join('~');
+        const staticMapUrl = `https://static-maps.yandex.ru/1.x/?l=map&size=450,220&pt=${ptString}`;
+        const res = await fetch(staticMapUrl);
+        if (res.ok) {
+          mapImageBuffer = Buffer.from(await res.arrayBuffer());
+        }
+      } catch (err) {
+        console.error('Failed to fetch static map image:', err);
+      }
+    }
+
+    return buildLocationReportPdf(data, period, mapImageBuffer);
   }
 }

@@ -49,7 +49,15 @@ export default function ReportsPage() {
       if (reportsHook.period === "custom" && (!reportsHook.startDate || !reportsHook.endDate)) return;
       reportsHook.loadStats(reportsHook.reportData === null);
     }
-  }, [reportsHook.period, reportsHook.startDate, reportsHook.endDate, reportsHook.hasContext, role]);
+  }, [
+    reportsHook.period,
+    reportsHook.startDate,
+    reportsHook.endDate,
+    reportsHook.selectedYear,
+    reportsHook.selectedMonth,
+    reportsHook.hasContext,
+    role
+  ]);
 
   // If Admin or Super Admin, render Admin reports directly
   if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
@@ -65,6 +73,10 @@ export default function ReportsPage() {
       setStartDate={reportsHook.setStartDate}
       endDate={reportsHook.endDate}
       setEndDate={reportsHook.setEndDate}
+      selectedYear={reportsHook.selectedYear}
+      setSelectedYear={reportsHook.setSelectedYear}
+      selectedMonth={reportsHook.selectedMonth}
+      setSelectedMonth={reportsHook.setSelectedMonth}
       reportData={reportsHook.reportData}
       loading={reportsHook.loading}
       refreshing={reportsHook.refreshing}

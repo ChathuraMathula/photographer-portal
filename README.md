@@ -539,12 +539,23 @@ When offline cash payments are logged on the photographer's reservation panel, t
 - **Frontend changes**: [`ReservationHeader.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/tracking/ReservationHeader.tsx) renders the ID with selection-friendly font formatting under the header title.
 
 ### 6. Location Analytics PDF Reports
-- **Behavior**: Real-time generation and downloading of PDF reports summarizing geographic statistics and detailed booking logs.
+- **Behavior**: Real-time generation and downloading of PDF reports summarizing geographic statistics, detailed booking logs, and visual static maps of booking points.
 - **Backend changes**:
-  - [`reports-pdf-builder.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports-pdf-builder.ts): Added `buildLocationReportPdf` using PDFKit to lay out summary stats (top district, top city, GPS coverage ratio), tables for district/city counts, and a detailed log grid.
-  - [`reports.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.service.ts): Wired service method `generateLocationReportPdf`.
-  - [`reports.controller.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.controller.ts): Added route GET `/reports/pdf/location`.
+  - [`reports-pdf-builder.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports-pdf-builder.ts): Serving as clean re-export entrypoint for modularized generator sub-files:
+    - [`pdf-shared.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/pdf-shared.ts): Shared layout styles, colors, and line-chart rendering helpers.
+    - [`pdf-financial.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/pdf-financial.ts): Financial analytics PDF generation logic.
+    - [`pdf-bookings.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/pdf-bookings.ts): Bookings and category traffic PDF generation logic.
+    - [`pdf-location.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/pdf-location.ts): Geographic analytics, distribution tables, and dynamic static maps display in the PDF.
+  - [`reports.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.service.ts): Parses lat/lon coordinates from booking maps links, queries Yandex Static Maps API to get the preview image buffer, and feeds it to the PDF renderer.
 - **Frontend changes**: Added a "Location PDF" download button in the reports header section on both photographer and admin reports panels.
+
+### 7. Monthly & Yearly Date Filters and Timeline Labels
+- **Behavior**: Enables selecting a specific year (when "yearly" is active) or selecting a specific month & year (when "monthly" is active) to view and download precise analytics reports instead of only sliding relative window periods.
+- **Backend changes**:
+  - [`reports.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.service.ts): Formats yearly timeline labels with both short month and year (e.g. "Jun 2026") to avoid overlap and improve visual clarity.
+- **Frontend changes**:
+  - [`ReportsHeader.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/reports/components/ReportsHeader.tsx) & [`AdminReportsPage.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/reports/AdminReportsPage.tsx): Display Month and Year dropdown lists conditionally.
+  - [`useReports.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/reports/hooks/useReports.ts): Computes exact date boundaries for selected month/year filter options and appends them to reports query URLs.
 
 ---
 

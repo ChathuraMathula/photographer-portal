@@ -17,6 +17,10 @@ type Props = {
   setStartDate: (s: string) => void;
   endDate: string;
   setEndDate: (e: string) => void;
+  selectedYear: string;
+  setSelectedYear: (y: string) => void;
+  selectedMonth: string;
+  setSelectedMonth: (m: string) => void;
   reportData: ReportData | null;
   loading: boolean;
   refreshing: boolean;
@@ -36,6 +40,10 @@ export function PhotographerReportsView({
   setStartDate,
   endDate,
   setEndDate,
+  selectedYear,
+  setSelectedYear,
+  selectedMonth,
+  setSelectedMonth,
   reportData,
   loading,
   refreshing,
@@ -53,6 +61,10 @@ export function PhotographerReportsView({
         period={period}
         startDate={startDate}
         endDate={endDate}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
         onPeriodChange={setPeriod}
         onStartDateChange={setStartDate}
         onEndDateChange={setEndDate}
