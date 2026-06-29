@@ -49,6 +49,7 @@ photographer-portal/
      └── src/
           ├── app/
           │   ├── login/       # Login page
+          │   ├── test-accounts/ # [NEW] TestAccountsPage credentials directory
           │   ├── dashboard/   # Role-based collapsible dashboard
           │   │   ├── reports/
           │   │   │   ├── hooks/

@@ -66,6 +66,21 @@ export function DashboardLayout({
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    const collapsed = localStorage.getItem("sidebar_collapsed") === "true";
+    if (collapsed) {
+      setIsCollapsed(true);
+    }
+  }, []);
+
+  const handleSetCollapsed = (val: boolean | ((prev: boolean) => boolean)) => {
+    setIsCollapsed((prev) => {
+      const next = typeof val === "function" ? val(prev) : val;
+      localStorage.setItem("sidebar_collapsed", String(next));
+      return next;
+    });
+  };
+
+  useEffect(() => {
     // Save original styles
     const origHtmlOverflow = document.documentElement.style.overflow;
     const origBodyOverflow = document.body.style.overflow;
@@ -124,7 +139,7 @@ export function DashboardLayout({
         {/* Topbar */}
         <TopbarHeader
           isCollapsed={isCollapsed}
-          setIsCollapsed={setIsCollapsed}
+          setIsCollapsed={handleSetCollapsed}
           setIsMobileOpen={setIsMobileOpen}
           activeLabel={activeLabel}
           notificationBell={notificationBell}
