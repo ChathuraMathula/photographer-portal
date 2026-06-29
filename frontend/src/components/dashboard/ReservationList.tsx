@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { type Reservation } from "@/types";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReservationListItem } from "./ReservationListItem";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   reservations: Reservation[];
@@ -45,8 +46,19 @@ export function ReservationList({ reservations, selectedId, onSelect }: Props) {
               placeholder="Search request or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-[50px] pl-10 pr-3 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-1 focus:ring-primary-dark"
+              className="w-full h-[50px] pl-10 pr-10 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-1 focus:ring-primary-dark"
             />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-7 w-7 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-150 dark:hover:bg-zinc-900 rounded-lg cursor-pointer"
+                title="Reset search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
           <SearchableSelect
             options={[

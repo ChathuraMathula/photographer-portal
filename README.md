@@ -558,6 +558,11 @@ When offline cash payments are logged on the photographer's reservation panel, t
   - [`ReportsHeader.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/reports/components/ReportsHeader.tsx) & [`AdminReportsPage.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/reports/AdminReportsPage.tsx): Display Month and Year select dropdown lists conditionally using shadcn components for consistent styling.
   - [`useReports.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/app/dashboard/reports/hooks/useReports.ts): Computes exact date boundaries for selected month/year filter options and appends them to reports query URLs.
 
+### 8. Search Reset Button inside Reservations List Search
+- **Behavior**: An absolute close button is added inside the search input box, appearing only when the search field is not empty, allowing users to reset queries instantly.
+- **Frontend changes**:
+  - [`ReservationList.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/dashboard/ReservationList.tsx): Uses shadcn UI's `<Button>` component with `variant="ghost"` and `size="icon"`, together with a close icon `X` aligned to the right inside the input wrapper.
+
 ---
 
 
