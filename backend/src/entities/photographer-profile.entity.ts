@@ -63,7 +63,10 @@ export class PhotographerProfile {
   @Column({ default: '#2563eb' })
   invoiceColor!: string;
 
-  @Column({ type: 'text', default: 'Thank you for booking with us! We appreciate your trust.' })
+  @Column({
+    type: 'text',
+    default: 'Thank you for booking with us! We appreciate your trust.',
+  })
   invoiceNotes!: string;
 
   @Column({ nullable: true })

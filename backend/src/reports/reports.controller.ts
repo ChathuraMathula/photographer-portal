@@ -18,9 +18,12 @@ interface RequestWithUser extends express.Request {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.PHOTOGRAPHER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) { }
+  constructor(private readonly reportsService: ReportsService) {}
 
-  private getTargetPhotographerId(req: RequestWithUser, queryId?: string): string | undefined {
+  private getTargetPhotographerId(
+    req: RequestWithUser,
+    queryId?: string,
+  ): string | undefined {
     // If photographer, they can only view their own data
     if (req.user.role === UserRole.PHOTOGRAPHER) {
       return req.user.userId;
@@ -38,7 +41,12 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
-    return this.reportsService.generateReportData(targetId, period, startDate, endDate);
+    return this.reportsService.generateReportData(
+      targetId,
+      period,
+      startDate,
+      endDate,
+    );
   }
 
   @Get('pdf/financial')
@@ -51,10 +59,18 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
-    const pdfDoc = await this.reportsService.generateFinancialReportPdf(targetId, period, startDate, endDate);
+    const pdfDoc = await this.reportsService.generateFinancialReportPdf(
+      targetId,
+      period,
+      startDate,
+      endDate,
+    );
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=financial_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=financial_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`,
+    );
 
     pdfDoc.pipe(res);
     pdfDoc.end();
@@ -70,10 +86,18 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
-    const pdfDoc = await this.reportsService.generateBookingsReportPdf(targetId, period, startDate, endDate);
+    const pdfDoc = await this.reportsService.generateBookingsReportPdf(
+      targetId,
+      period,
+      startDate,
+      endDate,
+    );
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=bookings_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=bookings_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`,
+    );
 
     pdfDoc.pipe(res);
     pdfDoc.end();
@@ -89,10 +113,18 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
-    const pdfDoc = await this.reportsService.generateLocationReportPdf(targetId, period, startDate, endDate);
+    const pdfDoc = await this.reportsService.generateLocationReportPdf(
+      targetId,
+      period,
+      startDate,
+      endDate,
+    );
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=location_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=location_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`,
+    );
 
     pdfDoc.pipe(res);
     pdfDoc.end();

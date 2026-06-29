@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -64,7 +69,9 @@ export class AuthService {
     const user = await this.userRepository.findOneBy({ email });
     if (!user || !user.isActive) {
       // Return a success message even if email is not found to prevent user enumeration attacks
-      return { message: 'If the email exists, a password reset link has been sent.' };
+      return {
+        message: 'If the email exists, a password reset link has been sent.',
+      };
     }
 
     const token = crypto.randomBytes(32).toString('hex');
@@ -75,7 +82,11 @@ export class AuthService {
     const origin = process.env.FRONTEND_URL ?? 'http://localhost:4000';
     const resetLink = `${origin}/reset-password?token=${token}`;
 
-    await this.emailService.sendResetPasswordEmail(user.email, user.firstName, resetLink);
+    await this.emailService.sendResetPasswordEmail(
+      user.email,
+      user.firstName,
+      resetLink,
+    );
 
     await this.auditLogsService.logAction(
       'FORGOT_PASSWORD_REQUEST',
@@ -84,7 +95,9 @@ export class AuthService {
       user.email,
     );
 
-    return { message: 'If the email exists, a password reset link has been sent.' };
+    return {
+      message: 'If the email exists, a password reset link has been sent.',
+    };
   }
 
   async resetPassword(token: string, newPassword: string) {

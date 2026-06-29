@@ -565,5 +565,56 @@ When offline cash payments are logged on the photographer's reservation panel, t
 
 ---
 
+## 🧪 Testing & Database Seeding
+
+### 1. Database Seeding Script (`npm run seed`)
+The project contains an automated database seeding tool located at [`seed-data.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/scripts/seed-data.ts) which clears/resets tables and creates a comprehensive, realistic Sri Lankan dataset covering:
+*   **Users & Roles**: Sets up `SUPER_ADMIN` (admin@photoportal.com), `ADMIN` (agency@photoportal.com), and 4 specialized `PHOTOGRAPHER` accounts (Sarah, Michael, Kanishka, Nadeeka).
+*   **Sri Lankan Customers & Venues**: Populates Sri Lankan names (Priya Perera, Kasun Jayasinghe, Tharindu Goonetilleke, Roshan Alwis) and major venue locations (Galle Face Hotel, Cinnamon Grand, Jetwing Lighthouse Galle, Earls Regency Kandy).
+*   **Various Status Segments**: Populates booking variations across all phases (`PENDING`, `PROPOSED`, `CONFIRMED`, `COMPLETED`) to simulate realistic historical records.
+
+To reset and seed the database, run:
+```bash
+# Run from backend directory
+npm run seed
+```
+
+### 2. Comprehensive Jest Test Suite (`npm run test`)
+A complete unit testing suite is implemented inside `backend/src` with 100% pass verification across 7 distinct test suites and 13 unit tests:
+
+#### A. Authentication Services ([`auth.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/auth/auth.service.spec.ts))
+*   **Test Case 1 (User Retrieval)**: Throws `UnauthorizedException` if the credentials email does not match any user registered in the system.
+*   **Test Case 2 (Password Integrity Verification)**: Throws `UnauthorizedException` if the input password does not match the hashed password stored in the database.
+*   **Test Case 3 (Successful Authorization Flow)**: Verifies that successful validation triggers the generation of a valid JWT payload containing the user's role and email.
+
+#### B. Booking & Availability Services ([`bookings.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/bookings/bookings.service.spec.ts))
+*   **Test Case 4 (Photographer Profile Lookup)**: Throws `NotFoundException` if a request attempts to fetch details of a non-existent slug.
+*   **Test Case 5 (Inactive Photographers Handling)**: Throws `NotFoundException` when attempting to load a profile for an inactive photographer.
+
+#### C. Packages Management Services ([`packages.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/packages/packages.service.spec.ts))
+*   **Test Case 6 (Retrieve Package by ID)**: Throws `NotFoundException` if a query checks an invalid/deleted package identifier.
+*   **Test Case 7 (Authorization Boundaries check)**: Throws `ForbiddenException` if a photographer tries to retrieve or edit a package belonging to another user.
+*   **Test Case 8 (Validation)**: Resolves and returns the core package metrics if permissions are correct.
+
+#### D. Payment Gateway Services ([`payments.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/payments/payments.service.spec.ts))
+*   **Test Case 9 (Token Verification)**: Throws `NotFoundException` if a card transaction process attempts to reference an invalid or expired reservation token.
+
+#### E. Reservation Workflows ([`reservations.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reservations/reservations.service.spec.ts))
+*   **Test Case 10 (Deadline Integrity Guard)**: Assures that when a proposal is updated or package selection changes later on, the pre-existing 24-hour payment deadline is **not reset**.
+*   **Test Case 11 (Quotation Status checks)**: Throws `BadRequestException` when trying to propose a quotation for bookings that are not in `PENDING` or `PROPOSED` states.
+
+#### F. Reports & Analytics Services ([`reports.service.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.service.spec.ts))
+*   **Test Case 12 (Empty State Safe-Fallbacks)**: Assures report data generates clean 0 metrics and avoids division-by-zero crashes when the database contains no transactions.
+
+#### G. Core Applications Controller ([`app.controller.spec.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/app.controller.spec.ts))
+*   **Test Case 13 (Module Root)**: Resolves that the default path returns "Hello World!" successfully.
+
+To execute all tests, run:
+```bash
+# Run from backend directory
+npm run test
+```
+
+
 
 

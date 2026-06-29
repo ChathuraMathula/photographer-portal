@@ -7,7 +7,9 @@ export class AppService implements OnModuleInit {
 
   onModuleInit() {
     if (this.dataSource.isInitialized) {
-      console.log('✅ PostgreSQL connected successfully to Docker container via TypeORM');
+      console.log(
+        '✅ PostgreSQL connected successfully to Docker container via TypeORM',
+      );
     }
   }
 

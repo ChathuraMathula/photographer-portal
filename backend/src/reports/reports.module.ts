@@ -7,10 +7,8 @@ import { Payment } from '../entities/payment.entity';
 import { User } from '../entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Reservation, Payment, User]),
-  ],
+  imports: [TypeOrmModule.forFeature([Reservation, Payment, User])],
   controllers: [ReportsController],
   providers: [ReportsService],
 })
-export class ReportsModule { }
+export class ReportsModule {}

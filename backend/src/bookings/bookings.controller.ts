@@ -55,18 +55,12 @@ export class BookingsController {
   }
 
   @Post('track/:token/verify')
-  verifyEmail(
-    @Param('token') token: string,
-    @Body('email') email: string,
-  ) {
+  verifyEmail(@Param('token') token: string, @Body('email') email: string) {
     return this.bookingsService.verifyTrackingEmail(token, email);
   }
 
   @Get('track/:token/messages')
-  getMessages(
-    @Param('token') token: string,
-    @Query('email') email: string,
-  ) {
+  getMessages(@Param('token') token: string, @Query('email') email: string) {
     return this.bookingsService.getMessages(token, email);
   }
 
@@ -89,10 +83,7 @@ export class BookingsController {
   }
 
   @Post('track/:token/cancel')
-  cancel(
-    @Param('token') token: string,
-    @Body('email') email: string,
-  ) {
+  cancel(@Param('token') token: string, @Body('email') email: string) {
     return this.bookingsService.cancelBooking(token, email);
   }
 }

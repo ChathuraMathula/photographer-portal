@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import * as crypto from 'crypto';
@@ -42,7 +46,10 @@ export class InvoicesService {
     // Map and filter down to fully paid reservations (Invoices)
     const invoices = reservations.map((res) => {
       const resPayments = payments.filter((p) => p.reservationId === res.id);
-      const totalPaid = resPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+      const totalPaid = resPayments.reduce(
+        (sum, p) => sum + p.amountInCents,
+        0,
+      );
       const isFullyPaid = totalPaid >= (res.totalAmountInCents || 1);
 
       return {
@@ -59,7 +66,7 @@ export class InvoicesService {
   }
 
   async getSettings(photographerId: string) {
-    let profile = await this.profileRepository.findOne({
+    const profile = await this.profileRepository.findOne({
       where: { userId: photographerId },
     });
 
@@ -70,7 +77,9 @@ export class InvoicesService {
     return {
       invoiceTitle: profile.invoiceTitle || 'INVOICE',
       invoiceColor: profile.invoiceColor || '#2563eb',
-      invoiceNotes: profile.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
+      invoiceNotes:
+        profile.invoiceNotes ||
+        'Thank you for booking with us! We appreciate your trust.',
       invoiceLogoText: profile.invoiceLogoText || '',
       invoicePhone: profile.invoicePhone || '',
       invoiceTaxRate: profile.invoiceTaxRate || 0,
@@ -79,7 +88,7 @@ export class InvoicesService {
   }
 
   async updateSettings(photographerId: string, body: any) {
-    let profile = await this.profileRepository.findOne({
+    const profile = await this.profileRepository.findOne({
       where: { userId: photographerId },
     });
 
@@ -87,13 +96,20 @@ export class InvoicesService {
       throw new NotFoundException('Photographer profile not found');
     }
 
-    if (body.invoiceTitle !== undefined) profile.invoiceTitle = body.invoiceTitle;
-    if (body.invoiceColor !== undefined) profile.invoiceColor = body.invoiceColor;
-    if (body.invoiceNotes !== undefined) profile.invoiceNotes = body.invoiceNotes;
-    if (body.invoiceLogoText !== undefined) profile.invoiceLogoText = body.invoiceLogoText;
-    if (body.invoicePhone !== undefined) profile.invoicePhone = body.invoicePhone;
-    if (body.invoiceTaxRate !== undefined) profile.invoiceTaxRate = Number(body.invoiceTaxRate || 0);
-    if (body.invoiceInstructions !== undefined) profile.invoiceInstructions = body.invoiceInstructions;
+    if (body.invoiceTitle !== undefined)
+      profile.invoiceTitle = body.invoiceTitle;
+    if (body.invoiceColor !== undefined)
+      profile.invoiceColor = body.invoiceColor;
+    if (body.invoiceNotes !== undefined)
+      profile.invoiceNotes = body.invoiceNotes;
+    if (body.invoiceLogoText !== undefined)
+      profile.invoiceLogoText = body.invoiceLogoText;
+    if (body.invoicePhone !== undefined)
+      profile.invoicePhone = body.invoicePhone;
+    if (body.invoiceTaxRate !== undefined)
+      profile.invoiceTaxRate = Number(body.invoiceTaxRate || 0);
+    if (body.invoiceInstructions !== undefined)
+      profile.invoiceInstructions = body.invoiceInstructions;
 
     await this.profileRepository.save(profile);
     return this.getSettings(photographerId);
@@ -127,23 +143,30 @@ export class InvoicesService {
     const settings = {
       invoiceTitle: profile?.invoiceTitle || 'INVOICE',
       invoiceColor: profile?.invoiceColor || '#2563eb',
-      invoiceNotes: profile?.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
-      invoiceLogoText: profile?.invoiceLogoText || reservation.photographer.firstName,
+      invoiceNotes:
+        profile?.invoiceNotes ||
+        'Thank you for booking with us! We appreciate your trust.',
+      invoiceLogoText:
+        profile?.invoiceLogoText || reservation.photographer.firstName,
       invoicePhone: profile?.invoicePhone || '',
       invoiceInstructions: profile?.invoiceInstructions || '',
     };
 
     const packages = reservation.selectedPackages || [];
-    const selectedPkg = packages.find((p: any) => p.id === reservation.clientSelectedPackageId) || {
+    const selectedPkg = packages.find(
+      (p: any) => p.id === reservation.clientSelectedPackageId,
+    ) || {
       name: 'Photography Services',
       priceInCents: reservation.totalAmountInCents || 0,
     };
 
     const taxRate = profile?.invoiceTaxRate || 0;
-    const packagePriceLkr = (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
+    const packagePriceLkr =
+      (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
     const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
     const grandTotalLkr = packagePriceLkr + taxAmountLkr;
-    const totalPaidLkr = payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
+    const totalPaidLkr =
+      payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
     const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
 
     const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
@@ -157,7 +180,9 @@ export class InvoicesService {
       photographerName: `${reservation.photographer.firstName} ${reservation.photographer.lastName}`,
       photographerEmail: reservation.photographer.email,
       photographerPhone: '',
-      eventDate: reservation.date ? reservation.date.toString().split('T')[0] : '',
+      eventDate: reservation.date
+        ? reservation.date.toString().split('T')[0]
+        : '',
       eventTime: `${reservation.startTime || ''} - ${reservation.endTime || ''}`,
       eventType: reservation.eventType || 'Event',
       location: reservation.location || '',
@@ -202,8 +227,11 @@ export class InvoicesService {
       throw new NotFoundException('Reservation not found');
     }
 
-    const pdfDoc = await this.generateInvoicePdfDoc(reservation.id, photographerId);
-    
+    const pdfDoc = await this.generateInvoicePdfDoc(
+      reservation.id,
+      photographerId,
+    );
+
     const getPdfBuffer = async (doc: any): Promise<Buffer> => {
       return new Promise<Buffer>((resolve, reject) => {
         const chunks: Buffer[] = [];

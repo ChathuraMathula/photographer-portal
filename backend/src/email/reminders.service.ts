@@ -1,4 +1,8 @@
-import { Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
+import {
+  Injectable,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, MoreThan } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
@@ -6,7 +10,9 @@ import { User } from '../entities/user.entity';
 import { EmailService } from './email.service';
 
 @Injectable()
-export class RemindersService implements OnApplicationBootstrap, OnApplicationShutdown {
+export class RemindersService
+  implements OnApplicationBootstrap, OnApplicationShutdown
+{
   private timer: NodeJS.Timeout | null = null;
   private processedReminders = new Set<string>();
 
@@ -56,7 +62,7 @@ export class RemindersService implements OnApplicationBootstrap, OnApplicationSh
 
         const origin = process.env.FRONTEND_URL ?? 'http://localhost:4000';
         const trackingLink = `${origin}/book/track/${res.reservationToken}`;
-        
+
         await this.emailService.sendPaymentReminder(
           res.customer.email,
           res.customer.firstName + ' ' + res.customer.lastName,
@@ -69,7 +75,9 @@ export class RemindersService implements OnApplicationBootstrap, OnApplicationSh
       }
 
       // 2. Find CONFIRMED reservations happening within the next 24 hours
-      const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const twentyFourHoursFromNow = new Date(
+        now.getTime() + 24 * 60 * 60 * 1000,
+      );
       const upcomingReservations = await this.reservationRepository.find({
         where: {
           status: ReservationStatus.CONFIRMED,
@@ -95,7 +103,11 @@ export class RemindersService implements OnApplicationBootstrap, OnApplicationSh
         }
 
         // Photographer Reminder
-        if (res.photographer && res.photographer.reminderEmailsEnabled && !this.processedReminders.has(photographerKey)) {
+        if (
+          res.photographer &&
+          res.photographer.reminderEmailsEnabled &&
+          !this.processedReminders.has(photographerKey)
+        ) {
           await this.emailService.sendUpcomingBookingReminder(
             res.photographer.email,
             res.photographer.firstName + ' ' + res.photographer.lastName,

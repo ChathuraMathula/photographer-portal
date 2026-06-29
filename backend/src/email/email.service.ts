@@ -133,10 +133,7 @@ export class EmailService {
     });
   }
 
-  async sendAccountDeactivated(
-    userEmail: string,
-    firstName: string,
-  ) {
+  async sendAccountDeactivated(userEmail: string, firstName: string) {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #dc2626;">Account Suspended</h2>

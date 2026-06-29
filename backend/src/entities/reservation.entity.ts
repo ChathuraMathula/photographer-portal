@@ -26,7 +26,9 @@ export class Reservation {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => Customer, (customer) => customer.reservations, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Customer, (customer) => customer.reservations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'customerId' })
   customer!: Customer;
 

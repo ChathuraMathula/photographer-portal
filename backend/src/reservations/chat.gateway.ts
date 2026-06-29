@@ -42,7 +42,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { reservationId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`👤 Client ${client.id} joining room: reservation_${data.reservationId}`);
+    console.log(
+      `👤 Client ${client.id} joining room: reservation_${data.reservationId}`,
+    );
     client.join(`reservation_${data.reservationId}`);
     return { status: 'joined' };
   }
@@ -52,7 +54,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { reservationId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`👤 Client ${client.id} leaving room: reservation_${data.reservationId}`);
+    console.log(
+      `👤 Client ${client.id} leaving room: reservation_${data.reservationId}`,
+    );
     client.leave(`reservation_${data.reservationId}`);
     return { status: 'left' };
   }
@@ -67,8 +71,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       content: string;
     },
   ) {
-    console.log(`💬 Message received for reservation ${data.reservationId} from ${data.senderName}`);
-    
+    console.log(
+      `💬 Message received for reservation ${data.reservationId} from ${data.senderName}`,
+    );
+
     // Save to DB
     const message = this.messageRepository.create({
       reservationId: data.reservationId,
@@ -83,7 +89,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .to(`reservation_${data.reservationId}`)
       .emit('message', message);
 
-    const reservation = await this.reservationRepository.findOneBy({ id: data.reservationId });
+    const reservation = await this.reservationRepository.findOneBy({
+      id: data.reservationId,
+    });
     if (reservation) {
       this.server
         .to(`photographer_${reservation.photographerId}`)
@@ -96,7 +104,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { photographerId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`👤 Photographer ${data.photographerId} joining room: photographer_${data.photographerId}`);
+    console.log(
+      `👤 Photographer ${data.photographerId} joining room: photographer_${data.photographerId}`,
+    );
     client.join(`photographer_${data.photographerId}`);
     return { status: 'joined' };
   }
@@ -107,7 +117,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { userId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`👤 User ${data.userId} joined personal room: user_${data.userId}`);
+    console.log(
+      `👤 User ${data.userId} joined personal room: user_${data.userId}`,
+    );
     client.join(`user_${data.userId}`);
     return { status: 'joined' };
   }
@@ -118,14 +130,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { bookingSlug: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`👤 Client ${client.id} viewing photographer calendar: booking_${data.bookingSlug}`);
+    console.log(
+      `👤 Client ${client.id} viewing photographer calendar: booking_${data.bookingSlug}`,
+    );
     client.join(`booking_${data.bookingSlug}`);
     return { status: 'joined' };
   }
 
   // Broadcaster utility for other services (e.g. BookingsService when reservation created or confirmed)
-  broadcastAvailabilityChange(bookingSlug: string, date: string, startTime: string, endTime: string, available: boolean) {
-    console.log(`📢 Broadcasting availability change for ${bookingSlug} on ${date}: available=${available}`);
+  broadcastAvailabilityChange(
+    bookingSlug: string,
+    date: string,
+    startTime: string,
+    endTime: string,
+    available: boolean,
+  ) {
+    console.log(
+      `📢 Broadcasting availability change for ${bookingSlug} on ${date}: available=${available}`,
+    );
     this.server.to(`booking_${bookingSlug}`).emit('availabilityChange', {
       date,
       startTime,
@@ -136,6 +158,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   broadcastProfileUpdate(bookingSlug: string, profileData: any) {
     console.log(`📢 Broadcasting profile update for ${bookingSlug}`);
-    this.server.to(`booking_${bookingSlug}`).emit('profileUpdated', profileData);
+    this.server
+      .to(`booking_${bookingSlug}`)
+      .emit('profileUpdated', profileData);
   }
 }

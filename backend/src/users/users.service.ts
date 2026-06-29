@@ -182,19 +182,20 @@ export class UsersService {
     if (wasActive && !user.isActive) {
       // Emit WebSocket event to the user's personal room so they get logged out in real-time
       try {
-        this.chatGateway.server
-          .to(`user_${id}`)
-          .emit('userDeactivated', {
-            userId: id,
-            message: 'Your account has been suspended by an administrator.',
-          });
+        this.chatGateway.server.to(`user_${id}`).emit('userDeactivated', {
+          userId: id,
+          message: 'Your account has been suspended by an administrator.',
+        });
       } catch (err) {
         console.error('Failed to emit userDeactivated event:', err);
       }
 
       // Send deactivation email
       try {
-        await this.emailService.sendAccountDeactivated(user.email, user.firstName);
+        await this.emailService.sendAccountDeactivated(
+          user.email,
+          user.firstName,
+        );
       } catch (err) {
         console.error('Failed to send account deactivated email:', err);
       }

@@ -13,7 +13,10 @@ import { PhotographerProfile } from '../entities/photographer-profile.entity';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { ChatGateway } from '../reservations/chat.gateway';
 import { EmailService } from '../email/email.service';
-import { generateInvoicePdf, InvoiceData } from '../reports/invoices-pdf-generator';
+import {
+  generateInvoicePdf,
+  InvoiceData,
+} from '../reports/invoices-pdf-generator';
 
 @Injectable()
 export class PaymentsService {
@@ -46,7 +49,9 @@ export class PaymentsService {
       reservation.status !== ReservationStatus.PROPOSED &&
       reservation.status !== ReservationStatus.CONFIRMED
     ) {
-      throw new BadRequestException('Reservation is not in proposed or confirmed state');
+      throw new BadRequestException(
+        'Reservation is not in proposed or confirmed state',
+      );
     }
 
     // Expiry Check only for deposit payment
@@ -64,7 +69,9 @@ export class PaymentsService {
     const packages = reservation.selectedPackages || [];
     const selectedPkg = packages.find((p: any) => p.id === dto.packageId);
     if (!selectedPkg) {
-      throw new BadRequestException('Selected package is not part of the proposal');
+      throw new BadRequestException(
+        'Selected package is not part of the proposal',
+      );
     }
 
     const normalizedCard = dto.cardNumber.replace(/\s+/g, '');
@@ -101,7 +108,8 @@ export class PaymentsService {
       if (cardNum.startsWith('405659')) return 'Commercial Bank (Visa)';
       if (cardNum.startsWith('525496')) return 'Commercial Bank (Mastercard)';
       if (cardNum.startsWith('490822')) return 'Hatton National Bank (Visa)';
-      if (cardNum.startsWith('510526')) return 'Hatton National Bank (Mastercard)';
+      if (cardNum.startsWith('510526'))
+        return 'Hatton National Bank (Mastercard)';
       if (cardNum.startsWith('400586')) return 'Bank of Ceylon (Visa)';
       if (cardNum.startsWith('549040')) return 'Bank of Ceylon (Mastercard)';
       if (cardNum.startsWith('415668')) return 'Seylan Bank (Visa)';
@@ -110,23 +118,30 @@ export class PaymentsService {
     };
 
     const lkBankName = getSriLankanBankName(normalizedCard);
-    const resolvedCardBrand = lkBankName || (normalizedCard.startsWith('4')
-      ? 'Visa'
-      : normalizedCard.startsWith('5')
-        ? 'Mastercard'
-        : 'Generic Sandbox');
+    const resolvedCardBrand =
+      lkBankName ||
+      (normalizedCard.startsWith('4')
+        ? 'Visa'
+        : normalizedCard.startsWith('5')
+          ? 'Mastercard'
+          : 'Generic Sandbox');
 
     // Get all previous successful payments to calculate balance
     const successfulPayments = await this.paymentRepository.find({
       where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
     });
-    const totalPaidInCents = successfulPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+    const totalPaidInCents = successfulPayments.reduce(
+      (sum, p) => sum + p.amountInCents,
+      0,
+    );
 
     let chargeAmountInCents = 0;
     const isBalancePayment = reservation.status === ReservationStatus.CONFIRMED;
 
     if (isBalancePayment) {
-      chargeAmountInCents = (reservation.totalAmountInCents || selectedPkg.priceInCents) - totalPaidInCents;
+      chargeAmountInCents =
+        (reservation.totalAmountInCents || selectedPkg.priceInCents) -
+        totalPaidInCents;
       if (chargeAmountInCents <= 0) {
         throw new BadRequestException('Reservation is already fully paid.');
       }
@@ -134,7 +149,10 @@ export class PaymentsService {
       // Calculate dynamic deposit amount based on selected package deposit policy
       let depositAmountInCents = reservation.advancePaymentPriceInCents || 0;
       if (selectedPkg) {
-        if (selectedPkg.customDepositAmountInCents !== undefined && selectedPkg.customDepositAmountInCents !== null) {
+        if (
+          selectedPkg.customDepositAmountInCents !== undefined &&
+          selectedPkg.customDepositAmountInCents !== null
+        ) {
           depositAmountInCents = selectedPkg.customDepositAmountInCents;
         } else if (selectedPkg.depositType === 'fixed') {
           depositAmountInCents = selectedPkg.depositValue || 0;
@@ -171,14 +189,19 @@ export class PaymentsService {
     // Update reservation
     if (!isBalancePayment) {
       // Check if this time slot is already booked and confirmed
-      const conflicts = await this.reservationRepository.createQueryBuilder('res')
-        .where('res.photographerId = :photographerId', { photographerId: reservation.photographerId })
+      const conflicts = await this.reservationRepository
+        .createQueryBuilder('res')
+        .where('res.photographerId = :photographerId', {
+          photographerId: reservation.photographerId,
+        })
         .andWhere('res.date = :date', { date: reservation.date })
         .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
           startTime: reservation.startTime,
           endTime: reservation.endTime,
         })
-        .andWhere('res.status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+        .andWhere('res.status = :confirmedStatus', {
+          confirmedStatus: ReservationStatus.CONFIRMED,
+        })
         .getMany();
 
       if (conflicts.length > 0) {
@@ -247,14 +270,20 @@ export class PaymentsService {
     }
 
     if (reservation.status !== ReservationStatus.CONFIRMED) {
-      throw new BadRequestException('Can only fulfill payments for Confirmed bookings.');
+      throw new BadRequestException(
+        'Can only fulfill payments for Confirmed bookings.',
+      );
     }
 
     const successfulPayments = await this.paymentRepository.find({
       where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
     });
-    const totalPaidInCents = successfulPayments.reduce((sum, p) => sum + p.amountInCents, 0);
-    const remainingAmountInCents = (reservation.totalAmountInCents || 0) - totalPaidInCents;
+    const totalPaidInCents = successfulPayments.reduce(
+      (sum, p) => sum + p.amountInCents,
+      0,
+    );
+    const remainingAmountInCents =
+      (reservation.totalAmountInCents || 0) - totalPaidInCents;
 
     if (remainingAmountInCents <= 0) {
       throw new BadRequestException('Reservation is already fully paid.');
@@ -276,7 +305,10 @@ export class PaymentsService {
     const updatedPayments = await this.paymentRepository.find({
       where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
     });
-    const updatedTotalPaidInCents = updatedPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+    const updatedTotalPaidInCents = updatedPayments.reduce(
+      (sum, p) => sum + p.amountInCents,
+      0,
+    );
 
     const emitData = {
       ...reservation,
@@ -297,7 +329,10 @@ export class PaymentsService {
       .emit('transactionLogged', { reservationId: reservation.id });
 
     // Generate Invoice PDF and email it
-    await this.sendInvoiceAndNotify(reservation, [...successfulPayments, payment]);
+    await this.sendInvoiceAndNotify(reservation, [
+      ...successfulPayments,
+      payment,
+    ]);
 
     return {
       status: reservation.status,
@@ -306,7 +341,10 @@ export class PaymentsService {
     };
   }
 
-  private async sendInvoiceAndNotify(reservation: Reservation, allPayments: Payment[]) {
+  private async sendInvoiceAndNotify(
+    reservation: Reservation,
+    allPayments: Payment[],
+  ) {
     // Fetch customization settings
     const profile = await this.profileRepository.findOne({
       where: { userId: reservation.photographerId },
@@ -315,28 +353,35 @@ export class PaymentsService {
     const settings = {
       invoiceTitle: profile?.invoiceTitle || 'INVOICE',
       invoiceColor: profile?.invoiceColor || '#2563eb',
-      invoiceNotes: profile?.invoiceNotes || 'Thank you for booking with us! We appreciate your trust.',
-      invoiceLogoText: profile?.invoiceLogoText || reservation.photographer.firstName,
+      invoiceNotes:
+        profile?.invoiceNotes ||
+        'Thank you for booking with us! We appreciate your trust.',
+      invoiceLogoText:
+        profile?.invoiceLogoText || reservation.photographer.firstName,
       invoicePhone: profile?.invoicePhone || '',
       invoiceInstructions: profile?.invoiceInstructions || '',
     };
 
     // Construct InvoiceData
     const packages = reservation.selectedPackages || [];
-    const selectedPkg = packages.find((p: any) => p.id === reservation.clientSelectedPackageId) || {
+    const selectedPkg = packages.find(
+      (p: any) => p.id === reservation.clientSelectedPackageId,
+    ) || {
       name: 'Custom Booking Package',
       priceInCents: reservation.totalAmountInCents || 0,
     };
 
     const taxRate = profile?.invoiceTaxRate || 0;
-    const packagePriceLkr = (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
+    const packagePriceLkr =
+      (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
     const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
     const grandTotalLkr = packagePriceLkr + taxAmountLkr;
-    const totalPaidLkr = allPayments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
+    const totalPaidLkr =
+      allPayments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
     const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
 
     const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-    
+
     const mappedPayments = allPayments.map((p) => ({
       date: new Date(p.createdAt).toLocaleDateString(),
       method: `${p.cardBrand} (*${p.cardLast4})`,
@@ -353,7 +398,9 @@ export class PaymentsService {
       photographerName: `${reservation.photographer.firstName} ${reservation.photographer.lastName}`,
       photographerEmail: reservation.photographer.email,
       photographerPhone: '',
-      eventDate: reservation.date ? reservation.date.toString().split('T')[0] : '',
+      eventDate: reservation.date
+        ? reservation.date.toString().split('T')[0]
+        : '',
       eventTime: `${reservation.startTime || ''} - ${reservation.endTime || ''}`,
       eventType: reservation.eventType || 'Event',
       location: reservation.location || '',
@@ -369,7 +416,7 @@ export class PaymentsService {
     };
 
     const pdfDoc = generateInvoicePdf(invoiceData);
-    
+
     // Convert PDF document to buffer
     const getPdfBuffer = async (doc: any): Promise<Buffer> => {
       return new Promise<Buffer>((resolve, reject) => {

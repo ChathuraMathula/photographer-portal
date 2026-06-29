@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -33,7 +41,10 @@ export class PaymentsController {
     @Param('reservationId') reservationId: string,
     @Req() req: RequestWithUser,
   ) {
-    return this.paymentsService.manualFulfillPayment(reservationId, req.user.userId);
+    return this.paymentsService.manualFulfillPayment(
+      reservationId,
+      req.user.userId,
+    );
   }
 
   @Get('photographer')
@@ -50,6 +61,9 @@ export class PaymentsController {
     @Param('reservationId') reservationId: string,
     @Req() req: RequestWithUser,
   ) {
-    return this.paymentsService.getReservationPayments(reservationId, req.user.userId);
+    return this.paymentsService.getReservationPayments(
+      reservationId,
+      req.user.userId,
+    );
   }
 }

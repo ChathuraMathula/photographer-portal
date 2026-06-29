@@ -68,7 +68,9 @@ export class BookingsService {
     if (!email) return null;
     const customer = await this.customerRepository
       .createQueryBuilder('customer')
-      .where('LOWER(customer.email) = :email', { email: email.trim().toLowerCase() })
+      .where('LOWER(customer.email) = :email', {
+        email: email.trim().toLowerCase(),
+      })
       .getOne();
     if (!customer) return null;
     return {
@@ -111,14 +113,23 @@ export class BookingsService {
     // A conflict is any reservation for the same photographer, on the same date, which overlap with the requested time:
     // requested.startTime < existing.endTime AND requested.endTime > existing.startTime
     // AND is in status PENDING, CONFIRMED, or PROPOSED (only if PROPOSED lock hasn't expired yet)
-    const conflicts = await this.reservationRepository.createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', { photographerId: profile.userId })
+    const conflicts = await this.reservationRepository
+      .createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', {
+        photographerId: profile.userId,
+      })
       .andWhere('res.date = :date', { date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', { startTime, endTime })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+        startTime,
+        endTime,
+      })
       .andWhere(
         new Brackets((qb) => {
           qb.where('res.status IN (:...activeStatuses)', {
-            activeStatuses: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
+            activeStatuses: [
+              ReservationStatus.PENDING,
+              ReservationStatus.CONFIRMED,
+            ],
           }).orWhere(
             'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
             { proposedStatus: ReservationStatus.PROPOSED, now },
@@ -162,7 +173,9 @@ export class BookingsService {
     }
 
     // Find or create customer — if email exists, keep the stored name/phone for consistency
-    let customer = await this.customerRepository.findOneBy({ email: dto.email });
+    let customer = await this.customerRepository.findOneBy({
+      email: dto.email,
+    });
     if (!customer) {
       customer = this.customerRepository.create({
         firstName: dto.firstName,
@@ -197,7 +210,9 @@ export class BookingsService {
     reservation.customer = customer;
 
     // Broadcast new reservation created
-    this.chatGateway.server.to(`photographer_${profile.userId}`).emit('reservationCreated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${profile.userId}`)
+      .emit('reservationCreated', reservation);
 
     // Send email notification to customer
     const trackingLink = `http://localhost:4000/book/track/${token}`;
@@ -208,7 +223,13 @@ export class BookingsService {
     );
 
     // Broadcast real-time availability change
-    this.chatGateway.broadcastAvailabilityChange(slug, dto.date, dto.startTime, dto.endTime, false);
+    this.chatGateway.broadcastAvailabilityChange(
+      slug,
+      dto.date,
+      dto.startTime,
+      dto.endTime,
+      false,
+    );
 
     return {
       reservationToken: token,
@@ -223,7 +244,9 @@ export class BookingsService {
       .createQueryBuilder()
       .update(Reservation)
       .set({ status: ReservationStatus.COMPLETED })
-      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .where('status = :confirmedStatus', {
+        confirmedStatus: ReservationStatus.CONFIRMED,
+      })
       .andWhere('date < :todayStr', { todayStr })
       .execute();
 
@@ -241,7 +264,10 @@ export class BookingsService {
     const successfulPayments = await this.paymentRepository.find({
       where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
     });
-    const totalPaidInCents = successfulPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+    const totalPaidInCents = successfulPayments.reduce(
+      (sum, p) => sum + p.amountInCents,
+      0,
+    );
 
     return {
       id: reservation.id,
@@ -279,7 +305,8 @@ export class BookingsService {
 
     if (!reservation) throw new NotFoundException('Reservation not found');
 
-    const matches = reservation.customer.email.toLowerCase() === email.toLowerCase();
+    const matches =
+      reservation.customer.email.toLowerCase() === email.toLowerCase();
     if (!matches) {
       throw new ForbiddenException('Invalid email address for this booking');
     }
@@ -351,7 +378,9 @@ export class BookingsService {
     const packages = reservation.selectedPackages || [];
     const selectedPkg = packages.find((p: any) => p.id === packageId);
     if (!selectedPkg) {
-      throw new BadRequestException('Selected package is not part of the proposal');
+      throw new BadRequestException(
+        'Selected package is not part of the proposal',
+      );
     }
 
     reservation.status = ReservationStatus.CONFIRMED;
@@ -362,8 +391,12 @@ export class BookingsService {
     await this.reservationRepository.save(reservation);
 
     // Broadcast updated reservation
-    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
 
     // Send confirmation email to photographer
     await this.emailService.sendReservationConfirmed(
@@ -390,7 +423,10 @@ export class BookingsService {
       throw new ForbiddenException('Access denied');
     }
 
-    if (reservation.status !== ReservationStatus.PROPOSED && reservation.status !== ReservationStatus.PENDING) {
+    if (
+      reservation.status !== ReservationStatus.PROPOSED &&
+      reservation.status !== ReservationStatus.PENDING
+    ) {
       throw new BadRequestException('Cannot cancel reservation in this state');
     }
 
@@ -400,11 +436,17 @@ export class BookingsService {
     await this.reservationRepository.save(reservation);
 
     // Broadcast updated reservation
-    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
 
     // Broadcast availability change to unlock this slot on the calendar
-    const profile = await this.profileRepository.findOneBy({ userId: reservation.photographerId });
+    const profile = await this.profileRepository.findOneBy({
+      userId: reservation.photographerId,
+    });
     if (profile) {
       this.chatGateway.broadcastAvailabilityChange(
         profile.bookingSlug,

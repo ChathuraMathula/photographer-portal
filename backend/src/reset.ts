@@ -5,7 +5,7 @@ import { seedDatabase } from './scripts/seed-data';
 
 async function bootstrap() {
   const dbHost = process.env.DB_HOST ?? 'localhost';
-  
+
   const app = await NestFactory.createApplicationContext(AppModule);
 
   console.log(
@@ -14,7 +14,7 @@ async function bootstrap() {
 
   try {
     const dataSource = app.get(DataSource);
-    
+
     console.log('  🗑  Dropping database tables...');
     await dataSource.dropDatabase();
     console.log('  ✔ Database dropped');

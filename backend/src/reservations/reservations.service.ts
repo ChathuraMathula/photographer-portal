@@ -55,11 +55,14 @@ export class ReservationsService {
       .createQueryBuilder()
       .update(Reservation)
       .set({ status: ReservationStatus.COMPLETED })
-      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .where('status = :confirmedStatus', {
+        confirmedStatus: ReservationStatus.CONFIRMED,
+      })
       .andWhere('date < :todayStr', { todayStr })
       .execute();
 
-    const query = this.reservationRepository.createQueryBuilder('res')
+    const query = this.reservationRepository
+      .createQueryBuilder('res')
       .leftJoinAndSelect('res.customer', 'customer')
       .leftJoinAndSelect('res.photographer', 'photographer')
       .leftJoinAndSelect('res.messages', 'messages');
@@ -70,7 +73,10 @@ export class ReservationsService {
       });
     }
 
-    return query.orderBy('res.date', 'DESC').addOrderBy('res.startTime', 'ASC').getMany();
+    return query
+      .orderBy('res.date', 'DESC')
+      .addOrderBy('res.startTime', 'ASC')
+      .getMany();
   }
 
   async findOne(id: string, user: JwtUser) {
@@ -80,7 +86,9 @@ export class ReservationsService {
       .createQueryBuilder()
       .update(Reservation)
       .set({ status: ReservationStatus.COMPLETED })
-      .where('status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .where('status = :confirmedStatus', {
+        confirmedStatus: ReservationStatus.CONFIRMED,
+      })
       .andWhere('date < :todayStr', { todayStr })
       .execute();
 
@@ -105,14 +113,20 @@ export class ReservationsService {
     const reservation = await this.findOne(id, user);
     reservation.status = status;
     const saved = await this.reservationRepository.save(reservation);
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', saved);
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', saved);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', saved);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationUpdated', saved);
     return saved;
   }
 
   async createManualBooking(dto: CreateManualBookingDto, user: JwtUser) {
     if (user.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Only Photographers can create manual bookings');
+      throw new ForbiddenException(
+        'Only Photographers can create manual bookings',
+      );
     }
 
     if (dto.startTime >= dto.endTime) {
@@ -120,12 +134,17 @@ export class ReservationsService {
     }
 
     // Check availability
-    const profile = await this.profileRepository.findOneBy({ userId: user.userId });
+    const profile = await this.profileRepository.findOneBy({
+      userId: user.userId,
+    });
     if (!profile) throw new NotFoundException('Photographer profile not found');
 
     const now = new Date();
-    const conflicts = await this.reservationRepository.createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', { photographerId: user.userId })
+    const conflicts = await this.reservationRepository
+      .createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', {
+        photographerId: user.userId,
+      })
       .andWhere('res.date = :date', { date: dto.date })
       .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
         startTime: dto.startTime,
@@ -134,7 +153,10 @@ export class ReservationsService {
       .andWhere(
         new Brackets((qb) => {
           qb.where('res.status IN (:...activeStatuses)', {
-            activeStatuses: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
+            activeStatuses: [
+              ReservationStatus.PENDING,
+              ReservationStatus.CONFIRMED,
+            ],
           }).orWhere(
             'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
             { proposedStatus: ReservationStatus.PROPOSED, now },
@@ -148,7 +170,9 @@ export class ReservationsService {
     }
 
     // Find or create customer — if email exists, keep the stored name/phone for consistency
-    let customer = await this.customerRepository.findOneBy({ email: dto.email });
+    let customer = await this.customerRepository.findOneBy({
+      email: dto.email,
+    });
     if (!customer) {
       customer = this.customerRepository.create({
         firstName: dto.firstName,
@@ -219,7 +243,9 @@ export class ReservationsService {
     reservation.customer = customer;
 
     // Broadcast new reservation created
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationCreated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationCreated', reservation);
 
     // Broadcast change
     this.chatGateway.broadcastAvailabilityChange(
@@ -233,46 +259,57 @@ export class ReservationsService {
     return reservation;
   }
 
-  async proposeQuotation(
-    id: string,
-    dto: ProposeQuotationDto,
-    user: JwtUser,
-  ) {
+  async proposeQuotation(id: string, dto: ProposeQuotationDto, user: JwtUser) {
     const reservation = await this.findOne(id, user);
 
-    if (reservation.status !== ReservationStatus.PENDING && reservation.status !== ReservationStatus.PROPOSED) {
-      throw new BadRequestException('Can only propose quotation for pending or proposed requests');
+    if (
+      reservation.status !== ReservationStatus.PENDING &&
+      reservation.status !== ReservationStatus.PROPOSED
+    ) {
+      throw new BadRequestException(
+        'Can only propose quotation for pending or proposed requests',
+      );
     }
 
     // Find packages
     const packageIds = dto.packageIds || [];
-    const pkgs = packageIds.length > 0
-      ? await this.packageRepository.find({
-          where: { id: In(packageIds), photographerId: user.userId },
-        })
-      : [];
+    const pkgs =
+      packageIds.length > 0
+        ? await this.packageRepository.find({
+            where: { id: In(packageIds), photographerId: user.userId },
+          })
+        : [];
 
     if (pkgs.length === 0 && packageIds.length > 0) {
       throw new BadRequestException('Invalid package IDs selected');
     }
 
     if (pkgs.length === 0 && !dto.customPackage) {
-      throw new BadRequestException('Must select at least one package or include a custom package');
+      throw new BadRequestException(
+        'Must select at least one package or include a custom package',
+      );
     }
 
     // Check if this time slot is already booked and confirmed
-    const conflicts = await this.reservationRepository.createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', { photographerId: reservation.photographerId })
+    const conflicts = await this.reservationRepository
+      .createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', {
+        photographerId: reservation.photographerId,
+      })
       .andWhere('res.date = :date', { date: reservation.date })
       .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
         startTime: reservation.startTime,
         endTime: reservation.endTime,
       })
-      .andWhere('res.status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .andWhere('res.status = :confirmedStatus', {
+        confirmedStatus: ReservationStatus.CONFIRMED,
+      })
       .getMany();
 
     if (conflicts.length > 0) {
-      throw new BadRequestException('This time slot is already booked and confirmed.');
+      throw new BadRequestException(
+        'This time slot is already booked and confirmed.',
+      );
     }
 
     // Update reservation
@@ -283,9 +320,10 @@ export class ReservationsService {
 
     // Snapshot packages
     const selectedPkgsMapped = pkgs.map((p) => {
-      const customDeposit = dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
-        ? dto.packageDeposits[p.id]
-        : null;
+      const customDeposit =
+        dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
+          ? dto.packageDeposits[p.id]
+          : null;
       return {
         id: p.id,
         name: p.name,
@@ -303,9 +341,10 @@ export class ReservationsService {
     if (dto.customPackage) {
       const cp = dto.customPackage;
       const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const customDeposit = dto.packageDeposits && dto.packageDeposits['custom'] !== undefined
-        ? dto.packageDeposits['custom']
-        : null;
+      const customDeposit =
+        dto.packageDeposits && dto.packageDeposits['custom'] !== undefined
+          ? dto.packageDeposits['custom']
+          : null;
 
       selectedPkgsMapped.push({
         id: customId,
@@ -330,8 +369,12 @@ export class ReservationsService {
     await this.reservationRepository.save(reservation);
 
     // Broadcast updated reservation
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationUpdated', reservation);
 
     // Send email notification to client
     const trackingLink = `http://localhost:4000/book/track/${reservation.reservationToken}`;
@@ -363,8 +406,12 @@ export class ReservationsService {
     await this.reservationRepository.save(reservation);
 
     // Broadcast updated reservation
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationUpdated', reservation);
 
     // Send rejection email to client
     await this.emailService.sendReservationRejected(
@@ -374,7 +421,9 @@ export class ReservationsService {
     );
 
     // Broadcast availability change to unlock
-    const profile = await this.profileRepository.findOneBy({ userId: user.userId });
+    const profile = await this.profileRepository.findOneBy({
+      userId: user.userId,
+    });
     if (profile) {
       this.chatGateway.broadcastAvailabilityChange(
         profile.bookingSlug,
@@ -410,9 +459,7 @@ export class ReservationsService {
     await this.messageRepository.save(message);
 
     // Broadcast to room
-    this.chatGateway.server
-      .to(`reservation_${id}`)
-      .emit('message', message);
+    this.chatGateway.server.to(`reservation_${id}`).emit('message', message);
 
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)

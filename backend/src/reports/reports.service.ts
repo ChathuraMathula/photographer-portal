@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Payment, PaymentStatus } from '../entities/payment.entity';
-import { buildFinancialReportPdf, buildBookingsReportPdf, buildLocationReportPdf } from './reports-pdf-builder';
+import {
+  buildFinancialReportPdf,
+  buildBookingsReportPdf,
+  buildLocationReportPdf,
+} from './reports-pdf-builder';
 
 @Injectable()
 export class ReportsService {
@@ -60,27 +64,40 @@ export class ReportsService {
     });
 
     // Fetch all successful payments in the period
-    const paymentsQuery = this.paymentRepository.createQueryBuilder('payment')
+    const paymentsQuery = this.paymentRepository
+      .createQueryBuilder('payment')
       .leftJoinAndSelect('payment.reservation', 'reservation')
       .where('payment.status = :status', { status: PaymentStatus.SUCCESS })
       .andWhere('payment.createdAt >= :startDate', { startDate })
       .andWhere('payment.createdAt <= :endDate', { endDate });
 
     if (photographerId) {
-      paymentsQuery.andWhere('reservation.photographerId = :photographerId', { photographerId });
+      paymentsQuery.andWhere('reservation.photographerId = :photographerId', {
+        photographerId,
+      });
     }
     const payments = await paymentsQuery.getMany();
 
     // Calculations
     const totalBookings = reservations.length;
-    
+
     // Revenue calculations (in cents, then convert to LKR)
     const potentialRevenueCents = reservations
-      .filter(res => res.status !== ReservationStatus.CANCELLED && res.status !== ReservationStatus.REJECTED)
+      .filter(
+        (res) =>
+          res.status !== ReservationStatus.CANCELLED &&
+          res.status !== ReservationStatus.REJECTED,
+      )
       .reduce((sum, res) => sum + (res.totalAmountInCents || 0), 0);
-    
-    const paidRevenueCents = payments.reduce((sum, pay) => sum + (pay.amountInCents || 0), 0);
-    const pendingRevenueCents = Math.max(0, potentialRevenueCents - paidRevenueCents);
+
+    const paidRevenueCents = payments.reduce(
+      (sum, pay) => sum + (pay.amountInCents || 0),
+      0,
+    );
+    const pendingRevenueCents = Math.max(
+      0,
+      potentialRevenueCents - paidRevenueCents,
+    );
 
     const potentialRevenueLkr = potentialRevenueCents / 100;
     const paidRevenueLkr = paidRevenueCents / 100;
@@ -88,9 +105,14 @@ export class ReportsService {
 
     // Conversion rate: Confirmed or Completed reservations out of total bookings
     const successfulBookings = reservations.filter(
-      res => res.status === ReservationStatus.CONFIRMED || res.status === ReservationStatus.COMPLETED
+      (res) =>
+        res.status === ReservationStatus.CONFIRMED ||
+        res.status === ReservationStatus.COMPLETED,
     ).length;
-    const conversionRate = totalBookings > 0 ? Math.round((successfulBookings / totalBookings) * 100) : 0;
+    const conversionRate =
+      totalBookings > 0
+        ? Math.round((successfulBookings / totalBookings) * 100)
+        : 0;
 
     // Booking Status Distribution
     const statusCounts = {
@@ -101,7 +123,7 @@ export class ReportsService {
       CANCELLED: 0,
       REJECTED: 0,
     };
-    reservations.forEach(res => {
+    reservations.forEach((res) => {
       if (statusCounts[res.status] !== undefined) {
         statusCounts[res.status]++;
       }
@@ -109,22 +131,36 @@ export class ReportsService {
 
     // Event Types breakdown
     const eventTypeCounts: Record<string, number> = {};
-    reservations.forEach(res => {
+    reservations.forEach((res) => {
       const type = res.eventType || 'Other';
       eventTypeCounts[type] = (eventTypeCounts[type] || 0) + 1;
     });
-    const eventTypes = Object.entries(eventTypeCounts).map(([name, count]) => ({ name, count }));
+    const eventTypes = Object.entries(eventTypeCounts).map(([name, count]) => ({
+      name,
+      count,
+    }));
 
     // Package Performance breakdown
-    const packageCounts: Record<string, { count: number; revenueCents: number }> = {};
+    const packageCounts: Record<
+      string,
+      { count: number; revenueCents: number }
+    > = {};
     reservations
-      .filter(res => res.status !== ReservationStatus.CANCELLED && res.status !== ReservationStatus.REJECTED)
-      .forEach(res => {
+      .filter(
+        (res) =>
+          res.status !== ReservationStatus.CANCELLED &&
+          res.status !== ReservationStatus.REJECTED,
+      )
+      .forEach((res) => {
         let pkgName = 'Custom/Quotation';
-        if (res.selectedPackages && Array.isArray(res.selectedPackages) && res.selectedPackages.length > 0) {
+        if (
+          res.selectedPackages &&
+          Array.isArray(res.selectedPackages) &&
+          res.selectedPackages.length > 0
+        ) {
           pkgName = res.selectedPackages[0].name || pkgName;
         }
-        
+
         if (!packageCounts[pkgName]) {
           packageCounts[pkgName] = { count: 0, revenueCents: 0 };
         }
@@ -132,14 +168,19 @@ export class ReportsService {
         packageCounts[pkgName].revenueCents += res.totalAmountInCents || 0;
       });
 
-    const packages = Object.entries(packageCounts).map(([name, data]) => ({
-      name,
-      count: data.count,
-      revenueLkr: data.revenueCents / 100,
-    })).sort((a, b) => b.revenueLkr - a.revenueLkr);
+    const packages = Object.entries(packageCounts)
+      .map(([name, data]) => ({
+        name,
+        count: data.count,
+        revenueLkr: data.revenueCents / 100,
+      }))
+      .sort((a, b) => b.revenueLkr - a.revenueLkr);
 
     // Timeline Coordinates
-    const timelineMap: Record<string, { bookings: number; revenueLkr: number }> = {};
+    const timelineMap: Record<
+      string,
+      { bookings: number; revenueLkr: number }
+    > = {};
     const diffMs = endDate.getTime() - startDate.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
@@ -156,18 +197,30 @@ export class ReportsService {
       for (let i = diffDays - 1; i >= 0; i--) {
         const d = new Date(endDate);
         d.setDate(endDate.getDate() - i);
-        const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const label = d.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
-      
-      reservations.forEach(res => {
-        const label = new Date(res.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+      reservations.forEach((res) => {
+        const label = new Date(res.date).toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
         if (timelineMap[label]) {
           timelineMap[label].bookings++;
         }
       });
-      payments.forEach(pay => {
-        const label = new Date(pay.createdAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      payments.forEach((pay) => {
+        const label = new Date(pay.createdAt).toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
         if (timelineMap[label]) {
           timelineMap[label].revenueLkr += pay.amountInCents / 100;
         }
@@ -177,18 +230,24 @@ export class ReportsService {
       for (let i = diffDays - 5; i >= 0; i -= steps) {
         const d = new Date(endDate);
         d.setDate(endDate.getDate() - i);
-        const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const label = d.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
 
       const keys = Object.keys(timelineMap);
-      
-      reservations.forEach(res => {
+
+      reservations.forEach((res) => {
         const resDate = new Date(res.date);
         let closest = keys[0];
         let minDiff = Infinity;
-        keys.forEach(k => {
-          const diff = Math.abs(resDate.getTime() - new Date(k + `, ${today.getFullYear()}`).getTime());
+        keys.forEach((k) => {
+          const diff = Math.abs(
+            resDate.getTime() -
+              new Date(k + `, ${today.getFullYear()}`).getTime(),
+          );
           if (diff < minDiff) {
             minDiff = diff;
             closest = k;
@@ -196,13 +255,16 @@ export class ReportsService {
         });
         timelineMap[closest].bookings++;
       });
-      
-      payments.forEach(pay => {
+
+      payments.forEach((pay) => {
         const payDate = new Date(pay.createdAt);
         let closest = keys[0];
         let minDiff = Infinity;
-        keys.forEach(k => {
-          const diff = Math.abs(payDate.getTime() - new Date(k + `, ${today.getFullYear()}`).getTime());
+        keys.forEach((k) => {
+          const diff = Math.abs(
+            payDate.getTime() -
+              new Date(k + `, ${today.getFullYear()}`).getTime(),
+          );
           if (diff < minDiff) {
             minDiff = diff;
             closest = k;
@@ -215,18 +277,27 @@ export class ReportsService {
         const d = new Date(endDate);
         d.setDate(1); // Prevent date overflow for months with < 31 days
         d.setMonth(endDate.getMonth() - i);
-        const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const label = d.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
         timelineMap[label] = { bookings: 0, revenueLkr: 0 };
       }
-      
-      reservations.forEach(res => {
-        const label = new Date(res.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+      reservations.forEach((res) => {
+        const label = new Date(res.date).toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
         if (timelineMap[label]) {
           timelineMap[label].bookings++;
         }
       });
-      payments.forEach(pay => {
-        const label = new Date(pay.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      payments.forEach((pay) => {
+        const label = new Date(pay.createdAt).toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
         if (timelineMap[label]) {
           timelineMap[label].revenueLkr += pay.amountInCents / 100;
         }
@@ -245,9 +316,15 @@ export class ReportsService {
 
     if (!photographerId) {
       const manager = this.reservationRepository.manager;
-      const totalPhotographers = await manager.count('User', { where: { role: 'PHOTOGRAPHER', isActive: true } });
-      const totalAdmins = await manager.count('User', { where: { role: 'ADMIN', isActive: true } });
-      const totalSuspended = await manager.count('User', { where: { isActive: false } });
+      const totalPhotographers = await manager.count('User', {
+        where: { role: 'PHOTOGRAPHER', isActive: true },
+      });
+      const totalAdmins = await manager.count('User', {
+        where: { role: 'ADMIN', isActive: true },
+      });
+      const totalSuspended = await manager.count('User', {
+        where: { isActive: false },
+      });
 
       systemStats = {
         totalPhotographers,
@@ -255,29 +332,46 @@ export class ReportsService {
         totalSuspended,
       };
 
-      const photographerStats: Record<string, { name: string; email: string; bookings: number; revenueCents: number }> = {};
-      
+      const photographerStats: Record<
+        string,
+        { name: string; email: string; bookings: number; revenueCents: number }
+      > = {};
+
       reservations
-        .filter(res => res.status !== ReservationStatus.CANCELLED && res.status !== ReservationStatus.REJECTED)
-        .forEach(res => {
+        .filter(
+          (res) =>
+            res.status !== ReservationStatus.CANCELLED &&
+            res.status !== ReservationStatus.REJECTED,
+        )
+        .forEach((res) => {
           const photoId = res.photographerId;
-          const photoName = res.photographer ? `${res.photographer.firstName} ${res.photographer.lastName}` : 'Unknown';
+          const photoName = res.photographer
+            ? `${res.photographer.firstName} ${res.photographer.lastName}`
+            : 'Unknown';
           const photoEmail = res.photographer ? res.photographer.email : '';
-          
+
           if (!photographerStats[photoId]) {
-            photographerStats[photoId] = { name: photoName, email: photoEmail, bookings: 0, revenueCents: 0 };
+            photographerStats[photoId] = {
+              name: photoName,
+              email: photoEmail,
+              bookings: 0,
+              revenueCents: 0,
+            };
           }
           photographerStats[photoId].bookings++;
-          photographerStats[photoId].revenueCents += res.totalAmountInCents || 0;
+          photographerStats[photoId].revenueCents +=
+            res.totalAmountInCents || 0;
         });
 
-      photographerLeaderboard = Object.entries(photographerStats).map(([id, stats]) => ({
-        id,
-        name: stats.name,
-        email: stats.email,
-        bookingsCount: stats.bookings,
-        revenueLkr: stats.revenueCents / 100,
-      })).sort((a, b) => b.revenueLkr - a.revenueLkr);
+      photographerLeaderboard = Object.entries(photographerStats)
+        .map(([id, stats]) => ({
+          id,
+          name: stats.name,
+          email: stats.email,
+          bookingsCount: stats.bookings,
+          revenueLkr: stats.revenueCents / 100,
+        }))
+        .sort((a, b) => b.revenueLkr - a.revenueLkr);
     }
 
     return {
@@ -291,16 +385,23 @@ export class ReportsService {
         pendingRevenueLkr,
         conversionRate,
       },
-      statusDistribution: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
+      statusDistribution: Object.entries(statusCounts).map(([name, value]) => ({
+        name,
+        value,
+      })),
       eventTypes,
       packages,
       timeline,
       photographerLeaderboard,
       systemStats,
-      rawBookings: reservations.map(res => ({
+      rawBookings: reservations.map((res) => ({
         id: res.id,
-        clientName: res.customer ? `${res.customer.firstName} ${res.customer.lastName}` : 'Manual Client',
-        photographerName: res.photographer ? `${res.photographer.firstName} ${res.photographer.lastName}` : 'Unknown',
+        clientName: res.customer
+          ? `${res.customer.firstName} ${res.customer.lastName}`
+          : 'Manual Client',
+        photographerName: res.photographer
+          ? `${res.photographer.firstName} ${res.photographer.lastName}`
+          : 'Unknown',
         date: res.date,
         eventType: res.eventType,
         totalLkr: (res.totalAmountInCents || 0) / 100,
@@ -309,12 +410,14 @@ export class ReportsService {
         locationMapLink: res.locationMapLink,
         city: res.city,
         district: res.district,
-        customer: res.customer ? {
-          firstName: res.customer.firstName,
-          lastName: res.customer.lastName,
-          email: res.customer.email,
-          phone: res.customer.phone,
-        } : undefined,
+        customer: res.customer
+          ? {
+              firstName: res.customer.firstName,
+              lastName: res.customer.lastName,
+              email: res.customer.email,
+              phone: res.customer.phone,
+            }
+          : undefined,
       })),
     };
   }
@@ -325,7 +428,12 @@ export class ReportsService {
     customStartDate?: string,
     customEndDate?: string,
   ): Promise<any> {
-    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
+    const data = await this.generateReportData(
+      photographerId,
+      period,
+      customStartDate,
+      customEndDate,
+    );
     return buildFinancialReportPdf(data, period);
   }
   async generateBookingsReportPdf(
@@ -334,7 +442,12 @@ export class ReportsService {
     customStartDate?: string,
     customEndDate?: string,
   ): Promise<any> {
-    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
+    const data = await this.generateReportData(
+      photographerId,
+      period,
+      customStartDate,
+      customEndDate,
+    );
     return buildBookingsReportPdf(data, period);
   }
 
@@ -344,7 +457,12 @@ export class ReportsService {
     customStartDate?: string,
     customEndDate?: string,
   ): Promise<any> {
-    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
+    const data = await this.generateReportData(
+      photographerId,
+      period,
+      customStartDate,
+      customEndDate,
+    );
     return buildLocationReportPdf(data, period);
   }
 }

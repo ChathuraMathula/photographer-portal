@@ -10,7 +10,10 @@ import { Message } from '../entities/message.entity';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
-if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function') {
+if (
+  fs.existsSync(envPath) &&
+  typeof (process as any).loadEnvFile === 'function'
+) {
   (process as any).loadEnvFile(envPath);
 }
 
@@ -21,7 +24,14 @@ export default new DataSource({
   username: process.env.DB_USERNAME ?? 'admin',
   password: process.env.DB_PASSWORD ?? 'securepassword123',
   database: process.env.DB_DATABASE ?? 'portal',
-  entities: [User, PhotographerProfile, Package, Customer, Reservation, Message],
+  entities: [
+    User,
+    PhotographerProfile,
+    Package,
+    Customer,
+    Reservation,
+    Message,
+  ],
   migrations: ['src/migrations/*.ts', 'dist/migrations/*.js'],
   synchronize: false,
 });

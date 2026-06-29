@@ -7,7 +7,10 @@ import fs from 'fs';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
-if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function') {
+if (
+  fs.existsSync(envPath) &&
+  typeof (process as any).loadEnvFile === 'function'
+) {
   (process as any).loadEnvFile(envPath);
 }
 
