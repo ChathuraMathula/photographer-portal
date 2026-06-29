@@ -68,7 +68,8 @@ photographer-portal/
           │   └── book/[slug]/ # Public booking page
           ├── components/
           │   ├── common/
-          │   │   └── OSMMapPreview.tsx # [NEW] Clean, sandboxed OpenStreetMap Leaflet component
+          │   │   ├── OSMMapPreview.tsx # [NEW] Clean, sandboxed OpenStreetMap Leaflet preview component
+          │   │   └── OSMMapPicker.tsx  # [NEW] Interactive OpenStreetMap coordinate pin selector
           │   ├── dashboard/
           │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
           │   │   ├── reports/ 

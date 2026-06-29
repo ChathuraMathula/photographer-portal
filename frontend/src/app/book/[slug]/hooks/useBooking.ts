@@ -53,41 +53,10 @@ const DetailsSchema = Yup.object({
   phone: Yup.string()
     .required("Phone number is required")
     .matches(/^[+]?[0-9\s-]{7,15}$/, "Please enter a valid phone number"),
-  location: Yup.string().test(
-    "venue-required",
-    "Venue is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  city: Yup.string().test(
-    "city-required",
-    "City is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  district: Yup.string().test(
-    "district-required",
-    "District is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  locationMapLink: Yup.string()
-    .url("Must be a valid URL")
-    .nullable()
-    .test(
-      "at-least-one-location-link",
-      "Either Venue details or Google Maps link is required",
-      function (value) {
-        const { location, city, district } = this.parent;
-        return !!(value?.trim() || (location?.trim() && city?.trim() && district?.trim()));
-      }
-    ),
+  location: Yup.string().required("Venue / Location address is required"),
+  city: Yup.string().required("City is required"),
+  district: Yup.string().required("District is required"),
+  locationMapLink: Yup.string().url("Must be a valid URL").required("Map pin location is required"),
   notes: Yup.string(),
 });
 

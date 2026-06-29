@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/common/FieldError";
 import { X } from "lucide-react";
 import { NominatimSelect } from "@/components/common/NominatimSelect";
+import { OSMMapPicker } from "@/components/common/OSMMapPicker";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { TimeSelect } from "@/components/booking/TimeSelect";
 import { EventTypeSelect } from "@/components/booking/EventTypeSelect";
@@ -193,61 +194,71 @@ export function ManualBookingModal({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="mb-locationMapLink" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Google Maps Location Link (optional)</Label>
-              <Input
-                id="mb-locationMapLink"
-                placeholder="e.g. https://maps.google.com/?q=..."
-                {...formik.getFieldProps("locationMapLink")}
-                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
-              />
-              <FieldError msg={formik.touched.locationMapLink ? formik.errors.locationMapLink : undefined} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mb-packageId" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Package (optional)</Label>
-              <select
-                id="mb-packageId"
-                value={formik.values.packageId}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  formik.setFieldValue("packageId", val);
-                  if (val) {
-                    const selected = packages.find((p) => p.id === val);
-                    if (selected) {
-                      const priceLkr = selected.priceInCents / 100;
-                      formik.setFieldValue("totalAmountLkr", priceLkr);
-                      let depositLkr = 0;
-                      const depType = selected.depositType || "universal";
-                      if (depType === "fixed") {
-                        depositLkr = (selected.depositValue ?? 0) / 100;
-                      } else if (depType === "percentage") {
-                        depositLkr = (priceLkr * (selected.depositValue ?? 0)) / 100;
+          <div className="space-y-2">
+            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Pin Venue Location (Map Picker) <span className="text-red-500">*</span>
+            </Label>
+            <OSMMapPicker
+              lat={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || undefined : undefined}
+              lon={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2] || "") || undefined : undefined}
+              city={formik.values.city}
+              district={formik.values.district}
+              onChange={(lat, lon) => {
+                formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
+              }}
+              height="200px"
+            />
+            {formik.values.locationMapLink && (
+              <p className="text-[10px] text-zinc-400 font-medium truncate mt-1">
+                Generated Coordinates Link: <span className="text-zinc-600 dark:text-zinc-400 font-mono">{formik.values.locationMapLink}</span>
+              </p>
+            )}
+            <FieldError msg={formik.touched.locationMapLink ? formik.errors.locationMapLink : undefined} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mb-packageId" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Package (optional)</Label>
+            <select
+              id="mb-packageId"
+              value={formik.values.packageId}
+              onChange={(e) => {
+                const val = e.target.value;
+                formik.setFieldValue("packageId", val);
+                if (val) {
+                  const selected = packages.find((p) => p.id === val);
+                  if (selected) {
+                    const priceLkr = selected.priceInCents / 100;
+                    formik.setFieldValue("totalAmountLkr", priceLkr);
+                    let depositLkr = 0;
+                    const depType = selected.depositType || "universal";
+                    if (depType === "fixed") {
+                      depositLkr = (selected.depositValue ?? 0) / 100;
+                    } else if (depType === "percentage") {
+                      depositLkr = (priceLkr * (selected.depositValue ?? 0)) / 100;
+                    } else {
+                      if (universalDepositType === "fixed") {
+                        depositLkr = universalDepositValue;
                       } else {
-                        if (universalDepositType === "fixed") {
-                          depositLkr = universalDepositValue;
-                        } else {
-                          depositLkr = (priceLkr * universalDepositValue) / 100;
-                        }
+                        depositLkr = (priceLkr * universalDepositValue) / 100;
                       }
-                      formik.setFieldValue("advancePaymentLkr", Math.round(depositLkr));
                     }
-                  } else {
-                    formik.setFieldValue("totalAmountLkr", "");
-                    formik.setFieldValue("advancePaymentLkr", "");
+                    formik.setFieldValue("advancePaymentLkr", Math.round(depositLkr));
                   }
-                }}
-                className="w-full h-11 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-body-small text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-transparent transition-all"
-              >
-                <option value="">-- No Package --</option>
-                {packages.map((pkg) => (
-                  <option key={pkg.id} value={pkg.id}>
-                    {pkg.name} (LKR {(pkg.priceInCents / 100).toLocaleString()})
-                  </option>
-                ))}
-              </select>
-              <FieldError msg={formik.touched.packageId ? formik.errors.packageId : undefined} />
-            </div>
+                } else {
+                  formik.setFieldValue("totalAmountLkr", "");
+                  formik.setFieldValue("advancePaymentLkr", "");
+                }
+              }}
+              className="w-full h-11 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-body-small text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-transparent transition-all"
+            >
+              <option value="">-- No Package --</option>
+              {packages.map((pkg) => (
+                <option key={pkg.id} value={pkg.id}>
+                  {pkg.name} (LKR {(pkg.priceInCents / 100).toLocaleString()})
+                </option>
+              ))}
+            </select>
+            <FieldError msg={formik.touched.packageId ? formik.errors.packageId : undefined} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

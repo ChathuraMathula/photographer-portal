@@ -44,42 +44,10 @@ const ManualBookingSchema = Yup.object().shape({
       return !v || v > this.parent.startTime;
     }),
   eventType: Yup.string().required("Event type is required"),
-  location: Yup.string().test(
-    "venue-required",
-    "Venue is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  city: Yup.string().test(
-    "city-required",
-    "City is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  district: Yup.string().test(
-    "district-required",
-    "District is required if map link is not provided",
-    function (value) {
-      const { locationMapLink } = this.parent;
-      return !!(value?.trim() || locationMapLink?.trim());
-    }
-  ),
-  locationMapLink: Yup.string()
-    .url("Must be a valid URL")
-    .nullable()
-    .optional()
-    .test(
-      "at-least-one-location-link",
-      "Either Venue details or Google Maps link is required",
-      function (value) {
-        const { location, city, district } = this.parent;
-        return !!(value?.trim() || (location?.trim() && city?.trim() && district?.trim()));
-      }
-    ),
+  location: Yup.string().required("Venue / Location address is required"),
+  city: Yup.string().required("City is required"),
+  district: Yup.string().required("District is required"),
+  locationMapLink: Yup.string().url("Must be a valid URL").required("Map pin location is required"),
   notes: Yup.string().optional().nullable(),
   packageId: Yup.string().optional().nullable(),
   advancePaymentLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),

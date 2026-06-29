@@ -13,6 +13,7 @@ import {
 import { FieldError } from "@/components/common/FieldError";
 import { type AvailabilityValues } from "./AvailabilityForm";
 import { NominatimSelect } from "@/components/common/NominatimSelect";
+import { OSMMapPicker } from "@/components/common/OSMMapPicker";
 
 export type CustomerDetailsValues = {
   firstName: string;
@@ -173,19 +174,24 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="locationMapLink" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-              Google Maps Location Link <span className="text-red-500">*</span> <span className="text-[10px] text-zinc-400 font-normal">(Either Venue or Maps Link is required)</span>
+            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Pin Venue Location (Map Picker) <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="locationMapLink"
-              placeholder="e.g. https://maps.app.goo.gl/... or https://google.com/maps/..."
-              {...formik.getFieldProps("locationMapLink")}
-              className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
-                formik.touched.locationMapLink && formik.errors.locationMapLink
-                  ? "border-red-500"
-                  : ""
-              }`}
+            <OSMMapPicker
+              lat={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || undefined : undefined}
+              lon={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2] || "") || undefined : undefined}
+              city={formik.values.city}
+              district={formik.values.district}
+              onChange={(lat, lon) => {
+                formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
+              }}
+              height="250px"
             />
+            {formik.values.locationMapLink && (
+              <p className="text-[10px] text-zinc-400 font-medium truncate mt-1">
+                Generated Coordinates Link: <span className="text-zinc-600 dark:text-zinc-400 font-mono">{formik.values.locationMapLink}</span>
+              </p>
+            )}
             <FieldError
               msg={formik.touched.locationMapLink ? formik.errors.locationMapLink : undefined}
             />
