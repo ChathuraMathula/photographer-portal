@@ -13,8 +13,10 @@ type ReportsHeaderProps = {
   onEndDateChange: (val: string) => void;
   downloadingFinancial: boolean;
   downloadingBookings: boolean;
+  downloadingLocation?: boolean;
   onDownloadFinancial: () => void;
   onDownloadBookings: () => void;
+  onDownloadLocation?: () => void;
 };
 
 export function ReportsHeader({
@@ -26,8 +28,10 @@ export function ReportsHeader({
   onEndDateChange,
   downloadingFinancial,
   downloadingBookings,
+  downloadingLocation = false,
   onDownloadFinancial,
   onDownloadBookings,
+  onDownloadLocation,
 }: ReportsHeaderProps) {
   return (
     <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
@@ -94,6 +98,18 @@ export function ReportsHeader({
           <FileDown className="h-4 w-4" />
           {downloadingBookings ? "Generating..." : "Bookings PDF"}
         </button>
+
+        {/* Location Download Button */}
+        {onDownloadLocation && (
+          <button
+            onClick={onDownloadLocation}
+            disabled={downloadingLocation}
+            className="flex items-center gap-2 h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-body-caption font-bold shadow-md cursor-pointer transition-all disabled:opacity-50"
+          >
+            <FileDown className="h-4 w-4" />
+            {downloadingLocation ? "Generating..." : "Location PDF"}
+          </button>
+        )}
       </div>
     </div>
   );

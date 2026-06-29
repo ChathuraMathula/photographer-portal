@@ -62,6 +62,7 @@ export function AdminReportsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
+  const [downloadingLocation, setDownloadingLocation] = useState(false);
 
   const fetchStats = async (showMainSpinner: boolean) => {
     if (showMainSpinner) {
@@ -147,6 +148,33 @@ export function AdminReportsPage() {
     }
   };
 
+  const handleDownloadLocation = async () => {
+    setDownloadingLocation(true);
+    try {
+      let url = `${API}/reports/pdf/location?period=${period}`;
+      if (period === "custom") {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+      const response = await fetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to download location report");
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `system_location_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Location report PDF downloaded successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to download report PDF");
+    } finally {
+      setDownloadingLocation(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -223,6 +251,16 @@ export function AdminReportsPage() {
             >
               {downloadingBookings ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
               Bookings PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={downloadingLocation}
+              onClick={handleDownloadLocation}
+              className="h-9 rounded-xl flex items-center gap-1.5 cursor-pointer text-xs"
+            >
+              {downloadingLocation ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+              Location PDF
             </Button>
           </div>
         </div>

@@ -62,6 +62,7 @@ export function useReports() {
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
+  const [downloadingLocation, setDownloadingLocation] = useState(false);
 
   const loadStats = async (showMainSpinner: boolean) => {
     if (!context) return;
@@ -145,6 +146,34 @@ export function useReports() {
     }
   };
 
+  const handleDownloadLocation = async () => {
+    if (!context) return;
+    setDownloadingLocation(true);
+    try {
+      let url = `${API}/reports/pdf/location?period=${period}`;
+      if (period === "custom") {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+      const response = await context.authFetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to download PDF report");
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `location_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Location report PDF downloaded successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to download report PDF");
+    } finally {
+      setDownloadingLocation(false);
+    }
+  };
+
   return {
     period,
     setPeriod,
@@ -157,9 +186,11 @@ export function useReports() {
     refreshing,
     downloadingFinancial,
     downloadingBookings,
+    downloadingLocation,
     loadStats,
     handleDownloadFinancial,
     handleDownloadBookings,
+    handleDownloadLocation,
     hasContext: !!context,
   };
 }

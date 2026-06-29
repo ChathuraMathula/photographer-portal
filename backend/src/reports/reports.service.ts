@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Payment, PaymentStatus } from '../entities/payment.entity';
-import { buildFinancialReportPdf, buildBookingsReportPdf } from './reports-pdf-builder';
+import { buildFinancialReportPdf, buildBookingsReportPdf, buildLocationReportPdf } from './reports-pdf-builder';
 
 @Injectable()
 export class ReportsService {
@@ -325,7 +325,6 @@ export class ReportsService {
     const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
     return buildFinancialReportPdf(data, period);
   }
-
   async generateBookingsReportPdf(
     photographerId: string | undefined,
     period: 'weekly' | 'monthly' | 'yearly' | 'custom',
@@ -334,5 +333,15 @@ export class ReportsService {
   ): Promise<any> {
     const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
     return buildBookingsReportPdf(data, period);
+  }
+
+  async generateLocationReportPdf(
+    photographerId: string | undefined,
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    customStartDate?: string,
+    customEndDate?: string,
+  ): Promise<any> {
+    const data = await this.generateReportData(photographerId, period, customStartDate, customEndDate);
+    return buildLocationReportPdf(data, period);
   }
 }

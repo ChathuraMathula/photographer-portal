@@ -538,6 +538,15 @@ When offline cash payments are logged on the photographer's reservation panel, t
 - **Behavior**: The unique Reservation ID is now displayed on the customer's tracking page header for easy copying and referencing.
 - **Frontend changes**: [`ReservationHeader.tsx`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/frontend/src/components/tracking/ReservationHeader.tsx) renders the ID with selection-friendly font formatting under the header title.
 
+### 6. Location Analytics PDF Reports
+- **Behavior**: Real-time generation and downloading of PDF reports summarizing geographic statistics and detailed booking logs.
+- **Backend changes**:
+  - [`reports-pdf-builder.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports-pdf-builder.ts): Added `buildLocationReportPdf` using PDFKit to lay out summary stats (top district, top city, GPS coverage ratio), tables for district/city counts, and a detailed log grid.
+  - [`reports.service.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.service.ts): Wired service method `generateLocationReportPdf`.
+  - [`reports.controller.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/reports/reports.controller.ts): Added route GET `/reports/pdf/location`.
+- **Frontend changes**: Added a "Location PDF" download button in the reports header section on both photographer and admin reports panels.
+
 ---
+
 
 

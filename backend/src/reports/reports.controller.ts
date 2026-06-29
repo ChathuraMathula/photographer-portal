@@ -78,4 +78,23 @@ export class ReportsController {
     pdfDoc.pipe(res);
     pdfDoc.end();
   }
+
+  @Get('pdf/location')
+  async downloadLocationReportPdf(
+    @Req() req: RequestWithUser,
+    @Res() res: express.Response,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('photographerId') queryPhotographerId?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
+    const pdfDoc = await this.reportsService.generateLocationReportPdf(targetId, period, startDate, endDate);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=location_report_${period}_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  }
 }

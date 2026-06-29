@@ -22,9 +22,11 @@ type Props = {
   refreshing: boolean;
   downloadingFinancial: boolean;
   downloadingBookings: boolean;
+  downloadingLocation?: boolean;
   loadStats: (showSpinner: boolean) => void;
   handleDownloadFinancial: () => void;
   handleDownloadBookings: () => void;
+  handleDownloadLocation?: () => void;
 };
 
 export function PhotographerReportsView({
@@ -39,9 +41,11 @@ export function PhotographerReportsView({
   refreshing,
   downloadingFinancial,
   downloadingBookings,
+  downloadingLocation = false,
   loadStats,
   handleDownloadFinancial,
   handleDownloadBookings,
+  handleDownloadLocation,
 }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -54,8 +58,10 @@ export function PhotographerReportsView({
         onEndDateChange={setEndDate}
         onDownloadFinancial={handleDownloadFinancial}
         onDownloadBookings={handleDownloadBookings}
+        onDownloadLocation={handleDownloadLocation}
         downloadingFinancial={downloadingFinancial}
         downloadingBookings={downloadingBookings}
+        downloadingLocation={downloadingLocation}
       />
 
       {loading ? (

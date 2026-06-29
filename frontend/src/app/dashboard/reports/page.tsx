@@ -70,9 +70,11 @@ export default function ReportsPage() {
       refreshing={reportsHook.refreshing}
       downloadingFinancial={reportsHook.downloadingFinancial}
       downloadingBookings={reportsHook.downloadingBookings}
+      downloadingLocation={reportsHook.downloadingLocation}
       loadStats={reportsHook.loadStats}
       handleDownloadFinancial={reportsHook.handleDownloadFinancial}
       handleDownloadBookings={reportsHook.handleDownloadBookings}
+      handleDownloadLocation={reportsHook.handleDownloadLocation}
     />
   );
 }
