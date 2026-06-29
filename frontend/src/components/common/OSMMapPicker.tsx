@@ -50,6 +50,7 @@ export function OSMMapPicker({
   useEffect(() => {
     let active = true;
     if (!city && !district) return;
+    if (lat !== undefined && lon !== undefined) return;
 
     async function centerOnCity() {
       setLoading(true);
