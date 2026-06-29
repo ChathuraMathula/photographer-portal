@@ -603,7 +603,278 @@ export async function seedDatabase(
     }
   }
 
+  // ── 7. Bulk Sri Lankan Seed Data (Thousands) ───────────────────────────────
+  console.log('  Generating bulk Sri Lankan photographers, customers, and reservations...');
+
+  const lkFirstNames = [
+    'Pathum', 'Chathura', 'Dilshan', 'Kanishka', 'Nadeeka', 'Roshan', 'Ruwan', 'Priya', 'Kasun', 'Tharindu',
+    'Amali', 'Suresh', 'Nadeesha', 'Isuru', 'Sanduni', 'Thilina', 'Lahiru', 'Anushka', 'Sajith', 'Kavinda',
+    'Chamara', 'Dhanushka', 'Dinuka', 'Nipuna', 'Oshada', 'Geeth', 'Harsha', 'Milan', 'Nuwan', 'Ranil',
+    'Sachith', 'Upul', 'Yohan', 'Asanka', 'Mahesh', 'Duminda', 'Kelum', 'Pramod', 'Gayan', 'Buddhika',
+    'Sameera', 'Indika', 'Pradeep', 'Sanjeewa', 'Nalin', 'Dinesh', 'Manoj', 'Priyanthi', 'Nilanthi',
+    'Samanthi', 'Tharushi', 'Kavindi', 'Chamari', 'Dilini', 'Hashini', 'Menaka', 'Sajini', 'Hansini',
+    'Malkanthi', 'Oshadi', 'Gayani', 'Madu', 'Sachini', 'Yoshini', 'Nilmini', 'Erandi', 'Bhagya',
+    'Dilrukshi', 'Ishara', 'Sandamali', 'Piyumi', 'Shashika', 'Upeksha', 'Dilani', 'Ruwani', 'Chathurika'
+  ];
+
+  const lkLastNames = [
+    'Perera', 'Jayasinghe', 'Goonetilleke', 'Alwis', 'Silva', 'Ranasinghe', 'Cooray', 'Liyanage',
+    'Wickramasinghe', 'Jayawardena', 'Fernando', 'Ratnayake', 'Wijewardene', 'Gunasekara', 'Senanayake',
+    'Rajapaksa', 'Herath', 'Bandara', 'Karunaratne', 'Dissanayake', 'Edirisinghe', 'Peiris', 'Rodrigo',
+    'Mendis', 'Fonseka', 'Samaranayake', 'Abeyasinghe', 'Weerasinghe', 'Attanayake', 'Gunawardena',
+    'Premadasa', 'Kumarasinghe', 'Pathirana', 'Siriwardena', 'Hettiarachchi', 'Munasinghe', 'Tennakoon',
+    'Kariyawasam'
+  ];
+
+  const lkLocations = [
+    { district: 'Colombo', city: 'Colombo', loc: 'Viharamahadevi Park, Colombo' },
+    { district: 'Colombo', city: 'Dehiwala', loc: 'Dehiwala Beach, Dehiwala' },
+    { district: 'Colombo', city: 'Mount Lavinia', loc: 'Mount Lavinia Hotel, Mount Lavinia' },
+    { district: 'Colombo', city: 'Moratuwa', loc: 'Bolgoda Lake, Moratuwa' },
+    { district: 'Colombo', city: 'Kotte', loc: 'Diyatha Uyana, Battaramulla' },
+    { district: 'Kandy', city: 'Kandy', loc: 'Kandy Lake Round, Kandy' },
+    { district: 'Kandy', city: 'Peradeniya', loc: 'Royal Botanical Gardens, Peradeniya' },
+    { district: 'Galle', city: 'Galle', loc: 'Galle Fort, Galle' },
+    { district: 'Galle', city: 'Unawatuna', loc: 'Jungle Beach, Unawatuna' },
+    { district: 'Gampaha', city: 'Gampaha', loc: 'Henarathgoda Botanical Garden, Gampaha' },
+    { district: 'Gampaha', city: 'Negombo', loc: 'Negombo Beach, Negombo' },
+    { district: 'Kurunegala', city: 'Kurunegala', loc: 'Ethagala Rock, Kurunegala' },
+    { district: 'Jaffna', city: 'Jaffna', loc: 'Nallur Kandaswamy Temple, Jaffna' },
+    { district: 'Matara', city: 'Mirissa', loc: 'Coconut Tree Hill, Mirissa' },
+    { district: 'Nuwara Eliya', city: 'Nuwara Eliya', loc: 'Gregory Lake, Nuwara Eliya' },
+    { district: 'Kalutara', city: 'Panadura', loc: 'Panadura Beach, Panadura' },
+    { district: 'Badulla', city: 'Ella', loc: 'Nine Arch Bridge, Ella' },
+    { district: 'Trincomalee', city: 'Trincomalee', loc: 'Nilaveli Beach, Trincomalee' }
+  ];
+
+  const specsList = ['Wedding', 'Portrait', 'Corporate Event', 'Conference', 'Family', 'Newborn', 'Maternity', 'Fashion', 'Product', 'Travel'];
+
+  const lkBios = [
+    'Capturing raw emotions and beautiful moments across Sri Lanka.',
+    'Professional visual storyteller specializing in weddings and lifestyle portraits.',
+    'Event and commercial photographer with over 5 years of industry experience.',
+    'Dedicated to framing your memories in the most aesthetic way possible.',
+    'Bringing a unique creative vision to product, fashion, and portrait sessions.'
+  ];
+
+  const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  const pickMultiple = <T>(arr: T[], count: number): T[] => {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  const numPhotographers = 1000;
+  const numCustomers = 1000;
+  const numReservations = 2000;
+
+  // 1. Generate Photographers
+  const bulkPhotographers: User[] = [];
+  const bulkProfiles: PhotographerProfile[] = [];
+  const bulkPackages: Package[] = [];
+
+  for (let i = 0; i < numPhotographers; i++) {
+    const first = pick(lkFirstNames);
+    const last = pick(lkLastNames);
+    const email = `photographer_${i}_${Date.now()}@photoportal.com`;
+
+    const user = manager.create(User, {
+      firstName: first,
+      lastName: last,
+      email: email,
+      passwordHash: hash,
+      role: UserRole.PHOTOGRAPHER,
+      isActive: true,
+      phone: `+9477${Math.floor(1000000 + Math.random() * 9000000)}`,
+    });
+    bulkPhotographers.push(user);
+  }
+
+  // Save users in chunks
+  const chunkSize = 200;
+  for (let i = 0; i < bulkPhotographers.length; i += chunkSize) {
+    const chunk = bulkPhotographers.slice(i, i + chunkSize);
+    await manager.save(User, chunk);
+  }
+
+  // Create profiles and packages for saved users
+  for (let i = 0; i < bulkPhotographers.length; i++) {
+    const user = bulkPhotographers[i];
+    const location = pick(lkLocations);
+    const slug = `${user.firstName.toLowerCase()}-${user.lastName.toLowerCase()}-${i}`;
+
+    const profile = manager.create(PhotographerProfile, {
+      userId: user.id,
+      bookingSlug: slug,
+      bio: pick(lkBios),
+      specializations: pickMultiple(specsList, 2),
+      portfolioUrl: `https://${slug}photo.lk`,
+      baseLocation: location.city,
+      isAvailableForBooking: true,
+    });
+    bulkProfiles.push(profile);
+
+    // Create 2 packages per photographer
+    const pkg1 = manager.create(Package, {
+      photographerId: user.id,
+      name: 'Standard Session',
+      description: 'Standard session covering key highlights.',
+      priceInCents: 2000000 + Math.floor(Math.random() * 10000000),
+      durationHours: 2,
+      includes: ['2 Hours', 'Digital Gallery'],
+      isActive: true,
+      depositType: 'percentage',
+      depositValue: 20,
+    });
+
+    const pkg2 = manager.create(Package, {
+      photographerId: user.id,
+      name: 'Elite Package',
+      description: 'Comprehensive coverage with premium albums and drones.',
+      priceInCents: 12000000 + Math.floor(Math.random() * 20000000),
+      durationHours: 6,
+      includes: ['6 Hours', 'Premium Album', 'All Digital Copy'],
+      isActive: true,
+      depositType: 'percentage',
+      depositValue: 25,
+    });
+
+    bulkPackages.push(pkg1, pkg2);
+  }
+
+  // Save profiles & packages in chunks
+  for (let i = 0; i < bulkProfiles.length; i += chunkSize) {
+    await manager.save(PhotographerProfile, bulkProfiles.slice(i, i + chunkSize));
+  }
+  for (let i = 0; i < bulkPackages.length; i += chunkSize) {
+    await manager.save(Package, bulkPackages.slice(i, i + chunkSize));
+  }
+
+  // 2. Generate Customers
+  const bulkCustomers: Customer[] = [];
+  for (let i = 0; i < numCustomers; i++) {
+    const first = pick(lkFirstNames);
+    const last = pick(lkLastNames);
+    const location = pick(lkLocations);
+    const email = `customer_${i}_${Date.now()}@example.com`;
+
+    const customer = manager.create(Customer, {
+      firstName: first,
+      lastName: last,
+      email: email,
+      phone: `+9477${Math.floor(1000000 + Math.random() * 9000000)}`,
+      address: `${Math.floor(1 + Math.random() * 150)} Main Street, ${location.city}`,
+    });
+    bulkCustomers.push(customer);
+  }
+
+  for (let i = 0; i < bulkCustomers.length; i += chunkSize) {
+    await manager.save(Customer, bulkCustomers.slice(i, i + chunkSize));
+  }
+
+  // Map packages to their photographers for quick lookups
+  const photographerPackagesMap = new Map<string, Package[]>();
+  for (const pkg of bulkPackages) {
+    if (!photographerPackagesMap.has(pkg.photographerId)) {
+      photographerPackagesMap.set(pkg.photographerId, []);
+    }
+    photographerPackagesMap.get(pkg.photographerId)!.push(pkg);
+  }
+
+  // 3. Generate Reservations
+  const statuses = [
+    ReservationStatus.PENDING,
+    ReservationStatus.PROPOSED,
+    ReservationStatus.REJECTED,
+    ReservationStatus.CONFIRMED,
+    ReservationStatus.CANCELLED,
+    ReservationStatus.COMPLETED,
+  ];
+
+  const eventTypes = ['Wedding', 'Portrait', 'Corporate Event', 'Conference', 'Maternity', 'Newborn'];
+
+  const bulkReservations: Reservation[] = [];
+  const bulkPayments: Payment[] = [];
+
+  for (let i = 0; i < numReservations; i++) {
+    const customer = pick(bulkCustomers);
+    const photographer = pick(bulkPhotographers);
+    const packagesForPhoto = photographerPackagesMap.get(photographer.id) || [];
+    if (packagesForPhoto.length === 0) continue;
+
+    const pkg = pick(packagesForPhoto);
+    const location = pick(lkLocations);
+    const status = pick(statuses);
+    const dateOffset = Math.floor(Math.random() * 150) - 60; // -60 to +90 days
+    const totalAmount = pkg.priceInCents;
+    const advanceAmount = Math.round(totalAmount * (pkg.depositValue / 100));
+
+    const reservation = manager.create(Reservation, {
+      customerId: customer.id,
+      photographerId: photographer.id,
+      date: daysFromNow(dateOffset),
+      startTime: '09:00',
+      endTime: '12:00',
+      eventType: pick(eventTypes),
+      location: location.loc,
+      district: location.district,
+      city: location.city,
+      status: status,
+      reservationToken: tok(),
+      totalAmountInCents: totalAmount,
+      advancePaymentPriceInCents: advanceAmount,
+      paymentDeadline: status === ReservationStatus.PROPOSED ? daysFromNow(2) : undefined,
+      clientSelectedPackageId: pkg.id,
+      selectedPackages: [pkg],
+    });
+
+    bulkReservations.push(reservation);
+  }
+
+  // Save reservations in chunks
+  for (let i = 0; i < bulkReservations.length; i += chunkSize) {
+    const chunk = bulkReservations.slice(i, i + chunkSize);
+    await manager.save(Reservation, chunk);
+
+    // After saving, chunk contains generated IDs; generate payments for confirmed/completed statuses
+    for (const res of chunk) {
+      if (res.status === ReservationStatus.CONFIRMED) {
+        const pay = manager.create(Payment, {
+          reservationId: res.id,
+          amountInCents: res.advancePaymentPriceInCents,
+          status: PaymentStatus.SUCCESS,
+          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+          cardBrand: pick(['Visa', 'Mastercard']),
+          cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
+        });
+        bulkPayments.push(pay);
+      } else if (res.status === ReservationStatus.COMPLETED) {
+        const pay1 = manager.create(Payment, {
+          reservationId: res.id,
+          amountInCents: res.advancePaymentPriceInCents,
+          status: PaymentStatus.SUCCESS,
+          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+          cardBrand: pick(['Visa', 'Mastercard']),
+          cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
+        });
+        const pay2 = manager.create(Payment, {
+          reservationId: res.id,
+          amountInCents: res.totalAmountInCents! - res.advancePaymentPriceInCents!,
+          status: PaymentStatus.SUCCESS,
+          transactionId: 'ch_bulk_' + crypto.randomBytes(8).toString('hex'),
+          cardBrand: 'Offline Payment',
+          cardLast4: 'Cash',
+        });
+        bulkPayments.push(pay1, pay2);
+      }
+    }
+  }
+
+  // Save payments in chunks
+  for (let i = 0; i < bulkPayments.length; i += chunkSize) {
+    await manager.save(Payment, bulkPayments.slice(i, i + chunkSize));
+  }
+
   console.log(
-    '🌱 Database seeding completed with Sri Lankan names, locations and statuses!',
+    `🌱 Database seeding completed with ${numPhotographers} Sri Lankan photographers and ${numReservations} reservations!`,
   );
 }
