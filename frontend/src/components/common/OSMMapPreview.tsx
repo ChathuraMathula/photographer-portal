@@ -143,11 +143,7 @@ export function OSMMapPreview({
             const fallbackQuery = fallbackParts.join(", ");
             const fallbackResponse = await fetch(
               `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fallbackQuery)}&format=json&limit=1`,
-              {
-                headers: {
-                  "Accept-Language": "en",
-                },
-              }
+              { headers: { "Accept-Language": "en" } }
             );
             const fallbackData = await fallbackResponse.json();
             if (fallbackData && fallbackData.length > 0 && active) {
@@ -157,6 +153,35 @@ export function OSMMapPreview({
               return;
             }
           }
+          
+          // Try district only
+          if (district) {
+            const distResponse = await fetch(
+              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(district)}&format=json&limit=1`,
+              { headers: { "Accept-Language": "en" } }
+            );
+            const distData = await distResponse.json();
+            if (distData && distData.length > 0 && active) {
+              const lat = parseFloat(distData[0].lat);
+              const lon = parseFloat(distData[0].lon);
+              setCoords({ lat, lon });
+              return;
+            }
+          }
+
+          // Ultimate fallback to Sri Lanka center
+          const lkResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=Sri+Lanka&format=json&limit=1`,
+            { headers: { "Accept-Language": "en" } }
+          );
+          const lkData = await lkResponse.json();
+          if (lkData && lkData.length > 0 && active) {
+            const lat = parseFloat(lkData[0].lat);
+            const lon = parseFloat(lkData[0].lon);
+            setCoords({ lat, lon });
+            return;
+          }
+
           if (active) {
             setErrorMsg("Could not find address on OpenStreetMap.");
           }
