@@ -36,6 +36,7 @@ photographer-portal/
 │   ├── src/
 │   │   ├── auth/            # JWT auth, guards, strategies
 │   │   ├── bookings/        # Public booking flow (no auth)
+│   │   ├── audit-logs/      # [NEW] System-wide action audit log tracking
 │   │   ├── photographers/   # Photographer profile management
 │   │   ├── reservations/    # Reservation management (protected)
 │   │   ├── users/           # User / photographer account creation
@@ -60,6 +61,8 @@ photographer-portal/
           │   │   │   │   ├── PhotographerAnalyticsCharts.tsx      # [NEW] Encapsulates revenue & status charts
           │   │   │   │   └── PhotographerPerformanceBreakdown.tsx # [NEW] Encapsulates package & bookings lists
           │   │   │   └── ...
+          │   │   ├── settings/    # [NEW] User settings page (notifications preference switches)
+          │   │   └── audit-logs/  # [NEW] Super Admin audit logs viewer dashboard
           │   ├── api-tester/  # Interactive developer API Docs & Tester Console
           │   └── book/[slug]/ # Public booking page
           ├── components/

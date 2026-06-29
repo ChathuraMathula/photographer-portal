@@ -41,6 +41,18 @@ export class UsersController {
     return this.usersService.updateProfile(req.user.userId, body);
   }
 
+  @Get('settings')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  getSettings(@Req() req: RequestWithUser) {
+    return this.usersService.getSettings(req.user.userId);
+  }
+
+  @Patch('settings')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  updateSettings(@Body() body: any, @Req() req: RequestWithUser) {
+    return this.usersService.updateSettings(req.user.userId, body);
+  }
+
   @Post()
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   create(@Body() dto: CreateUserDto, @Req() req: RequestWithUser) {

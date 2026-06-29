@@ -61,6 +61,12 @@ export class User {
   @Column({ nullable: true })
   resetPasswordExpires?: Date;
 
+  @Column({ default: true })
+  emailNotificationsEnabled!: boolean;
+
+  @Column({ default: true })
+  reminderEmailsEnabled!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

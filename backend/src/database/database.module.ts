@@ -7,6 +7,7 @@ import { Customer } from '../entities/customer.entity';
 import { Reservation } from '../entities/reservation.entity';
 import { Message } from '../entities/message.entity';
 import { Payment } from '../entities/payment.entity';
+import { AuditLog } from '../entities/audit-log.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Payment } from '../entities/payment.entity';
       Reservation,
       Message,
       Payment,
+      AuditLog,
     ]),
   ],
   exports: [TypeOrmModule],

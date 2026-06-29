@@ -9,6 +9,7 @@ import {
   CreditCard,
   BarChart3,
   Receipt,
+  Settings,
 } from "lucide-react";
 import { LogoutConfirmModal } from "@/components/common/LogoutConfirmModal";
 import { DesktopSidebar } from "./layout/DesktopSidebar";
@@ -46,6 +47,7 @@ const PHOTOGRAPHER_MENU: MenuItem[] = [
   { id: "reports",      label: "Reports & Analytics", icon: BarChart3 },
   { id: "invoices",     label: "Invoices",     icon: Receipt },
   { id: "profile",      label: "My Profile",   icon: User },
+  { id: "settings",     label: "User Settings", icon: Settings },
 ];
 
 // ── Main Component ────────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { EmailService } from '../email/email.service';
 import * as crypto from 'crypto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private auditLogsService: AuditLogsService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -39,6 +41,13 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
+
+    await this.auditLogsService.logAction(
+      'LOGIN_SUCCESS',
+      `User ${user.email} logged in successfully`,
+      user.id,
+      user.email,
+    );
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -68,6 +77,13 @@ export class AuthService {
 
     await this.emailService.sendResetPasswordEmail(user.email, user.firstName, resetLink);
 
+    await this.auditLogsService.logAction(
+      'FORGOT_PASSWORD_REQUEST',
+      `Password reset requested for ${user.email}`,
+      user.id,
+      user.email,
+    );
+
     return { message: 'If the email exists, a password reset link has been sent.' };
   }
 
@@ -88,6 +104,13 @@ export class AuthService {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await this.userRepository.save(user);
+
+    await this.auditLogsService.logAction(
+      'PASSWORD_RESET_SUCCESS',
+      `Password reset successfully completed for ${user.email}`,
+      user.id,
+      user.email,
+    );
 
     return { message: 'Password has been reset successfully.' };
   }

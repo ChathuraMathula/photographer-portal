@@ -10,8 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../entities/user.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ChatGateway } from '../reservations/chat.gateway';
 import { EmailService } from '../email/email.service';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { ChatGateway } from '../reservations/chat.gateway';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,7 @@ export class UsersService {
     private profileRepository: Repository<PhotographerProfile>,
     private readonly chatGateway: ChatGateway,
     private readonly emailService: EmailService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
@@ -70,6 +72,13 @@ export class UsersService {
       bookingLink = `/book/${slug}`;
     }
 
+    await this.auditLogsService.logAction(
+      'USER_CREATED',
+      `User ${user.email} of role ${user.role} was created by admin`,
+      user.id,
+      user.email,
+    );
+
     return {
       id: user.id,
       firstName: user.firstName,
@@ -115,6 +124,13 @@ export class UsersService {
     }
 
     await this.userRepository.save(user);
+
+    await this.auditLogsService.logAction(
+      'PROFILE_UPDATED',
+      `User ${user.email} updated their profile settings`,
+      user.id,
+      user.email,
+    );
 
     return {
       id: user.id,
@@ -184,6 +200,13 @@ export class UsersService {
       }
     }
 
+    await this.auditLogsService.logAction(
+      'USER_STATUS_TOGGLED',
+      `User ${user.email} active status toggled to ${user.isActive} by admin`,
+      user.id,
+      user.email,
+    );
+
     return {
       id: user.id,
       firstName: user.firstName,
@@ -208,5 +231,44 @@ export class UsersService {
       slug = `${base}-${i++}`;
     }
     return slug;
+  }
+
+  async getSettings(userId: string) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return {
+      emailNotificationsEnabled: user.emailNotificationsEnabled,
+      reminderEmailsEnabled: user.reminderEmailsEnabled,
+    };
+  }
+
+  async updateSettings(userId: string, updates: any) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updates.emailNotificationsEnabled !== undefined) {
+      user.emailNotificationsEnabled = updates.emailNotificationsEnabled;
+    }
+    if (updates.reminderEmailsEnabled !== undefined) {
+      user.reminderEmailsEnabled = updates.reminderEmailsEnabled;
+    }
+
+    await this.userRepository.save(user);
+
+    await this.auditLogsService.logAction(
+      'SETTINGS_UPDATED',
+      `User ${user.email} updated their settings (Notifications: ${user.emailNotificationsEnabled}, Reminders: ${user.reminderEmailsEnabled})`,
+      user.id,
+      user.email,
+    );
+
+    return {
+      emailNotificationsEnabled: user.emailNotificationsEnabled,
+      reminderEmailsEnabled: user.reminderEmailsEnabled,
+    };
   }
 }

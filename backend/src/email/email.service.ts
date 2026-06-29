@@ -188,4 +188,66 @@ export class EmailService {
       html,
     });
   }
+
+  async sendPaymentReminder(
+    customerEmail: string,
+    customerName: string,
+    trackingLink: string,
+    packageName: string,
+    advancePaymentAmount: number,
+  ) {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #d97706;">Action Required: Complete Your Booking Payment</h2>
+        <p>Dear ${customerName},</p>
+        <p>This is a friendly reminder to complete your reservation deposit payment for the package <strong>${packageName}</strong>.</p>
+        <p><strong>Advance Deposit Amount:</strong> LKR ${(advancePaymentAmount / 100).toLocaleString()}</p>
+        <p>Please use the link below to verify your details, complete the deposit, and lock in your reservation date:</p>
+        <p style="margin: 20px 0;">
+          <a href="${trackingLink}" style="display: inline-block; background-color: #d97706; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            Complete Deposit & Confirm Booking
+          </a>
+        </p>
+        <p>If you have any questions, feel free to contact us.</p>
+        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
+      </div>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: customerEmail,
+      subject: 'Reminder: Complete Deposit to Confirm Your Reservation',
+      html,
+    });
+  }
+
+  async sendUpcomingBookingReminder(
+    email: string,
+    name: string,
+    recipientType: 'photographer' | 'customer',
+    otherPartyName: string,
+    eventDate: string,
+  ) {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">Reminder: Upcoming Photography Event</h2>
+        <p>Dear ${name},</p>
+        <p>This is a reminder that you have an upcoming photography session scheduled on <strong>${eventDate}</strong>.</p>
+        <p>Details:</p>
+        <ul>
+          <li><strong>Date:</strong> ${eventDate}</li>
+          <li><strong>${recipientType === 'photographer' ? 'Customer' : 'Photographer'}:</strong> ${otherPartyName}</li>
+        </ul>
+        <p>We hope you have an amazing session!</p>
+        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
+      </div>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: email,
+      subject: 'Reminder: Upcoming Photography Session',
+      html,
+    });
+  }
 }

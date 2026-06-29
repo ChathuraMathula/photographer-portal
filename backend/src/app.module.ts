@@ -15,6 +15,7 @@ import { PackagesModule } from './packages/packages.module';
 import { EmailModule } from './email/email.module';
 import { ReportsModule } from './reports/reports.module';
 import { InvoicesModule } from './reports/invoices.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { User } from './entities/user.entity';
 import { PhotographerProfile } from './entities/photographer-profile.entity';
 import { Package } from './entities/package.entity';
@@ -22,6 +23,7 @@ import { Customer } from './entities/customer.entity';
 import { Reservation } from './entities/reservation.entity';
 import { Message } from './entities/message.entity';
 import { Payment } from './entities/payment.entity';
+import { AuditLog } from './entities/audit-log.entity';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
@@ -46,6 +48,7 @@ if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function'
         Reservation,
         Message,
         Payment,
+        AuditLog,
       ],
       synchronize: true, // Automatically synchronize schema in development
     }),
@@ -60,6 +63,7 @@ if (fs.existsSync(envPath) && typeof (process as any).loadEnvFile === 'function'
     PackagesModule,
     ReportsModule,
     InvoicesModule,
+    AuditLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -15,6 +15,7 @@ import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
 import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
+import { Settings, ClipboardList, LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
 
 function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -179,6 +180,8 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
     if (tab === "overview") router.push("/dashboard");
     else if (tab === "reports") router.push("/dashboard/reports");
     else if (tab === "profile") router.push("/dashboard/profile");
+    else if (tab === "settings") router.push("/dashboard/settings");
+    else if (tab === "audit-logs") router.push("/dashboard/audit-logs");
     else router.push("/dashboard/users");
   };
 
@@ -196,6 +199,18 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
     window.location.href = "/login";
   };
 
+  const menuItems = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "users", label: "User Management", icon: Users },
+    { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
+    { id: "profile", label: "Profile Details", icon: UserCog },
+    { id: "settings", label: "User Settings", icon: Settings },
+  ];
+
+  if (role === UserRole.SUPER_ADMIN) {
+    menuItems.push({ id: "audit-logs", label: "Audit Logs", icon: ClipboardList });
+  }
+
   return (
     <DashboardLayout
       activeTab={activeTab}
@@ -203,7 +218,7 @@ function AdminLayoutWrapper({ children, firstName, role }: { children: React.Rea
       onLogout={handleLogout}
       userName={firstName}
       userRole={role}
-      menuItems={ADMIN_MENU}
+      menuItems={menuItems}
     >
       {children}
     </DashboardLayout>
