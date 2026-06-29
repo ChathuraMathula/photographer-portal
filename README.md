@@ -57,25 +57,34 @@ photographer-portal/
           │   ├── dashboard/   # Role-based collapsible dashboard
           │   │   ├── reports/
           │   │   │   ├── hooks/
-          │   │   │   │   └── useReports.ts # [NEW] Custom hook managing statistics & reports state
+          │   │   │   │   └── useReports.ts # Custom hook managing statistics & reports state
           │   │   │   ├── components/
-          │   │   │   │   ├── PhotographerAnalyticsCharts.tsx      # [NEW] Encapsulates revenue & status charts
-          │   │   │   │   └── PhotographerPerformanceBreakdown.tsx # [NEW] Encapsulates package & bookings lists
+          │   │   │   │   ├── PhotographerAnalyticsCharts.tsx      # Encapsulates revenue & status charts
+          │   │   │   │   └── PhotographerPerformanceBreakdown.tsx # Encapsulates package & bookings lists
+          │   │   │   ├── utils/
+          │   │   │   │   └── locationUtils.ts # [NEW] Pure functions: coord extraction, district/city/map-point aggregation
           │   │   │   └── ...
-          │   │   ├── settings/    # [NEW] User settings page (notifications preference switches)
-          │   │   └── audit-logs/  # [NEW] Super Admin audit logs viewer dashboard
+          │   │   ├── settings/    # User settings page (notifications preference switches)
+          │   │   └── audit-logs/  # Super Admin audit logs viewer dashboard
           │   ├── api-tester/  # Interactive developer API Docs & Tester Console
           │   └── book/[slug]/ # Public booking page
           ├── components/
           │   ├── common/
-          │   │   ├── OSMMapPreview.tsx # [NEW] Clean, sandboxed OpenStreetMap Leaflet preview component
-          │   │   └── OSMMapPicker.tsx  # [NEW] Interactive OpenStreetMap coordinate pin selector
+          │   │   ├── OSMMapPreview.tsx # Clean, sandboxed OpenStreetMap Leaflet preview component
+          │   │   └── OSMMapPicker.tsx  # Interactive OpenStreetMap coordinate pin selector
           │   ├── dashboard/
-          │   │   ├── profile/ # [NEW] AdminProfilePage.tsx - Admin profile configuration
+          │   │   ├── profile/ # AdminProfilePage.tsx - Admin profile configuration
           │   │   ├── reports/ 
-          │   │   │   ├── AdminReportsPage.tsx       # [NEW] Admin analytics dashboard with graphs
-          │   │   │   ├── PhotographerReportsView.tsx # [NEW] Photographer reports visualization component
-          │   │   │   └── LocationAnalyticsMap.tsx  # [NEW] OpenStreetMap booking locations density heatmap
+          │   │   │   ├── AdminReportsPage.tsx         # Admin analytics dashboard with graphs
+          │   │   │   ├── PhotographerReportsView.tsx  # Photographer reports visualization component
+          │   │   │   ├── LocationAnalyticsMap.tsx     # Legacy OpenStreetMap heatmap (kept for backward compat)
+          │   │   │   └── location/                   # [NEW] Modular location analytics components
+          │   │   │       ├── LocationAnalyticsSection.tsx   # [NEW] Orchestrator: renders all location analytics panels
+          │   │   │       ├── LocationInsightsCard.tsx       # [NEW] KPI summary: top district/city, coord coverage %
+          │   │   │       ├── DistrictBookingsBar.tsx        # [NEW] Segmented horizontal bar chart per district
+          │   │   │       ├── CityBookingsRank.tsx           # [NEW] Ranked list of top cities with booking counts
+          │   │   │       ├── EventTypeByDistrictChart.tsx   # [NEW] Stacked bar of event types across districts
+          │   │   │       └── EnhancedLocationMap.tsx        # [NEW] Leaflet OSM map: clustered colour-coded markers
           │   │   └── ...
           ├── config/routes.ts # Route permissions + prefixes
           ├── proxy.ts         # Next.js middleware (auth guard)
@@ -451,3 +460,54 @@ Data is persisted in `./postgres-data/` and survives restarts. To wipe the data 
 docker compose down -v
 rm -rf ./postgres-data
 ```
+
+---
+
+## Location Analytics in Reports & Analytics
+
+The **Reports & Analytics** page includes a comprehensive **Location Analytics** panel available to both Photographers and Admins. It is powered by OpenStreetMap (via Leaflet) and operates entirely from the `rawBookings` data already returned by `GET /reports/data` — no additional API calls are made.
+
+### Architecture: Modular Components
+
+All location analytics components live under `frontend/src/components/dashboard/reports/location/`:
+
+| Component | Responsibility |
+|---|---|
+| `LocationAnalyticsSection.tsx` | **Orchestrator** — computes all derived shapes from `rawBookings` via `useMemo` and renders the full panel |
+| `LocationInsightsCard.tsx` | Four KPI tiles: top district, top city, bookings with exact coordinates, location coverage % |
+| `DistrictBookingsBar.tsx` | Horizontal **segmented bar chart** (top 10 districts) — each segment coloured by event type |
+| `CityBookingsRank.tsx` | **Ranked list** of top 8 cities with colour-coded rank badges and mini progress bars |
+| `EventTypeByDistrictChart.tsx` | **Stacked horizontal bar chart** showing how event types are distributed across districts |
+| `EnhancedLocationMap.tsx` | **Interactive Leaflet OSM map** with clustered, colour-coded markers per event type |
+
+### Utility File
+
+`frontend/src/app/dashboard/reports/utils/locationUtils.ts` exports pure (side-effect-free) functions:
+
+| Function | Purpose |
+|---|---|
+| `extractCoordsFromMapLink(url)` | Parses `@lat,lon` or `?q=lat,lon` patterns from Google Maps URLs stored in `locationMapLink` |
+| `buildMapPoints(bookings)` | Converts bookings with extractable coordinates into `MapPoint[]` for the map |
+| `buildDistrictStats(bookings)` | Groups bookings by district, returns `DistrictStat[]` sorted by count |
+| `buildCityStats(bookings)` | Groups bookings by city, returns `CityStat[]` sorted by count |
+| `buildLocationInsights(...)` | Computes the `LocationInsightsSummary` object for the KPI card |
+| `getUniqueEventTypes(bookings)` | Returns sorted array of all unique event type names |
+
+### Map Marker Colours
+
+Markers in the interactive map are colour-coded by event type:
+
+| Event Type | Colour |
+|---|---|
+| Wedding | Pink `#ec4899` |
+| Portrait | Indigo `#6366f1` |
+| Corporate | Blue `#3b82f6` |
+| Birthday Party | Amber `#f59e0b` |
+| Graduation | Emerald `#10b981` |
+| Engagement | Orange `#f97316` |
+| Maternity | Violet `#8b5cf6` |
+| Other / Custom | Gray `#a1a1aa` |
+
+Markers are clustered by proximity using **Leaflet.MarkerCluster** (loaded via CDN inside an iframe `srcDoc`).
+
+---
