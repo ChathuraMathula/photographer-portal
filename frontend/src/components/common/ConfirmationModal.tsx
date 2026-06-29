@@ -109,20 +109,20 @@ export function ConfirmationModal({
         {/* Footer */}
         <div className="px-6 pb-6 flex gap-3">
           <Button
-            variant="outline"
-            onClick={onCancel}
-            disabled={loading}
-            className="flex-1 h-10 btn btn-secondary text-body-small-s font-semibold cursor-pointer"
-          >
-            {cancelLabel}
-          </Button>
-          <Button
             onClick={onConfirm}
             disabled={loading}
             className={`flex-1 h-10 text-body-small-s font-semibold cursor-pointer flex items-center justify-center gap-2 ${confirmClass}`}
           >
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {loading ? "Processing..." : confirmLabel}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 h-10 btn btn-secondary text-body-small-s font-semibold cursor-pointer"
+          >
+            {cancelLabel}
           </Button>
         </div>
       </div>
