@@ -482,9 +482,14 @@ export function AdminReportsPage() {
       {reportData && <KpiCardsGrid summary={reportData.summary} />}
 
       {/* Charts section */}
-      {reportData && (
-        <section className="grid gap-6 md:grid-cols-3">
-          <Card className="md:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+      {reportData ? (
+        <section className="grid gap-6 md:grid-cols-3 relative">
+          {refreshing && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 dark:bg-zinc-950/40 backdrop-blur-[1px] rounded-xl">
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            </div>
+          )}
+          <Card className="md:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl min-h-[350px]">
             <CardHeader>
               <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Platform Revenue Trend</CardTitle>
               <CardDescription className="text-xs">Timeline representation of cash logs &amp; card payouts</CardDescription>
@@ -494,17 +499,26 @@ export function AdminReportsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
+          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl min-h-[350px]">
             <CardHeader>
               <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white">Reservation Status</CardTitle>
               <CardDescription className="text-xs">Platform booking states conversion breakdown</CardDescription>
             </CardHeader>
-            <CardContent className="flex items-center justify-center">
+            <CardContent className="flex items-center justify-center min-h-[250px]">
               <BookingStatusDonut data={reportData.statusDistribution} />
             </CardContent>
           </Card>
         </section>
-      )}
+      ) : loading ? (
+        <section className="grid gap-6 md:grid-cols-3">
+          <Card className="md:col-span-2 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl min-h-[350px] flex items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">
+            <Loader2 className="h-8 w-8 text-zinc-400 animate-spin" />
+          </Card>
+          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl min-h-[350px] flex items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">
+            <Loader2 className="h-8 w-8 text-zinc-400 animate-spin" />
+          </Card>
+        </section>
+      ) : null}
 
       {/* Leaderboard Section */}
       {leaderboardData && (
@@ -532,25 +546,33 @@ export function AdminReportsPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-0">
-            {leaderboardLoading ? (
-              <div className="text-center py-12 text-zinc-500 animate-pulse">Loading leaderboard...</div>
-            ) : leaderboardData.data.length === 0 ? (
-              <div className="text-center py-12 text-zinc-400 italic">No photographers found.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-body-small">
-                  <thead>
-                    <tr className="border-b border-zinc-150 bg-zinc-55/10 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-body-small-s font-semibold">
-                      <th className="p-4">Rank</th>
-                      <th className="p-4">Photographer Name</th>
-                      <th className="p-4">Email</th>
-                      <th className="p-4 text-center">Settled Bookings</th>
-                      <th className="p-4 text-right">Settled Revenue</th>
+          <CardContent className="p-0 relative min-h-[400px]">
+            {leaderboardLoading && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px] rounded-b-xl">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-body-small">
+                <thead>
+                  <tr className="border-b border-zinc-150 bg-zinc-55/10 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-body-small-s font-semibold">
+                    <th className="p-4">Rank</th>
+                    <th className="p-4">Photographer Name</th>
+                    <th className="p-4">Email</th>
+                    <th className="p-4 text-center">Settled Bookings</th>
+                    <th className="p-4 text-right">Settled Revenue</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  {leaderboardData.data.length === 0 && !leaderboardLoading ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-12 text-zinc-400 italic">
+                        No photographers found.
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                    {leaderboardData.data.map((row: any, idx: number) => {
+                  ) : (
+                    leaderboardData.data.map((row: any, idx: number) => {
                       const absoluteRank = (leaderboardPage - 1) * 5 + idx + 1;
                       return (
                         <tr key={row.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
@@ -563,15 +585,15 @@ export function AdminReportsPage() {
                           </td>
                         </tr>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
             
             {/* Leaderboard Pagination */}
-            {leaderboardData.totalPages > 1 && !leaderboardLoading && (
-              <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-800">
+            {leaderboardData.totalPages > 1 && (
+              <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-800 mt-auto">
                 <Pagination
                   page={leaderboardPage}
                   totalPages={leaderboardData.totalPages}

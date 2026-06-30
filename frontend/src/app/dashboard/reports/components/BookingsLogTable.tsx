@@ -34,29 +34,33 @@ export function BookingsLogTable({ bookingsData, bookingsPage, setBookingsPage, 
           A comprehensive list of all reservations scheduled in the filtered time window.
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
-        {bookingsLoading ? (
-          <div className="flex justify-center items-center py-12">
+      <CardContent className="p-0 relative min-h-[400px]">
+        {bookingsLoading && (
+          <div className="absolute inset-0 z-10 flex justify-center items-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px] rounded-b-xl">
             <Loader2 className="h-8 w-8 text-primary animate-spin" />
           </div>
-        ) : rawBookings.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-body-small text-zinc-400 italic">No bookings registered for this range.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-body-small border-collapse">
-              <thead>
-                <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-855">
-                  <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Total Value</th>
-                  <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
+        )}
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-body-small border-collapse">
+            <thead>
+              <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-855">
+                <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Client</th>
+                <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Total Value</th>
+                <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
+              {rawBookings.length === 0 && !bookingsLoading ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-12 text-body-small text-zinc-400 italic">
+                    No bookings registered for this range.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
-                {rawBookings.map((res: any) => (
+              ) : (
+                rawBookings.map((res: any) => (
                   <tr key={res.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 font-semibold text-zinc-855 dark:text-zinc-200">
                       {res.clientName}
@@ -86,13 +90,14 @@ export function BookingsLogTable({ bookingsData, bookingsPage, setBookingsPage, 
                       </span>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {totalPages > 1 && !bookingsLoading && (
-          <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-850">
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {totalPages > 1 && (
+          <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-850 mt-auto">
             <Pagination
               page={bookingsPage}
               totalPages={totalPages}

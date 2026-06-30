@@ -218,17 +218,15 @@ export default function AuditLogsPage() {
             Viewing {logs.length} matched system logs out of {total} total.
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          {loading ? (
-            <div className="text-center py-16 text-zinc-500 animate-pulse flex flex-col items-center justify-center gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
-              Fetching log data...
+        <CardContent className="p-0 relative min-h-[500px]">
+          {loading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px] rounded-b-xl">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="text-zinc-500 font-medium">Fetching log data...</span>
             </div>
-          ) : logs.length === 0 ? (
-            <div className="text-center py-16 text-zinc-400 italic">
-              No audit log entries matching filters were found.
-            </div>
-          ) : (
+          )}
+          
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-zinc-150/40 dark:border-zinc-850/60 bg-zinc-50/50 dark:bg-zinc-950/20 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
@@ -239,33 +237,41 @@ export default function AuditLogsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-150/30 dark:divide-zinc-850/40 text-xs">
-                {logs.map((log) => (
-                  <tr 
-                    key={log.id} 
-                    className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/10 transition-colors"
-                  >
-                    <td className="py-4 px-6 font-mono text-[11px] text-zinc-400">
-                      {new Date(log.createdAt).toLocaleString()}
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getActionBadgeColor(log.action)}`}>
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 font-semibold text-zinc-700 dark:text-zinc-300">
-                      {log.userEmail || <span className="text-zinc-400 italic">System</span>}
-                    </td>
-                    <td className="py-4 px-6 text-zinc-600 dark:text-zinc-400 max-w-sm truncate" title={log.details}>
-                      {log.details}
+                {logs.length === 0 && !loading ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-16 text-zinc-400 italic">
+                      No audit log entries matching filters were found.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  logs.map((log) => (
+                    <tr 
+                      key={log.id} 
+                      className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/10 transition-colors"
+                    >
+                      <td className="py-4 px-6 font-mono text-[11px] text-zinc-400">
+                        {new Date(log.createdAt).toLocaleString()}
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getActionBadgeColor(log.action)}`}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 font-semibold text-zinc-700 dark:text-zinc-300">
+                        {log.userEmail || <span className="text-zinc-400 italic">System</span>}
+                      </td>
+                      <td className="py-4 px-6 text-zinc-600 dark:text-zinc-400 max-w-sm truncate" title={log.details}>
+                        {log.details}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
-          )}
+          </div>
           {/* Pagination Controls */}
-          {totalPages > 1 && !loading && (
-            <div className="p-4 flex justify-center border-t border-zinc-150/40 dark:border-zinc-850/60">
+          {totalPages > 1 && (
+            <div className="p-4 flex justify-center border-t border-zinc-150/40 dark:border-zinc-850/60 mt-auto">
               <Pagination
                 page={page}
                 totalPages={totalPages}

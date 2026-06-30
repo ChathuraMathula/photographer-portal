@@ -99,36 +99,43 @@ export function PhotographerReportsView({
           <div className="h-[450px] bg-zinc-100 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50" />
         </div>
       ) : reportData ? (
-        <>
-          {/* KPI Summary Cards */}
-          <KpiCardsGrid summary={reportData.summary} />
+        <div className="relative">
+          {refreshing && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/40 dark:bg-zinc-950/40 backdrop-blur-[1px] rounded-xl pointer-events-none">
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            </div>
+          )}
+          <div className="space-y-6">
+            {/* KPI Summary Cards */}
+            <KpiCardsGrid summary={reportData.summary} />
 
-          {/* Business Advisory Widget */}
-          <BusinessAdvisoryCard
-            conversionRate={reportData.summary.conversionRate}
-            totalBookings={reportData.summary.totalBookings}
-          />
+            {/* Business Advisory Widget */}
+            <BusinessAdvisoryCard
+              conversionRate={reportData.summary.conversionRate}
+              totalBookings={reportData.summary.totalBookings}
+            />
 
-          {/* Charts Section */}
-          <PhotographerAnalyticsCharts
-            timeline={reportData.timeline}
-            statusDistribution={reportData.statusDistribution}
-          />
+            {/* Charts Section */}
+            <PhotographerAnalyticsCharts
+              timeline={reportData.timeline}
+              statusDistribution={reportData.statusDistribution}
+            />
 
-          {/* Location Analytics Section */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-6 shadow-sm">
-            <LocationAnalyticsSection rawBookings={reportData.locationData as any} />
+            {/* Location Analytics Section */}
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-6 shadow-sm min-h-[400px]">
+              <LocationAnalyticsSection rawBookings={reportData.locationData as any} />
+            </div>
+
+            {/* Performance Lists Section */}
+            <PhotographerPerformanceBreakdown
+              packages={reportData.packages}
+              bookingsData={bookingsData}
+              bookingsPage={bookingsPage}
+              setBookingsPage={setBookingsPage}
+              bookingsLoading={bookingsLoading}
+            />
           </div>
-
-          {/* Performance Lists Section */}
-          <PhotographerPerformanceBreakdown
-            packages={reportData.packages}
-            bookingsData={bookingsData}
-            bookingsPage={bookingsPage}
-            setBookingsPage={setBookingsPage}
-            bookingsLoading={bookingsLoading}
-          />
-        </>
+        </div>
       ) : (
         <div className="text-center py-12 text-zinc-500">No report data loaded.</div>
       )}
