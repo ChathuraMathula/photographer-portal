@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, Search, Calendar as CalendarIcon, MapPin, Clock, Plus, Tag, ArrowLeft, ArrowRight } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { useDebounce } from "@/hooks/useDebounce";
 
 type Props = {
   reservations: Reservation[];
@@ -102,6 +103,7 @@ export function BookingCalendar({
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   
   const mobileSliderRef = useRef<HTMLDivElement>(null);
@@ -188,8 +190,8 @@ export function BookingCalendar({
       if (eventTypeFilter !== "ALL" && r.eventType !== eventTypeFilter) return false;
 
       // Search Query
-      if (searchQuery.trim() !== "") {
-        const query = searchQuery.toLowerCase();
+      if (debouncedSearchQuery.trim() !== "") {
+        const query = debouncedSearchQuery.toLowerCase();
         const firstName = r.customer?.firstName?.toLowerCase() ?? "";
         const lastName = r.customer?.lastName?.toLowerCase() ?? "";
         const location = r.location?.toLowerCase() ?? "";
@@ -243,7 +245,7 @@ export function BookingCalendar({
               </Button>
               
               {/* Searchable dropdowns with 50px height for Month/Year */}
-              <div className="w-[110px]">
+              <div className="w-[140px]">
                 <SearchableSelect
                   options={MONTHS}
                   value={currentDate.getMonth().toString()}
@@ -251,7 +253,7 @@ export function BookingCalendar({
                 />
               </div>
    
-              <div className="w-[85px]">
+              <div className="w-[110px]">
                 <SearchableSelect
                   options={YEARS.map((y) => ({ name: y, value: y }))}
                   value={currentDate.getFullYear().toString()}
@@ -299,7 +301,7 @@ export function BookingCalendar({
             <span className="text-[10px] uppercase font-bold text-zinc-450 dark:text-zinc-500 tracking-wider">Search Bookings</span>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
-              <input
+              <Input
                 type="text"
                 placeholder="Search by client or location..."
                 value={searchQuery}

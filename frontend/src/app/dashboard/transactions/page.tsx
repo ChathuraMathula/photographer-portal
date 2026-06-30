@@ -3,8 +3,9 @@
 import React, { useEffect } from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle } from "lucide-react";
+import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Select,
@@ -124,14 +125,15 @@ export default function TransactionsPage() {
 
       {/* Filters Bar */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
-        <div className="flex-1 w-full">
-          <input
+        <div className="flex-1 w-full relative">
+          <Input
             type="text"
             placeholder="Search by customer name, email, transaction ID or method..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all text-zinc-700 dark:text-zinc-300 placeholder-zinc-400"
+            className="w-full h-10 pl-9 pr-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all text-zinc-700 dark:text-zinc-300 placeholder-zinc-400"
           />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
         </div>
         <div className="w-full sm:w-auto flex gap-3">
           <div className="flex-1 sm:flex-initial">

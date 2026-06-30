@@ -135,8 +135,9 @@ export default function InvoicesPage() {
     const fullName = `${item.reservation.customer.firstName} ${item.reservation.customer.lastName}`.toLowerCase();
     const email = item.reservation.customer.email.toLowerCase();
     const eventType = item.reservation.eventType.toLowerCase();
+    const resId = item.reservation.id.toLowerCase();
     const query = searchTerm.toLowerCase();
-    return fullName.includes(query) || email.includes(query) || eventType.includes(query);
+    return fullName.includes(query) || email.includes(query) || eventType.includes(query) || resId.includes(query);
   });
 
   if (loading || !settings) {
