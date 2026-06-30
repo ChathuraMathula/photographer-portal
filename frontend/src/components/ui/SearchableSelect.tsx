@@ -57,12 +57,12 @@ export function SearchableSelect({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      {/* Selector Trigger Button (Explicitly 50px height) */}
+      {/* Selector Trigger Button (Explicitly 32px height) */}
       <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
-        className="w-full h-[50px] px-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors flex items-center justify-between text-body-small text-zinc-900 dark:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-700 shadow-sm"
+        className="w-full h-8 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors flex items-center justify-between text-body-small text-zinc-900 dark:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-700 shadow-sm"
       >
         <span className="truncate font-medium">
           {selectedOption ? selectedOption.name : placeholder}

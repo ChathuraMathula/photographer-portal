@@ -53,7 +53,7 @@ export function ReservationList({
               placeholder="Search request or location..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-[50px] pl-10 pr-10 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-1 focus:ring-primary-dark"
+              className="w-full h-8 pl-10 pr-10 rounded-xl border border-zinc-250 dark:border-zinc-850 bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-1 focus:ring-primary-dark"
             />
             {search && (
               <Button

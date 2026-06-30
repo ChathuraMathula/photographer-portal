@@ -131,14 +131,14 @@ export default function TransactionsPage() {
             placeholder="Search by customer name, email, transaction ID or method..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-10 pl-9 pr-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all text-zinc-700 dark:text-zinc-300 placeholder-zinc-400"
+            className="w-full h-8 pl-9 pr-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all text-zinc-700 dark:text-zinc-300 placeholder-zinc-400"
           />
-          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-3 top-2 h-4 w-4 text-zinc-400" />
         </div>
         <div className="w-full sm:w-auto flex gap-3">
           <div className="flex-1 sm:flex-initial">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -150,7 +150,7 @@ export default function TransactionsPage() {
           </div>
           <div className="flex-1 sm:flex-initial">
             <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
                 <SelectValue placeholder="All Methods" />
               </SelectTrigger>
               <SelectContent>

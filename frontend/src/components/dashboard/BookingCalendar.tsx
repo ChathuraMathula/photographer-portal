@@ -239,7 +239,7 @@ export function BookingCalendar({
                 variant="outline"
                 type="button"
                 onClick={onPrevMonth}
-                className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
+                className="h-8 w-8 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -266,7 +266,7 @@ export function BookingCalendar({
                 variant="outline"
                 type="button"
                 onClick={onNextMonth}
-                className="h-9 w-9 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
+                className="h-8 w-8 shrink-0 p-0 shadow-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -306,7 +306,7 @@ export function BookingCalendar({
                 placeholder="Search by client or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-[50px] w-full pl-9 pr-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 font-medium text-body-small focus:outline-none focus:ring-2 focus:ring-zinc-900"
+                className="h-8 w-full pl-9 pr-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 font-medium text-body-small focus:outline-none focus:ring-2 focus:ring-zinc-900"
               />
             </div>
           </div>
