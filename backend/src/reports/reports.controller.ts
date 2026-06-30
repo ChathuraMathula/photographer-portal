@@ -49,6 +49,29 @@ export class ReportsController {
     );
   }
 
+  @Get('bookings')
+  async getReportBookings(
+    @Req() req: RequestWithUser,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('photographerId') queryPhotographerId?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const targetId = this.getTargetPhotographerId(req, queryPhotographerId);
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return this.reportsService.getReportBookings(
+      targetId,
+      period,
+      pageNum,
+      limitNum,
+      startDate,
+      endDate,
+    );
+  }
+
   @Get('pdf/financial')
   async downloadFinancialReportPdf(
     @Req() req: RequestWithUser,

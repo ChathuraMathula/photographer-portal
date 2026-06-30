@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Query,
   Param,
   Patch,
   Post,
@@ -31,8 +32,15 @@ export class InvoicesController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PHOTOGRAPHER)
-  async getInvoices(@Req() req: RequestWithUser) {
-    return this.invoicesService.getInvoices(req.user.userId);
+  async getInvoices(
+    @Req() req: RequestWithUser,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('search') search: string,
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return this.invoicesService.getInvoices(req.user.userId, pageNum, limitNum, search);
   }
 
   @Get('settings')

@@ -84,6 +84,10 @@ export default function ReportsPage() {
       downloadingBookings={reportsHook.downloadingBookings}
       downloadingLocation={reportsHook.downloadingLocation}
       loadStats={reportsHook.loadStats}
+      bookingsData={reportsHook.bookingsData}
+      bookingsPage={reportsHook.bookingsPage}
+      setBookingsPage={reportsHook.setBookingsPage}
+      bookingsLoading={reportsHook.bookingsLoading}
       handleDownloadFinancial={reportsHook.handleDownloadFinancial}
       handleDownloadBookings={reportsHook.handleDownloadBookings}
       handleDownloadLocation={reportsHook.handleDownloadLocation}

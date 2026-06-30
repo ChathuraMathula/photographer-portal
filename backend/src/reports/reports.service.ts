@@ -394,31 +394,70 @@ export class ReportsService {
       timeline,
       photographerLeaderboard,
       systemStats,
-      rawBookings: reservations.map((res) => ({
-        id: res.id,
-        clientName: res.customer
-          ? `${res.customer.firstName} ${res.customer.lastName}`
-          : 'Manual Client',
-        photographerName: res.photographer
-          ? `${res.photographer.firstName} ${res.photographer.lastName}`
-          : 'Unknown',
-        date: res.date,
-        eventType: res.eventType,
-        totalLkr: (res.totalAmountInCents || 0) / 100,
-        status: res.status,
-        location: res.location,
-        locationMapLink: res.locationMapLink,
-        city: res.city,
-        district: res.district,
-        customer: res.customer
-          ? {
-              firstName: res.customer.firstName,
-              lastName: res.customer.lastName,
-              email: res.customer.email,
-              phone: res.customer.phone,
-            }
-          : undefined,
-      })),
+      rawBookings: [],
+    };
+  }
+
+  async getReportBookings(
+    photographerId: string | undefined,
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    page: number,
+    limit: number,
+    customStartDate?: string,
+    customEndDate?: string,
+  ) {
+    const today = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+
+    if (customStartDate && customEndDate) {
+      startDate = new Date(customStartDate);
+      endDate = new Date(customEndDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+    } else {
+      if (period === 'weekly') {
+        startDate.setDate(today.getDate() - 7);
+      } else if (period === 'monthly') {
+        startDate.setDate(today.getDate() - 30);
+      } else if (period === 'yearly') {
+        startDate.setDate(today.getDate() - 365);
+      }
+    }
+
+    const whereClause: any = {
+      date: Between(startDate, endDate),
+    };
+    if (photographerId) {
+      whereClause.photographerId = photographerId;
+    }
+
+    const [reservations, total] = await this.reservationRepository.findAndCount({
+      where: whereClause,
+      relations: {
+        customer: true,
+      },
+      order: {
+        date: 'ASC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const rawBookings = reservations.map((res) => ({
+      id: res.id,
+      clientName: `${res.customer.firstName} ${res.customer.lastName}`,
+      date: res.date,
+      eventType: res.eventType,
+      totalLkr: (res.totalAmountInCents || 0) / 100,
+      status: res.status,
+    }));
+
+    return {
+      data: rawBookings,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
     };
   }
 

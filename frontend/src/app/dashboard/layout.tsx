@@ -60,6 +60,7 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     handleLogout,
     handleSendChatMessage,
     packages,
+    universalDepositType,
     universalDepositValue,
     forceOpenChat,
     setForceOpenChat,

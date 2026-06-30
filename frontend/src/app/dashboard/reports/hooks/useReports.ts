@@ -23,7 +23,10 @@ export type ReportData = {
   eventTypes: Array<{ name: string; count: number }>;
   packages: Array<{ name: string; count: number; revenueLkr: number }>;
   timeline: Array<{ label: string; bookings: number; revenueLkr: number }>;
-  rawBookings: Array<{
+};
+
+export type PaginatedBookingsData = {
+  data: Array<{
     id: string;
     clientName: string;
     date: string;
@@ -41,6 +44,9 @@ export type ReportData = {
       phone: string;
     };
   }>;
+  total: number;
+  page: number;
+  totalPages: number;
 };
 
 export function useReports() {
@@ -62,6 +68,13 @@ export function useReports() {
   const [selectedMonth, setSelectedMonth] = useState(() => (new Date().getMonth() + 1).toString().padStart(2, "0"));
 
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  
+  // Bookings Log Pagination State
+  const [bookingsData, setBookingsData] = useState<PaginatedBookingsData | null>(null);
+  const [bookingsPage, setBookingsPage] = useState(1);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const bookingsLimit = 10;
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
@@ -92,6 +105,9 @@ export function useReports() {
     } else {
       setRefreshing(true);
     }
+    
+    // Reset page to 1 when period/date changes
+    setBookingsPage(1);
 
     try {
       let url = `${API}/reports/data?period=${period}`;
@@ -113,6 +129,32 @@ export function useReports() {
       setRefreshing(false);
     }
   };
+
+  const loadBookings = async () => {
+    if (!context) return;
+    setBookingsLoading(true);
+    try {
+      let url = `${API}/reports/bookings?period=${period}&page=${bookingsPage}&limit=${bookingsLimit}`;
+      if (period === "custom") {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
+      }
+      const res = await context.authFetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch report bookings");
+      const json = await res.json();
+      setBookingsData(json);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBookings();
+  }, [bookingsPage, period, startDate, endDate, selectedYear, selectedMonth]);
 
   const handleDownloadFinancial = async () => {
     if (!context) return;
@@ -225,6 +267,10 @@ export function useReports() {
     downloadingBookings,
     downloadingLocation,
     loadStats,
+    bookingsData,
+    bookingsPage,
+    setBookingsPage,
+    bookingsLoading,
     handleDownloadFinancial,
     handleDownloadBookings,
     handleDownloadLocation,

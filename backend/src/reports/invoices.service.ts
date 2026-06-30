@@ -24,45 +24,68 @@ export class InvoicesService {
     private readonly emailService: EmailService,
   ) {}
 
-  async getInvoices(photographerId: string) {
+  async getInvoices(photographerId: string, page = 1, limit = 10, search = '') {
+    // We want reservations that are CONFIRMED or COMPLETED and fully paid.
+    // In SQLite, filtering by HAVING SUM(payments) >= totalAmountInCents is tricky if we want to return full entities.
+    // A robust way for SQLite is to query the reservation IDs that meet the criteria, then fetch the entities.
+    const qb = this.reservationRepository.createQueryBuilder('reservation')
+      .select('reservation.id', 'id')
+      .addSelect('reservation.totalAmountInCents', 'totalAmountInCents')
+      .addSelect('COALESCE(SUM(payments.amountInCents), 0)', 'totalPaid')
+      .leftJoin('reservation.customer', 'customer')
+      .leftJoin('reservation.payments', 'payments', 'payments.status = :paymentStatus', { paymentStatus: PaymentStatus.SUCCESS })
+      .where('reservation.photographerId = :photographerId', { photographerId })
+      .andWhere('reservation.status IN (:...statuses)', { statuses: [ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED] })
+      .groupBy('reservation.id')
+      .addGroupBy('reservation.totalAmountInCents');
+
+    if (search) {
+      qb.andWhere(
+        '(LOWER(customer.firstName) || " " || LOWER(customer.lastName) LIKE LOWER(:search) OR LOWER(customer.email) LIKE LOWER(:search) OR LOWER(reservation.eventType) LIKE LOWER(:search) OR LOWER(reservation.id) LIKE LOWER(:search))',
+        { search: `%${search}%` }
+      );
+    }
+
+    const aggregated = await qb.getRawMany();
+
+    // Filter to fully paid
+    let fullyPaidIds = aggregated
+      .filter(row => row.totalPaid >= (row.totalAmountInCents || 1))
+      .map(row => row.id);
+
+    // Calculate KPIs across all matching invoices (ignoring pagination)
+    const totalInvoiced = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + ((row.totalAmountInCents || 0) / 100), 0);
+    const totalSettled = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + (row.totalPaid / 100), 0);
+    const outstanding = Math.max(0, totalInvoiced - totalSettled);
+    const kpis = { totalInvoiced, totalSettled, outstanding };
+
+    const total = fullyPaidIds.length;
+    const totalPages = Math.ceil(total / limit);
+    const paginatedIds = fullyPaidIds.slice((page - 1) * limit, page * limit);
+
+    if (paginatedIds.length === 0) {
+      return { data: [], total, page, totalPages, kpis };
+    }
+
     const reservations = await this.reservationRepository.find({
-      where: {
-        photographerId,
-        status: In([ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED]),
-      },
-      relations: { customer: true },
+      where: { id: In(paginatedIds) },
+      relations: { customer: true, payments: true },
       order: { date: 'DESC' },
     });
 
-    if (reservations.length === 0) return [];
-
-    const payments = await this.paymentRepository.find({
-      where: {
-        reservationId: In(reservations.map((r) => r.id)),
-        status: PaymentStatus.SUCCESS,
-      },
-    });
-
-    // Map and filter down to fully paid reservations (Invoices)
-    const invoices = reservations.map((res) => {
-      const resPayments = payments.filter((p) => p.reservationId === res.id);
-      const totalPaid = resPayments.reduce(
-        (sum, p) => sum + p.amountInCents,
-        0,
-      );
-      const isFullyPaid = totalPaid >= (res.totalAmountInCents || 1);
-
+    const data = reservations.map((res) => {
+      const resPayments = (res.payments || []).filter(p => p.status === PaymentStatus.SUCCESS);
+      const totalPaid = resPayments.reduce((sum, p) => sum + p.amountInCents, 0);
       return {
         reservation: res,
         payments: resPayments,
         totalPaidLkr: totalPaid / 100,
         totalValueLkr: (res.totalAmountInCents || 0) / 100,
-        isFullyPaid,
+        isFullyPaid: true,
       };
     });
 
-    // We can show all invoices (meaning fully paid confirmed/completed bookings)
-    return invoices.filter((inv) => inv.isFullyPaid);
+    return { data, total, page, totalPages, kpis };
   }
 
   async getSettings(photographerId: string) {

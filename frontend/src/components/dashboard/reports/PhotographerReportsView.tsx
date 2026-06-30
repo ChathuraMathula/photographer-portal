@@ -28,6 +28,10 @@ type Props = {
   downloadingBookings: boolean;
   downloadingLocation?: boolean;
   loadStats: (showSpinner: boolean) => void;
+  bookingsData: any;
+  bookingsPage: number;
+  setBookingsPage: (page: number) => void;
+  bookingsLoading: boolean;
   handleDownloadFinancial: () => void;
   handleDownloadBookings: () => void;
   handleDownloadLocation?: () => void;
@@ -51,6 +55,10 @@ export function PhotographerReportsView({
   downloadingBookings,
   downloadingLocation = false,
   loadStats,
+  bookingsData,
+  bookingsPage,
+  setBookingsPage,
+  bookingsLoading,
   handleDownloadFinancial,
   handleDownloadBookings,
   handleDownloadLocation,
@@ -109,13 +117,16 @@ export function PhotographerReportsView({
 
           {/* Location Analytics Section */}
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-6 shadow-sm">
-            <LocationAnalyticsSection rawBookings={reportData.rawBookings as any} />
+            <LocationAnalyticsSection rawBookings={reportData.locationMap as any} />
           </div>
 
           {/* Performance Lists Section */}
           <PhotographerPerformanceBreakdown
             packages={reportData.packages}
-            rawBookings={reportData.rawBookings}
+            bookingsData={bookingsData}
+            bookingsPage={bookingsPage}
+            setBookingsPage={setBookingsPage}
+            bookingsLoading={bookingsLoading}
           />
         </>
       ) : (

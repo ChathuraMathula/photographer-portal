@@ -44,6 +44,10 @@ export default function InvoicesPage() {
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalInvoiced, setTotalInvoiced] = useState(0);
+  const [totalSettled, setTotalSettled] = useState(0);
+  const [outstanding, setOutstanding] = useState(0);
   const itemsPerPage = 10;
 
   if (!context) return null;
@@ -51,10 +55,17 @@ export default function InvoicesPage() {
 
   const loadData = async () => {
     try {
-      const invRes = await authFetch(`${API}/invoices`, { credentials: "include" });
+      const invRes = await authFetch(`${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`, { credentials: "include" });
       if (!invRes.ok) throw new Error("Failed to load invoices list");
       const invData = await invRes.json();
-      setInvoices(invData);
+      setInvoices(invData.data || []);
+      setTotalPages(invData.totalPages || 1);
+      
+      if (invData.kpis) {
+        setTotalInvoiced(invData.kpis.totalInvoiced || 0);
+        setTotalSettled(invData.kpis.totalSettled || 0);
+        setOutstanding(invData.kpis.outstanding || 0);
+      }
 
       const settingsRes = await authFetch(`${API}/invoices/settings`, { credentials: "include" });
       if (!settingsRes.ok) throw new Error("Failed to load invoice settings");
@@ -71,7 +82,7 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     loadData();
-  }, [authFetch]);
+  }, [authFetch, currentPage, searchTerm]);
 
   const handleDownload = async (resId: string) => {
     try {
@@ -127,24 +138,6 @@ export default function InvoicesPage() {
     const data = await res.json();
     setSettings(data);
   };
-
-  // KPIs
-  const totalInvoiced = invoices.reduce((sum, item) => sum + item.totalValueLkr, 0);
-  const totalSettled = invoices.reduce((sum, item) => sum + item.totalPaidLkr, 0);
-  const outstanding = Math.max(0, totalInvoiced - totalSettled);
-
-  // Filtered List
-  const filteredInvoices = invoices.filter((item) => {
-    const fullName = `${item.reservation.customer.firstName} ${item.reservation.customer.lastName}`.toLowerCase();
-    const email = item.reservation.customer.email.toLowerCase();
-    const eventType = item.reservation.eventType.toLowerCase();
-    const resId = item.reservation.id.toLowerCase();
-    const query = searchTerm.toLowerCase();
-    return fullName.includes(query) || email.includes(query) || eventType.includes(query) || resId.includes(query);
-  });
-
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
-  const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -231,7 +224,7 @@ export default function InvoicesPage() {
           </div>
 
           <InvoicesListTable
-            invoices={paginatedInvoices}
+            invoices={invoices}
             onDownload={handleDownload}
             onResend={handleResend}
             resendingId={resendingId}

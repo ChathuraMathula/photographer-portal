@@ -7,17 +7,13 @@ import { BookingsLogTable } from "./BookingsLogTable";
 
 type Props = {
   packages: Array<{ name: string; count: number; revenueLkr: number }>;
-  rawBookings: Array<{
-    id: string;
-    clientName: string;
-    date: string;
-    eventType: string;
-    totalLkr: number;
-    status: string;
-  }>;
+  bookingsData: any;
+  bookingsPage: number;
+  setBookingsPage: (page: number) => void;
+  bookingsLoading: boolean;
 };
 
-export function PhotographerPerformanceBreakdown({ packages, rawBookings }: Props) {
+export function PhotographerPerformanceBreakdown({ packages, bookingsData, bookingsPage, setBookingsPage, bookingsLoading }: Props) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Package Performance */}
@@ -32,7 +28,12 @@ export function PhotographerPerformanceBreakdown({ packages, rawBookings }: Prop
       </Card>
 
       {/* Bookings log table */}
-      <BookingsLogTable rawBookings={rawBookings} />
+      <BookingsLogTable 
+        bookingsData={bookingsData} 
+        bookingsPage={bookingsPage} 
+        setBookingsPage={setBookingsPage} 
+        bookingsLoading={bookingsLoading} 
+      />
     </div>
   );
 }

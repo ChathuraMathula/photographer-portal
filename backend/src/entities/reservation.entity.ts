@@ -11,6 +11,7 @@ import {
 import { Customer } from './customer.entity';
 import { User } from './user.entity';
 import { Message } from './message.entity';
+import { Payment } from './payment.entity';
 
 export enum ReservationStatus {
   PENDING = 'PENDING',
@@ -108,6 +109,9 @@ export class Reservation {
 
   @OneToMany(() => Message, (message) => message.reservation)
   messages?: Message[];
+
+  @OneToMany(() => Payment, (payment) => payment.reservation)
+  payments?: Payment[];
 
   @CreateDateColumn()
   createdAt!: Date;
