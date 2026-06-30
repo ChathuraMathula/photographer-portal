@@ -96,6 +96,7 @@ export default function UserSettingsPage() {
             showManualBookingInTopbar: localShowManualBooking,
             showAcceptBookingsInTopbar: localShowAcceptBookings,
           }),
+          credentials: "include",
         });
       }
 
