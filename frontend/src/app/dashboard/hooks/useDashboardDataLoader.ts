@@ -26,6 +26,7 @@ export function useDashboardDataLoader({
   const [transactionsPage, setTransactionsPage] = useState(1);
   const [transactionsTotalPages, setTransactionsTotalPages] = useState(1);
   const [transactionsTotal, setTransactionsTotal] = useState(0);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [transactionStats, setTransactionStats] = useState({
     totalRevenueInCents: 0,
     cashPaymentsCount: 0,
@@ -33,6 +34,7 @@ export function useDashboardDataLoader({
   });
 
   const loadTransactions = async (paramsObj?: { page?: number; search?: string; status?: string; method?: string }) => {
+    setTransactionsLoading(true);
     try {
       const pageNum = paramsObj?.page || 1;
       const params = new URLSearchParams();
@@ -55,6 +57,8 @@ export function useDashboardDataLoader({
       }
     } catch (err) {
       console.error("Error loading transactions:", err);
+    } finally {
+      setTransactionsLoading(false);
     }
   };
 
@@ -104,6 +108,7 @@ export function useDashboardDataLoader({
     setTransactionsTotal,
     transactionStats,
     setTransactionStats,
+    transactionsLoading,
     loadTransactions,
     loadPhotographerData,
   };

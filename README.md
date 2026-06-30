@@ -43,8 +43,9 @@ photographer-portal/
 │   │   ├── entities/        # TypeORM entity schemas
 │   │   ├── migrations/      # DB Schema migrations
 │   │   ├── database/        # DatabaseModule configurations
-│   │   ├── scripts/         # seed-data.ts (shared seed logic)
+│   │   ├── scripts/         # seed-data.ts & seed-sarah-data.ts (seeding logic)
 │   │   ├── seed.ts          # npm run seed entry point
+│   │   ├── seed-sarah.ts    # [NEW] npm run seed:sarah entry point
 │   │   └── reset.ts         # npm run db:reset entry point
 │   └── package.json
 └── frontend/                # Next.js App Router (port 4000)
@@ -72,6 +73,9 @@ photographer-portal/
           │   ├── common/
           │   │   ├── OSMMapPreview.tsx # Clean, sandboxed OpenStreetMap Leaflet preview component
           │   │   └── OSMMapPicker.tsx  # Interactive OpenStreetMap coordinate pin selector
+          │   ├── ui/
+          │   │   ├── pagination.tsx    # [NEW] Reusable Shadcn-style pagination component
+          │   │   └── ...
           │   ├── dashboard/
           │   │   ├── profile/ # AdminProfilePage.tsx - Admin profile configuration
           │   │   ├── reports/ 

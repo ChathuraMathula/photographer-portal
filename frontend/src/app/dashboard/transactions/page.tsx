@@ -18,6 +18,7 @@ export default function TransactionsPage() {
     transactionsTotalPages,
     transactionsTotal,
     transactionStats,
+    transactionsLoading,
     loadTransactions,
   } = context;
 
@@ -162,7 +163,47 @@ export default function TransactionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          {transactions.length === 0 ? (
+          {transactionsLoading ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-body-small border-collapse">
+                <thead>
+                  <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-855">
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Transaction ID</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Method</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 animate-pulse">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <tr key={`skeleton-row-${i}`} className="hover:bg-zinc-50/10 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-28 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                        <div className="h-3 w-40 bg-zinc-150/50 dark:bg-zinc-850/50 rounded mt-1.5" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-3.5 w-32 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-16 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-20 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-24 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-6 w-16 bg-zinc-150/50 dark:bg-zinc-850/50 rounded-full" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : transactions.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-body-small text-zinc-400 italic">
                 No transactions recorded yet.

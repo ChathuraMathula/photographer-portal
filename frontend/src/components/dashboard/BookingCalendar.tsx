@@ -23,6 +23,7 @@ type Props = {
   onDateChange?: (date: Date) => void;
   onDayReservationClick: (res: Reservation) => void;
   onDayClick: (date: Date) => void;
+  loading?: boolean;
 };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -96,6 +97,7 @@ export function BookingCalendar({
   onDateChange,
   onDayReservationClick,
   onDayClick,
+  loading = false,
 }: Props) {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
@@ -332,6 +334,23 @@ export function BookingCalendar({
             const isToday = day.toDateString() === new Date().toDateString();
             const isSelected = day.toDateString() === selectedDay.toDateString();
  
+            if (loading) {
+              return (
+                <div
+                  key={day.toISOString()}
+                  className="border border-zinc-200 dark:border-zinc-800 p-2 rounded-xl min-h-[85px] text-left relative flex flex-col justify-between bg-white dark:bg-zinc-900"
+                >
+                  <span className="text-body-caption font-bold inline-flex items-center justify-center rounded-full h-5 w-5 bg-zinc-100 dark:bg-zinc-850 text-zinc-400 dark:text-zinc-550 animate-pulse">
+                    {day.getDate()}
+                  </span>
+                  <div className="space-y-1.5 mt-2 flex-1 flex flex-col justify-end">
+                    <div className="h-2.5 w-full bg-zinc-150/50 dark:bg-zinc-850/50 rounded animate-pulse" />
+                    <div className="h-2 w-2/3 bg-zinc-150/50 dark:bg-zinc-850/50 rounded animate-pulse" />
+                  </div>
+                </div>
+              );
+            }
+ 
             return (
               <div
                 key={day.toISOString()}
@@ -456,7 +475,19 @@ export function BookingCalendar({
           </div>
 
           <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-            {selectedDayReservations.length > 0 ? (
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2].map((i) => (
+                  <div
+                    key={`skeleton-mobile-${i}`}
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-3.5 rounded-xl shadow-sm space-y-2.5 animate-pulse"
+                  >
+                    <div className="h-4 w-1/3 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                    <div className="h-3 w-1/2 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : selectedDayReservations.length > 0 ? (
               selectedDayReservations.map((r) => (
                 <div
                   key={r.id}

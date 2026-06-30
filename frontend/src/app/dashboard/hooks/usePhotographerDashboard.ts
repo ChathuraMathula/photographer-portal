@@ -100,6 +100,7 @@ export function usePhotographerDashboard() {
     transactionsTotal,
     setTransactionsTotal,
     transactionStats,
+    transactionsLoading,
     loadTransactions,
     loadPhotographerData,
   } = useDashboardDataLoader({
@@ -223,6 +224,7 @@ export function usePhotographerDashboard() {
     transactionsTotal,
     setTransactionsTotal,
     transactionStats,
+    transactionsLoading,
     loadTransactions,
     packageDeposits: reservationsState.packageDeposits,
     setPackageDeposits: reservationsState.setPackageDeposits,
@@ -246,5 +248,6 @@ export function usePhotographerDashboard() {
     reservationsLoading: reservationsState.loading,
     calendarReservations: reservationsState.calendarReservations,
     fetchCalendarReservations: reservationsState.fetchCalendarReservations,
+    calendarLoading: reservationsState.calendarLoading,
   };
 }

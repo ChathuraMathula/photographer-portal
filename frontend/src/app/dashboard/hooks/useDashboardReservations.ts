@@ -36,6 +36,8 @@ export function useDashboardReservations({
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [loading, setLoading] = useState(false);
 
+  const [calendarLoading, setCalendarLoading] = useState(false);
+
   // Calendar specific state to prevent pulling all 100k
   const [calendarReservations, setCalendarReservations] = useState<Reservation[]>([]);
 
@@ -71,6 +73,7 @@ export function useDashboardReservations({
   };
 
   const fetchCalendarReservations = async (startStr: string, endStr: string) => {
+    setCalendarLoading(true);
     try {
       const params = new URLSearchParams();
       params.append("startDate", startStr);
@@ -82,6 +85,8 @@ export function useDashboardReservations({
       }
     } catch (err) {
       console.error("Error loading calendar reservations:", err);
+    } finally {
+      setCalendarLoading(false);
     }
   };
 
@@ -282,5 +287,6 @@ export function useDashboardReservations({
     loading,
     calendarReservations,
     fetchCalendarReservations,
+    calendarLoading,
   };
 }
