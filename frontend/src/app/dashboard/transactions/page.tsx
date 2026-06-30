@@ -5,6 +5,7 @@ import { usePhotographerDashboardContext } from "../context/PhotographerDashboar
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function TransactionsPage() {
   const context = usePhotographerDashboardContext();
@@ -254,27 +255,16 @@ export default function TransactionsPage() {
 
       {/* Pagination Controls */}
       {transactionsTotalPages > 1 && (
-        <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm gap-4">
           <div className="text-body-caption text-zinc-500">
             Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsPage}</span> of{" "}
             <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsTotalPages}</span> ({transactionsTotal} total transactions)
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setTransactionsPage((p) => Math.max(1, p - 1))}
-              disabled={transactionsPage === 1}
-              className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => setTransactionsPage((p) => Math.min(transactionsTotalPages, p + 1))}
-              disabled={transactionsPage === transactionsTotalPages}
-              className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination
+            page={transactionsPage}
+            totalPages={transactionsTotalPages}
+            onPageChange={setTransactionsPage}
+          />
         </div>
       )}
     </div>

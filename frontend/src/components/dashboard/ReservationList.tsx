@@ -5,6 +5,7 @@ import { ReservationListItem } from "./ReservationListItem";
 import { Search, X } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 
 type Props = {
   reservations: Reservation[];
@@ -106,30 +107,16 @@ export function ReservationList({
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/20 shrink-0 flex items-center justify-between">
-          <span className="text-[11px] text-zinc-450">
+        <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/20 shrink-0 flex items-center justify-between gap-2 overflow-x-auto">
+          <span className="text-[11px] text-zinc-450 whitespace-nowrap">
             Page {page} of {totalPages}
           </span>
-          <div className="flex gap-1.5">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="h-7 px-2.5 text-body-caption rounded-lg disabled:opacity-50"
-            >
-              Prev
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="h-7 px-2.5 text-body-caption rounded-lg disabled:opacity-50"
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            className="scale-90 origin-right shrink-0"
+          />
         </div>
       )}
     </Card>

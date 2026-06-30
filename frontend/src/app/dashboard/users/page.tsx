@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { UserTable } from "@/components/users/UserTable";
 import { CreateUserModal } from "@/components/users/CreateUserModal";
 import { UserPlus } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 export default function UserManagementPage() {
@@ -157,27 +158,16 @@ export default function UserManagementPage() {
           
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm gap-4">
               <div className="text-body-caption text-zinc-500">
                 Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{page}</span> of{" "}
                 <span className="font-semibold text-zinc-800 dark:text-zinc-200">{totalPages}</span> ({total} total users)
               </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
-                >
-                  Previous
-                </Button>
-                <Button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
-                >
-                  Next
-                </Button>
-              </div>
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>
