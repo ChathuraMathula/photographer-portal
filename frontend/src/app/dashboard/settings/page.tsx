@@ -87,7 +87,7 @@ export default function UserSettingsPage() {
       if (context && context.role === "PHOTOGRAPHER" && context.userId) {
         context.setShowManualBookingInTopbar(localShowManualBooking);
         context.setShowAcceptBookingsInTopbar(localShowAcceptBookings);
-        
+
         // Directly patch the profile to avoid using stale state via handleSaveProfile
         await context.authFetch(`${API}/photographers/${context.userId}/profile`, {
           method: "PATCH",
@@ -118,7 +118,7 @@ export default function UserSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
-      
+
       {/* Header */}
       <div>
         <h1 className="text-title-large text-primary-dark dark:text-white flex items-center gap-2">
@@ -130,7 +130,7 @@ export default function UserSettingsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        
+
         {/* Main Settings Panel */}
         <div className="md:col-span-2 space-y-6">
           <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
@@ -144,7 +144,7 @@ export default function UserSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              
+
               {/* Option 1: General Emails */}
               <div className="flex items-start justify-between p-4 rounded-xl border border-zinc-150/40 bg-zinc-50/20 dark:bg-zinc-950/20 dark:border-zinc-850/60">
                 <div className="space-y-1 pr-4">
@@ -231,23 +231,6 @@ export default function UserSettingsPage() {
             <CardContent className="text-body-caption text-zinc-500 space-y-3 leading-relaxed">
               <p>
                 Notification alerts are sent to the verified email address linked to your profile credentials.
-              </p>
-              <p>
-                To change your password or general user profile details, navigate to the <span className="font-semibold text-zinc-800 dark:text-white">Profile Details</span> tab instead.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-gradient-to-br from-indigo-50/30 to-blue-50/10 dark:from-zinc-900 dark:to-zinc-950">
-            <CardHeader>
-              <CardTitle className="text-body-small-bold font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-indigo-500" />
-                Upcoming Updates
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-body-caption text-zinc-500 leading-relaxed">
-              <p>
-                SMS integration, web push configurations, and customized reminder cron intervals will be available in future releases.
               </p>
             </CardContent>
           </Card>
