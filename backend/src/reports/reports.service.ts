@@ -514,4 +514,102 @@ export class ReportsService {
     );
     return buildLocationReportPdf(data, period);
   }
+
+  async getPhotographerLeaderboard(
+    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    page: number,
+    limit: number,
+    search?: string,
+    customStartDate?: string,
+    customEndDate?: string,
+  ) {
+    const today = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+
+    if (customStartDate && customEndDate) {
+      startDate = new Date(customStartDate);
+      endDate = new Date(customEndDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+    } else {
+      if (period === 'weekly') {
+        startDate.setDate(today.getDate() - 7);
+      } else if (period === 'monthly') {
+        startDate.setDate(today.getDate() - 30);
+      } else if (period === 'yearly') {
+        startDate.setDate(today.getDate() - 365);
+      }
+    }
+
+    const skip = (page - 1) * limit;
+
+    // Use QueryBuilder to compute leaderboard directly in DB
+    const qb = this.reservationRepository.createQueryBuilder('reservation')
+      .leftJoinAndSelect('reservation.photographer', 'photographer')
+      .select('photographer.id', 'id')
+      .addSelect('photographer.firstName', 'firstName')
+      .addSelect('photographer.lastName', 'lastName')
+      .addSelect('photographer.email', 'email')
+      .addSelect('COUNT(reservation.id)', 'bookingsCount')
+      .addSelect('SUM(reservation.totalAmountInCents)', 'totalAmountInCents')
+      .where('reservation.date >= :startDate', { startDate })
+      .andWhere('reservation.date <= :endDate', { endDate })
+      .andWhere('reservation.status NOT IN (:...statuses)', { statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED] })
+      .andWhere('photographer.id IS NOT NULL');
+
+    if (search) {
+      const searchPattern = `%${search.toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search OR LOWER(photographer.email) LIKE :search)',
+        { search: searchPattern }
+      );
+    }
+
+    qb.groupBy('photographer.id')
+      .addGroupBy('photographer.firstName')
+      .addGroupBy('photographer.lastName')
+      .addGroupBy('photographer.email')
+      .orderBy('"totalAmountInCents"', 'DESC')
+      .offset(skip)
+      .limit(limit);
+
+    const rawResults = await qb.getRawMany();
+
+    // To get the total count of distinct photographers for pagination:
+    const countQb = this.reservationRepository.createQueryBuilder('reservation')
+      .leftJoin('reservation.photographer', 'photographer')
+      .select('COUNT(DISTINCT photographer.id)', 'total')
+      .where('reservation.date >= :startDate', { startDate })
+      .andWhere('reservation.date <= :endDate', { endDate })
+      .andWhere('reservation.status NOT IN (:...statuses)', { statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED] })
+      .andWhere('photographer.id IS NOT NULL');
+      
+    if (search) {
+      const searchPattern = `%${search.toLowerCase()}%`;
+      countQb.andWhere(
+        '(LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search OR LOWER(photographer.email) LIKE :search)',
+        { search: searchPattern }
+      );
+    }
+
+    const countResult = await countQb.getRawOne();
+    const total = parseInt(countResult.total, 10) || 0;
+
+    const leaderboard = rawResults.map((row) => ({
+      id: row.id,
+      name: `${row.firstName} ${row.lastName}`.trim(),
+      email: row.email,
+      bookingsCount: parseInt(row.bookingsCount, 10) || 0,
+      revenueLkr: (parseInt(row.totalAmountInCents, 10) || 0) / 100,
+    }));
+
+    return {
+      data: leaderboard,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
 }

@@ -14,12 +14,18 @@ export class AuditLogsController {
 
   @Get()
   async getLogs(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
     @Query('action') action?: string,
     @Query('userEmail') userEmail?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-  ): Promise<AuditLog[]> {
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
     return this.auditLogsService.getLogs({
+      page: pageNum,
+      limit: limitNum,
       action,
       userEmail,
       startDate,

@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { RevenueAreaChart, BookingStatusDonut, PackagePerformanceBar } from "@/app/dashboard/reports/charts";
 import { KpiCardsGrid } from "@/app/dashboard/reports/components/KpiCardsGrid";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import { LocationAnalyticsSection } from "./location/LocationAnalyticsSection";
 import { BookingsLogTable } from "@/app/dashboard/reports/components/BookingsLogTable";
+import { Pagination } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Search, Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -82,6 +84,12 @@ export function AdminReportsPage() {
   const [bookingsPage, setBookingsPage] = useState(1);
   const [bookingsLoading, setBookingsLoading] = useState(false);
 
+  // Leaderboard states
+  const [leaderboardData, setLeaderboardData] = useState<any>(null);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [leaderboardSearch, setLeaderboardSearch] = useState("");
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+
   // Helper to compute start & end date for the selected year or month
   const getPeriodDateRange = () => {
     if (period === "yearly") {
@@ -149,6 +157,31 @@ export function AdminReportsPage() {
     }
   };
 
+  const fetchLeaderboard = async () => {
+    setLeaderboardLoading(true);
+    try {
+      let url = `${API}/reports/leaderboard?period=${period}&page=${leaderboardPage}&limit=5`;
+      if (leaderboardSearch) {
+        url += `&search=${encodeURIComponent(leaderboardSearch)}`;
+      }
+      if (period === "custom") {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
+      }
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch admin leaderboard data");
+      const json = await res.json();
+      setLeaderboardData(json);
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not load leaderboard list. Please try again.");
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (period === "custom" && (!startDate || !endDate)) return;
     fetchStats(reportData === null);
@@ -158,6 +191,14 @@ export function AdminReportsPage() {
     if (period === "custom" && (!startDate || !endDate)) return;
     fetchBookings();
   }, [period, startDate, endDate, selectedYear, selectedMonth, bookingsPage]);
+
+  useEffect(() => {
+    if (period === "custom" && (!startDate || !endDate)) return;
+    const delay = setTimeout(() => {
+      fetchLeaderboard();
+    }, 300); // debounce search
+    return () => clearTimeout(delay);
+  }, [period, startDate, endDate, selectedYear, selectedMonth, leaderboardPage, leaderboardSearch]);
 
   const handleDownloadFinancial = async () => {
     setDownloadingFinancial(true);
@@ -466,41 +507,78 @@ export function AdminReportsPage() {
       )}
 
       {/* Leaderboard Section */}
-      {reportData?.photographerLeaderboard && reportData.photographerLeaderboard.length > 0 && (
+      {leaderboardData && (
         <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/20">
-            <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-              <ArrowUpRight className="h-4 w-4 text-emerald-600" /> Photographer Performance Leaderboard
-            </CardTitle>
-            <CardDescription className="text-xs">Top performing photographers sorted by total settled volume.</CardDescription>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                  <ArrowUpRight className="h-4 w-4 text-emerald-600" /> Photographer Performance Leaderboard
+                </CardTitle>
+                <CardDescription className="text-xs">Top performing photographers sorted by total settled volume.</CardDescription>
+              </div>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <Input
+                  type="text"
+                  placeholder="Search photographers..."
+                  value={leaderboardSearch}
+                  onChange={(e) => {
+                    setLeaderboardSearch(e.target.value);
+                    setLeaderboardPage(1);
+                  }}
+                  className="pl-9 h-9 text-xs"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-body-small">
-                <thead>
-                  <tr className="border-b border-zinc-150 bg-zinc-55/10 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-body-small-s font-semibold">
-                    <th className="p-4">Rank</th>
-                    <th className="p-4">Photographer Name</th>
-                    <th className="p-4">Email</th>
-                    <th className="p-4 text-center">Settled Bookings</th>
-                    <th className="p-4 text-right">Settled Revenue</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {reportData.photographerLeaderboard.map((row, idx) => (
-                    <tr key={row.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                      <td className="p-4 font-bold text-zinc-400">#{idx + 1}</td>
-                      <td className="p-4 font-semibold text-zinc-900 dark:text-white">{row.name}</td>
-                      <td className="p-4 text-zinc-555 dark:text-zinc-405">{row.email}</td>
-                      <td className="p-4 text-center font-medium">{row.bookingsCount}</td>
-                      <td className="p-4 text-right font-bold text-emerald-700 dark:text-emerald-450">
-                        LKR {row.revenueLkr.toLocaleString()}
-                      </td>
+            {leaderboardLoading ? (
+              <div className="text-center py-12 text-zinc-500 animate-pulse">Loading leaderboard...</div>
+            ) : leaderboardData.data.length === 0 ? (
+              <div className="text-center py-12 text-zinc-400 italic">No photographers found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-body-small">
+                  <thead>
+                    <tr className="border-b border-zinc-150 bg-zinc-55/10 dark:border-zinc-800 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-body-small-s font-semibold">
+                      <th className="p-4">Rank</th>
+                      <th className="p-4">Photographer Name</th>
+                      <th className="p-4">Email</th>
+                      <th className="p-4 text-center">Settled Bookings</th>
+                      <th className="p-4 text-right">Settled Revenue</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    {leaderboardData.data.map((row: any, idx: number) => {
+                      const absoluteRank = (leaderboardPage - 1) * 5 + idx + 1;
+                      return (
+                        <tr key={row.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                          <td className="p-4 font-bold text-zinc-400">#{absoluteRank}</td>
+                          <td className="p-4 font-semibold text-zinc-900 dark:text-white">{row.name}</td>
+                          <td className="p-4 text-zinc-555 dark:text-zinc-405">{row.email}</td>
+                          <td className="p-4 text-center font-medium">{row.bookingsCount}</td>
+                          <td className="p-4 text-right font-bold text-emerald-700 dark:text-emerald-450">
+                            LKR {row.revenueLkr.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            
+            {/* Leaderboard Pagination */}
+            {leaderboardData.totalPages > 1 && !leaderboardLoading && (
+              <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-800">
+                <Pagination
+                  page={leaderboardPage}
+                  totalPages={leaderboardData.totalPages}
+                  onPageChange={setLeaderboardPage}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

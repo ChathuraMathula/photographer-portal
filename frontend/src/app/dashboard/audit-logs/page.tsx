@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, RefreshCw, Filter, Search, ClipboardList } from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
+import { Pagination } from "@/components/ui/pagination";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -26,6 +27,9 @@ export default function AuditLogsPage() {
   const { role } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   
   // Filters
   const [actionFilter, setActionFilter] = useState("");
@@ -41,14 +45,26 @@ export default function AuditLogsPage() {
       if (emailSearch) queryParams.append("userEmail", emailSearch);
       if (startDate) queryParams.append("startDate", startDate);
       if (endDate) queryParams.append("endDate", endDate);
+      queryParams.append("page", page.toString());
+      queryParams.append("limit", "15");
 
       const res = await fetch(`${API}/audit-logs?${queryParams.toString()}`, {
         credentials: "include",
       });
 
       if (!res.ok) throw new Error("Failed to load audit logs");
-      const data = await res.json();
-      setLogs(data);
+      const json = await res.json();
+      
+      // If the backend returned paginated data (has .data property)
+      if (json.data && Array.isArray(json.data)) {
+        setLogs(json.data);
+        setTotalPages(json.totalPages || 1);
+        setTotal(json.total || 0);
+      } else {
+        setLogs(json);
+        setTotalPages(1);
+        setTotal(json.length);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to load audit logs");
     } finally {
@@ -60,7 +76,7 @@ export default function AuditLogsPage() {
     if (role === UserRole.SUPER_ADMIN) {
       fetchLogs();
     }
-  }, [role]);
+  }, [role, page]);
 
   if (role !== UserRole.SUPER_ADMIN) {
     return (
@@ -178,7 +194,10 @@ export default function AuditLogsPage() {
 
           <div className="sm:col-span-2 md:col-span-4 flex justify-end">
             <Button
-              onClick={fetchLogs}
+              onClick={() => {
+                setPage(1);
+                fetchLogs();
+              }}
               className="btn btn-primary h-10 px-8 text-xs font-bold shadow-md cursor-pointer"
             >
               Apply Filters
@@ -196,7 +215,7 @@ export default function AuditLogsPage() {
             Activity Log Entries
           </CardTitle>
           <CardDescription className="text-xs">
-            Viewing {logs.length} matched system logs.
+            Viewing {logs.length} matched system logs out of {total} total.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
@@ -243,6 +262,16 @@ export default function AuditLogsPage() {
                 ))}
               </tbody>
             </table>
+          )}
+          {/* Pagination Controls */}
+          {totalPages > 1 && !loading && (
+            <div className="p-4 flex justify-center border-t border-zinc-150/40 dark:border-zinc-850/60">
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>
           )}
         </CardContent>
       </Card>

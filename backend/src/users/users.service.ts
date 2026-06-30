@@ -170,11 +170,11 @@ export class UsersService {
     // RBAC: Admins can only see Photographers
     if (callerRole === UserRole.ADMIN) {
       qb.andWhere('user.role = :role', { role: UserRole.PHOTOGRAPHER });
-    } else if (query.role) {
+    } else if (query.role && query.role !== 'ALL') {
       qb.andWhere('user.role = :role', { role: query.role });
     }
 
-    if (query.status !== undefined && query.status !== '') {
+    if (query.status !== undefined && query.status !== '' && query.status !== 'ALL') {
       const isActive = query.status === 'active';
       qb.andWhere('user.isActive = :isActive', { isActive });
     }

@@ -72,6 +72,29 @@ export class ReportsController {
     );
   }
 
+  @Get('leaderboard')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  async getLeaderboard(
+    @Req() req: RequestWithUser,
+    @Query('period') period: 'weekly' | 'monthly' | 'yearly' | 'custom',
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('search') search?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return this.reportsService.getPhotographerLeaderboard(
+      period,
+      pageNum,
+      limitNum,
+      search,
+      startDate,
+      endDate,
+    );
+  }
+
   @Get('pdf/financial')
   async downloadFinancialReportPdf(
     @Req() req: RequestWithUser,

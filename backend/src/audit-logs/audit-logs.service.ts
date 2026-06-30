@@ -26,12 +26,15 @@ export class AuditLogsService {
   }
 
   async getLogs(filters: {
+    page?: number;
+    limit?: number;
     action?: string;
     userEmail?: string;
     startDate?: string;
     endDate?: string;
-  }): Promise<AuditLog[]> {
-    const { action, userEmail, startDate, endDate } = filters;
+  }) {
+    const { page = 1, limit = 10, action, userEmail, startDate, endDate } = filters;
+    const skip = (page - 1) * limit;
     const where: any = {};
 
     if (action) {
@@ -48,9 +51,19 @@ export class AuditLogsService {
       where.createdAt = Between(start, end);
     }
 
-    return this.auditLogRepository.find({
+    const [data, total] = await this.auditLogRepository.findAndCount({
       where,
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }
