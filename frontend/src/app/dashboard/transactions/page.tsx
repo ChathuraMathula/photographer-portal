@@ -6,6 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TransactionsPage() {
   const context = usePhotographerDashboardContext();
@@ -128,26 +135,28 @@ export default function TransactionsPage() {
         </div>
         <div className="w-full sm:w-auto flex gap-3">
           <div className="flex-1 sm:flex-initial">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="SUCCESS">Success</option>
-              <option value="FAILED">Declined</option>
-            </select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Statuses</SelectItem>
+                <SelectItem value="SUCCESS">Success</SelectItem>
+                <SelectItem value="FAILED">Declined</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex-1 sm:flex-initial">
-            <select
-              value={methodFilter}
-              onChange={(e) => setMethodFilter(e.target.value)}
-              className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer"
-            >
-              <option value="ALL">All Methods</option>
-              <option value="CARD">Card Payments</option>
-              <option value="CASH">Offline Cash</option>
-            </select>
+            <Select value={methodFilter} onValueChange={setMethodFilter}>
+              <SelectTrigger className="w-full h-10 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+                <SelectValue placeholder="All Methods" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Methods</SelectItem>
+                <SelectItem value="CARD">Card Payments</SelectItem>
+                <SelectItem value="CASH">Cash / Offline</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

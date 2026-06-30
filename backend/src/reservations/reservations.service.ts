@@ -100,7 +100,7 @@ export class ReservationsService {
     if (queryOptions.search) {
       const searchPattern = `%${queryOptions.search.toLowerCase()}%`;
       qb.andWhere(
-        '(LOWER(customer.firstName) LIKE :search OR LOWER(customer.lastName) LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(res.location) LIKE :search OR LOWER(res.eventType) LIKE :search OR LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search)',
+        '(LOWER(customer.firstName) LIKE :search OR LOWER(customer.lastName) LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(res.location) LIKE :search OR LOWER(res.eventType) LIKE :search OR LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search OR CAST(res.id AS text) LIKE :search)',
         { search: searchPattern },
       );
     }

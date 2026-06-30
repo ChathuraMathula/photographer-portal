@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { BookingPageLinkCard } from "./profile/BookingPageLinkCard";
 import { BiographyCard } from "./profile/BiographyCard";
 import { LocationPortfolioCard } from "./profile/LocationPortfolioCard";
-import { DepositPolicyCard } from "./profile/DepositPolicyCard";
 import { EventTypesCard } from "./profile/EventTypesCard";
 
 type Props = {
@@ -71,14 +70,6 @@ export function ProfileSettingsForm({
         onLocationChange={onLocationChange}
         portfolio={portfolio}
         onPortfolioChange={onPortfolioChange}
-      />
-
-      {/* Card 4: Default Deposit Policy */}
-      <DepositPolicyCard
-        universalDepositType={universalDepositType}
-        universalDepositValue={universalDepositValue}
-        onUniversalDepositTypeChange={onUniversalDepositTypeChange}
-        onUniversalDepositValueChange={onUniversalDepositValueChange}
       />
 
       {/* Card 5: Service Offerings & Event Types */}

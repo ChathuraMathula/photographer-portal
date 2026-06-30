@@ -29,16 +29,16 @@ const lankanLastNames = [
 const eventTypes = ['Wedding', 'Portrait', 'Engagement', 'Corporate Event', 'Newborn', 'Maternity'];
 
 const cities = [
-  { name: 'Colombo', district: 'Colombo' },
-  { name: 'Kandy', district: 'Kandy' },
-  { name: 'Galle', district: 'Galle' },
-  { name: 'Negombo', district: 'Gampaha' },
-  { name: 'Bentota', district: 'Galle' },
-  { name: 'Hikkaduwa', district: 'Galle' },
-  { name: 'Nuwara Eliya', district: 'Nuwara Eliya' },
-  { name: 'Kurunegala', district: 'Kurunegala' },
-  { name: 'Matara', district: 'Matara' },
-  { name: 'Kalutara', district: 'Kalutara' }
+  { name: 'Colombo', district: 'Colombo', lat: 6.9271, lon: 79.8612 },
+  { name: 'Kandy', district: 'Kandy', lat: 7.2906, lon: 80.6337 },
+  { name: 'Galle', district: 'Galle', lat: 6.0535, lon: 80.2210 },
+  { name: 'Negombo', district: 'Gampaha', lat: 7.2008, lon: 79.8737 },
+  { name: 'Bentota', district: 'Galle', lat: 6.4285, lon: 79.9997 },
+  { name: 'Hikkaduwa', district: 'Galle', lat: 6.1396, lon: 80.1063 },
+  { name: 'Nuwara Eliya', district: 'Nuwara Eliya', lat: 6.9497, lon: 80.7828 },
+  { name: 'Kurunegala', district: 'Kurunegala', lat: 7.4818, lon: 80.3609 },
+  { name: 'Matara', district: 'Matara', lat: 5.9549, lon: 80.5469 },
+  { name: 'Kalutara', district: 'Kalutara', lat: 6.5854, lon: 79.9607 }
 ];
 
 export async function seedSarahData(
@@ -189,6 +189,7 @@ export async function seedSarahData(
           endTime,
           eventType,
           location: `${cityObj.name} Scenic Point`,
+          locationMapLink: `https://maps.google.com/?q=${cityObj.lat + (Math.random() * 0.02 - 0.01)},${cityObj.lon + (Math.random() * 0.02 - 0.01)}`,
           city: cityObj.name,
           district: cityObj.district,
           customerNotes: `Excited for this ${eventType} shoot. Need professional lighting.`,
