@@ -126,7 +126,7 @@ export default function TransactionsPage() {
       {/* Filters Bar */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
         <div className="flex-1 w-full relative">
-          <Input
+          <input
             type="text"
             placeholder="Search by customer name, email, transaction ID or method..."
             value={searchTerm}
