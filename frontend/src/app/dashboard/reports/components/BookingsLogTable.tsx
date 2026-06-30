@@ -94,7 +94,7 @@ export function BookingsLogTable({ bookingsData, bookingsPage, setBookingsPage, 
         {totalPages > 1 && !bookingsLoading && (
           <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-850">
             <Pagination
-              currentPage={bookingsPage}
+              page={bookingsPage}
               totalPages={totalPages}
               onPageChange={setBookingsPage}
             />

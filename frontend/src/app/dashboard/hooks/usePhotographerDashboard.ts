@@ -150,6 +150,7 @@ export function usePhotographerDashboard() {
   return {
     firstName,
     role,
+    userId,
     isAuthenticated,
     activeTab,
     setActiveTab,

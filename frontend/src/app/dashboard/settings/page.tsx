@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, BellRing, ShieldAlert, Sparkles } from "lucide-react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { TopBarPreferencesCard } from "@/components/dashboard/profile/TopBarPreferencesCard";
@@ -19,6 +20,17 @@ export default function UserSettingsPage() {
   const [inAppNotifications, setInAppNotifications] = useState(true);
 
   const context = usePhotographerDashboardContext();
+
+  const [localShowManualBooking, setLocalShowManualBooking] = useState(true);
+  const [localShowAcceptBookings, setLocalShowAcceptBookings] = useState(true);
+
+  // Initialize local top bar preferences when context is available
+  useEffect(() => {
+    if (context) {
+      setLocalShowManualBooking(context.showManualBookingInTopbar);
+      setLocalShowAcceptBookings(context.showAcceptBookingsInTopbar);
+    }
+  }, [context?.showManualBookingInTopbar, context?.showAcceptBookingsInTopbar]);
 
   // Fetch current user notification settings
   useEffect(() => {
@@ -72,8 +84,19 @@ export default function UserSettingsPage() {
       );
 
       // Save TopBar preferences to photographer profile if context is available
-      if (context && context.role === "PHOTOGRAPHER") {
-        await context.handleSaveProfile({ preventDefault: () => {} } as any);
+      if (context && context.role === "PHOTOGRAPHER" && context.userId) {
+        context.setShowManualBookingInTopbar(localShowManualBooking);
+        context.setShowAcceptBookingsInTopbar(localShowAcceptBookings);
+        
+        // Directly patch the profile to avoid using stale state via handleSaveProfile
+        await context.authFetch(`${API}/photographers/${context.userId}/profile`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            showManualBookingInTopbar: localShowManualBooking,
+            showAcceptBookingsInTopbar: localShowAcceptBookings,
+          }),
+        });
       }
 
       toast.success("Settings updated successfully!");
@@ -131,11 +154,9 @@ export default function UserSettingsPage() {
                     Receive instant notifications for reservation confirmations, proposals, invoices, and message logs.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
+                <Switch
                   checked={emailNotifications}
-                  onChange={(e) => setEmailNotifications(e.target.checked)}
-                  className="h-5 w-5 rounded border-zinc-300 dark:border-zinc-800 text-primary-dark focus:ring-primary-dark cursor-pointer mt-1"
+                  onCheckedChange={setEmailNotifications}
                 />
               </div>
 
@@ -149,11 +170,9 @@ export default function UserSettingsPage() {
                     Trigger automatic background payment reminders and upcoming booking reminders for photographers and customers.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
+                <Switch
                   checked={reminderEmails}
-                  onChange={(e) => setReminderEmails(e.target.checked)}
-                  className="h-5 w-5 rounded border-zinc-300 dark:border-zinc-800 text-primary-dark focus:ring-primary-dark cursor-pointer mt-1"
+                  onCheckedChange={setReminderEmails}
                 />
               </div>
 
@@ -167,24 +186,10 @@ export default function UserSettingsPage() {
                     Enable the notification bell badge inside the dashboard toolbar to see real-time updates while active.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
+                <Switch
                   checked={inAppNotifications}
-                  onChange={(e) => setInAppNotifications(e.target.checked)}
-                  className="h-5 w-5 rounded border-zinc-300 dark:border-zinc-800 text-primary-dark focus:ring-primary-dark cursor-pointer mt-1"
+                  onCheckedChange={setInAppNotifications}
                 />
-              </div>
-
-              {/* Save Button */}
-              <div className="flex justify-end pt-2">
-                <Button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="btn btn-primary h-11 px-8 gap-2 font-semibold shadow-md cursor-pointer transition-all"
-                >
-                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {saving ? "Saving Changes..." : "Save Settings"}
-                </Button>
               </div>
 
             </CardContent>
@@ -193,12 +198,24 @@ export default function UserSettingsPage() {
           {/* Top Bar Preferences - Only for Photographers */}
           {context && context.role === "PHOTOGRAPHER" && (
             <TopBarPreferencesCard
-              showManualBookingInTopbar={context.showManualBookingInTopbar}
-              onShowManualBookingInTopbarChange={context.setShowManualBookingInTopbar}
-              showAcceptBookingsInTopbar={context.showAcceptBookingsInTopbar}
-              onShowAcceptBookingsInTopbarChange={context.setShowAcceptBookingsInTopbar}
+              showManualBookingInTopbar={localShowManualBooking}
+              onShowManualBookingInTopbarChange={setLocalShowManualBooking}
+              showAcceptBookingsInTopbar={localShowAcceptBookings}
+              onShowAcceptBookingsInTopbarChange={setLocalShowAcceptBookings}
             />
           )}
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-2">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="btn btn-primary h-11 px-8 gap-2 font-semibold shadow-md cursor-pointer transition-all"
+            >
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+              {saving ? "Saving Changes..." : "Save Settings"}
+            </Button>
+          </div>
         </div>
 
         {/* Informational Sidebar */}

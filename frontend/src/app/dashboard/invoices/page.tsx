@@ -233,7 +233,7 @@ export default function InvoicesPage() {
           {totalPages > 1 && (
             <div className="pt-4 flex justify-center">
               <Pagination
-                currentPage={currentPage}
+                page={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
               />
