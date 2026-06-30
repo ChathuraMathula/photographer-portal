@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2, BellRing, ShieldAlert, Sparkles } from "lucide-react";
+import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
+import { TopBarPreferencesCard } from "@/components/dashboard/profile/TopBarPreferencesCard";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -15,6 +17,8 @@ export default function UserSettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [reminderEmails, setReminderEmails] = useState(true);
   const [inAppNotifications, setInAppNotifications] = useState(true);
+
+  const context = usePhotographerDashboardContext();
 
   // Fetch current user notification settings
   useEffect(() => {
@@ -66,6 +70,11 @@ export default function UserSettingsPage() {
           },
         })
       );
+
+      // Save TopBar preferences to photographer profile if context is available
+      if (context && context.role === "PHOTOGRAPHER") {
+        await context.handleSaveProfile({ preventDefault: () => {} } as any);
+      }
 
       toast.success("Settings updated successfully!");
     } catch (err: any) {
@@ -180,6 +189,16 @@ export default function UserSettingsPage() {
 
             </CardContent>
           </Card>
+
+          {/* Top Bar Preferences - Only for Photographers */}
+          {context && context.role === "PHOTOGRAPHER" && (
+            <TopBarPreferencesCard
+              showManualBookingInTopbar={context.showManualBookingInTopbar}
+              onShowManualBookingInTopbarChange={context.setShowManualBookingInTopbar}
+              showAcceptBookingsInTopbar={context.showAcceptBookingsInTopbar}
+              onShowAcceptBookingsInTopbarChange={context.setShowAcceptBookingsInTopbar}
+            />
+          )}
         </div>
 
         {/* Informational Sidebar */}

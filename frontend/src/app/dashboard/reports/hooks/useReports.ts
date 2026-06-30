@@ -23,6 +23,14 @@ export type ReportData = {
   eventTypes: Array<{ name: string; count: number }>;
   packages: Array<{ name: string; count: number; revenueLkr: number }>;
   timeline: Array<{ label: string; bookings: number; revenueLkr: number }>;
+  locationData: Array<{
+    id: string;
+    eventType: string;
+    locationMapLink?: string;
+    district?: string;
+    city?: string;
+    location?: string;
+  }>;
 };
 
 export type PaginatedBookingsData = {

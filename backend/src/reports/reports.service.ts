@@ -374,6 +374,15 @@ export class ReportsService {
         .sort((a, b) => b.revenueLkr - a.revenueLkr);
     }
 
+    const locationData = reservations.map(res => ({
+      id: res.id,
+      eventType: res.eventType,
+      locationMapLink: res.locationMapLink,
+      district: res.district,
+      city: res.city,
+      location: res.location
+    }));
+
     return {
       period,
       startDateStr: startDate.toISOString().split('T')[0],
@@ -394,6 +403,7 @@ export class ReportsService {
       timeline,
       photographerLeaderboard,
       systemStats,
+      locationData,
       rawBookings: [],
     };
   }

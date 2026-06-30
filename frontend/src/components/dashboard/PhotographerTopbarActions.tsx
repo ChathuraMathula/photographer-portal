@@ -27,9 +27,9 @@ export function PhotographerTopbarActions({
   return (
     <div className="flex items-center gap-2 sm:gap-4 ml-2 sm:ml-4">
       {showAcceptBookingsInTopbar && (
-        <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-1 pr-2 pl-3 rounded-full border border-zinc-200/60 dark:border-zinc-700/60 shadow-sm hidden sm:flex">
-          <CalendarCheck className="w-3.5 h-3.5 text-zinc-500" />
-          <span className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mr-1">
+        <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-1 pr-2 pl-3 rounded-full border border-zinc-200/60 dark:border-zinc-700/60 shadow-sm">
+          <CalendarCheck className="w-3.5 h-3.5 text-zinc-500 hidden sm:block" />
+          <span className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mr-1 hidden sm:block">
             Accepting:
           </span>
           <button
