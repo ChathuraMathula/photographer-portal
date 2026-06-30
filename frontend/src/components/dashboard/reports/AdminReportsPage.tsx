@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2, Users, Download, ArrowUpRight, BarChart3, ShieldAlert } from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import { LocationAnalyticsSection } from "./location/LocationAnalyticsSection";
+import { BookingsLogTable } from "@/app/dashboard/reports/components/BookingsLogTable";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,7 @@ type AdminReportData = {
   timeline: Array<{ label: string; bookings: number; revenueLkr: number }>;
   photographerLeaderboard: LeaderboardRow[];
   systemStats: SystemStats;
+  locationData: any[];
   rawBookings: any[];
 };
 
@@ -74,6 +76,11 @@ export function AdminReportsPage() {
   const [downloadingFinancial, setDownloadingFinancial] = useState(false);
   const [downloadingBookings, setDownloadingBookings] = useState(false);
   const [downloadingLocation, setDownloadingLocation] = useState(false);
+
+  // Pagination states for bookings log
+  const [bookingsData, setBookingsData] = useState<any>(null);
+  const [bookingsPage, setBookingsPage] = useState(1);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
 
   // Helper to compute start & end date for the selected year or month
   const getPeriodDateRange = () => {
@@ -120,10 +127,37 @@ export function AdminReportsPage() {
     }
   };
 
+  const fetchBookings = async () => {
+    setBookingsLoading(true);
+    try {
+      let url = `${API}/reports/bookings?period=${period}&page=${bookingsPage}&limit=10`;
+      if (period === "custom") {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      } else if (period === "yearly" || period === "monthly") {
+        const range = getPeriodDateRange();
+        url += `&startDate=${range.start}&endDate=${range.end}`;
+      }
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch admin bookings data");
+      const json = await res.json();
+      setBookingsData(json);
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not load bookings list. Please try again.");
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (period === "custom" && (!startDate || !endDate)) return;
     fetchStats(reportData === null);
   }, [period, startDate, endDate, selectedYear, selectedMonth]);
+
+  useEffect(() => {
+    if (period === "custom" && (!startDate || !endDate)) return;
+    fetchBookings();
+  }, [period, startDate, endDate, selectedYear, selectedMonth, bookingsPage]);
 
   const handleDownloadFinancial = async () => {
     setDownloadingFinancial(true);
@@ -514,13 +548,21 @@ export function AdminReportsPage() {
         <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
           <CardContent className="p-6">
             <LocationAnalyticsSection
-              rawBookings={reportData.rawBookings as any}
+              rawBookings={reportData.locationData as any}
               title="System-wide Booking Location Analytics"
               description="Platform-wide geographic insights across all photographers — district breakdowns, city rankings, event type distribution, and exact coordinate mapping."
             />
           </CardContent>
         </Card>
       )}
+
+      {/* Bookings Log Table */}
+      <BookingsLogTable
+        bookingsData={bookingsData}
+        bookingsPage={bookingsPage}
+        setBookingsPage={setBookingsPage}
+        bookingsLoading={bookingsLoading}
+      />
     </div>
   );
 }
