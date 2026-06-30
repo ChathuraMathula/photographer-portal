@@ -53,6 +53,8 @@ export class PhotographersService {
       'universalDepositType',
       'universalDepositValue',
       'offlineMessage',
+      'showManualBookingInTopbar',
+      'showAcceptBookingsInTopbar',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),

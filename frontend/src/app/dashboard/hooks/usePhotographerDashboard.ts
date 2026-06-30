@@ -249,5 +249,9 @@ export function usePhotographerDashboard() {
     calendarReservations: reservationsState.calendarReservations,
     fetchCalendarReservations: reservationsState.fetchCalendarReservations,
     calendarLoading: reservationsState.calendarLoading,
+    showManualBookingInTopbar: profile.showManualBookingInTopbar,
+    setShowManualBookingInTopbar: profile.setShowManualBookingInTopbar,
+    showAcceptBookingsInTopbar: profile.showAcceptBookingsInTopbar,
+    setShowAcceptBookingsInTopbar: profile.setShowAcceptBookingsInTopbar,
   };
 }

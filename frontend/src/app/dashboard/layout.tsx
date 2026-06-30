@@ -8,6 +8,7 @@ import { UserRole, logout } from "@/store/slices/authSlice";
 import { PhotographerDashboardProvider, usePhotographerDashboardContext } from "./context/PhotographerDashboardContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PhotographerBanner } from "@/components/dashboard/PhotographerBanner";
+import { PhotographerTopbarActions } from "@/components/dashboard/PhotographerTopbarActions";
 import { FloatingChatWidget } from "@/components/dashboard/FloatingChatWidget";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal";
@@ -59,10 +60,11 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
     handleLogout,
     handleSendChatMessage,
     packages,
-    universalDepositType,
     universalDepositValue,
     forceOpenChat,
     setForceOpenChat,
+    showManualBookingInTopbar,
+    showAcceptBookingsInTopbar,
   } = context;
 
   const activeTab = pathname.split("/").pop() as any;
@@ -111,14 +113,17 @@ function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) 
           }}
         />
       }
-    >
-      <div className="space-y-6">
-        <PhotographerBanner
-          firstName={firstName ?? ""}
+      topbarActions={
+        <PhotographerTopbarActions
+          showAcceptBookingsInTopbar={showAcceptBookingsInTopbar}
+          showManualBookingInTopbar={showManualBookingInTopbar}
           profileAvailability={profileAvailability}
           onToggleAvailability={handleToggleAvailability}
           onAddManualBooking={() => setShowManualModal(true)}
         />
+      }
+    >
+      <div className="space-y-6">
         {children}
       </div>
 

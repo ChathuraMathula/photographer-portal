@@ -4,6 +4,8 @@ import { BiographyCard } from "./profile/BiographyCard";
 import { LocationPortfolioCard } from "./profile/LocationPortfolioCard";
 import { EventTypesCard } from "./profile/EventTypesCard";
 
+import { TopBarPreferencesCard } from "./profile/TopBarPreferencesCard";
+
 type Props = {
   bio: string;
   location: string;
@@ -25,6 +27,10 @@ type Props = {
   onUniversalDepositValueChange: (v: number) => void;
   offlineMessage: string;
   onOfflineMessageChange: (v: string) => void;
+  showManualBookingInTopbar: boolean;
+  onShowManualBookingInTopbarChange: (v: boolean) => void;
+  showAcceptBookingsInTopbar: boolean;
+  onShowAcceptBookingsInTopbarChange: (v: boolean) => void;
 };
 
 export function ProfileSettingsForm({
@@ -48,6 +54,10 @@ export function ProfileSettingsForm({
   onUniversalDepositValueChange,
   offlineMessage,
   onOfflineMessageChange,
+  showManualBookingInTopbar,
+  onShowManualBookingInTopbarChange,
+  showAcceptBookingsInTopbar,
+  onShowAcceptBookingsInTopbarChange,
 }: Props) {
   return (
     <form onSubmit={onSubmit} className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -78,6 +88,14 @@ export function ProfileSettingsForm({
         onAllowedEventTypesChange={onAllowedEventTypesChange}
         allowCustomEventTypes={allowCustomEventTypes}
         onAllowCustomEventTypesChange={onAllowCustomEventTypesChange}
+      />
+
+      {/* Card 6: Top Bar Preferences */}
+      <TopBarPreferencesCard
+        showManualBookingInTopbar={showManualBookingInTopbar}
+        onShowManualBookingInTopbarChange={onShowManualBookingInTopbarChange}
+        showAcceptBookingsInTopbar={showAcceptBookingsInTopbar}
+        onShowAcceptBookingsInTopbarChange={onShowAcceptBookingsInTopbarChange}
       />
 
       {/* Save Button */}

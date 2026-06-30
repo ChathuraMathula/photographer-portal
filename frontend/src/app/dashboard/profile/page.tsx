@@ -70,6 +70,10 @@ export default function ProfilePage() {
     setUniversalDepositValue,
     offlineMessage,
     setOfflineMessage,
+    showManualBookingInTopbar,
+    setShowManualBookingInTopbar,
+    showAcceptBookingsInTopbar,
+    setShowAcceptBookingsInTopbar,
   } = context;
 
   return (
@@ -94,6 +98,10 @@ export default function ProfilePage() {
       onUniversalDepositValueChange={setUniversalDepositValue}
       offlineMessage={offlineMessage}
       onOfflineMessageChange={setOfflineMessage}
+      showManualBookingInTopbar={showManualBookingInTopbar}
+      onShowManualBookingInTopbarChange={setShowManualBookingInTopbar}
+      showAcceptBookingsInTopbar={showAcceptBookingsInTopbar}
+      onShowAcceptBookingsInTopbarChange={setShowAcceptBookingsInTopbar}
     />
   );
 }

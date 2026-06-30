@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 
 type RawBooking = {
   id: string;
@@ -17,6 +18,17 @@ type BookingsLogTableProps = {
 };
 
 export function BookingsLogTable({ rawBookings }: BookingsLogTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // reset page if rawBookings change (e.g. date range changes)
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [rawBookings]);
+
+  const totalPages = Math.ceil(rawBookings.length / itemsPerPage);
+  const paginatedBookings = rawBookings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
       <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-850">
@@ -43,7 +55,7 @@ export function BookingsLogTable({ rawBookings }: BookingsLogTableProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
-                {rawBookings.map((res) => (
+                {paginatedBookings.map((res) => (
                   <tr key={res.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 font-semibold text-zinc-855 dark:text-zinc-200">
                       {res.clientName}
@@ -76,6 +88,15 @@ export function BookingsLogTable({ rawBookings }: BookingsLogTableProps) {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {totalPages > 1 && (
+          <div className="p-4 flex justify-center border-t border-zinc-100 dark:border-zinc-850">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </CardContent>

@@ -81,6 +81,12 @@ export class PhotographerProfile {
   @Column({ type: 'text', nullable: true })
   invoiceInstructions?: string;
 
+  @Column({ default: true })
+  showManualBookingInTopbar!: boolean;
+
+  @Column({ default: true })
+  showAcceptBookingsInTopbar!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

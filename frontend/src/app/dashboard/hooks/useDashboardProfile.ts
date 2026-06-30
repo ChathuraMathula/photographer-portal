@@ -22,6 +22,8 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
   const [universalDepositType, setUniversalDepositType] = useState("fixed");
   const [universalDepositValue, setUniversalDepositValue] = useState(5000);
   const [offlineMessage, setOfflineMessage] = useState("");
+  const [showManualBookingInTopbar, setShowManualBookingInTopbar] = useState(true);
+  const [showAcceptBookingsInTopbar, setShowAcceptBookingsInTopbar] = useState(true);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +45,8 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
               ? Math.round(universalDepositValue * 100)
               : Math.round(universalDepositValue),
           offlineMessage,
+          showManualBookingInTopbar,
+          showAcceptBookingsInTopbar,
         }),
         credentials: "include",
       });
@@ -97,6 +101,10 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
     setUniversalDepositValue,
     offlineMessage,
     setOfflineMessage,
+    showManualBookingInTopbar,
+    setShowManualBookingInTopbar,
+    showAcceptBookingsInTopbar,
+    setShowAcceptBookingsInTopbar,
     handleSaveProfile,
     handleToggleAvailability,
   };

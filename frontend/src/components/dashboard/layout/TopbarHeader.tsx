@@ -9,6 +9,7 @@ type TopbarHeaderProps = {
   setIsMobileOpen: (open: boolean) => void;
   activeLabel: string;
   notificationBell?: React.ReactNode;
+  topbarActions?: React.ReactNode;
   profileImageUrl?: string;
   userName: string;
   userRole: string;
@@ -21,6 +22,7 @@ export function TopbarHeader({
   setIsMobileOpen,
   activeLabel,
   notificationBell,
+  topbarActions,
   profileImageUrl,
   userName,
   userRole,
@@ -60,6 +62,7 @@ export function TopbarHeader({
       </div>
 
       <div className="flex items-center gap-3">
+        {topbarActions}
         {notificationBell}
         <span className="h-8 w-[1px] bg-zinc-200" />
         <div

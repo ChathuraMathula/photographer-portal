@@ -91,6 +91,8 @@ export function useDashboardDataLoader({
             : (profData.universalDepositValue ?? 500000) / 100
         );
         profile.setOfflineMessage(profData.offlineMessage || "");
+        profile.setShowManualBookingInTopbar(profData.showManualBookingInTopbar !== false);
+        profile.setShowAcceptBookingsInTopbar(profData.showAcceptBookingsInTopbar !== false);
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);

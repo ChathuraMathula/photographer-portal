@@ -34,6 +34,7 @@ type DashboardLayoutProps = {
   menuItems?: MenuItem[];
   profileImageUrl?: string;
   notificationBell?: React.ReactNode;
+  topbarActions?: React.ReactNode;
 };
 
 // ── Default photographer menu ─────────────────────────────────────────────────
@@ -60,6 +61,7 @@ export function DashboardLayout({
   menuItems,
   profileImageUrl,
   notificationBell,
+  topbarActions,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed]       = useState(false);
   const [isMobileOpen, setIsMobileOpen]     = useState(false);
@@ -143,6 +145,7 @@ export function DashboardLayout({
           setIsMobileOpen={setIsMobileOpen}
           activeLabel={activeLabel}
           notificationBell={notificationBell}
+          topbarActions={topbarActions}
           profileImageUrl={profileImageUrl}
           userName={userName}
           userRole={userRole}

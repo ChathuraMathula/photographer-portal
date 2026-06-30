@@ -6,6 +6,7 @@ import { InvoicesListTable } from "./components/InvoicesListTable";
 import { InvoiceCustomizerCard } from "./components/InvoiceCustomizerCard";
 import { toast } from "sonner";
 import { Search, DollarSign, CheckCircle2, AlertCircle } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -42,6 +43,8 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   if (!context) return null;
   const { authFetch } = context;
@@ -140,6 +143,13 @@ export default function InvoicesPage() {
     return fullName.includes(query) || email.includes(query) || eventType.includes(query) || resId.includes(query);
   });
 
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   if (loading || !settings) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
@@ -221,11 +231,21 @@ export default function InvoicesPage() {
           </div>
 
           <InvoicesListTable
-            invoices={filteredInvoices}
+            invoices={paginatedInvoices}
             onDownload={handleDownload}
             onResend={handleResend}
             resendingId={resendingId}
           />
+          
+          {totalPages > 1 && (
+            <div className="pt-4 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
