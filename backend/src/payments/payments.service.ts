@@ -484,12 +484,30 @@ export class PaymentsService {
 
     const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
 
+    // Count overall stats for this photographer
+    const statsQb = this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoin('payment.reservation', 'res')
+      .where('res.photographerId = :photographerId', { photographerId })
+      .andWhere('payment.status = :successStatus', { successStatus: PaymentStatus.SUCCESS });
+
+    const stats = await statsQb
+      .select('SUM(payment.amountInCents)', 'totalAmount')
+      .addSelect("SUM(CASE WHEN payment.cardBrand = 'Offline Payment' THEN 1 ELSE 0 END)", 'cashCount')
+      .addSelect("SUM(CASE WHEN payment.cardBrand != 'Offline Payment' THEN 1 ELSE 0 END)", 'cardCount')
+      .getRawOne();
+
     return {
       data,
       total,
       page,
       limit,
       totalPages: Math.ceil(total / limit),
+      stats: {
+        totalRevenueInCents: parseInt(stats?.totalAmount || '0', 10),
+        cashPaymentsCount: parseInt(stats?.cashCount || '0', 10),
+        cardPaymentsCount: parseInt(stats?.cardCount || '0', 10),
+      }
     };
   }
 

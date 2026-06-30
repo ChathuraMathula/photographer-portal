@@ -1,61 +1,55 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function TransactionsPage() {
   const context = usePhotographerDashboardContext();
   if (!context) return null;
 
-  const { transactions } = context;
+  const {
+    transactions,
+    transactionsPage,
+    setTransactionsPage,
+    transactionsTotalPages,
+    transactionsTotal,
+    transactionStats,
+    loadTransactions,
+  } = context;
 
   // Filter States
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("ALL"); // ALL, SUCCESS, FAILED
   const [methodFilter, setMethodFilter] = React.useState("ALL"); // ALL, CARD, CASH
 
-  // Compute stats
-  const successfulTransactions = transactions.filter((t) => t.status === "SUCCESS");
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setTransactionsPage(1);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
-  const totalCollectedCents = successfulTransactions.reduce((acc, t) => acc + (t.amountInCents || 0), 0);
-  const totalCollectedLkr = totalCollectedCents / 100;
+  useEffect(() => {
+    loadTransactions({
+      page: transactionsPage,
+      search: debouncedSearch,
+      status: statusFilter,
+      method: methodFilter,
+    });
+  }, [transactionsPage, debouncedSearch, statusFilter, methodFilter]);
 
-  const cardPaymentsCount = successfulTransactions.filter(
-    (t) => t.cardBrand !== "Offline Payment"
-  ).length;
+  // Compute stats from server aggregations
+  const totalCollectedLkr = (transactionStats?.totalRevenueInCents || 0) / 100;
+  const cardPaymentsCount = transactionStats?.cardPaymentsCount || 0;
+  const cashPaymentsCount = transactionStats?.cashPaymentsCount || 0;
 
-  const cashPaymentsCount = successfulTransactions.filter(
-    (t) => t.cardBrand === "Offline Payment"
-  ).length;
-
-  // Filter logic
-  const filteredTransactions = transactions.filter((txn) => {
-    const custName = txn.reservation?.customer
-      ? `${txn.reservation.customer.firstName} ${txn.reservation.customer.lastName}`.toLowerCase()
-      : "manual client";
-    const email = (txn.reservation?.customer?.email || "").toLowerCase();
-    const txnId = (txn.transactionId || "").toLowerCase();
-    const cardBrand = (txn.cardBrand || "").toLowerCase();
-    
-    const matchesSearch = 
-      custName.includes(searchTerm.toLowerCase()) ||
-      email.includes(searchTerm.toLowerCase()) ||
-      txnId.includes(searchTerm.toLowerCase()) ||
-      cardBrand.includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "ALL" || txn.status === statusFilter;
-
-    const isOffline = txn.cardBrand === "Offline Payment";
-    const matchesMethod =
-      methodFilter === "ALL" ||
-      (methodFilter === "CASH" && isOffline) ||
-      (methodFilter === "CARD" && !isOffline);
-
-    return matchesSearch && matchesStatus && matchesMethod;
-  });
+  // Filter logic: backend handles filter, so filteredTransactions is just transactions
+  const filteredTransactions = transactions;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -79,7 +73,7 @@ export default function TransactionsPage() {
               LKR {totalCollectedLkr.toLocaleString()}
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              From {successfulTransactions.length} successful bookings
+              From {cardPaymentsCount + cashPaymentsCount} successful bookings
             </p>
           </CardContent>
         </Card>
@@ -257,6 +251,32 @@ export default function TransactionsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {transactionsTotalPages > 1 && (
+        <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
+          <div className="text-body-caption text-zinc-500">
+            Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsPage}</span> of{" "}
+            <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsTotalPages}</span> ({transactionsTotal} total transactions)
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setTransactionsPage((p) => Math.max(1, p - 1))}
+              disabled={transactionsPage === 1}
+              className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={() => setTransactionsPage((p) => Math.min(transactionsTotalPages, p + 1))}
+              disabled={transactionsPage === transactionsTotalPages}
+              className="h-9 px-4 text-body-caption border border-zinc-200 rounded-lg disabled:opacity-50"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

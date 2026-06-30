@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
 
@@ -8,7 +9,8 @@ export default function CalendarPage() {
   if (!context) return null;
 
   const {
-    reservations,
+    calendarReservations,
+    fetchCalendarReservations,
     currentDate,
     setCurrentDate,
     setCalendarSelectedRes,
@@ -16,9 +18,18 @@ export default function CalendarPage() {
     setShowManualModal,
   } = context;
 
+  useEffect(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const startStr = `${year}-${String(month).padStart(2, "0")}-01`;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const endStr = `${year}-${String(month).padStart(2, "0")}-${String(daysInMonth).padStart(2, "0")}`;
+    fetchCalendarReservations(startStr, endStr);
+  }, [currentDate]);
+
   return (
     <BookingCalendar
-      reservations={reservations}
+      reservations={calendarReservations}
       currentDate={currentDate}
       onPrevMonth={() =>
         setCurrentDate(

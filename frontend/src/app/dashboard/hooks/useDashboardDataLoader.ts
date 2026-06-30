@@ -23,12 +23,35 @@ export function useDashboardDataLoader({
   profile,
 }: Props) {
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactionsPage, setTransactionsPage] = useState(1);
+  const [transactionsTotalPages, setTransactionsTotalPages] = useState(1);
+  const [transactionsTotal, setTransactionsTotal] = useState(0);
+  const [transactionStats, setTransactionStats] = useState({
+    totalRevenueInCents: 0,
+    cashPaymentsCount: 0,
+    cardPaymentsCount: 0,
+  });
 
-  const loadTransactions = async () => {
+  const loadTransactions = async (paramsObj?: { page?: number; search?: string; status?: string; method?: string }) => {
     try {
-      const res = await authFetch(`${API}/payments/photographer`, { credentials: "include" });
+      const pageNum = paramsObj?.page || 1;
+      const params = new URLSearchParams();
+      params.append("page", pageNum.toString());
+      params.append("limit", "15");
+      if (paramsObj?.search) params.append("search", paramsObj.search);
+      if (paramsObj?.status && paramsObj.status !== "ALL") params.append("status", paramsObj.status);
+      if (paramsObj?.method && paramsObj.method !== "ALL") params.append("method", paramsObj.method);
+
+      const res = await authFetch(`${API}/payments/photographer?${params.toString()}`, { credentials: "include" });
       if (res.ok) {
-        setTransactions(await res.json());
+        const data = await res.json();
+        setTransactions(data.data || []);
+        setTransactionsPage(data.page || 1);
+        setTransactionsTotalPages(data.totalPages || 1);
+        setTransactionsTotal(data.total || 0);
+        if (data.stats) {
+          setTransactionStats(data.stats);
+        }
       }
     } catch (err) {
       console.error("Error loading transactions:", err);
@@ -39,16 +62,11 @@ export function useDashboardDataLoader({
     if (role !== UserRole.PHOTOGRAPHER) return;
     if (!userId || userId === "null" || userId === "undefined") return;
     try {
-      const [resRes, pkgRes, profRes] = await Promise.all([
-        authFetch(`${API}/reservations`, { credentials: "include" }),
+      const [pkgRes, profRes] = await Promise.all([
         authFetch(`${API}/packages`, { credentials: "include" }),
         authFetch(`${API}/photographers/${userId}`, { credentials: "include" }),
       ]);
 
-      if (resRes.ok) {
-        const resData = await resRes.json();
-        reservationsState.setReservations(resData);
-      }
       if (pkgRes.ok) {
         packagesState.setPackages(await pkgRes.json());
       }
@@ -70,7 +88,6 @@ export function useDashboardDataLoader({
         );
         profile.setOfflineMessage(profData.offlineMessage || "");
       }
-      await loadTransactions();
     } catch (err) {
       console.error("Error loading photographer data:", err);
     }
@@ -79,6 +96,14 @@ export function useDashboardDataLoader({
   return {
     transactions,
     setTransactions,
+    transactionsPage,
+    setTransactionsPage,
+    transactionsTotalPages,
+    setTransactionsTotalPages,
+    transactionsTotal,
+    setTransactionsTotal,
+    transactionStats,
+    setTransactionStats,
     loadTransactions,
     loadPhotographerData,
   };

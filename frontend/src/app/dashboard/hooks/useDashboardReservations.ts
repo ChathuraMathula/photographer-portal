@@ -26,6 +26,69 @@ export function useDashboardReservations({
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
 
+  // Pagination & Filters
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [loading, setLoading] = useState(false);
+
+  // Calendar specific state to prevent pulling all 100k
+  const [calendarReservations, setCalendarReservations] = useState<Reservation[]>([]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const fetchReservations = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+      if (debouncedSearch) params.append("search", debouncedSearch);
+      if (statusFilter !== "ALL") params.append("status", statusFilter);
+
+      const res = await authFetch(`${API}/reservations?${params.toString()}`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setReservations(data.data || []);
+        setTotalPages(data.totalPages || 1);
+        setTotal(data.total || 0);
+      }
+    } catch (err) {
+      console.error("Error loading reservations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCalendarReservations = async (startStr: string, endStr: string) => {
+    try {
+      const params = new URLSearchParams();
+      params.append("startDate", startStr);
+      params.append("endDate", endStr);
+      const res = await authFetch(`${API}/reservations?${params.toString()}`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setCalendarReservations(data || []);
+      }
+    } catch (err) {
+      console.error("Error loading calendar reservations:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [page, debouncedSearch, statusFilter]);
+
   // Proposal / rejection form states
   const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);
   const [quotationNotes, setQuotationNotes] = useState("");
@@ -152,6 +215,7 @@ export function useDashboardReservations({
       setQuotationNotes("");
       setCustomPackage(null);
       setIsCustomPackageSelected(false);
+      fetchReservations();
       await loadPhotographerData();
       setSelectedRes(data);
       toast.success("Proposal sent successfully to customer email!");
@@ -173,6 +237,7 @@ export function useDashboardReservations({
       if (!res.ok) throw new Error(data.message || "Failed to reject");
       setRejectionReason("");
       setShowRejectForm(false);
+      fetchReservations();
       await loadPhotographerData();
       setSelectedRes(data);
       toast.success("Request rejected professionally.");
@@ -205,5 +270,17 @@ export function useDashboardReservations({
     setCustomPackageDeposit,
     isCustomPackageSelected,
     setIsCustomPackageSelected,
+    fetchReservations,
+    page,
+    setPage,
+    totalPages,
+    total,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    loading,
+    calendarReservations,
+    fetchCalendarReservations,
   };
 }

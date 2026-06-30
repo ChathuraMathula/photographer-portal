@@ -30,6 +30,15 @@ export default function ReservationsPage() {
     setCustomPackageDeposit,
     isCustomPackageSelected,
     setIsCustomPackageSelected,
+    page,
+    setPage,
+    totalPages,
+    total,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    reservationsLoading,
   } = context;
 
   return (
@@ -56,6 +65,15 @@ export default function ReservationsPage() {
       setCustomPackageDeposit={setCustomPackageDeposit}
       isCustomPackageSelected={isCustomPackageSelected}
       setIsCustomPackageSelected={setIsCustomPackageSelected}
+      page={page}
+      setPage={setPage}
+      totalPages={totalPages}
+      total={total}
+      search={search}
+      setSearch={setSearch}
+      statusFilter={statusFilter}
+      setStatusFilter={setStatusFilter}
+      reservationsLoading={reservationsLoading}
     />
   );
 }

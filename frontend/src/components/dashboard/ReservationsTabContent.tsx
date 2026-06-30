@@ -28,6 +28,15 @@ type Props = {
   setCustomPackageDeposit: (val: string) => void;
   isCustomPackageSelected: boolean;
   setIsCustomPackageSelected: (val: boolean) => void;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  total: number;
+  search: string;
+  setSearch: (val: string) => void;
+  statusFilter: string;
+  setStatusFilter: (val: string) => void;
+  reservationsLoading: boolean;
 };
 
 export function ReservationsTabContent({
@@ -53,6 +62,15 @@ export function ReservationsTabContent({
   setCustomPackageDeposit,
   isCustomPackageSelected,
   setIsCustomPackageSelected,
+  page,
+  setPage,
+  totalPages,
+  total,
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
+  reservationsLoading,
 }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -68,6 +86,15 @@ export function ReservationsTabContent({
               window.history.replaceState(null, "", `/dashboard/reservations?id=${res.id}`);
             }
           }}
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+          total={total}
+          search={search}
+          setSearch={setSearch}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          loading={reservationsLoading}
         />
       </div>
 
