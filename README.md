@@ -31,9 +31,8 @@ A reservation management system for photographers. Super Admins manage photograp
 
 ```
 photographer-portal/
-├── docker-compose.yml       # PostgreSQL + pgAdmin + Maildev
+├── docker-compose.yml       # PostgreSQL, pgAdmin, Maildev, RabbitMQ, Elasticsearch
 ├── backend/                 # NestJS API (port 4001)
-│   ├── docker-compose.yml   # [NEW] RabbitMQ (ports 5672, 15672)
 │   ├── src/
 │   │   ├── auth/            # JWT auth, guards, strategies
 │   │   ├── bookings/        # Public booking flow (no auth)
@@ -100,7 +99,7 @@ photographer-portal/
 
 ## Getting Started
 
-### 1. Start the services
+To start the database, messaging queues, and email server locally, use Docker Compose from the root directory:
 
 ```bash
 docker compose up -d
@@ -110,15 +109,6 @@ This starts:
 - **PostgreSQL 16** on `localhost:5433`
 - **pgAdmin 4** (DB UI) on `http://localhost:5050`
 - **Maildev** (Local SMTP Web UI) on `http://localhost:1080` (SMTP port `1025`)
-
-### Start RabbitMQ (Backend Infrastructure)
-
-```bash
-cd backend
-docker compose up -d
-```
-
-This starts:
 - **RabbitMQ Message Broker** on `localhost:5672`
 - **RabbitMQ Management UI** on `http://localhost:15672`
   - **Login**: `guest` / `guest`

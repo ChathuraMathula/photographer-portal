@@ -1,4 +1,4 @@
-﻿/**
+/**
  * start-dev.js
  * Sequential dev startup:
  *   1. Kill any processes holding dev ports (calls existing kill-ports.js)
@@ -72,8 +72,8 @@ async function main() {
     log('SETUP', 'kill-ports.js not found, skipping.');
   }
 
-  // 2. Start docker DB (non-blocking)
-  var dockerProc = spawnProc('DOCKER', 'docker-compose', ['up', '-d'], ROOT);
+  // 2. Start root docker DB (non-blocking)
+  var dockerRootProc = spawnProc('DOCKER-ROOT', 'docker-compose', ['up', '-d'], ROOT);
 
   // 3. Start backend
   log('BACKEND', 'Starting NestJS backend...');
@@ -97,7 +97,7 @@ async function main() {
   // Graceful shutdown on Ctrl+C
   function shutdown() {
     log('SHUTDOWN', 'Shutting down all processes...');
-    [backendProc, frontendProc, dockerProc].forEach(function(p) {
+    [backendProc, frontendProc, dockerRootProc].forEach(function(p) {
       try { if (p && !p.killed) p.kill(); } catch (_) {}
     });
     process.exit(0);
