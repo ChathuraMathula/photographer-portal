@@ -20,11 +20,7 @@ export class AnalyticsSyncSubscriber implements EntitySubscriberInterface {
     dataSource.subscribers.push(this);
   }
 
-  listenTo() {
-    // We want to listen to both, but typeorm subscriber listenTo can only return one entity or 'any'.
-    // We will listen to any and filter in the methods.
-    return 'all' as any; 
-  }
+
 
   async afterInsert(event: InsertEvent<any>) {
     await this.handleEvent(event.entity);
