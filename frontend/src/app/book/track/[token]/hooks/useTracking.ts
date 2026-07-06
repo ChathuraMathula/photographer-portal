@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { io, Socket } from "socket.io-client";
-import { toast } from "sonner";
+import { Socket } from "socket.io-client";
 
 import { type TrackingReservation, type ChatMessage } from "@/types";
+import { getDeadlineText } from "../utils/dateUtils";
+import { useTrackingSocket } from "./useTrackingSocket";
+import { useTrackingActions } from "./useTrackingActions";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -29,6 +31,7 @@ export function useTracking() {
 
   const [selectedPkgId, setSelectedPkgId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   // 1. Check localStorage for pre-verified email
   useEffect(() => {
@@ -62,146 +65,31 @@ export function useTracking() {
       });
   }, [token, verifiedEmail]);
 
-  // 3. Chat + Socket.io
-  useEffect(() => {
-    if (!reservation?.id || !verifiedEmail || !token) return;
-    fetch(`${API}/bookings/track/${token}/messages?email=${encodeURIComponent(verifiedEmail)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setMessages(data);
-        scrollToBottom();
-      })
-      .catch(console.error);
-
-    const socket = io(API);
-    socketRef.current = socket;
-    socket.emit("joinReservation", { reservationId: reservation.id });
-
-    socket.on("message", (msg: ChatMessage) => {
-      setMessages((prev) => [...prev, msg]);
-      scrollToBottom();
-    });
-
-    socket.on("reservationUpdated", (updatedRes: any) => {
-      setReservation((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          status: updatedRes.status,
-          advancePaymentPriceInCents: updatedRes.advancePaymentPriceInCents,
-          totalAmountInCents: updatedRes.totalAmountInCents,
-          totalPaidInCents: updatedRes.totalPaidInCents,
-          quotationNotes: updatedRes.quotationNotes,
-          clientSelectedPackageId: updatedRes.clientSelectedPackageId,
-          selectedPackages: updatedRes.selectedPackages,
-          paymentDeadline: updatedRes.paymentDeadline,
-          rejectionReason: updatedRes.rejectionReason,
-        };
-      });
-    });
-
-    socket.on("transactionLogged", () => {
-      fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Could not refetch");
-          return res.json() as Promise<TrackingReservation>;
-        })
-        .then((data) => {
-          setReservation(data);
-        })
-        .catch(console.error);
-    });
-
-    return () => {
-      socket.emit("leaveReservation", { reservationId: reservation.id });
-      socket.disconnect();
-    };
-  }, [reservation?.id, verifiedEmail, token]);
-
   const scrollToBottom = () => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const handleVerifyEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setVerifying(true);
-    setVerificationError("");
-    try {
-      const res = await fetch(`${API}/bookings/track/${token}/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailInput }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Email verification failed");
-      localStorage.setItem(`verified_email_res_${token}`, emailInput);
-      setVerifiedEmail(emailInput);
-    } catch (err: any) {
-      setVerificationError(err.message || "Verification failed");
-      setVerifying(false);
-    }
-  };
+  // 3. Chat + Socket.io
+  useTrackingSocket(
+    reservation,
+    verifiedEmail,
+    token,
+    setMessages,
+    setReservation,
+    socketRef,
+    scrollToBottom
+  );
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!messageText.trim() || !verifiedEmail || !token) return;
-    try {
-      const text = messageText;
-      setMessageText("");
-      await fetch(`${API}/bookings/track/${token}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifiedEmail, content: text }),
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleConfirmReservation = async () => {
-    if (!selectedPkgId || !verifiedEmail || !token) return;
-    setConfirming(true);
-    try {
-      const res = await fetch(`${API}/bookings/track/${token}/confirm`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifiedEmail, packageId: selectedPkgId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Confirmation failed");
-      setReservation((prev) =>
-        prev ? { ...prev, status: "CONFIRMED", clientSelectedPackageId: selectedPkgId } : null
-      );
-      setConfirming(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to confirm reservation");
-      setConfirming(false);
-    }
-  };
-
-  const [cancelling, setCancelling] = useState(false);
-
-  const handleCancelReservation = async () => {
-    if (!verifiedEmail || !token) return;
-    setCancelling(true);
-    try {
-      const res = await fetch(`${API}/bookings/track/${token}/cancel`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifiedEmail }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Cancellation failed");
-      setReservation((prev) =>
-        prev ? { ...prev, status: "CANCELLED" } : null
-      );
-      setCancelling(false);
-      toast.success("Reservation cancelled successfully!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to cancel reservation");
-      setCancelling(false);
-    }
-  };
+  const actions = useTrackingActions(
+    token,
+    verifiedEmail,
+    setVerifiedEmail,
+    setVerificationError,
+    setVerifying,
+    setReservation,
+    setConfirming,
+    setCancelling
+  );
 
   const refetchReservation = () => {
     if (!token || !verifiedEmail) return;
@@ -215,16 +103,6 @@ export function useTracking() {
         if (data.clientSelectedPackageId) setSelectedPkgId(data.clientSelectedPackageId);
       })
       .catch(console.error);
-  };
-
-  const getDeadlineText = (deadlineStr?: string) => {
-    if (!deadlineStr) return "";
-    const deadline = new Date(deadlineStr);
-    const diffMs = deadline.getTime() - Date.now();
-    if (diffMs <= 0) return "Expired";
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    return `${diffHours}h ${diffMins}m remaining`;
   };
 
   return {
@@ -247,10 +125,17 @@ export function useTracking() {
     setSelectedPkgId,
     confirming,
     cancelling,
-    handleVerifyEmail,
-    handleSendMessage,
-    handleConfirmReservation,
-    handleCancelReservation,
+    handleVerifyEmail: (e: React.FormEvent) => {
+      e.preventDefault();
+      actions.handleVerifyEmail(emailInput);
+    },
+    handleSendMessage: (e: React.FormEvent) => {
+      e.preventDefault();
+      actions.handleSendMessage(messageText);
+      setMessageText("");
+    },
+    handleConfirmReservation: () => actions.handleConfirmReservation(selectedPkgId),
+    handleCancelReservation: actions.handleCancelReservation,
     getDeadlineText,
     setReservation,
     refetchReservation,

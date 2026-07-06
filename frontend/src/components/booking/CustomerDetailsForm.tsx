@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { type FormikProps } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { FieldError } from "@/components/common/FieldError";
 import { type AvailabilityValues } from "./AvailabilityForm";
 import { NominatimSelect } from "@/components/common/NominatimSelect";
 import { OSMMapPicker } from "@/components/common/OSMMapPicker";
+import { useBookingGeocoding } from "./hooks/useBookingGeocoding";
 
 export type CustomerDetailsValues = {
   firstName: string;
@@ -36,8 +37,7 @@ type Props = {
 };
 
 export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Props) {
-  const [geocodingStatus, setGeocodingStatus] = useState<string>("");
-
+  const { geocodingStatus, fetchCityDistrictFromCoords, fetchCoordsFromCityDistrict } = useBookingGeocoding();
 
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
@@ -171,23 +171,11 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
                 formik.setFieldValue("city", city);
                 formik.setFieldValue("district", district);
                 // Fallback: If no coordinates entered, fetch the selected city center coordinates to auto-generate the map link
-                try {
-                  const query = [city, district, "Sri Lanka"].filter(Boolean).join(", ");
-                  const res = await fetch(
-                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&accept-language=en`
-                  );
-                  if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.length > 0) {
-                      const lat = parseFloat(data[0].lat);
-                      const lon = parseFloat(data[0].lon);
-                      if (!isNaN(lat) && !isNaN(lon) && !formik.values.coordinates) {
-                        formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
-                      }
-                    }
+                if (!formik.values.coordinates) {
+                  const coords = await fetchCoordsFromCityDistrict(city, district);
+                  if (coords) {
+                    formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${coords.lat},${coords.lon}`);
                   }
-                } catch (err) {
-                  console.error("City center search fallback failed", err);
                 }
               }}
               error={(formik.touched.city && formik.errors.city) || (formik.touched.district && formik.errors.district) ? "Error" : undefined}
@@ -215,28 +203,10 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
                   if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
                     formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
                     
-                    // Reverse geocode to find city and district
-                    setGeocodingStatus("Resolving nearest city & district from coordinates...");
-                    try {
-                      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`);
-                      if (geoRes.ok) {
-                        const geoJson = await geoRes.json();
-                        const addr = geoJson.address || {};
-                        const resCity = addr.city || addr.town || addr.suburb || addr.village || addr.neighbourhood || addr.hamlet || "";
-                        const resDistrict = addr.county || addr.state || "";
-                        if (resCity && resDistrict) {
-                          formik.setFieldValue("city", resCity);
-                          formik.setFieldValue("district", resDistrict);
-                          setGeocodingStatus("City & District auto-detected from coordinates. Please define the exact Venue details.");
-                        } else {
-                          setGeocodingStatus("");
-                        }
-                      } else {
-                        setGeocodingStatus("");
-                      }
-                    } catch (err) {
-                      console.error("Reverse geocoding failed", err);
-                      setGeocodingStatus("");
+                    const res = await fetchCityDistrictFromCoords(lat, lon);
+                    if (res) {
+                      formik.setFieldValue("city", res.city);
+                      formik.setFieldValue("district", res.district);
                     }
                   }
                 }
@@ -277,28 +247,10 @@ export function CustomerDetailsForm({ formik, availabilityChecked, onBack }: Pro
                 formik.setFieldValue("locationMapLink", `https://www.google.com/maps?q=${lat},${lon}`);
                 formik.setFieldValue("coordinates", `${lat.toFixed(7)}, ${lon.toFixed(7)}`);
                 
-                // Reverse geocode to find city and district
-                setGeocodingStatus("Resolving nearest city & district from map marker...");
-                try {
-                  const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`);
-                  if (geoRes.ok) {
-                    const geoJson = await geoRes.json();
-                    const addr = geoJson.address || {};
-                    const resCity = addr.city || addr.town || addr.suburb || addr.village || addr.neighbourhood || addr.hamlet || "";
-                    const resDistrict = addr.county || addr.state || "";
-                    if (resCity && resDistrict) {
-                      formik.setFieldValue("city", resCity);
-                      formik.setFieldValue("district", resDistrict);
-                      setGeocodingStatus("City & District auto-detected from map. Please define the exact Venue details.");
-                    } else {
-                      setGeocodingStatus("");
-                    }
-                  } else {
-                    setGeocodingStatus("");
-                  }
-                } catch (err) {
-                  console.error("Reverse geocoding failed", err);
-                  setGeocodingStatus("");
+                const res = await fetchCityDistrictFromCoords(lat, lon);
+                if (res) {
+                  formik.setFieldValue("city", res.city);
+                  formik.setFieldValue("district", res.district);
                 }
               }}
               height="250px"
