@@ -1,20 +1,25 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { ChatWorkerGateway } from './chat-worker.gateway';
 
 @Injectable()
 export class ChatGateway {
   constructor(
-    @Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy,
+    @Inject(forwardRef(() => ChatWorkerGateway))
+    private readonly chatWorker: ChatWorkerGateway,
   ) {}
 
   // Proxy object that mimics Socket.IO's Server API for emitting events
-  public server = {
-    to: (room: string) => ({
-      emit: (event: string, data: any) => {
-        this.client.emit('chat.broadcast', { room, event, data });
-      },
-    }),
-  };
+  public get server() {
+    return {
+      to: (room: string) => ({
+        emit: (event: string, data: any) => {
+          if (this.chatWorker?.server) {
+            this.chatWorker.server.to(room).emit(event, data);
+          }
+        },
+      }),
+    };
+  }
 
   broadcastAvailabilityChange(
     bookingSlug: string,
@@ -23,16 +28,23 @@ export class ChatGateway {
     endTime: string,
     available: boolean,
   ) {
-    this.client.emit('chat.availabilityChange', {
-      bookingSlug,
-      date,
-      startTime,
-      endTime,
-      available,
-    });
+    if (this.chatWorker?.server) {
+      this.chatWorker.server
+        .to(`booking_${bookingSlug}`)
+        .emit('availabilityChange', {
+          date,
+          startTime,
+          endTime,
+          available,
+        });
+    }
   }
 
   broadcastProfileUpdate(bookingSlug: string, profileData: any) {
-    this.client.emit('chat.profileUpdate', { bookingSlug, profileData });
+    if (this.chatWorker?.server) {
+      this.chatWorker.server
+        .to(`booking_${bookingSlug}`)
+        .emit('profileUpdated', profileData);
+    }
   }
 }

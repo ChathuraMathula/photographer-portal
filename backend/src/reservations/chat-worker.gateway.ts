@@ -12,7 +12,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { Reservation } from '../entities/reservation.entity';
-import { ChatGateway } from './chat.gateway';
 
 @WebSocketGateway({
   cors: {
@@ -28,7 +27,6 @@ export class ChatWorkerGateway implements OnGatewayConnection, OnGatewayDisconne
     private messageRepository: Repository<Message>,
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
-    private readonly chatGatewayProducer: ChatGateway,
   ) {}
 
   handleConnection(client: Socket) {
@@ -86,8 +84,8 @@ export class ChatWorkerGateway implements OnGatewayConnection, OnGatewayDisconne
     });
     await this.messageRepository.save(message);
 
-    // Route through RabbitMQ so all instances receive the message
-    this.chatGatewayProducer.server
+    // Route directly
+    this.server
       .to(`reservation_${data.reservationId}`)
       .emit('message', message);
 
@@ -95,7 +93,7 @@ export class ChatWorkerGateway implements OnGatewayConnection, OnGatewayDisconne
       id: data.reservationId,
     });
     if (reservation) {
-      this.chatGatewayProducer.server
+      this.server
         .to(`photographer_${reservation.photographerId}`)
         .emit('messageReceived', { reservationId: reservation.id, message });
     }
