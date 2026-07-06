@@ -164,7 +164,7 @@ export default function UserManagementPage() {
         <div className="text-center py-12 text-red-500">{error}</div>
       ) : (
         <div className="space-y-4">
-          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} />
+          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} loggedInRole={loggedInRole as UserRole} />
           
           {/* Pagination Controls */}
           {totalPages > 1 && (

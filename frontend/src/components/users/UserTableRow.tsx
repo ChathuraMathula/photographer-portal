@@ -4,7 +4,7 @@ import { UserRole } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Shield, Camera, CheckCircle, XCircle, Edit2 } from "lucide-react";
 import { ConfirmationModal } from "@/components/common/ConfirmationModal";
-import { EditUserSlugModal } from "./EditUserSlugModal";
+import { EditUserDetailsModal } from "./EditUserDetailsModal";
 
 type Props = {
   user: UserAccount;
@@ -37,6 +37,8 @@ export function UserTableRow({ user, onToggleActive, loggedInUserId, loggedInRol
   const [showConfirm, setShowConfirm] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [currentFirstName, setCurrentFirstName] = useState(user.firstName);
+  const [currentLastName, setCurrentLastName] = useState(user.lastName);
   const [currentSlug, setCurrentSlug] = useState(user.profile?.bookingSlug || "");
 
   const isDeactivating = user.isActive;
@@ -56,8 +58,10 @@ export function UserTableRow({ user, onToggleActive, loggedInUserId, loggedInRol
   return (
     <>
       <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 dark:border-zinc-800 dark:hover:bg-zinc-900/20">
-        <td className="p-4 text-body-small-s font-semibold text-zinc-950 dark:text-white">
-          {user.firstName} {user.lastName}
+        <td className="p-4 text-body-small-s">
+          <span className="font-semibold text-zinc-900 dark:text-white">
+            {currentFirstName} {currentLastName}
+          </span>
         </td>
         <td className="p-4 text-body-small-s text-zinc-600 dark:text-zinc-350">{user.email}</td>
         <td className="p-4">
@@ -135,11 +139,13 @@ export function UserTableRow({ user, onToggleActive, loggedInUserId, loggedInRol
       )}
 
       {showEditModal && (
-        <EditUserSlugModal
+        <EditUserDetailsModal
           user={user}
           onClose={() => setShowEditModal(false)}
-          onSuccess={(newSlug) => {
-            setCurrentSlug(newSlug);
+          onSuccess={(updatedUser) => {
+            setCurrentFirstName(updatedUser.firstName);
+            setCurrentLastName(updatedUser.lastName);
+            setCurrentSlug(updatedUser.bookingSlug || "");
             setShowEditModal(false);
           }}
         />

@@ -9,18 +9,26 @@ import { type UserAccount } from "@/types";
 type Props = {
   user: UserAccount;
   onClose: () => void;
-  onSuccess: (newSlug: string) => void;
+  onSuccess: (updatedUser: { firstName: string; lastName: string; bookingSlug: string }) => void;
 };
 
-export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
+export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
+  const [firstName, setFirstName] = useState(user.firstName || "");
+  const [lastName, setLastName] = useState(user.lastName || "");
   const [slug, setSlug] = useState(user.profile?.bookingSlug || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!slug.trim()) {
-      setError("Slug cannot be empty.");
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("First and Last name cannot be empty.");
+      return;
+    }
+    
+    // For photographers, slug is required. For others, it might be empty
+    if (user.role === "PHOTOGRAPHER" && !slug.trim()) {
+      setError("Slug cannot be empty for photographers.");
       return;
     }
 
@@ -29,10 +37,14 @@ export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
 
     try {
       const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-      const res = await fetch(`${API}/users/${user.id}/slug`, {
+      const res = await fetch(`${API}/users/${user.id}/details`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingSlug: slug }),
+        body: JSON.stringify({ 
+          firstName, 
+          lastName, 
+          bookingSlug: slug 
+        }),
         credentials: "include",
       });
 
@@ -40,14 +52,14 @@ export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
         if (res.status === 409) {
           setError("This booking slug is already taken. Please choose another one.");
         } else {
-          setError("Failed to update slug.");
+          setError("Failed to update user details.");
         }
         return;
       }
 
       const data = await res.json();
-      toast.success("Slug updated successfully!");
-      onSuccess(data.bookingSlug);
+      toast.success("User details updated successfully!");
+      onSuccess(data);
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred.");
@@ -62,7 +74,7 @@ export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
         <div className="flex items-center justify-between border-b px-6 py-4 dark:border-zinc-800">
           <h2 className="text-title-medium font-bold text-primary-dark dark:text-white flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-indigo-500" />
-            Edit Booking Slug
+            Edit User Details
           </h2>
           <Button
             type="button"
@@ -83,21 +95,48 @@ export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="bookingSlug" className="text-body-small-s font-semibold">
-                Photographer Booking Slug
-              </Label>
-              <Input
-                id="bookingSlug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="e.g. john-doe"
-                className="h-11 rounded-xl"
-              />
-              <p className="text-body-caption text-zinc-500 dark:text-zinc-400">
-                This forms the booking URL (e.g. /book/{slug || "slug"})
-              </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-body-small-s font-semibold">
+                  First Name
+                </Label>
+                <Input
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="h-11 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-body-small-s font-semibold">
+                  Last Name
+                </Label>
+                <Input
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="h-11 rounded-xl"
+                />
+              </div>
             </div>
+
+            {user.role === "PHOTOGRAPHER" && (
+              <div className="space-y-2">
+                <Label htmlFor="bookingSlug" className="text-body-small-s font-semibold">
+                  Photographer Booking Slug
+                </Label>
+                <Input
+                  id="bookingSlug"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="e.g. john-doe"
+                  className="h-11 rounded-xl"
+                />
+                <p className="text-body-caption text-zinc-500 dark:text-zinc-400">
+                  This forms the booking URL (e.g. /book/{slug || "slug"})
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3">
@@ -111,11 +150,11 @@ export function EditUserSlugModal({ user, onClose, onSuccess }: Props) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !slug}
+              disabled={isSubmitting || !firstName || !lastName || (user.role === "PHOTOGRAPHER" && !slug)}
               className="h-11 py-0 shadow-sm btn-primary gap-2"
             >
               <Save className="h-4 w-4" />
-              {isSubmitting ? "Saving..." : "Save Slug"}
+              {isSubmitting ? "Saving..." : "Save Details"}
             </Button>
           </div>
         </form>

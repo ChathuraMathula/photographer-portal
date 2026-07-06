@@ -241,28 +241,46 @@ export class UsersService {
     return this.profileService.updateSettings(userId, updates);
   }
 
-  async updateUserSlug(userId: string, newSlug: string) {
-    const profile = await this.profileRepository.findOneBy({ userId });
-    if (!profile) {
-      throw new NotFoundException('Photographer profile not found');
+  async updateUserDetails(
+    userId: string,
+    updates: { firstName?: string; lastName?: string; bookingSlug?: string },
+  ) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    if (profile.bookingSlug !== newSlug) {
-      const existing = await this.profileRepository.findOneBy({
-        bookingSlug: newSlug,
-      });
-      if (existing) {
-        throw new ConflictException('Booking slug is already in use');
+    if (updates.firstName) user.firstName = updates.firstName;
+    if (updates.lastName) user.lastName = updates.lastName;
+    await this.userRepository.save(user);
+
+    let finalSlug = null;
+    const profile = await this.profileRepository.findOneBy({ userId });
+    
+    if (profile && updates.bookingSlug) {
+      if (profile.bookingSlug !== updates.bookingSlug) {
+        const existing = await this.profileRepository.findOneBy({
+          bookingSlug: updates.bookingSlug,
+        });
+        if (existing) {
+          throw new ConflictException('Booking slug is already in use');
+        }
+        profile.bookingSlug = updates.bookingSlug;
+        await this.profileRepository.save(profile);
       }
-      profile.bookingSlug = newSlug;
-      await this.profileRepository.save(profile);
-      
-      await this.auditLogsService.logAction(
-        'USER_SLUG_UPDATED',
-        `User ${userId} booking slug was updated to ${newSlug} by super admin`,
-        userId,
-      );
+      finalSlug = profile.bookingSlug;
     }
-    return { bookingSlug: profile.bookingSlug };
+    
+    await this.auditLogsService.logAction(
+      'USER_DETAILS_UPDATED',
+      `User ${userId} details (name/slug) were updated by super admin`,
+      userId,
+    );
+
+    return { 
+      firstName: user.firstName, 
+      lastName: user.lastName, 
+      bookingSlug: finalSlug 
+    };
   }
 }

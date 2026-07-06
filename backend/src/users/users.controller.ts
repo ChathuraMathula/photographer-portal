@@ -88,12 +88,12 @@ export class UsersController {
     return this.usersService.toggleActive(id, callerRole);
   }
 
-  @Patch(':id/slug')
+  @Patch(':id/details')
   @Roles(UserRole.SUPER_ADMIN)
-  updateUserSlug(
+  updateUserDetails(
     @Param('id') id: string,
-    @Body('bookingSlug') newSlug: string,
+    @Body() body: { firstName?: string; lastName?: string; bookingSlug?: string },
   ) {
-    return this.usersService.updateUserSlug(id, newSlug);
+    return this.usersService.updateUserDetails(id, body);
   }
 }
