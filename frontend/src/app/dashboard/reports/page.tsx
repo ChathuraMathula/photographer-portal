@@ -1,47 +1,18 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { UserRole, logout } from "@/store/slices/authSlice";
+import { UserRole } from "@/store/slices/authSlice";
 import { useReports } from "./hooks/useReports";
 import { PhotographerReportsView } from "@/components/dashboard/reports/PhotographerReportsView";
 import { AdminReportsPage } from "@/components/dashboard/reports/AdminReportsPage";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
-import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 export default function ReportsPage() {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { start } = useTopLoadingBar();
-  const { role, firstName } = useSelector((state: RootState) => state.auth);
+  const { role } = useSelector((state: RootState) => state.auth);
 
   // Photographer custom reports hook
   const reportsHook = useReports();
-
-  const handleLogout = async () => {
-    try {
-      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-      await fetch(`${API}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Backend logout error:", err);
-    }
-    dispatch(logout());
-    window.location.href = "/login";
-  };
-
-  const handleTabChange = (tab: string) => {
-    start();
-    if (tab === "overview") router.push("/dashboard");
-    else if (tab === "reports") router.push("/dashboard/reports");
-    else if (tab === "profile") router.push("/dashboard/profile");
-    else router.push("/dashboard/users");
-  };
 
   // Fetch data on mount/change if role is photographer
   useEffect(() => {

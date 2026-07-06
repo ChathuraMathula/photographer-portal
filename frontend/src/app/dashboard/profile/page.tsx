@@ -1,45 +1,15 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { UserRole, logout } from "@/store/slices/authSlice";
+import { UserRole } from "@/store/slices/authSlice";
 import { AdminProfilePage } from "@/components/dashboard/profile/AdminProfilePage";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { ProfileSettingsForm } from "@/components/dashboard/ProfileSettingsForm";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
-import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 export default function ProfilePage() {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { start } = useTopLoadingBar();
-  const { role, firstName } = useSelector((state: RootState) => state.auth);
-  
+  const { role } = useSelector((state: RootState) => state.auth);
   const context = usePhotographerDashboardContext();
-
-  const handleLogout = async () => {
-    try {
-      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-      await fetch(`${API}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Backend logout error:", err);
-    }
-    dispatch(logout());
-    window.location.href = "/login";
-  };
-
-  const handleTabChange = (tab: string) => {
-    start();
-    if (tab === "overview") router.push("/dashboard");
-    else if (tab === "reports") router.push("/dashboard/reports");
-    else if (tab === "profile") router.push("/dashboard/profile");
-    else router.push("/dashboard/users");
-  };
 
   // If Admin or Super Admin, render Admin profile directly
   if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {
@@ -101,3 +71,4 @@ export default function ProfilePage() {
     />
   );
 }
+
