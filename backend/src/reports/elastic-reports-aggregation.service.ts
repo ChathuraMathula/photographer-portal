@@ -5,9 +5,17 @@ import { getDateFilters, getTimelineInterval } from './elastic/elastic-date.util
 import { buildGenerateReportQuery, buildLeaderboardQuery } from './elastic/elastic-query-builder.util';
 import { parseReportAggregations, parseLeaderboardAggregations } from './elastic/elastic-response-parser.util';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserRole } from '../entities/user.entity';
+
 @Injectable()
 export class ElasticReportsAggregationService {
-  constructor(private readonly esService: ElasticsearchService) {}
+  constructor(
+    private readonly esService: ElasticsearchService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async generateReportData(
     photographerId: string | undefined,
@@ -60,15 +68,33 @@ export class ElasticReportsAggregationService {
       };
     });
 
-    return {
-      period,
-      startDateStr: startDate.toISOString().split('T')[0],
-      endDateStr: endDate.toISOString().split('T')[0],
-      ...parsedData,
-      systemStats: null, 
-      locationData,
-      rawBookings: [],
-    };
+      let systemStats: any = null;
+      if (!photographerId) {
+        const totalPhotographers = await this.userRepository.count({
+          where: { role: UserRole.PHOTOGRAPHER },
+        });
+        const totalAdmins = await this.userRepository.count({
+          where: { role: UserRole.ADMIN },
+        });
+        const totalSuspended = await this.userRepository.count({
+          where: { isActive: false },
+        });
+        systemStats = {
+          totalPhotographers,
+          totalAdmins,
+          totalSuspended,
+        };
+      }
+
+      return {
+        period,
+        startDateStr: startDate.toISOString().split('T')[0],
+        endDateStr: endDate.toISOString().split('T')[0],
+        ...parsedData,
+        systemStats,
+        locationData,
+        rawBookings: [],
+      };
   }
 
   async getPhotographerLeaderboard(

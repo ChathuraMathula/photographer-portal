@@ -14,6 +14,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           queueOptions: {
             durable: true,
           },
+          socketOptions: {
+            heartbeatIntervalInSeconds: 60,
+            reconnectTimeInSeconds: 5,
+          },
         },
       },
     ]),
