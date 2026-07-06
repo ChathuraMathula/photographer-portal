@@ -8,6 +8,8 @@ import { PaymentsService } from './payments.service';
 import { Reservation } from '../entities/reservation.entity';
 import { Payment } from '../entities/payment.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { StripeHelperService } from './stripe-helper.service';
+import { OfflinePaymentService } from './offline-payment.service';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { PhotographerProfile } from '../entities/photographer-profile.entity';
     EmailModule,
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
-  exports: [PaymentsService],
+  providers: [PaymentsService, StripeHelperService, OfflinePaymentService],
+  exports: [PaymentsService, StripeHelperService, OfflinePaymentService],
 })
 export class PaymentsModule {}

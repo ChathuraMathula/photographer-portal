@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { ChatGateway } from '../reservations/chat.gateway';
+import { UserProfileService } from './user-profile.service';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,7 @@ export class UsersService {
     private readonly chatGateway: ChatGateway,
     private readonly emailService: EmailService,
     private readonly auditLogsService: AuditLogsService,
+    private readonly profileService: UserProfileService,
   ) {}
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
@@ -91,55 +93,11 @@ export class UsersService {
   }
 
   async getProfile(userId: string) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      phone: user.phone || '',
-    };
+    return this.profileService.getProfile(userId);
   }
 
   async updateProfile(userId: string, updates: any) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (updates.firstName !== undefined) user.firstName = updates.firstName;
-    if (updates.lastName !== undefined) user.lastName = updates.lastName;
-    if (updates.phone !== undefined) user.phone = updates.phone;
-
-    if (updates.password) {
-      user.passwordHash = await bcrypt.hash(updates.password, 10);
-    }
-
-    await this.userRepository.save(user);
-
-    await this.auditLogsService.logAction(
-      'PROFILE_UPDATED',
-      `User ${user.email} updated their profile settings`,
-      user.id,
-      user.email,
-    );
-
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      phone: user.phone || '',
-    };
+    return this.profileService.updateProfile(userId, updates);
   }
 
   async findAll(
@@ -273,46 +231,10 @@ export class UsersService {
   }
 
   async getSettings(userId: string) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return {
-      emailNotificationsEnabled: user.emailNotificationsEnabled,
-      reminderEmailsEnabled: user.reminderEmailsEnabled,
-      inAppNotificationsEnabled: user.inAppNotificationsEnabled,
-    };
+    return this.profileService.getSettings(userId);
   }
 
   async updateSettings(userId: string, updates: any) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (updates.emailNotificationsEnabled !== undefined) {
-      user.emailNotificationsEnabled = updates.emailNotificationsEnabled;
-    }
-    if (updates.reminderEmailsEnabled !== undefined) {
-      user.reminderEmailsEnabled = updates.reminderEmailsEnabled;
-    }
-    if (updates.inAppNotificationsEnabled !== undefined) {
-      user.inAppNotificationsEnabled = updates.inAppNotificationsEnabled;
-    }
-
-    await this.userRepository.save(user);
-
-    await this.auditLogsService.logAction(
-      'SETTINGS_UPDATED',
-      `User ${user.email} updated their settings (Email: ${user.emailNotificationsEnabled}, Reminders: ${user.reminderEmailsEnabled}, InApp: ${user.inAppNotificationsEnabled})`,
-      user.id,
-      user.email,
-    );
-
-    return {
-      emailNotificationsEnabled: user.emailNotificationsEnabled,
-      reminderEmailsEnabled: user.reminderEmailsEnabled,
-      inAppNotificationsEnabled: user.inAppNotificationsEnabled,
-    };
+    return this.profileService.updateSettings(userId, updates);
   }
 }

@@ -19,6 +19,8 @@ import { ProposeQuotationDto } from './dto/propose-quotation.dto';
 import { RejectReservationDto } from './dto/reject-reservation.dto';
 import { ChatGateway } from './chat.gateway';
 import { EmailService } from '../email/email.service';
+import { ReservationsQuotationService } from './reservations-quotation.service';
+import { ReservationsLifecycleService } from './reservations-lifecycle.service';
 
 interface JwtUser {
   userId: string;
@@ -46,6 +48,8 @@ export class ReservationsService {
     private paymentRepository: Repository<Payment>,
     private chatGateway: ChatGateway,
     private emailService: EmailService,
+    private quotationService: ReservationsQuotationService,
+    private lifecycleService: ReservationsLifecycleService,
   ) {}
 
   async findAll(
@@ -59,7 +63,6 @@ export class ReservationsService {
       endDate?: string;
     } = {},
   ) {
-    // Auto-complete reservations whose dates have passed
     const todayStr = new Date().toISOString().split('T')[0];
     await this.reservationRepository
       .createQueryBuilder()
@@ -76,19 +79,16 @@ export class ReservationsService {
       .leftJoinAndSelect('res.customer', 'customer')
       .leftJoinAndSelect('res.photographer', 'photographer');
 
-    // Filter by photographer if logged in user is a photographer
     if (user.role === UserRole.PHOTOGRAPHER) {
       qb.andWhere('res.photographerId = :photographerId', {
         photographerId: user.userId,
       });
     }
 
-    // Filter by status if provided
     if (queryOptions.status && queryOptions.status !== 'ALL') {
       qb.andWhere('res.status = :status', { status: queryOptions.status });
     }
 
-    // Filter by date range (e.g. for calendar)
     if (queryOptions.startDate && queryOptions.endDate) {
       qb.andWhere('res.date >= :startDate AND res.date <= :endDate', {
         startDate: queryOptions.startDate,
@@ -96,7 +96,6 @@ export class ReservationsService {
       });
     }
 
-    // Filter by search term
     if (queryOptions.search) {
       const searchPattern = `%${queryOptions.search.toLowerCase()}%`;
       qb.andWhere(
@@ -107,12 +106,10 @@ export class ReservationsService {
 
     qb.orderBy('res.date', 'DESC').addOrderBy('res.startTime', 'ASC');
 
-    // If date range is supplied, assume it is for the calendar view and return raw unpaginated results
     if (queryOptions.startDate && queryOptions.endDate) {
       return qb.getMany();
     }
 
-    // Otherwise, apply pagination
     const page = queryOptions.page || 1;
     const limit = queryOptions.limit || 10;
     const skip = (page - 1) * limit;
@@ -129,7 +126,6 @@ export class ReservationsService {
   }
 
   async findOne(id: string, user: JwtUser) {
-    // Auto-complete reservations whose dates have passed
     const todayStr = new Date().toISOString().split('T')[0];
     await this.reservationRepository
       .createQueryBuilder()
@@ -172,270 +168,12 @@ export class ReservationsService {
   }
 
   async createManualBooking(dto: CreateManualBookingDto, user: JwtUser) {
-    if (user.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException(
-        'Only Photographers can create manual bookings',
-      );
-    }
-
-    if (dto.startTime >= dto.endTime) {
-      throw new BadRequestException('startTime must be before endTime');
-    }
-
-    // Check availability
-    const profile = await this.profileRepository.findOneBy({
-      userId: user.userId,
-    });
-    if (!profile) throw new NotFoundException('Photographer profile not found');
-
-    const now = new Date();
-    const conflicts = await this.reservationRepository
-      .createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', {
-        photographerId: user.userId,
-      })
-      .andWhere('res.date = :date', { date: dto.date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
-        startTime: dto.startTime,
-        endTime: dto.endTime,
-      })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('res.status IN (:...activeStatuses)', {
-            activeStatuses: [
-              ReservationStatus.PENDING,
-              ReservationStatus.CONFIRMED,
-            ],
-          }).orWhere(
-            'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
-            { proposedStatus: ReservationStatus.PROPOSED, now },
-          );
-        }),
-      )
-      .getMany();
-
-    if (conflicts.length > 0) {
-      throw new BadRequestException('The requested time slot is not available');
-    }
-
-    // Find or create customer — if email exists, keep the stored name/phone for consistency
-    let customer = await this.customerRepository.findOneBy({
-      email: dto.email,
-    });
-    if (!customer) {
-      customer = this.customerRepository.create({
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        phone: dto.phone,
-      });
-      await this.customerRepository.save(customer);
-    }
-    // NOTE: If customer already exists we intentionally keep their stored name/phone.
-    // The dto values are used only for display in this request but not persisted.
-
-    let selectedPackagesSnap: any = null;
-    if (dto.packageId) {
-      const pkg = await this.packageRepository.findOneBy({ id: dto.packageId });
-      if (pkg) {
-        selectedPackagesSnap = [
-          {
-            id: pkg.id,
-            name: pkg.name,
-            description: pkg.description,
-            priceInCents: pkg.priceInCents,
-            durationHours: pkg.durationHours,
-            includes: pkg.includes,
-            depositType: pkg.depositType,
-            depositValue: pkg.depositValue,
-          },
-        ];
-      }
-    }
-
-    const reservation = this.reservationRepository.create({
-      customerId: customer.id,
-      photographerId: user.userId,
-      date: dto.date as any,
-      startTime: dto.startTime,
-      endTime: dto.endTime,
-      eventType: dto.eventType,
-      location: dto.location,
-      locationMapLink: dto.locationMapLink,
-      city: dto.city,
-      district: dto.district,
-      customerNotes: dto.notes,
-      status: ReservationStatus.CONFIRMED, // Manual offline bookings are pre-confirmed
-      reservationToken: crypto.randomBytes(32).toString('hex'),
-      advancePaymentPriceInCents: dto.advancePaymentPriceInCents,
-      totalAmountInCents: dto.totalAmountInCents,
-      clientSelectedPackageId: dto.packageId,
-      selectedPackages: selectedPackagesSnap,
-    });
-
-    await this.reservationRepository.save(reservation);
-
-    // Save payment log if deposit is provided
-    if (dto.advancePaymentPriceInCents && dto.advancePaymentPriceInCents > 0) {
-      const payment = this.paymentRepository.create({
-        reservationId: reservation.id,
-        amountInCents: dto.advancePaymentPriceInCents,
-        status: PaymentStatus.SUCCESS,
-        transactionId: 'ch_manual_' + crypto.randomBytes(8).toString('hex'),
-        cardBrand: 'Offline Payment',
-        cardLast4: 'Cash',
-      });
-      await this.paymentRepository.save(payment);
-    }
-
-    // Populate customer relation for the socket broadcast
-    reservation.customer = customer;
-
-    // Broadcast new reservation created
-    this.chatGateway.server
-      .to(`photographer_${user.userId}`)
-      .emit('reservationCreated', reservation);
-
-    // Broadcast change
-    this.chatGateway.broadcastAvailabilityChange(
-      profile.bookingSlug,
-      dto.date,
-      dto.startTime,
-      dto.endTime,
-      false,
-    );
-
-    return reservation;
+    return this.lifecycleService.createManualBooking(dto, user);
   }
 
   async proposeQuotation(id: string, dto: ProposeQuotationDto, user: JwtUser) {
     const reservation = await this.findOne(id, user);
-
-    if (
-      reservation.status !== ReservationStatus.PENDING &&
-      reservation.status !== ReservationStatus.PROPOSED
-    ) {
-      throw new BadRequestException(
-        'Can only propose quotation for pending or proposed requests',
-      );
-    }
-
-    // Find packages
-    const packageIds = dto.packageIds || [];
-    const pkgs =
-      packageIds.length > 0
-        ? await this.packageRepository.find({
-            where: { id: In(packageIds), photographerId: user.userId },
-          })
-        : [];
-
-    if (pkgs.length === 0 && packageIds.length > 0) {
-      throw new BadRequestException('Invalid package IDs selected');
-    }
-
-    if (pkgs.length === 0 && !dto.customPackage) {
-      throw new BadRequestException(
-        'Must select at least one package or include a custom package',
-      );
-    }
-
-    // Check if this time slot is already booked and confirmed
-    const conflicts = await this.reservationRepository
-      .createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', {
-        photographerId: reservation.photographerId,
-      })
-      .andWhere('res.date = :date', { date: reservation.date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-      })
-      .andWhere('res.status = :confirmedStatus', {
-        confirmedStatus: ReservationStatus.CONFIRMED,
-      })
-      .getMany();
-
-    if (conflicts.length > 0) {
-      throw new BadRequestException(
-        'This time slot is already booked and confirmed.',
-      );
-    }
-
-    // Update reservation
-    reservation.status = ReservationStatus.PROPOSED;
-    reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
-    reservation.quotationNotes = dto.quotationNotes;
-    reservation.usePackageWiseDeposit = dto.usePackageWiseDeposit ?? false;
-
-    // Snapshot packages
-    const selectedPkgsMapped = pkgs.map((p) => {
-      const customDeposit =
-        dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
-          ? dto.packageDeposits[p.id]
-          : null;
-      return {
-        id: p.id,
-        name: p.name,
-        description: p.description,
-        priceInCents: p.priceInCents,
-        durationHours: p.durationHours,
-        includes: p.includes,
-        depositType: p.depositType,
-        depositValue: p.depositValue,
-        customDepositAmountInCents: customDeposit,
-        isCustom: false,
-      };
-    });
-
-    if (dto.customPackage) {
-      const cp = dto.customPackage;
-      const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const customDeposit =
-        dto.packageDeposits && dto.packageDeposits['custom'] !== undefined
-          ? dto.packageDeposits['custom']
-          : null;
-
-      selectedPkgsMapped.push({
-        id: customId,
-        name: cp.name,
-        description: cp.description,
-        priceInCents: cp.priceInCents,
-        durationHours: cp.durationHours,
-        includes: cp.includes,
-        depositType: cp.depositType,
-        depositValue: cp.depositValue,
-        customDepositAmountInCents: customDeposit,
-        isCustom: true,
-      });
-    }
-
-    reservation.selectedPackages = selectedPkgsMapped;
-    // 24-hour deadline from now (only if not already set, e.g. when changing packages later)
-    if (!reservation.paymentDeadline) {
-      reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    }
-
-    await this.reservationRepository.save(reservation);
-
-    // Broadcast updated reservation
-    this.chatGateway.server
-      .to(`reservation_${reservation.id}`)
-      .emit('reservationUpdated', reservation);
-    this.chatGateway.server
-      .to(`photographer_${user.userId}`)
-      .emit('reservationUpdated', reservation);
-
-    // Send email notification to client
-    const trackingLink = `http://localhost:4000/book/track/${reservation.reservationToken}`;
-    await this.emailService.sendQuotationProposed(
-      reservation.customer.email,
-      `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      trackingLink,
-      dto.advancePaymentPriceInCents,
-      dto.quotationNotes,
-    );
-
-    return reservation;
+    return this.quotationService.proposeQuotation(reservation, dto, user);
   }
 
   async rejectReservation(
@@ -444,50 +182,10 @@ export class ReservationsService {
     user: JwtUser,
   ) {
     const reservation = await this.findOne(id, user);
-
-    if (reservation.status !== ReservationStatus.PENDING) {
-      throw new BadRequestException('Can only reject pending requests');
-    }
-
-    reservation.status = ReservationStatus.REJECTED;
-    reservation.rejectionReason = dto.rejectionReason;
-
-    await this.reservationRepository.save(reservation);
-
-    // Broadcast updated reservation
-    this.chatGateway.server
-      .to(`reservation_${reservation.id}`)
-      .emit('reservationUpdated', reservation);
-    this.chatGateway.server
-      .to(`photographer_${user.userId}`)
-      .emit('reservationUpdated', reservation);
-
-    // Send rejection email to client
-    await this.emailService.sendReservationRejected(
-      reservation.customer.email,
-      `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      dto.rejectionReason,
-    );
-
-    // Broadcast availability change to unlock
-    const profile = await this.profileRepository.findOneBy({
-      userId: user.userId,
-    });
-    if (profile) {
-      this.chatGateway.broadcastAvailabilityChange(
-        profile.bookingSlug,
-        reservation.date.toString().split('T')[0],
-        reservation.startTime,
-        reservation.endTime,
-        true,
-      );
-    }
-
-    return reservation;
+    return this.quotationService.rejectReservation(reservation, dto, user);
   }
 
   async getMessages(id: string, user: JwtUser) {
-    // Verifies ownership
     await this.findOne(id, user);
 
     return this.messageRepository.find({
@@ -507,9 +205,7 @@ export class ReservationsService {
     });
     await this.messageRepository.save(message);
 
-    // Broadcast to room
     this.chatGateway.server.to(`reservation_${id}`).emit('message', message);
-
     this.chatGateway.server
       .to(`photographer_${reservation.photographerId}`)
       .emit('messageReceived', { reservationId: id, message });
@@ -517,3 +213,4 @@ export class ReservationsService {
     return message;
   }
 }
+

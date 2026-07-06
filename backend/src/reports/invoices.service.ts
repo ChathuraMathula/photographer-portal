@@ -1,16 +1,13 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import * as crypto from 'crypto';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Payment, PaymentStatus } from '../entities/payment.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { generateInvoicePdf, InvoiceData } from './invoices-pdf-generator';
-import { EmailService } from '../email/email.service';
+import { InvoiceGenerationService } from './invoice-generation.service';
 
 @Injectable()
 export class InvoicesService {
@@ -21,13 +18,10 @@ export class InvoicesService {
     private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(PhotographerProfile)
     private readonly profileRepository: Repository<PhotographerProfile>,
-    private readonly emailService: EmailService,
+    private readonly invoiceGenerationService: InvoiceGenerationService,
   ) {}
 
   async getInvoices(photographerId: string, page = 1, limit = 10, search = '') {
-    // We want reservations that are CONFIRMED or COMPLETED and fully paid.
-    // In SQLite, filtering by HAVING SUM(payments) >= totalAmountInCents is tricky if we want to return full entities.
-    // A robust way for SQLite is to query the reservation IDs that meet the criteria, then fetch the entities.
     const qb = this.reservationRepository.createQueryBuilder('reservation')
       .select('reservation.id', 'id')
       .addSelect('reservation.totalAmountInCents', 'totalAmountInCents')
@@ -48,12 +42,10 @@ export class InvoicesService {
 
     const aggregated = await qb.getRawMany();
 
-    // Filter to fully paid
     let fullyPaidIds = aggregated
       .filter(row => row.totalPaid >= (row.totalAmountInCents || 1))
       .map(row => row.id);
 
-    // Calculate KPIs across all matching invoices (ignoring pagination)
     const totalInvoiced = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + ((row.totalAmountInCents || 0) / 100), 0);
     const totalSettled = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + (row.totalPaid / 100), 0);
     const outstanding = Math.max(0, totalInvoiced - totalSettled);
@@ -139,142 +131,15 @@ export class InvoicesService {
   }
 
   async generateInvoicePdfDoc(reservationId: string, photographerId?: string) {
-    const whereClause: any = { id: reservationId };
-    if (photographerId) {
-      whereClause.photographerId = photographerId;
-    }
-
-    const reservation = await this.reservationRepository.findOne({
-      where: whereClause,
-      relations: { customer: true, photographer: true },
-    });
-
-    if (!reservation) {
-      throw new NotFoundException('Reservation not found');
-    }
-
-    const payments = await this.paymentRepository.find({
-      where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
-      order: { createdAt: 'ASC' },
-    });
-
-    // Fetch customization settings
-    const profile = await this.profileRepository.findOne({
-      where: { userId: reservation.photographerId },
-    });
-
-    const settings = {
-      invoiceTitle: profile?.invoiceTitle || 'INVOICE',
-      invoiceColor: profile?.invoiceColor || '#2563eb',
-      invoiceNotes:
-        profile?.invoiceNotes ||
-        'Thank you for booking with us! We appreciate your trust.',
-      invoiceLogoText:
-        profile?.invoiceLogoText || reservation.photographer.firstName,
-      invoicePhone: profile?.invoicePhone || '',
-      invoiceInstructions: profile?.invoiceInstructions || '',
-    };
-
-    const packages = reservation.selectedPackages || [];
-    const selectedPkg = packages.find(
-      (p: any) => p.id === reservation.clientSelectedPackageId,
-    ) || {
-      name: 'Photography Services',
-      priceInCents: reservation.totalAmountInCents || 0,
-    };
-
-    const taxRate = profile?.invoiceTaxRate || 0;
-    const packagePriceLkr =
-      (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
-    const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
-    const grandTotalLkr = packagePriceLkr + taxAmountLkr;
-    const totalPaidLkr =
-      payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
-    const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
-
-    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
-
-    const invoiceData: InvoiceData = {
-      invoiceNumber,
-      issueDate: new Date().toLocaleDateString(),
-      clientName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      clientEmail: reservation.customer.email,
-      clientPhone: reservation.customer.phone || '',
-      photographerName: `${reservation.photographer.firstName} ${reservation.photographer.lastName}`,
-      photographerEmail: reservation.photographer.email,
-      photographerPhone: '',
-      eventDate: reservation.date
-        ? reservation.date.toString().split('T')[0]
-        : '',
-      eventTime: `${reservation.startTime || ''} - ${reservation.endTime || ''}`,
-      eventType: reservation.eventType || 'Event',
-      location: reservation.location || '',
-      packageName: selectedPkg.name,
-      packagePriceLkr,
-      payments: payments.map((p) => ({
-        date: new Date(p.createdAt).toLocaleDateString(),
-        method: `${p.cardBrand} (*${p.cardLast4})`,
-        amountLkr: p.amountInCents / 100,
-        transactionId: p.transactionId,
-      })),
-      totalPaidLkr,
-      balanceDueLkr,
-      taxRate,
-      taxAmountLkr,
-      grandTotalLkr,
-      settings,
-    };
-
-    return generateInvoicePdf(invoiceData);
+    return this.invoiceGenerationService.generateInvoicePdfDoc(reservationId, photographerId);
   }
 
   async generateInvoicePdfDocByToken(token: string) {
-    const reservation = await this.reservationRepository.findOne({
-      where: { reservationToken: token },
-    });
-
-    if (!reservation) {
-      throw new NotFoundException('Reservation not found');
-    }
-
-    return this.generateInvoicePdfDoc(reservation.id);
+    return this.invoiceGenerationService.generateInvoicePdfDocByToken(token);
   }
 
   async resendInvoice(reservationId: string, photographerId: string) {
-    const reservation = await this.reservationRepository.findOne({
-      where: { id: reservationId, photographerId },
-      relations: { customer: true, photographer: true },
-    });
-
-    if (!reservation) {
-      throw new NotFoundException('Reservation not found');
-    }
-
-    const pdfDoc = await this.generateInvoicePdfDoc(
-      reservation.id,
-      photographerId,
-    );
-
-    const getPdfBuffer = async (doc: any): Promise<Buffer> => {
-      return new Promise<Buffer>((resolve, reject) => {
-        const chunks: Buffer[] = [];
-        doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-        doc.on('error', (err) => reject(err));
-        doc.end();
-      });
-    };
-
-    const pdfBuffer = await getPdfBuffer(pdfDoc);
-    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
-
-    await this.emailService.sendInvoice(
-      reservation.customer.email,
-      `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      invoiceNumber,
-      pdfBuffer,
-    );
-
-    return { message: 'Invoice email resent successfully.' };
+    return this.invoiceGenerationService.resendInvoice(reservationId, photographerId);
   }
 }
+

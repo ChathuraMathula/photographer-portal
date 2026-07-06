@@ -1,22 +1,20 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
-import * as crypto from 'crypto';
+import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Customer } from '../entities/customer.entity';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { Package } from '../entities/package.entity';
 import { Message } from '../entities/message.entity';
 import { Payment, PaymentStatus } from '../entities/payment.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { ChatGateway } from '../reservations/chat.gateway';
-import { EmailService } from '../email/email.service';
+import { BookingsValidationService } from './bookings-validation.service';
+import { BookingsLifecycleService } from './bookings-lifecycle.service';
 
 @Injectable()
 export class BookingsService {
@@ -34,7 +32,8 @@ export class BookingsService {
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
     private chatGateway: ChatGateway,
-    private emailService: EmailService,
+    private validationService: BookingsValidationService,
+    private lifecycleService: BookingsLifecycleService,
   ) {}
 
   async getPhotographerProfile(slug: string) {
@@ -65,19 +64,7 @@ export class BookingsService {
   }
 
   async findCustomerByEmail(email: string) {
-    if (!email) return null;
-    const customer = await this.customerRepository
-      .createQueryBuilder('customer')
-      .where('LOWER(customer.email) = :email', {
-        email: email.trim().toLowerCase(),
-      })
-      .getOne();
-    if (!customer) return null;
-    return {
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      phone: customer.phone,
-    };
+    return this.validationService.findCustomerByEmail(email);
   }
 
   async checkAvailability(
@@ -86,159 +73,20 @@ export class BookingsService {
     startTime: string,
     endTime: string,
   ) {
-    const todayStr = new Date().toLocaleDateString('en-CA');
-    if (date <= todayStr) {
-      return {
-        available: false,
-        reason: 'Checking availability for today or past dates is not allowed.',
-      };
-    }
-
-    const profile = await this.profileRepository.findOne({
-      where: { bookingSlug: slug },
-      relations: { user: true },
-    });
-    if (!profile) throw new NotFoundException('Photographer not found');
-
-    if (!profile.isAvailableForBooking) {
-      return {
-        available: false,
-        reason: 'Photographer is not accepting bookings',
-      };
-    }
-
-    const now = new Date();
-
-    // Check overlaps:
-    // A conflict is any reservation for the same photographer, on the same date, which overlap with the requested time:
-    // requested.startTime < existing.endTime AND requested.endTime > existing.startTime
-    // AND is in status PENDING, CONFIRMED, or PROPOSED (only if PROPOSED lock hasn't expired yet)
-    const conflicts = await this.reservationRepository
-      .createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', {
-        photographerId: profile.userId,
-      })
-      .andWhere('res.date = :date', { date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
-        startTime,
-        endTime,
-      })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('res.status IN (:...activeStatuses)', {
-            activeStatuses: [
-              ReservationStatus.PENDING,
-              ReservationStatus.CONFIRMED,
-            ],
-          }).orWhere(
-            'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
-            { proposedStatus: ReservationStatus.PROPOSED, now },
-          );
-        }),
-      )
-      .getMany();
-
-    return { available: conflicts.length === 0 };
+    const result = await this.validationService.checkAvailability(
+      slug,
+      date,
+      startTime,
+      endTime,
+    );
+    return { available: result.available, reason: result.reason };
   }
 
   async createBooking(slug: string, dto: CreateBookingDto) {
-    if (dto.startTime >= dto.endTime) {
-      throw new BadRequestException('startTime must be before endTime');
-    }
-
-    const todayStr = new Date().toLocaleDateString('en-CA');
-    if (dto.date <= todayStr) {
-      throw new BadRequestException(
-        'Booking is only allowed for future dates (tomorrow onwards).',
-      );
-    }
-
-    const profile = await this.profileRepository.findOne({
-      where: { bookingSlug: slug },
-      relations: { user: true },
-    });
-    if (!profile) throw new NotFoundException('Photographer not found');
-    if (!profile.isAvailableForBooking) {
-      throw new BadRequestException('Photographer is not accepting bookings');
-    }
-
-    const { available } = await this.checkAvailability(
-      slug,
-      dto.date,
-      dto.startTime,
-      dto.endTime,
-    );
-    if (!available) {
-      throw new BadRequestException('The requested time slot is not available');
-    }
-
-    // Find or create customer — if email exists, keep the stored name/phone for consistency
-    let customer = await this.customerRepository.findOneBy({
-      email: dto.email,
-    });
-    if (!customer) {
-      customer = this.customerRepository.create({
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        phone: dto.phone,
-      });
-      await this.customerRepository.save(customer);
-    }
-    // NOTE: If customer already exists we intentionally keep their stored name/phone.
-    // The dto values are used only for display in this request but not persisted.
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const reservation = this.reservationRepository.create({
-      customerId: customer.id,
-      photographerId: profile.userId,
-      date: dto.date as any,
-      startTime: dto.startTime,
-      endTime: dto.endTime,
-      eventType: dto.eventType,
-      location: dto.location,
-      locationMapLink: dto.locationMapLink,
-      city: dto.city,
-      district: dto.district,
-      customerNotes: dto.notes,
-      status: ReservationStatus.PENDING,
-      reservationToken: token,
-    });
-    await this.reservationRepository.save(reservation);
-
-    // Populate customer relation for the socket broadcast
-    reservation.customer = customer;
-
-    // Broadcast new reservation created
-    this.chatGateway.server
-      .to(`photographer_${profile.userId}`)
-      .emit('reservationCreated', reservation);
-
-    // Send email notification to customer
-    const trackingLink = `http://localhost:4000/book/track/${token}`;
-    await this.emailService.sendBookingReceived(
-      customer.email,
-      `${customer.firstName} ${customer.lastName}`,
-      trackingLink,
-    );
-
-    // Broadcast real-time availability change
-    this.chatGateway.broadcastAvailabilityChange(
-      slug,
-      dto.date,
-      dto.startTime,
-      dto.endTime,
-      false,
-    );
-
-    return {
-      reservationToken: token,
-      message: 'Reservation request submitted successfully',
-    };
+    return this.lifecycleService.createBooking(slug, dto);
   }
 
   async trackReservation(token: string, email: string) {
-    // Auto-complete reservations whose dates have passed
     const todayStr = new Date().toISOString().split('T')[0];
     await this.reservationRepository
       .createQueryBuilder()
@@ -348,7 +196,6 @@ export class BookingsService {
     });
     await this.messageRepository.save(message);
 
-    // Broadcast to room
     this.chatGateway.server
       .to(`reservation_${reservation.id}`)
       .emit('message', message);
@@ -361,105 +208,10 @@ export class BookingsService {
   }
 
   async confirmBooking(token: string, email: string, packageId: string) {
-    const reservation = await this.reservationRepository.findOne({
-      where: { reservationToken: token },
-      relations: { customer: true, photographer: true },
-    });
-    if (!reservation) throw new NotFoundException('Reservation not found');
-    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    if (reservation.status !== ReservationStatus.PROPOSED) {
-      throw new BadRequestException('Reservation is not in proposed state');
-    }
-
-    // Verify if package exists in snapshotted selectedPackages
-    const packages = reservation.selectedPackages || [];
-    const selectedPkg = packages.find((p: any) => p.id === packageId);
-    if (!selectedPkg) {
-      throw new BadRequestException(
-        'Selected package is not part of the proposal',
-      );
-    }
-
-    reservation.status = ReservationStatus.CONFIRMED;
-    reservation.clientSelectedPackageId = packageId;
-    reservation.totalAmountInCents = selectedPkg.priceInCents;
-    reservation.paymentDeadline = undefined; // Clear lock expiry
-
-    await this.reservationRepository.save(reservation);
-
-    // Broadcast updated reservation
-    this.chatGateway.server
-      .to(`photographer_${reservation.photographerId}`)
-      .emit('reservationUpdated', reservation);
-    this.chatGateway.server
-      .to(`reservation_${reservation.id}`)
-      .emit('reservationUpdated', reservation);
-
-    // Send confirmation email to photographer
-    await this.emailService.sendReservationConfirmed(
-      reservation.photographer.email,
-      reservation.photographer.firstName,
-      `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      reservation.date.toString().split('T')[0],
-      selectedPkg.name,
-    );
-
-    return {
-      status: reservation.status,
-      message: 'Reservation confirmed successfully',
-    };
+    return this.lifecycleService.confirmBooking(token, email, packageId);
   }
 
   async cancelBooking(token: string, email: string) {
-    const reservation = await this.reservationRepository.findOne({
-      where: { reservationToken: token },
-      relations: { customer: true },
-    });
-    if (!reservation) throw new NotFoundException('Reservation not found');
-    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    if (
-      reservation.status !== ReservationStatus.PROPOSED &&
-      reservation.status !== ReservationStatus.PENDING
-    ) {
-      throw new BadRequestException('Cannot cancel reservation in this state');
-    }
-
-    reservation.status = ReservationStatus.CANCELLED;
-    reservation.paymentDeadline = undefined; // unlock slot
-
-    await this.reservationRepository.save(reservation);
-
-    // Broadcast updated reservation
-    this.chatGateway.server
-      .to(`photographer_${reservation.photographerId}`)
-      .emit('reservationUpdated', reservation);
-    this.chatGateway.server
-      .to(`reservation_${reservation.id}`)
-      .emit('reservationUpdated', reservation);
-
-    // Broadcast availability change to unlock this slot on the calendar
-    const profile = await this.profileRepository.findOneBy({
-      userId: reservation.photographerId,
-    });
-    if (profile) {
-      this.chatGateway.broadcastAvailabilityChange(
-        profile.bookingSlug,
-        reservation.date as any,
-        reservation.startTime,
-        reservation.endTime,
-        true,
-      );
-    }
-
-    return {
-      status: reservation.status,
-      message: 'Reservation cancelled successfully',
-    };
+    return this.lifecycleService.cancelBooking(token, email);
   }
 }
