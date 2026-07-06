@@ -13,6 +13,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { PhotographersService } from './photographers.service';
+import { UpdatePhotographerProfileDto } from './dto/update-photographer-profile.dto';
 
 @Controller('photographers')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -36,9 +37,9 @@ export class PhotographersController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.PHOTOGRAPHER)
   updateProfile(
     @Param('id') id: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: UpdatePhotographerProfileDto,
   ) {
-    return this.photographersService.updateProfile(id, body as any);
+    return this.photographersService.updateProfile(id, body);
   }
 
   @Get(':id/booking-link')

@@ -38,8 +38,7 @@ async function bootstrap() {
     options: {
       urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
       queue: 'notifications_queue',
-      prefetchCount: 10,
-      noAck: false,
+      noAck: true,
       queueOptions: {
         durable: true,
       },
