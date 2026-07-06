@@ -107,23 +107,21 @@ export function EventTypesCard({
             Select Predefined Types
           </Label>
           <div className="flex flex-wrap gap-1.5">
-            {PREDEFINED_EVENT_TYPES.map((type) => {
-              const isSelected = allowedEventTypes.includes(type);
+            {PREDEFINED_EVENT_TYPES.filter((type) => !allowedEventTypes.includes(type)).map((type) => {
               return (
                 <button
                   key={type}
                   type="button"
                   onClick={() => handleTogglePredefinedType(type)}
-                  className={`px-3 py-1 rounded-lg text-body-caption font-medium border transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-zinc-150 border-zinc-300 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
-                      : "border-zinc-200 text-zinc-650 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950"
-                  }`}
+                  className="px-3 py-1 rounded-lg text-body-caption font-medium border transition-all cursor-pointer border-zinc-200 text-zinc-650 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950"
                 >
                   {type}
                 </button>
               );
             })}
+            {PREDEFINED_EVENT_TYPES.every((type) => allowedEventTypes.includes(type)) && (
+              <span className="text-[11px] text-zinc-400 italic">All predefined types have been added.</span>
+            )}
           </div>
         </div>
 

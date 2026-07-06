@@ -96,6 +96,9 @@ export function useDashboardDataLoader({
         profile.setOfflineMessage(profData.offlineMessage || "");
         profile.setShowManualBookingInTopbar(profData.showManualBookingInTopbar !== false);
         profile.setShowAcceptBookingsInTopbar(profData.showAcceptBookingsInTopbar !== false);
+        if (typeof profile.setShowMapPreviewOnBookingPage === 'function') {
+          profile.setShowMapPreviewOnBookingPage(profData.showMapPreviewOnBookingPage !== false);
+        }
       }
     } catch (err) {
       console.error("Error loading photographer data:", err);
