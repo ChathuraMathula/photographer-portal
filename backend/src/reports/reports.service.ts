@@ -9,6 +9,7 @@ import {
   buildLocationReportPdf,
 } from './reports-pdf-builder';
 import { ReportsAggregationService } from './reports-aggregation.service';
+import { ElasticReportsAggregationService } from './elastic-reports-aggregation.service';
 
 @Injectable()
 export class ReportsService {
@@ -17,7 +18,7 @@ export class ReportsService {
     private readonly reservationRepository: Repository<Reservation>,
     @InjectRepository(Payment)
     private readonly paymentRepository: Repository<Payment>,
-    private readonly aggregationService: ReportsAggregationService,
+    private readonly aggregationService: ElasticReportsAggregationService,
   ) {}
 
   async generateReportData(
