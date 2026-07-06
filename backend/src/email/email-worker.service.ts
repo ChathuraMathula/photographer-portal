@@ -7,7 +7,7 @@ export class EmailWorkerService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'localhost',
+      host: '127.0.0.1',
       port: 1025,
       ignoreTLS: true,
     });
