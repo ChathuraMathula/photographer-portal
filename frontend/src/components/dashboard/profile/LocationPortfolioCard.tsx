@@ -49,27 +49,15 @@ export function LocationPortfolioCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="profLoc" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Base Location</Label>
-            <Input
-              id="profLoc"
-              value={location}
-              onChange={(e) => onLocationChange(e.target.value)}
-              placeholder="e.g. Colombo, Kandy"
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="profPort" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Portfolio URL</Label>
-            <Input
-              id="profPort"
-              value={portfolio}
-              onChange={(e) => onPortfolioChange(e.target.value)}
-              placeholder="e.g. https://myportfolio.com"
-              className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="profPort" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Portfolio URL</Label>
+          <Input
+            id="profPort"
+            value={portfolio}
+            onChange={(e) => onPortfolioChange(e.target.value)}
+            placeholder="e.g. https://myportfolio.com"
+            className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+          />
         </div>
 
         {/* Location Map Details */}
@@ -89,11 +77,47 @@ export function LocationPortfolioCard({
                 onSelect={async (c, d) => {
                   onCityChange(c);
                   onDistrictChange(d);
+                  onLocationChange(`${c}, ${d}`);
                   const coords = await fetchCoordsFromCityDistrict(c, d);
                   if (coords) {
                     onLocationMapLinkChange(`https://www.google.com/maps?q=${coords.lat},${coords.lon}`);
                   }
                 }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="coordinates" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                Coordinates <span className="text-zinc-400 font-normal">(optional, e.g. 7.2905715, 80.6337262)</span>
+              </Label>
+              <Input
+                id="coordinates"
+                placeholder="Paste exact coordinates (latitude, longitude)..."
+                value={
+                  locationMapLink
+                    ? `${parseFloat(locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || ""}, ${parseFloat(locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2] || "") || ""}`
+                    : ""
+                }
+                onChange={async (e) => {
+                  const val = e.target.value;
+                  const match = val.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
+                  if (match) {
+                    const lat = parseFloat(match[1]);
+                    const lon = parseFloat(match[2]);
+                    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+                      onLocationMapLinkChange(`https://www.google.com/maps?q=${lat},${lon}`);
+                      const res = await fetchCityDistrictFromCoords(lat, lon);
+                      if (res) {
+                        onCityChange(res.city);
+                        onDistrictChange(res.district);
+                        onLocationChange(`${res.city}, ${res.district}`);
+                      }
+                    }
+                  } else {
+                    // Optional: If they clear it, maybe clear the map link? But usually handled by the city picker
+                  }
+                }}
+                className="h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
               />
             </div>
 
@@ -112,6 +136,7 @@ export function LocationPortfolioCard({
                   if (res) {
                     onCityChange(res.city);
                     onDistrictChange(res.district);
+                    onLocationChange(`${res.city}, ${res.district}`);
                   }
                 }}
                 height="250px"

@@ -43,6 +43,7 @@ export function LocationPickerFormFields<T extends LocationPickerFormValues>({
         if (res) {
           formik.setFieldValue("city", res.city);
           formik.setFieldValue("district", res.district);
+          formik.setFieldValue("baseLocation", `${res.city}, ${res.district}`);
         }
       }
     }
@@ -51,6 +52,7 @@ export function LocationPickerFormFields<T extends LocationPickerFormValues>({
   const handleNominatimSelect = async (city: string, district: string) => {
     formik.setFieldValue("city", city);
     formik.setFieldValue("district", district);
+    formik.setFieldValue("baseLocation", `${city}, ${district}`);
     if (!formik.values.coordinates) {
       const coords = await fetchCoordsFromCityDistrict(city, district);
       if (coords) {
@@ -70,6 +72,7 @@ export function LocationPickerFormFields<T extends LocationPickerFormValues>({
     if (res) {
       formik.setFieldValue("city", res.city);
       formik.setFieldValue("district", res.district);
+      formik.setFieldValue("baseLocation", `${res.city}, ${res.district}`);
     }
   };
 
