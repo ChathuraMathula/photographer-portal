@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationPickerFormFields } from "@/components/common/LocationPickerFormFields";
 
 export type CreateUserValues = {
   firstName: string;
@@ -23,6 +24,10 @@ export type CreateUserValues = {
   bookingSlug: string;
   bio: string;
   baseLocation: string;
+  city: string;
+  district: string;
+  locationMapLink: string;
+  coordinates?: string;
 };
 
 type Props = {
@@ -217,6 +222,13 @@ export function CreateUserModal({
                     className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
                   />
                 </div>
+              </div>
+
+              <div className="border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 bg-zinc-50/50 dark:bg-zinc-900/50 space-y-4">
+                <h4 className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                  Base Location Map Details <span className="text-zinc-400 font-normal">(optional)</span>
+                </h4>
+                <LocationPickerFormFields formik={formik as any} isRequired={false} />
               </div>
 
               <div className="space-y-2">

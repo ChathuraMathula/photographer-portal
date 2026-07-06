@@ -144,6 +144,10 @@ export function useUserManagement() {
       bookingSlug: "",
       bio: "",
       baseLocation: "",
+      city: "",
+      district: "",
+      locationMapLink: "",
+      coordinates: "",
     },
     validationSchema: CreateUserSchema,
     onSubmit: async (values, { resetForm }) => {

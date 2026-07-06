@@ -40,8 +40,33 @@ export function PhotographerHeader({ profile }: { profile: PhotographerProfile }
             </div>
           )}
           {profile.baseLocation && (
+            <div className="flex items-center gap-2 pt-0.5">
+              <p className="text-body-caption text-zinc-450 dark:text-zinc-500 font-medium">
+                📍 Based in {profile.baseLocation}
+              </p>
+              {profile.locationMapLink && (
+                <a
+                  href={profile.locationMapLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-body-caption text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold underline underline-offset-2 decoration-indigo-200 dark:decoration-indigo-900 transition-colors"
+                >
+                  View on Map
+                </a>
+              )}
+            </div>
+          )}
+          {!profile.baseLocation && profile.locationMapLink && (
             <p className="text-body-caption text-zinc-450 dark:text-zinc-500 font-medium pt-0.5">
-              📍 Based in {profile.baseLocation}
+              📍{" "}
+              <a
+                href={profile.locationMapLink}
+                target="_blank"
+                rel="noreferrer"
+                className="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold underline underline-offset-2 decoration-indigo-200 dark:decoration-indigo-900 transition-colors"
+              >
+                View Base Location on Map
+              </a>
             </p>
           )}
         </div>

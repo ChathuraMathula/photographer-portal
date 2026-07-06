@@ -66,6 +66,9 @@ export class UsersService {
         bookingSlug: slug,
         bio: dto.bio,
         baseLocation: dto.baseLocation,
+        city: dto.city,
+        district: dto.district,
+        locationMapLink: dto.locationMapLink,
         specializations: dto.specializations ?? [],
         isAvailableForBooking: true,
       });
@@ -236,5 +239,30 @@ export class UsersService {
 
   async updateSettings(userId: string, updates: any) {
     return this.profileService.updateSettings(userId, updates);
+  }
+
+  async updateUserSlug(userId: string, newSlug: string) {
+    const profile = await this.profileRepository.findOneBy({ userId });
+    if (!profile) {
+      throw new NotFoundException('Photographer profile not found');
+    }
+
+    if (profile.bookingSlug !== newSlug) {
+      const existing = await this.profileRepository.findOneBy({
+        bookingSlug: newSlug,
+      });
+      if (existing) {
+        throw new ConflictException('Booking slug is already in use');
+      }
+      profile.bookingSlug = newSlug;
+      await this.profileRepository.save(profile);
+      
+      await this.auditLogsService.logAction(
+        'USER_SLUG_UPDATED',
+        `User ${userId} booking slug was updated to ${newSlug} by super admin`,
+        userId,
+      );
+    }
+    return { bookingSlug: profile.bookingSlug };
   }
 }

@@ -78,6 +78,9 @@ export function useDashboardDataLoader({
         const profData = await profRes.json();
         profile.setProfileBio(profData.bio || "");
         profile.setProfileLocation(profData.baseLocation || "");
+        profile.setCity(profData.city || "");
+        profile.setDistrict(profData.district || "");
+        profile.setLocationMapLink(profData.locationMapLink || "");
         profile.setProfilePortfolio(profData.portfolioUrl || "");
         profile.setProfileAvailability(profData.isAvailableForBooking);
         profile.setBookingSlug(profData.bookingSlug || "");

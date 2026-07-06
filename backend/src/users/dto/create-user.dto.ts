@@ -45,6 +45,18 @@ export class CreateUserDto {
   baseLocation?: string;
 
   @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  district?: string;
+
+  @IsOptional()
+  @IsString()
+  locationMapLink?: string;
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   specializations?: string[];

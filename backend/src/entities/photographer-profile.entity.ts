@@ -32,6 +32,15 @@ export class PhotographerProfile {
   @Column({ nullable: true })
   baseLocation?: string;
 
+  @Column({ nullable: true })
+  locationMapLink?: string;
+
+  @Column({ nullable: true })
+  city?: string;
+
+  @Column({ nullable: true })
+  district?: string;
+
   @Column({ default: true })
   isAvailableForBooking!: boolean;
 

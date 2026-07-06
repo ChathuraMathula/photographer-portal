@@ -55,6 +55,9 @@ export class PhotographersService {
       'offlineMessage',
       'showManualBookingInTopbar',
       'showAcceptBookingsInTopbar',
+      'city',
+      'district',
+      'locationMapLink',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),

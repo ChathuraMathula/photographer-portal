@@ -87,4 +87,13 @@ export class UsersController {
     const callerRole = req.user.role;
     return this.usersService.toggleActive(id, callerRole);
   }
+
+  @Patch(':id/slug')
+  @Roles(UserRole.SUPER_ADMIN)
+  updateUserSlug(
+    @Param('id') id: string,
+    @Body('bookingSlug') newSlug: string,
+  ) {
+    return this.usersService.updateUserSlug(id, newSlug);
+  }
 }

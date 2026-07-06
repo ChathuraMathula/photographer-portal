@@ -13,9 +13,15 @@ type Props = {
   location: string;
   portfolio: string;
   bookingSlug?: string;
+  city?: string;
+  district?: string;
+  locationMapLink?: string;
   onBioChange: (v: string) => void;
   onLocationChange: (v: string) => void;
   onPortfolioChange: (v: string) => void;
+  onCityChange?: (v: string) => void;
+  onDistrictChange?: (v: string) => void;
+  onLocationMapLinkChange?: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   profileImageUrl: string;
   onProfileImageUrlChange: (v: string) => void;
@@ -38,9 +44,15 @@ export function ProfileSettingsForm({
   location,
   portfolio,
   bookingSlug,
+  city,
+  district,
+  locationMapLink,
   onBioChange,
   onLocationChange,
   onPortfolioChange,
+  onCityChange,
+  onDistrictChange,
+  onLocationMapLinkChange,
   onSubmit,
   profileImageUrl,
   onProfileImageUrlChange,
@@ -109,6 +121,12 @@ export function ProfileSettingsForm({
         onLocationChange={onLocationChange}
         portfolio={portfolio}
         onPortfolioChange={onPortfolioChange}
+        city={city}
+        onCityChange={onCityChange}
+        district={district}
+        onDistrictChange={onDistrictChange}
+        locationMapLink={locationMapLink}
+        onLocationMapLinkChange={onLocationMapLinkChange}
       />
 
       {/* Card 5: Service Offerings & Event Types */}

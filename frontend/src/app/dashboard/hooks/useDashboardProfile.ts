@@ -13,6 +13,9 @@ interface UseDashboardProfileProps {
 export function useDashboardProfile({ userId, authFetch }: UseDashboardProfileProps) {
   const [profileBio, setProfileBio] = useState("");
   const [profileLocation, setProfileLocation] = useState("");
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
+  const [locationMapLink, setLocationMapLink] = useState("");
   const [profilePortfolio, setProfilePortfolio] = useState("");
   const [profileAvailability, setProfileAvailability] = useState(true);
   const [bookingSlug, setBookingSlug] = useState("");
@@ -35,6 +38,9 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
         body: JSON.stringify({
           bio: profileBio,
           baseLocation: profileLocation,
+          city,
+          district,
+          locationMapLink,
           portfolioUrl: profilePortfolio,
           profileImageUrl,
           allowedEventTypes,
@@ -83,6 +89,12 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
     setProfileBio,
     profileLocation,
     setProfileLocation,
+    city,
+    setCity,
+    district,
+    setDistrict,
+    locationMapLink,
+    setLocationMapLink,
     profilePortfolio,
     setProfilePortfolio,
     profileAvailability,

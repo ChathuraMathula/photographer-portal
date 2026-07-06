@@ -24,8 +24,14 @@ export default function ProfilePage() {
     profileLocation,
     profilePortfolio,
     bookingSlug,
+    city,
+    district,
+    locationMapLink,
     setProfileBio,
     setProfileLocation,
+    setCity,
+    setDistrict,
+    setLocationMapLink,
     setProfilePortfolio,
     handleSaveProfile,
     profileImageUrl,
@@ -50,9 +56,15 @@ export default function ProfilePage() {
       location={profileLocation}
       portfolio={profilePortfolio}
       bookingSlug={bookingSlug}
+      city={city}
+      district={district}
+      locationMapLink={locationMapLink}
       onBioChange={setProfileBio}
       onLocationChange={setProfileLocation}
       onPortfolioChange={setProfilePortfolio}
+      onCityChange={setCity}
+      onDistrictChange={setDistrict}
+      onLocationMapLinkChange={setLocationMapLink}
       onSubmit={handleSaveProfile}
       profileImageUrl={profileImageUrl}
       onProfileImageUrlChange={setProfileImageUrl}

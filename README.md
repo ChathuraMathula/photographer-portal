@@ -40,7 +40,7 @@ photographer-portal/
 │   │   ├── photographers/   # Photographer profile management
 │   │   ├── reservations/    # Reservation management (protected)
 │   │   ├── users/           # User / photographer account creation
-│   │   ├── entities/        # TypeORM entity schemas
+│   ├── entities/        # TypeORM entity schemas (Updated PhotographerProfile with location fields)
 │   │   ├── migrations/      # DB Schema migrations
 │   │   ├── database/        # DatabaseModule configurations
 │   │   ├── scripts/         # seed-data.ts & seed-sarah-data.ts (seeding logic)
@@ -72,10 +72,13 @@ photographer-portal/
           ├── components/
           │   ├── common/
           │   │   ├── OSMMapPreview.tsx # Clean, sandboxed OpenStreetMap Leaflet preview component
-          │   │   └── OSMMapPicker.tsx  # Interactive OpenStreetMap coordinate pin selector
+          │   │   ├── OSMMapPicker.tsx  # Interactive OpenStreetMap coordinate pin selector
+          │   │   └── LocationPickerFormFields.tsx # [NEW] Modular location component handling coords and map links
           │   ├── ui/
-          │   │   ├── pagination.tsx    # [NEW] Reusable Shadcn-style pagination component
+          │   │   ├── pagination.tsx    # Reusable Shadcn-style pagination component
           │   │   └── ...
+          │   ├── users/
+          │   │   └── EditUserSlugModal.tsx # [NEW] Super Admin modal to edit photographer booking slugs
           │   ├── dashboard/
           │   │   ├── profile/ # AdminProfilePage.tsx - Admin profile configuration
           │   │   ├── reports/ 
@@ -364,6 +367,9 @@ Public-facing profile, 1-to-1 with a User of role `PHOTOGRAPHER`.
 | `specializations` | String[] | e.g. `["Wedding", "Portrait"]` |
 | `portfolioUrl` | String | optional |
 | `baseLocation` | String | optional |
+| `city` | String | optional, derived from map coordinates |
+| `district` | String | optional, derived from map coordinates |
+| `locationMapLink` | String | optional, absolute Google Maps link |
 | `isAvailableForBooking` | Boolean | default `true` |
 
 ### `customers`
@@ -597,7 +603,15 @@ When offline cash payments are logged on the photographer's reservation panel, t
 
 ## 🧪 Testing & Database Seeding
 
-### 1. Database Seeding Script (`npm run seed`)
+### 1. Photographer Location & Slug Management
+The system includes modular location components that interact closely with the OpenStreetMap tools:
+- **LocationPickerFormFields.tsx**: Encapsulates all geocoding hooks (`useBookingGeocoding`), map previews (`OSMMapPicker`), and city/district dropdowns (`NominatimSelect`). Used consistently across:
+  - Super Admin's **CreateUserModal**.
+  - Photographer's **LocationPortfolioCard** (Profile Settings).
+  - Customer's **CustomerDetailsForm** (Booking Flow).
+- **EditUserSlugModal.tsx**: Super Admins have exclusive access to dynamically edit photographer `bookingSlug` properties directly from the User Management dashboard table.
+
+### 2. Database Seeding Script (`npm run seed`)
 The project contains an automated database seeding tool located at [`seed-data.ts`](file:///c:/My%20files/BIT%20-%20UOC%20%282025,%202026%29/Source/photographer-portal/backend/src/scripts/seed-data.ts) which clears/resets tables and creates a comprehensive, realistic Sri Lankan dataset covering:
 *   **Users & Roles**: Sets up `SUPER_ADMIN` (admin@photoportal.com), `ADMIN` (agency@photoportal.com), and 4 specialized `PHOTOGRAPHER` accounts (Sarah, Michael, Kanishka, Nadeeka).
 *   **Sri Lankan Customers & Venues**: Populates Sri Lankan names (Priya Perera, Kasun Jayasinghe, Tharindu Goonetilleke, Roshan Alwis) and major venue locations (Galle Face Hotel, Cinnamon Grand, Jetwing Lighthouse Galle, Earls Regency Kandy).

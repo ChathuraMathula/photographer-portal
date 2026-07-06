@@ -72,6 +72,9 @@ export type PhotographerProfile = {
   bio?: string;
   specializations: string[];
   baseLocation?: string;
+  city?: string;
+  district?: string;
+  locationMapLink?: string;
   isAvailableForBooking: boolean;
   profileImageUrl?: string;
   allowedEventTypes?: string[];

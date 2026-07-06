@@ -2,13 +2,15 @@ import { useState } from "react";
 import { type UserAccount } from "@/types";
 import { UserRole } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
-import { Shield, Camera, CheckCircle, XCircle } from "lucide-react";
+import { Shield, Camera, CheckCircle, XCircle, Edit2 } from "lucide-react";
 import { ConfirmationModal } from "@/components/common/ConfirmationModal";
+import { EditUserSlugModal } from "./EditUserSlugModal";
 
 type Props = {
   user: UserAccount;
   onToggleActive: (id: string) => void;
   loggedInUserId: string;
+  loggedInRole: string;
 };
 
 function RoleBadge({ role }: { role: UserRole }) {
@@ -31,9 +33,11 @@ function RoleBadge({ role }: { role: UserRole }) {
   );
 }
 
-export function UserTableRow({ user, onToggleActive, loggedInUserId }: Props) {
+export function UserTableRow({ user, onToggleActive, loggedInUserId, loggedInRole }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentSlug, setCurrentSlug] = useState(user.profile?.bookingSlug || "");
 
   const isDeactivating = user.isActive;
   const fullName = `${user.firstName} ${user.lastName}`;
@@ -61,18 +65,30 @@ export function UserTableRow({ user, onToggleActive, loggedInUserId }: Props) {
         </td>
         <td className="p-4 text-body-small-s text-zinc-500">{user.phone || "-"}</td>
         <td className="p-4">
-          {user.profile?.bookingSlug ? (
-            <a
-              href={`/book/${user.profile.bookingSlug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-body-caption text-primary-light hover:text-primary-dark hover:underline dark:text-indigo-400 dark:hover:text-indigo-305 transition-colors font-semibold"
-            >
-              slug: {user.profile.bookingSlug}
-            </a>
-          ) : (
-            <span className="text-body-caption text-zinc-400">-</span>
-          )}
+          <div className="flex items-center gap-2">
+            {currentSlug ? (
+              <a
+                href={`/book/${currentSlug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-body-caption text-primary-light hover:text-primary-dark hover:underline dark:text-indigo-400 dark:hover:text-indigo-305 transition-colors font-semibold"
+              >
+                slug: {currentSlug}
+              </a>
+            ) : (
+              <span className="text-body-caption text-zinc-400">-</span>
+            )}
+            
+            {loggedInRole === UserRole.SUPER_ADMIN && user.role === UserRole.PHOTOGRAPHER && (
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="p-1 text-zinc-400 hover:text-indigo-500 transition-colors"
+                title="Edit Slug"
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </td>
         <td className="p-4 text-right">
           <Button
@@ -115,6 +131,17 @@ export function UserTableRow({ user, onToggleActive, loggedInUserId }: Props) {
           loading={toggling}
           onConfirm={handleConfirm}
           onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
+      {showEditModal && (
+        <EditUserSlugModal
+          user={user}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={(newSlug) => {
+            setCurrentSlug(newSlug);
+            setShowEditModal(false);
+          }}
         />
       )}
     </>
