@@ -59,12 +59,14 @@ export default function ProfilePage() {
       city={city}
       district={district}
       locationMapLink={locationMapLink}
+      showMapPreviewOnBookingPage={context.showMapPreviewOnBookingPage}
       onBioChange={setProfileBio}
       onLocationChange={setProfileLocation}
       onPortfolioChange={setProfilePortfolio}
       onCityChange={setCity}
       onDistrictChange={setDistrict}
       onLocationMapLinkChange={setLocationMapLink}
+      onShowMapPreviewOnBookingPageChange={context.setShowMapPreviewOnBookingPage}
       onSubmit={handleSaveProfile}
       profileImageUrl={profileImageUrl}
       onProfileImageUrlChange={setProfileImageUrl}

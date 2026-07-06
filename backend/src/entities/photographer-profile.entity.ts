@@ -42,6 +42,9 @@ export class PhotographerProfile {
   district?: string;
 
   @Column({ default: true })
+  showMapPreviewOnBookingPage!: boolean;
+
+  @Column({ default: true })
   isAvailableForBooking!: boolean;
 
   @Column({ type: 'simple-array', default: '' })

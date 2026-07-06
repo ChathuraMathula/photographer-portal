@@ -188,6 +188,8 @@ export function usePhotographerDashboard() {
     setDistrict: profile.setDistrict,
     locationMapLink: profile.locationMapLink,
     setLocationMapLink: profile.setLocationMapLink,
+    showMapPreviewOnBookingPage: profile.showMapPreviewOnBookingPage,
+    setShowMapPreviewOnBookingPage: profile.setShowMapPreviewOnBookingPage,
     profilePortfolio: profile.profilePortfolio,
     setProfilePortfolio: profile.setProfilePortfolio,
     profileAvailability: profile.profileAvailability,

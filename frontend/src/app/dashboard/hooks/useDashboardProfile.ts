@@ -16,6 +16,7 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
   const [locationMapLink, setLocationMapLink] = useState("");
+  const [showMapPreviewOnBookingPage, setShowMapPreviewOnBookingPage] = useState(true);
   const [profilePortfolio, setProfilePortfolio] = useState("");
   const [profileAvailability, setProfileAvailability] = useState(true);
   const [bookingSlug, setBookingSlug] = useState("");
@@ -41,6 +42,7 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
           city,
           district,
           locationMapLink,
+          showMapPreviewOnBookingPage,
           portfolioUrl: profilePortfolio,
           profileImageUrl,
           allowedEventTypes,
@@ -95,6 +97,8 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
     setDistrict,
     locationMapLink,
     setLocationMapLink,
+    showMapPreviewOnBookingPage,
+    setShowMapPreviewOnBookingPage,
     profilePortfolio,
     setProfilePortfolio,
     profileAvailability,

@@ -22,6 +22,8 @@ type Props = {
   onCityChange?: (v: string) => void;
   onDistrictChange?: (v: string) => void;
   onLocationMapLinkChange?: (v: string) => void;
+  showMapPreviewOnBookingPage: boolean;
+  onShowMapPreviewOnBookingPageChange: (v: boolean) => void;
   onSubmit: (e: React.FormEvent) => void;
   profileImageUrl: string;
   onProfileImageUrlChange: (v: string) => void;
@@ -53,6 +55,8 @@ export function ProfileSettingsForm({
   onCityChange,
   onDistrictChange,
   onLocationMapLinkChange,
+  showMapPreviewOnBookingPage,
+  onShowMapPreviewOnBookingPageChange,
   onSubmit,
   profileImageUrl,
   onProfileImageUrlChange,
@@ -127,6 +131,8 @@ export function ProfileSettingsForm({
         onDistrictChange={onDistrictChange}
         locationMapLink={locationMapLink}
         onLocationMapLinkChange={onLocationMapLinkChange}
+        showMapPreviewOnBookingPage={showMapPreviewOnBookingPage}
+        onShowMapPreviewOnBookingPageChange={onShowMapPreviewOnBookingPageChange}
       />
 
       {/* Card 5: Service Offerings & Event Types */}

@@ -75,6 +75,7 @@ export type PhotographerProfile = {
   city?: string;
   district?: string;
   locationMapLink?: string;
+  showMapPreviewOnBookingPage?: boolean;
   isAvailableForBooking: boolean;
   profileImageUrl?: string;
   allowedEventTypes?: string[];

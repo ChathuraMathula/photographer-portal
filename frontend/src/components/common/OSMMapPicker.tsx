@@ -11,6 +11,7 @@ type Props = {
   district?: string;
   className?: string;
   height?: string;
+  readOnly?: boolean;
 };
 
 export function OSMMapPicker({
@@ -21,6 +22,7 @@ export function OSMMapPicker({
   district,
   className = "",
   height = "300px",
+  readOnly = false,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -116,17 +118,26 @@ export function OSMMapPicker({
       </style>
     </head>
     <body>
-      <div class="info-panel">📍 Click map to position the exact venue pin</div>
+      ${readOnly ? "" : `<div class="info-panel">📍 Click map to position the exact venue pin</div>`}
       <div id="map"></div>
       <script>
-        var map = L.map('map', { zoomControl: true }).setView([${currentLat}, ${currentLon}], 13);
+        var map = L.map('map', { 
+          zoomControl: ${!readOnly},
+          dragging: ${!readOnly},
+          scrollWheelZoom: ${!readOnly},
+          doubleClickZoom: ${!readOnly},
+          boxZoom: ${!readOnly},
+          keyboard: ${!readOnly}
+        }).setView([${currentLat}, ${currentLon}], 13);
+        
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        var marker = L.marker([${currentLat}, ${currentLon}], { draggable: true }).addTo(map);
+        var marker = L.marker([${currentLat}, ${currentLon}], { draggable: ${!readOnly} }).addTo(map);
 
+        ${!readOnly ? `
         // Click event on map
         map.on('click', function(e) {
           var lat = e.latlng.lat;
@@ -141,6 +152,7 @@ export function OSMMapPicker({
           var lng = marker.getLatLng().lng;
           window.parent.postMessage({ type: 'OSM_MAP_CLICK', lat: lat, lon: lng }, '*');
         });
+        ` : ""}
 
         // Listen for pan requests
         window.addEventListener('message', function(event) {

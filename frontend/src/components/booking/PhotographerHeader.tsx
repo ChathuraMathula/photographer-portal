@@ -1,5 +1,6 @@
 import { type PhotographerProfile } from "@/types";
 import { Card } from "@/components/ui/card";
+import { OSMMapPicker } from "@/components/common/OSMMapPicker";
 
 export function PhotographerHeader({ profile }: { profile: PhotographerProfile }) {
   return (
@@ -71,6 +72,24 @@ export function PhotographerHeader({ profile }: { profile: PhotographerProfile }
           )}
         </div>
       </div>
+      
+      {/* Map Preview section rendered at the bottom of the card if enabled */}
+      {profile.showMapPreviewOnBookingPage && profile.locationMapLink && (
+        <div className="border-t border-zinc-100 dark:border-zinc-850 p-4 bg-zinc-50/50 dark:bg-zinc-950/50">
+          <p className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300 mb-3 ml-1">
+            Service Location Map
+          </p>
+          <OSMMapPicker
+            lat={parseFloat(profile.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || undefined}
+            lon={parseFloat(profile.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2] || "") || undefined}
+            city={profile.city}
+            district={profile.district}
+            onChange={() => {}}
+            height="180px"
+            readOnly={true}
+          />
+        </div>
+      )}
     </Card>
   );
 }
