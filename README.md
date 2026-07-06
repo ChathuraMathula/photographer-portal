@@ -122,6 +122,8 @@ This starts:
 - **RabbitMQ Message Broker** on `localhost:5672`
 - **RabbitMQ Management UI** on `http://localhost:15672`
   - **Login**: `guest` / `guest`
+- **Elasticsearch (Analytics Engine)** on `localhost:9200`
+  - Accessible via `http://localhost:9200` (No auth required for local dev)
 
 ### pgAdmin Login & Database Connection
 
@@ -445,6 +447,10 @@ The backend employs an Event-Driven architecture powered by RabbitMQ to decouple
    - Traditional Socket.IO only works if User A and User B are connected to the same exact server.
    - We implemented a proxy pattern for `ChatGateway`. When `BookingsService` or a user emits a chat message, the proxy intercepts it and publishes `chat.broadcast` to RabbitMQ.
    - Every backend instance's `ChatController` picks up this event and commands its physical `ChatWorkerGateway` to push the update to locally connected clients, keeping all instances globally synchronized!
+3. **Analytics (Elasticsearch CQRS)**:
+   - To provide lightning-fast analytics across millions of records without slowing down PostgreSQL, we implemented a CQRS pattern using Elasticsearch.
+   - A TypeORM `EventSubscriber` intercepts any changes to `Reservation` or `Payment` and silently syncs the document to Elasticsearch in the background.
+   - The Reports module utilizes the `@elastic/elasticsearch` client to perform instant bucket aggregations (`aggs`) for timeline graphs, packaging, and revenue metrics.
 
 ---
 
