@@ -254,7 +254,7 @@ export class UsersService {
     if (updates.lastName) user.lastName = updates.lastName;
     await this.userRepository.save(user);
 
-    let finalSlug = null;
+    let finalSlug: string | null = null;
     const profile = await this.profileRepository.findOneBy({ userId });
     
     if (profile && updates.bookingSlug) {

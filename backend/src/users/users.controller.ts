@@ -16,6 +16,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDetailsDto } from './dto/update-user-details.dto';
 
 interface RequestWithUser extends Request {
   user: {
@@ -92,7 +93,7 @@ export class UsersController {
   @Roles(UserRole.SUPER_ADMIN)
   updateUserDetails(
     @Param('id') id: string,
-    @Body() body: { firstName?: string; lastName?: string; bookingSlug?: string },
+    @Body() body: UpdateUserDetailsDto,
   ) {
     return this.usersService.updateUserDetails(id, body);
   }
