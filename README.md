@@ -15,7 +15,7 @@ A reservation management system for photographers. Super Admins manage photograp
 | UI | shadcn/ui, Tailwind CSS 4 |
 | Forms | Formik + Yup |
 | State | Redux Toolkit |
-| Infrastructure | Docker + Docker Compose |
+| Infrastructure | Docker + Docker Compose + RabbitMQ |
 
 ---
 
@@ -33,6 +33,7 @@ A reservation management system for photographers. Super Admins manage photograp
 photographer-portal/
 ├── docker-compose.yml       # PostgreSQL + pgAdmin + Maildev
 ├── backend/                 # NestJS API (port 4001)
+│   ├── docker-compose.yml   # [NEW] RabbitMQ (ports 5672, 15672)
 │   ├── src/
 │   │   ├── auth/            # JWT auth, guards, strategies
 │   │   ├── bookings/        # Public booking flow (no auth)
@@ -110,6 +111,18 @@ This starts:
 - **pgAdmin 4** (DB UI) on `http://localhost:5050`
 - **Maildev** (Local SMTP Web UI) on `http://localhost:1080` (SMTP port `1025`)
 
+### Start RabbitMQ (Backend Infrastructure)
+
+```bash
+cd backend
+docker compose up -d
+```
+
+This starts:
+- **RabbitMQ Message Broker** on `localhost:5672`
+- **RabbitMQ Management UI** on `http://localhost:15672`
+  - **Login**: `guest` / `guest`
+
 ### pgAdmin Login & Database Connection
 
 To access and manage the database via the pgAdmin web UI:
@@ -163,6 +176,9 @@ DB_DATABASE=portal
 
 # Authentication configs
 JWT_SECRET=SUPER_SECRET_KEY_CHANGE_ME
+
+# RabbitMQ configs
+RABBITMQ_URL=amqp://localhost:5672
 ```
 
 #### Frontend configurations
@@ -415,6 +431,20 @@ Simulates custom portal chat logs between photographers and customer trackers.
 | `reservationId` | UUID (string) | foreign key: Reservation |
 | `sender` | String | `CUSTOMER` \| `PHOTOGRAPHER` |
 | `content` | String | chat message text |
+
+---
+
+## Asynchronous Architecture (RabbitMQ)
+
+The backend employs an Event-Driven architecture powered by RabbitMQ to decouple slow/resource-intensive tasks and scale WebSockets horizontally.
+
+1. **Email Notifications**: 
+   - Instead of blocking the HTTP thread to send an email via Nodemailer, the `EmailService` injects a RabbitMQ `ClientProxy` and publishes an event (e.g., `email.sendInvoice`) to the `notifications_queue`.
+   - A background microservice (`EmailController`) consumes the queue and actually dispatches the email.
+2. **WebSocket Horizontal Scaling (Chat)**:
+   - Traditional Socket.IO only works if User A and User B are connected to the same exact server.
+   - We implemented a proxy pattern for `ChatGateway`. When `BookingsService` or a user emits a chat message, the proxy intercepts it and publishes `chat.broadcast` to RabbitMQ.
+   - Every backend instance's `ChatController` picks up this event and commands its physical `ChatWorkerGateway` to push the update to locally connected clients, keeping all instances globally synchronized!
 
 ---
 
