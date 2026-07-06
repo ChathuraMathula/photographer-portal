@@ -16,10 +16,6 @@ import { User } from '../entities/user.entity';
     TypeOrmModule.forFeature([Reservation, Payment, User]),
     ElasticsearchModule.register({
       node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
     }),
   ],
   controllers: [ReportsController],
