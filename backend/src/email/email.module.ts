@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { EmailService } from './email.service';
 import { EmailWorkerService } from './email-worker.service';
 import { EmailController } from './email.controller';
@@ -12,19 +12,7 @@ import { User } from '../entities/user.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Reservation, User]),
-    ClientsModule.register([
-      {
-        name: 'RABBITMQ_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-          queue: 'notifications_queue',
-          queueOptions: {
-            durable: true,
-          },
-        },
-      },
-    ]),
+    RabbitMQModule,
   ],
   controllers: [EmailController],
   providers: [EmailService, EmailWorkerService, RemindersService],

@@ -16,6 +16,7 @@ import { EmailModule } from './email/email.module';
 import { ReportsModule } from './reports/reports.module';
 import { InvoicesModule } from './reports/invoices.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { User } from './entities/user.entity';
 import { PhotographerProfile } from './entities/photographer-profile.entity';
 import { Package } from './entities/package.entity';
@@ -67,6 +68,7 @@ if (
     ReportsModule,
     InvoicesModule,
     AuditLogsModule,
+    RabbitMQModule,
   ],
   controllers: [AppController],
   providers: [AppService],
