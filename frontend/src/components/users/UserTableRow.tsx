@@ -3,8 +3,8 @@ import { type UserAccount } from "@/types";
 import { UserRole } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Shield, Camera, CheckCircle, XCircle, Edit2 } from "lucide-react";
-import { ConfirmationModal } from "@/components/common/ConfirmationModal";
-import { EditUserDetailsModal } from "./EditUserDetailsModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { EditUserDetailsModal } from "@/components/modals/EditUserDetailsModal";
 
 type Props = {
   user: UserAccount;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useBooking } from "./hooks/useBooking";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { LoadingSpinner } from "@/components/feedback/LoadingSpinner";
 import { PhotographerHeader } from "@/components/booking/PhotographerHeader";
 import { AvailabilityForm } from "@/components/booking/AvailabilityForm";
 import { CustomerDetailsForm } from "@/components/booking/CustomerDetailsForm";

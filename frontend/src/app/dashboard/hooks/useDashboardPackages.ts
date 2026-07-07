@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { toast } from "sonner";
 import * as Yup from "yup";
 import { type Package } from "@/types";
-import { type PackageFormValues } from "@/components/dashboard/PackageFormModal";
+import { type PackageFormValues } from "@/components/modals/PackageFormModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

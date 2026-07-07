@@ -3,7 +3,7 @@ import { type FormikProps } from "formik";
 import { Label } from "@/components/ui/label";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { TimeSelect } from "@/components/booking/TimeSelect";
-import { type ManualBookingValues } from "../../ManualBookingModal";
+import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
 
 type Props = {
   formik: FormikProps<ManualBookingValues>;

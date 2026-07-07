@@ -1,6 +1,6 @@
 import React from "react";
 import { type Package } from "@/types";
-import { type CustomPackageValues } from "../../CustomPackageModal";
+import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 

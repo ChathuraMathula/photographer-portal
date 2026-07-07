@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Clock, ChevronDown } from "lucide-react";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 
 type Props = {
   value: string;

@@ -3,7 +3,7 @@
 import React from "react";
 import { type Reservation } from "@/types";
 import { Calendar, Clock, User, Mail, Phone, Tag } from "lucide-react";
-import { CustomerTrackingBlock } from "../../customer-details/components/CustomerTrackingBlock";
+import { CustomerTrackingBlock } from "@/components/dashboard/customer-details/components/CustomerTrackingBlock";
 
 interface MetaProps {
   reservation: Reservation;

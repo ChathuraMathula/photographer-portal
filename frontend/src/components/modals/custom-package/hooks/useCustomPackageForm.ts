@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { type CustomPackageValues } from "../../CustomPackageModal";
+import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 
 interface FormProps {
   initialValues?: CustomPackageValues;

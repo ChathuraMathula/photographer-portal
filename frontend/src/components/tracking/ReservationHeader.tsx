@@ -1,5 +1,5 @@
 import { type TrackingReservation } from "@/types";
-import { StatusBadge } from "@/components/common/StatusBadge";
+import { StatusBadge } from "@/components/feedback/StatusBadge";
 import { ExternalLink } from "lucide-react";
 
 export function ReservationHeader({ reservation }: { reservation: TrackingReservation }) {

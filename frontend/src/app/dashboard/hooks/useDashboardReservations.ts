@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { type Reservation, type Package } from "@/types";
 
-import { type CustomPackageValues } from "@/components/dashboard/CustomPackageModal";
+import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

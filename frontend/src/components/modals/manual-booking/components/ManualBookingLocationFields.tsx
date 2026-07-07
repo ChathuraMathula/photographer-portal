@@ -2,11 +2,11 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 import { EventTypeSelect } from "@/components/booking/EventTypeSelect";
-import { NominatimSelect } from "@/components/common/NominatimSelect";
-import { OSMMapPicker } from "@/components/common/OSMMapPicker";
-import { type ManualBookingValues } from "../../ManualBookingModal";
+import { NominatimSelect } from "@/components/maps/NominatimSelect";
+import { OSMMapPicker } from "@/components/maps/OSMMapPicker";
+import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
 import { useManualBookingGeocode } from "../hooks/useManualBookingGeocode";
 
 type Props = {

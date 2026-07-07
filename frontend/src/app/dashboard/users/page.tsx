@@ -9,7 +9,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
 import { Button } from "@/components/ui/button";
 import { UserTable } from "@/components/users/UserTable";
-import { CreateUserModal } from "@/components/users/CreateUserModal";
+import { CreateUserModal } from "@/components/modals/CreateUserModal";
 import { UserPlus, Search } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import {

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { RootState } from "@/store/store";
 import { UserRole, logout } from "@/store/slices/authSlice";
 import { type UserAccount } from "@/types";
-import { type CreateUserValues } from "@/components/users/CreateUserModal";
+import { type CreateUserValues } from "@/components/modals/CreateUserModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

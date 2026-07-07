@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CustomPackageModal, type CustomPackageValues } from "./CustomPackageModal";
+import { CustomPackageModal, type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 import { ProposePackageList } from "./propose-quotation/components/ProposePackageList";
 import { ProposeRejectForm } from "./propose-quotation/components/ProposeRejectForm";
 

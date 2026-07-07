@@ -3,7 +3,7 @@
 import React from "react";
 import { type Reservation } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ConfirmationModal } from "@/components/common/ConfirmationModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { useProposalStatus } from "./proposal-status/hooks/useProposalStatus";
 import { ProposalDetails } from "./proposal-status/components/ProposalDetails";
 import { ProposalPaymentDetails } from "./proposal-status/components/ProposalPaymentDetails";

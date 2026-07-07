@@ -2,7 +2,7 @@
 
 import React from "react";
 import { type Reservation, type Package } from "@/types";
-import { type CustomPackageValues } from "../../CustomPackageModal";
+import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 import { CustomerDetailsCard } from "../../CustomerDetailsCard";
 import { ProposalStatusCard } from "../../ProposalStatusCard";
 import { ReservationsProposalSection } from "./ReservationsProposalSection";

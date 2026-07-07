@@ -2,8 +2,8 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FieldError } from "@/components/common/FieldError";
-import { type PackageFormValues } from "../../PackageFormModal";
+import { FieldError } from "@/components/feedback/FieldError";
+import { type PackageFormValues } from "@/components/modals/PackageFormModal";
 
 type Props = {
   formik: FormikProps<PackageFormValues>;

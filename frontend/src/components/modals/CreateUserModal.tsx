@@ -3,7 +3,7 @@ import { UserRole } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 import { Sparkles, X } from "lucide-react";
 import {
   Select,
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LocationPickerFormFields } from "@/components/common/LocationPickerFormFields";
+import { LocationPickerFormFields } from "@/components/maps/LocationPickerFormFields";
 
 export type CreateUserValues = {
   firstName: string;

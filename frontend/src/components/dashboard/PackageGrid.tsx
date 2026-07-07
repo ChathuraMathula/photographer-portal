@@ -3,7 +3,7 @@ import { type Package } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PackageCard } from "./PackageCard";
-import { DeletePackageConfirmModal } from "./DeletePackageConfirmModal";
+import { DeletePackageConfirmModal } from "@/components/modals/DeletePackageConfirmModal";
 
 type Props = {
   packages: Package[];

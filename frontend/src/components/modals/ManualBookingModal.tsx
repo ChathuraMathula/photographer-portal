@@ -2,11 +2,11 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { Button } from "@/components/ui/button";
 import { type Package } from "@/types";
-import { ModalLayout } from "@/components/common/ModalLayout";
-import { ManualBookingClientFields } from "./manual-booking/components/ManualBookingClientFields";
-import { ManualBookingTimeFields } from "./manual-booking/components/ManualBookingTimeFields";
-import { ManualBookingLocationFields } from "./manual-booking/components/ManualBookingLocationFields";
-import { ManualBookingPackageFields } from "./manual-booking/components/ManualBookingPackageFields";
+import { ModalLayout } from "@/components/modals/ModalLayout";
+import { ManualBookingClientFields } from "@/components/modals/manual-booking/components/ManualBookingClientFields";
+import { ManualBookingTimeFields } from "@/components/modals/manual-booking/components/ManualBookingTimeFields";
+import { ManualBookingLocationFields } from "@/components/modals/manual-booking/components/ManualBookingLocationFields";
+import { ManualBookingPackageFields } from "@/components/modals/manual-booking/components/ManualBookingPackageFields";
 
 export type ManualBookingValues = {
   firstName: string;

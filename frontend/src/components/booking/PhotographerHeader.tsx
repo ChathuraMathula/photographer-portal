@@ -1,6 +1,6 @@
 import { type PhotographerProfile } from "@/types";
 import { Card } from "@/components/ui/card";
-import { OSMMapPicker } from "@/components/common/OSMMapPicker";
+import { OSMMapPicker } from "@/components/maps/OSMMapPicker";
 
 export function PhotographerHeader({ profile }: { profile: PhotographerProfile }) {
   return (

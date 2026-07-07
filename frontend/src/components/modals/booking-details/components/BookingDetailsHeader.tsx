@@ -3,7 +3,7 @@
 import React from "react";
 import { type Reservation } from "@/types";
 import { X } from "lucide-react";
-import { StatusBadge } from "@/components/common/StatusBadge";
+import { StatusBadge } from "@/components/feedback/StatusBadge";
 
 interface HeaderProps {
   reservation: Reservation;

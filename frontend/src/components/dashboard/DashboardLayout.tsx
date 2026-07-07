@@ -10,7 +10,7 @@ import {
   BarChart3,
   Receipt,
 } from "lucide-react";
-import { LogoutConfirmModal } from "@/components/common/LogoutConfirmModal";
+import { LogoutConfirmModal } from "@/components/modals/LogoutConfirmModal";
 import { DesktopSidebar } from "./layout/DesktopSidebar";
 import { MobileSidebarDrawer } from "./layout/MobileSidebarDrawer";
 import { TopbarHeader } from "./layout/TopbarHeader";

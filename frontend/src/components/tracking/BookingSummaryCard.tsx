@@ -1,7 +1,7 @@
 import { type TrackingReservation } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Tag, MapPin } from "lucide-react";
-import { OSMMapPreview } from "@/components/common/OSMMapPreview";
+import { OSMMapPreview } from "@/components/maps/OSMMapPreview";
 
 export function BookingSummaryCard({ reservation }: { reservation: TrackingReservation }) {
   return (

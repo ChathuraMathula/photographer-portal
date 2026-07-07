@@ -1,5 +1,5 @@
 import { type Reservation } from "@/types";
-import { StatusPill } from "@/components/common/StatusBadge";
+import { StatusPill } from "@/components/feedback/StatusBadge";
 
 type Props = {
   reservation: Reservation;

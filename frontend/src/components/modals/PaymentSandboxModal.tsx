@@ -10,8 +10,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { type TrackingReservation } from "@/types";
-import { TestCardsGrid } from "./components/TestCardsGrid";
-import { CardFormFields } from "./components/CardFormFields";
+import { TestCardsGrid } from "@/components/tracking/components/TestCardsGrid";
+import { CardFormFields } from "@/components/tracking/components/CardFormFields";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

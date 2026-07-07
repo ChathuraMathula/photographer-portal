@@ -3,7 +3,7 @@ import { BookingPageLinkCard } from "./profile/BookingPageLinkCard";
 import { BiographyCard } from "./profile/BiographyCard";
 import { LocationPortfolioCard } from "./profile/LocationPortfolioCard";
 import { EventTypesCard } from "./profile/EventTypesCard";
-import { AcceptBookingsConfirmModal } from "./AcceptBookingsConfirmModal";
+import { AcceptBookingsConfirmModal } from "@/components/modals/AcceptBookingsConfirmModal";
 import { useState } from "react";
 
 import { TopBarPreferencesCard } from "./profile/TopBarPreferencesCard";

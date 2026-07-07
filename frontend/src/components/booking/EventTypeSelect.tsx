@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown } from "lucide-react";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 
 type Props = {
   value: string;

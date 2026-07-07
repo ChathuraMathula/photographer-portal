@@ -11,9 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 import { type AvailabilityValues } from "./AvailabilityForm";
-import { LocationPickerFormFields } from "@/components/common/LocationPickerFormFields";
+import { LocationPickerFormFields } from "@/components/maps/LocationPickerFormFields";
 
 export type CustomerDetailsValues = {
   firstName: string;

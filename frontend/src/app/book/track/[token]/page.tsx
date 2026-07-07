@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useTracking } from "./hooks/useTracking";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { LoadingSpinner } from "@/components/feedback/LoadingSpinner";
 import { ChatBox } from "@/components/common/ChatBox";
 import { EmailVerificationScreen } from "@/components/tracking/EmailVerificationScreen";
 import { ReservationHeader } from "@/components/tracking/ReservationHeader";
@@ -12,7 +12,7 @@ import { CancelledNotice } from "@/components/tracking/CancelledNotice";
 import { ProposalSection } from "@/components/tracking/ProposalSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PaymentSandboxModal } from "@/components/tracking/PaymentSandboxModal";
+import { PaymentSandboxModal } from "@/components/modals/PaymentSandboxModal";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { OSMMapPreview } from "@/components/common/OSMMapPreview";
+import { OSMMapPreview } from "@/components/maps/OSMMapPreview";
 
 interface CustomerLocationSectionProps {
   startTime: string;

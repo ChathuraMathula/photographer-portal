@@ -2,7 +2,7 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type PackageFormValues } from "../../PackageFormModal";
+import { type PackageFormValues } from "@/components/modals/PackageFormModal";
 
 type Props = {
   formik: FormikProps<PackageFormValues>;

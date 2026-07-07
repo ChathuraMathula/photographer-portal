@@ -2,9 +2,9 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { type Package } from "@/types";
 import { Button } from "@/components/ui/button";
-import { ModalLayout } from "@/components/common/ModalLayout";
-import { PackageFormBasicInfo } from "./package-form/components/PackageFormBasicInfo";
-import { PackageFormPricing } from "./package-form/components/PackageFormPricing";
+import { ModalLayout } from "@/components/modals/ModalLayout";
+import { PackageFormBasicInfo } from "@/components/modals/package-form/components/PackageFormBasicInfo";
+import { PackageFormPricing } from "@/components/modals/package-form/components/PackageFormPricing";
 
 export type PackageFormValues = {
   name: string;

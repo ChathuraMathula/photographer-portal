@@ -2,7 +2,7 @@
 
 import React from "react";
 import { type Reservation, type Package } from "@/types";
-import { type CustomPackageValues } from "./CustomPackageModal";
+import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 import { ReservationsLeftPane } from "./reservations-tab/components/ReservationsLeftPane";
 import { ReservationsRightPane } from "./reservations-tab/components/ReservationsRightPane";
 

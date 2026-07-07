@@ -10,8 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { NominatimSelect } from "@/components/common/NominatimSelect";
-import { OSMMapPicker } from "@/components/common/OSMMapPicker";
+import { NominatimSelect } from "@/components/maps/NominatimSelect";
+import { OSMMapPicker } from "@/components/maps/OSMMapPicker";
 import { useBookingGeocoding } from "@/components/booking/hooks/useBookingGeocoding";
 
 type LocationPortfolioCardProps = {

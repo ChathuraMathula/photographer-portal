@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { type Reservation } from "@/types";
 import { usePhotographerDashboardContext } from "@/app/dashboard/context/PhotographerDashboardContext";
-import { downloadInvoice } from "../../proposal-status/utils/downloadInvoice";
-import { useCustomerDetails } from "../../customer-details/hooks/useCustomerDetails";
+import { downloadInvoice } from "@/components/dashboard/proposal-status/utils/downloadInvoice";
+import { useCustomerDetails } from "@/components/dashboard/customer-details/hooks/useCustomerDetails";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

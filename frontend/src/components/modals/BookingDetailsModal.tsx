@@ -3,12 +3,12 @@
 import React from "react";
 import { type Reservation } from "@/types";
 import { Button } from "@/components/ui/button";
-import { ConfirmationModal } from "@/components/common/ConfirmationModal";
-import { useBookingDetails } from "./booking-details/hooks/useBookingDetails";
-import { BookingDetailsHeader } from "./booking-details/components/BookingDetailsHeader";
-import { BookingDetailsMeta } from "./booking-details/components/BookingDetailsMeta";
-import { BookingDetailsLocation } from "./booking-details/components/BookingDetailsLocation";
-import { BookingDetailsPayments } from "./booking-details/components/BookingDetailsPayments";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { useBookingDetails } from "@/components/modals/booking-details/hooks/useBookingDetails";
+import { BookingDetailsHeader } from "@/components/modals/booking-details/components/BookingDetailsHeader";
+import { BookingDetailsMeta } from "@/components/modals/booking-details/components/BookingDetailsMeta";
+import { BookingDetailsLocation } from "@/components/modals/booking-details/components/BookingDetailsLocation";
+import { BookingDetailsPayments } from "@/components/modals/booking-details/components/BookingDetailsPayments";
 
 type Props = {
   reservation: Reservation;

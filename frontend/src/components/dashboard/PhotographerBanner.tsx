@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { AcceptBookingsConfirmModal } from "./AcceptBookingsConfirmModal";
+import { AcceptBookingsConfirmModal } from "@/components/modals/AcceptBookingsConfirmModal";
 
 type Props = {
   firstName: string;

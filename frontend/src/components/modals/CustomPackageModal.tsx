@@ -12,9 +12,9 @@ export type CustomPackageValues = {
   depositValue: number;
   includes: string[];
 };
-import { useCustomPackageForm } from "./custom-package/hooks/useCustomPackageForm";
-import { CustomPackageFormFields } from "./custom-package/components/CustomPackageFormFields";
-import { CustomPackageDepositRules } from "./custom-package/components/CustomPackageDepositRules";
+import { useCustomPackageForm } from "@/components/modals/custom-package/hooks/useCustomPackageForm";
+import { CustomPackageFormFields } from "@/components/modals/custom-package/components/CustomPackageFormFields";
+import { CustomPackageDepositRules } from "@/components/modals/custom-package/components/CustomPackageDepositRules";
 
 type Props = {
   isOpen: boolean;

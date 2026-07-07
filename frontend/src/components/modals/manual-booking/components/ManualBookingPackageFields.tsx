@@ -2,9 +2,9 @@ import React from "react";
 import { type FormikProps } from "formik";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FieldError } from "@/components/common/FieldError";
+import { FieldError } from "@/components/feedback/FieldError";
 import { type Package } from "@/types";
-import { type ManualBookingValues } from "../../ManualBookingModal";
+import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
 
 type Props = {
   formik: FormikProps<ManualBookingValues>;

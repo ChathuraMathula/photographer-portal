@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { type FormikProps } from "formik";
-import { type ManualBookingValues } from "../../ManualBookingModal";
+import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
 
 export function useManualBookingGeocode(formik: FormikProps<ManualBookingValues>) {
   const [geocodingStatus, setGeocodingStatus] = useState("");

@@ -3,7 +3,7 @@
 import { useFormik } from "formik";
 import { toast } from "sonner";
 import * as Yup from "yup";
-import { type ManualBookingValues } from "@/components/dashboard/ManualBookingModal";
+import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 

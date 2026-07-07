@@ -7,9 +7,9 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PhotographerTopbarActions } from "@/components/dashboard/PhotographerTopbarActions";
 import { FloatingChatWidget } from "@/components/dashboard/FloatingChatWidget";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
-import { BookingDetailsModal } from "@/components/dashboard/BookingDetailsModal";
-import { ManualBookingModal } from "@/components/dashboard/ManualBookingModal";
-import { PackageFormModal } from "@/components/dashboard/PackageFormModal";
+import { BookingDetailsModal } from "@/components/modals/BookingDetailsModal";
+import { ManualBookingModal } from "@/components/modals/ManualBookingModal";
+import { PackageFormModal } from "@/components/modals/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { useUserSettings } from "@/context/UserSettingsContext";
 
