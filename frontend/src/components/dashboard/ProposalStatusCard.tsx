@@ -16,6 +16,7 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
   const isExpired = reservation.status === "PROPOSED" && reservation.paymentDeadline && new Date(reservation.paymentDeadline) < new Date();
   
   const context = usePhotographerDashboardContext();
+  const paymentsUpdatedTrigger = context?.paymentsUpdatedTrigger;
   const [payments, setPayments] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [fulfilling, setFulfilling] = useState(false);
@@ -43,7 +44,7 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
     if (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") {
       fetchPayments();
     }
-  }, [reservation.id, reservation.status]);
+  }, [reservation.id, reservation.status, paymentsUpdatedTrigger]);
 
   const handleLogCashPayment = async () => {
     if (!context || !reservation.id) return;

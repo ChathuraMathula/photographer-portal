@@ -126,8 +126,16 @@ export function useDashboardRealtime({
       }
     };
 
-    const handleTransactionLogged = () => {
+    const handleTransactionLogged = (data?: { reservationId: string }) => {
       loadTransactions();
+      if (data?.reservationId) {
+        if (reservationsState.setPaymentsUpdatedTrigger) {
+          reservationsState.setPaymentsUpdatedTrigger((prev: number) => prev + 1);
+        }
+        if (reservationsState.fetchReservations) {
+          reservationsState.fetchReservations();
+        }
+      }
     };
 
     socket.on("reservationCreated", handleReservationCreated);

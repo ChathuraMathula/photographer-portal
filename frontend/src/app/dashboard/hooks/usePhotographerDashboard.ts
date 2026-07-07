@@ -262,5 +262,7 @@ export function usePhotographerDashboard() {
     setShowManualBookingInTopbar: profile.setShowManualBookingInTopbar,
     showAcceptBookingsInTopbar: profile.showAcceptBookingsInTopbar,
     setShowAcceptBookingsInTopbar: profile.setShowAcceptBookingsInTopbar,
+    paymentsUpdatedTrigger: reservationsState.paymentsUpdatedTrigger,
+    setPaymentsUpdatedTrigger: reservationsState.setPaymentsUpdatedTrigger,
   };
 }

@@ -27,6 +27,7 @@ export function BookingDetailsModal({
   const [showCashConfirm, setShowCashConfirm] = useState(false);
 
   const context = usePhotographerDashboardContext();
+  const paymentsUpdatedTrigger = context?.paymentsUpdatedTrigger;
   const [payments, setPayments] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [fulfilling, setFulfilling] = useState(false);
@@ -53,7 +54,7 @@ export function BookingDetailsModal({
     if (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") {
       fetchPayments();
     }
-  }, [reservation.id, reservation.status]);
+  }, [reservation.id, reservation.status, paymentsUpdatedTrigger]);
 
   const handleLogCashPayment = async () => {
     if (!context || !reservation.id) return;

@@ -25,6 +25,7 @@ export function useDashboardReservations({
 }: UseDashboardReservationsProps) {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
+  const [paymentsUpdatedTrigger, setPaymentsUpdatedTrigger] = useState(0);
 
   // Pagination & Filters
   const [page, setPage] = useState(1);
@@ -288,5 +289,7 @@ export function useDashboardReservations({
     calendarReservations,
     fetchCalendarReservations,
     calendarLoading,
+    paymentsUpdatedTrigger,
+    setPaymentsUpdatedTrigger,
   };
 }
