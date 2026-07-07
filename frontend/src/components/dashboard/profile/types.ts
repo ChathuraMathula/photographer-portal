@@ -1,0 +1,34 @@
+import React from "react";
+
+export type ProfileSettingsFormProps = {
+  bio: string;
+  location: string;
+  portfolio: string;
+  bookingSlug?: string;
+  city?: string;
+  district?: string;
+  locationMapLink?: string;
+  onBioChange: (v: string) => void;
+  onLocationChange: (v: string) => void;
+  onPortfolioChange: (v: string) => void;
+  onCityChange?: (v: string) => void;
+  onDistrictChange?: (v: string) => void;
+  onLocationMapLinkChange?: (v: string) => void;
+  showMapPreviewOnBookingPage: boolean;
+  onShowMapPreviewOnBookingPageChange: (v: boolean) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  profileImageUrl: string;
+  onProfileImageUrlChange: (v: string) => void;
+  allowedEventTypes: string[];
+  onAllowedEventTypesChange: (v: string[]) => void;
+  allowCustomEventTypes: boolean;
+  onAllowCustomEventTypesChange: (v: boolean) => void;
+  universalDepositType: string;
+  universalDepositValue: number;
+  onUniversalDepositTypeChange: (v: string) => void;
+  onUniversalDepositValueChange: (v: number) => void;
+  offlineMessage: string;
+  onOfflineMessageChange: (v: string) => void;
+  profileAvailability: boolean;
+  onToggleAvailability: () => void;
+};

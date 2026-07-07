@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Send, MessageSquare } from "lucide-react";
 import { type ChatMessage } from "@/types";
+import { ChatBoxHeader } from "./chat-box/components/ChatBoxHeader";
+import { ChatBoxMessageList } from "./chat-box/components/ChatBoxMessageList";
+import { ChatBoxInput } from "./chat-box/components/ChatBoxInput";
+import { useChatState } from "./chat-box/hooks/useChatState";
 
 type Props = {
   messages: ChatMessage[];
@@ -9,7 +10,6 @@ type Props = {
   onMessageChange: (text: string) => void;
   onSend: (e: React.FormEvent) => void;
   disabled?: boolean;
-  /** Which side is "me" — determines bubble alignment */
   myRole: "PHOTOGRAPHER" | "CUSTOMER";
   title?: string;
   description?: string;
@@ -29,146 +29,26 @@ export function ChatBox({
   reservationId,
   photographerFirstName,
 }: Props) {
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
-  const lastResIdRef = useRef<string | null>(null);
-  const [initialLastViewed, setInitialLastViewed] = useState<string | null>(null);
-
-  // Scroll to bottom on message load and updates
-  useEffect(() => {
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  }, [messages]);
-
-  // Set initial last viewed state on reservation ID changes
-  useEffect(() => {
-    if (reservationId) {
-      if (reservationId !== lastResIdRef.current) {
-        lastResIdRef.current = reservationId;
-        const key = `chat_last_viewed_${myRole.toLowerCase()}_${reservationId}`;
-        const stored = localStorage.getItem(key);
-        setInitialLastViewed(stored || new Date().toISOString());
-
-        // Mark as read after 2s delay
-        const timer = setTimeout(() => {
-          localStorage.setItem(key, new Date().toISOString());
-        }, 2000);
-
-        return () => clearTimeout(timer);
-      }
-    } else {
-      setInitialLastViewed(null);
-    }
-  }, [reservationId, myRole]);
-
-  // Keep local storage read indicator updated in real-time as messages arrive
-  useEffect(() => {
-    if (reservationId && messages.length > 0) {
-      const key = `chat_last_viewed_${myRole.toLowerCase()}_${reservationId}`;
-      localStorage.setItem(key, new Date().toISOString());
-    }
-  }, [messages.length, reservationId, myRole]);
-
-  const firstUnreadIndex = messages.findIndex(
-    (msg) =>
-      msg.sender !== myRole &&
-      initialLastViewed &&
-      new Date(msg.timestamp).getTime() > new Date(initialLastViewed).getTime()
-  );
-
-  const unreadCount = firstUnreadIndex !== -1 ? messages.length - firstUnreadIndex : 0;
+  const { chatEndRef, firstUnreadIndex, unreadCount } = useChatState(messages, reservationId, myRole);
 
   return (
     <div className="flex flex-col h-[500px] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-      {/* Header */}
-      <div className="pb-3 px-4 pt-4 border-b border-zinc-100 dark:border-zinc-800">
-        <h3 className="text-body-small-s font-bold flex items-center gap-1.5">
-          <div className="relative flex items-center justify-center">
-            <MessageSquare className="h-4 w-4" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[7px] font-bold h-3 w-3 rounded-full flex items-center justify-center">
-                {unreadCount}
-              </span>
-            )}
-          </div>
-          {title}
-        </h3>
-        <p className="text-body-caption text-zinc-550 mt-0.5">{description}</p>
-      </div>
-
-      {/* Message list */}
-      <div className="flex-1 p-3 overflow-y-auto space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20">
-        {messages.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-body-caption text-zinc-400 italic">
-              No messages yet. Start the conversation.
-            </p>
-          </div>
-        ) : (
-          messages.map((msg, index) => {
-            const isMe = msg.sender === myRole;
-            let displayName = isMe ? "You" : msg.senderName.split(" ")[0];
-            if (!isMe && msg.sender === "PHOTOGRAPHER" && photographerFirstName) {
-              displayName = photographerFirstName;
-            }
-            const isFirstUnread = index === firstUnreadIndex;
-
-            return (
-              <div key={msg.id} className="space-y-2">
-                {isFirstUnread && (
-                  <div className="flex items-center my-4 animate-in fade-in duration-300">
-                    <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
-                    <span className="mx-3 text-body-caption text-red-500 font-bold uppercase tracking-wider">
-                      New Messages
-                    </span>
-                    <div className="flex-1 border-t border-red-300/60 dark:border-red-800/60"></div>
-                  </div>
-                )}
-                <div
-                  className={`flex flex-col max-w-[85%] ${
-                    isMe ? "ml-auto items-end" : "mr-auto"
-                  }`}
-                >
-                  <span className="text-body-caption text-zinc-400 px-1">
-                    {displayName}
-                  </span>
-                  <div
-                    className={`rounded-xl px-3 py-1.5 text-body-caption shadow-sm ${
-                      isMe
-                        ? "bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"
-                        : "bg-white text-zinc-900 border dark:bg-zinc-900 dark:text-zinc-100"
-                    }`}
-                  >
-                    <p className="break-all whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={chatEndRef} />
-      </div>
-
-      {/* Input */}
-      <form
-        onSubmit={onSend}
-        className="p-2 border-t border-zinc-100 dark:border-zinc-800 flex gap-1.5"
-      >
-        <Input
-          placeholder="Type a message..."
-          value={messageText}
-          onChange={(e) => onMessageChange(e.target.value)}
-          className="chat-input text-body-caption"
-          disabled={disabled}
-        />
-        <button
-          type="submit"
-          disabled={!messageText.trim() || disabled}
-          className="chat-button flex items-center justify-center rounded-lg bg-[#0e2d5c] hover:bg-[#1a4175] text-white transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0e2d5c]"
-        >
-          <Send className="h-3.5 w-3.5" />
-        </button>
-      </form>
+      <ChatBoxHeader unreadCount={unreadCount} title={title} description={description} />
+      
+      <ChatBoxMessageList
+        messages={messages}
+        myRole={myRole}
+        photographerFirstName={photographerFirstName}
+        firstUnreadIndex={firstUnreadIndex}
+        chatEndRef={chatEndRef}
+      />
+      
+      <ChatBoxInput
+        messageText={messageText}
+        onMessageChange={onMessageChange}
+        onSend={onSend}
+        disabled={disabled}
+      />
     </div>
   );
 }
