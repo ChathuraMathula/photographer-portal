@@ -109,11 +109,10 @@ export class ReservationsService {
     const ALLOWED_SORT_FIELDS: Record<string, string> = {
       date: 'res.date',
       createdAt: 'res.createdAt',
-      eventType: 'res.eventType',
-      status: 'res.status',
+      customerFirstName: 'customer.firstName',
     };
     const sortField =
-      ALLOWED_SORT_FIELDS[queryOptions.sortBy || ''] || 'res.createdAt';
+      ALLOWED_SORT_FIELDS[queryOptions.sortBy || ''] || 'res.date';
     const sortDir =
       queryOptions.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 

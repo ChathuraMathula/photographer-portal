@@ -5,12 +5,10 @@ import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 
 const SORT_OPTIONS = [
-  { name: "Newest First", value: "createdAt|DESC" },
-  { name: "Oldest First", value: "createdAt|ASC" },
-  { name: "Event Date ↓", value: "date|DESC" },
-  { name: "Event Date ↑", value: "date|ASC" },
-  { name: "Status A–Z", value: "status|ASC" },
-  { name: "Event Type A–Z", value: "eventType|ASC" },
+  { name: "Date ↓ (Newest First)", value: "date|DESC" },
+  { name: "Date ↑ (Oldest First)", value: "date|ASC" },
+  { name: "Name A – Z", value: "customerFirstName|ASC" },
+  { name: "Name Z – A", value: "customerFirstName|DESC" },
 ];
 
 type Props = {

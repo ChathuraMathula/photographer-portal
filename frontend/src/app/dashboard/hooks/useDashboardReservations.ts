@@ -38,7 +38,7 @@ export function useDashboardReservations({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [loading, setLoading] = useState(false);
 

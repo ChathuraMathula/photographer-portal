@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { ReservationsTabContent } from "@/components/dashboard/ReservationsTabContent";
 
 export default function ReservationsPage() {
-  const searchParams = useSearchParams();
   const context = usePhotographerDashboardContext();
   if (!context) return null;
 
@@ -48,13 +45,6 @@ export default function ReservationsPage() {
     reservationsLoading,
     firstName,
   } = context;
-
-  useEffect(() => {
-    const id = searchParams.get("id");
-    if (id && search !== id) {
-      setSearch(id);
-    }
-  }, [searchParams]);
 
   return (
     <div className="space-y-6">
