@@ -128,15 +128,29 @@ export function usePhotographerDashboard() {
   }, [isAuthenticated, role, userId]);
 
   useEffect(() => {
-    if (resId && reservationsState.reservations.length > 0) {
-      const found = reservationsState.reservations.find((r) => r.id === resId);
-      if (found) {
-        if (reservationsState.selectedRes?.id !== found.id) {
-          reservationsState.setSelectedRes(found);
-        }
-      }
+    if (!resId || !isAuthenticated) return;
+    // Already selected – nothing to do
+    if (reservationsState.selectedRes?.id === resId) return;
+
+    // First try to find in the already-loaded page (instant, no request)
+    const found = reservationsState.reservations.find((r) => r.id === resId);
+    if (found) {
+      reservationsState.setSelectedRes(found);
+      return;
     }
-  }, [resId, reservationsState.reservations, reservationsState.selectedRes]);
+
+    // Not on the current page – fetch the reservation directly by ID
+    authFetch(
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001"}/reservations/${resId}`,
+      { credentials: "include" },
+    )
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) reservationsState.setSelectedRes(data);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resId, isAuthenticated, reservationsState.reservations]);
 
   const chatDisabled =
     reservationsState.selectedRes?.status === "CANCELLED" ||

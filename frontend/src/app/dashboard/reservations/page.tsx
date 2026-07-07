@@ -1,9 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { ReservationsTabContent } from "@/components/dashboard/ReservationsTabContent";
 
 export default function ReservationsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const context = usePhotographerDashboardContext();
   if (!context) return null;
 
@@ -45,6 +49,21 @@ export default function ReservationsPage() {
     reservationsLoading,
     firstName,
   } = context;
+
+  useEffect(() => {
+    const id = searchParams.get("id");
+    const fromCalendar = searchParams.get("fromCalendar");
+
+    if (id && fromCalendar === "true") {
+      setSearch(id);
+      setStatusFilter("ALL");
+      setSortBy("date");
+      setSortOrder("DESC");
+      
+      // Remove fromCalendar from the URL so it doesn't trigger again on reload
+      router.replace(`/dashboard/reservations?id=${id}`, { scroll: false });
+    }
+  }, [searchParams, router, setSearch, setStatusFilter, setSortBy, setSortOrder]);
 
   return (
     <div className="space-y-6">
