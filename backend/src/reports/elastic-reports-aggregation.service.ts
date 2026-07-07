@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { INDEX_NAME } from './analytics-sync.service';
-import { getDateFilters, getTimelineInterval } from './elastic/elastic-date.util';
-import { buildGenerateReportQuery, buildLeaderboardQuery } from './elastic/elastic-query-builder.util';
-import { parseReportAggregations, parseLeaderboardAggregations } from './elastic/elastic-response-parser.util';
+import {
+  getDateFilters,
+  getTimelineInterval,
+} from './elastic/elastic-date.util';
+import {
+  buildGenerateReportQuery,
+  buildLeaderboardQuery,
+} from './elastic/elastic-query-builder.util';
+import {
+  parseReportAggregations,
+  parseLeaderboardAggregations,
+} from './elastic/elastic-response-parser.util';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,7 +32,11 @@ export class ElasticReportsAggregationService {
     customStartDate?: string,
     customEndDate?: string,
   ) {
-    const { startDate, endDate } = getDateFilters(period, customStartDate, customEndDate);
+    const { startDate, endDate } = getDateFilters(
+      period,
+      customStartDate,
+      customEndDate,
+    );
     const { interval, format } = getTimelineInterval(startDate, endDate);
 
     const filters: any[] = [
@@ -41,7 +54,12 @@ export class ElasticReportsAggregationService {
       filters.push({ term: { photographerId } });
     }
 
-    const { query, aggregations } = buildGenerateReportQuery(filters, interval, format, photographerId);
+    const { query, aggregations } = buildGenerateReportQuery(
+      filters,
+      interval,
+      format,
+      photographerId,
+    );
 
     const res = await this.esService.search({
       index: INDEX_NAME,
@@ -52,9 +70,14 @@ export class ElasticReportsAggregationService {
 
     const aggs = res.aggregations as any;
     const hitsTotal: any = res.hits.total;
-    const totalBookings = typeof hitsTotal === 'number' ? hitsTotal : (hitsTotal?.value || 0);
+    const totalBookings =
+      typeof hitsTotal === 'number' ? hitsTotal : hitsTotal?.value || 0;
 
-    const parsedData = parseReportAggregations(aggs, totalBookings, photographerId);
+    const parsedData = parseReportAggregations(
+      aggs,
+      totalBookings,
+      photographerId,
+    );
 
     const locationData = res.hits.hits.map((hit: any) => {
       const src = hit._source;
@@ -68,33 +91,33 @@ export class ElasticReportsAggregationService {
       };
     });
 
-      let systemStats: any = null;
-      if (!photographerId) {
-        const totalPhotographers = await this.userRepository.count({
-          where: { role: UserRole.PHOTOGRAPHER },
-        });
-        const totalAdmins = await this.userRepository.count({
-          where: { role: UserRole.ADMIN },
-        });
-        const totalSuspended = await this.userRepository.count({
-          where: { isActive: false },
-        });
-        systemStats = {
-          totalPhotographers,
-          totalAdmins,
-          totalSuspended,
-        };
-      }
-
-      return {
-        period,
-        startDateStr: startDate.toISOString().split('T')[0],
-        endDateStr: endDate.toISOString().split('T')[0],
-        ...parsedData,
-        systemStats,
-        locationData,
-        rawBookings: [],
+    let systemStats: any = null;
+    if (!photographerId) {
+      const totalPhotographers = await this.userRepository.count({
+        where: { role: UserRole.PHOTOGRAPHER },
+      });
+      const totalAdmins = await this.userRepository.count({
+        where: { role: UserRole.ADMIN },
+      });
+      const totalSuspended = await this.userRepository.count({
+        where: { isActive: false },
+      });
+      systemStats = {
+        totalPhotographers,
+        totalAdmins,
+        totalSuspended,
       };
+    }
+
+    return {
+      period,
+      startDateStr: startDate.toISOString().split('T')[0],
+      endDateStr: endDate.toISOString().split('T')[0],
+      ...parsedData,
+      systemStats,
+      locationData,
+      rawBookings: [],
+    };
   }
 
   async getPhotographerLeaderboard(
@@ -105,7 +128,11 @@ export class ElasticReportsAggregationService {
     customStartDate?: string,
     customEndDate?: string,
   ) {
-    const { startDate, endDate } = getDateFilters(period, customStartDate, customEndDate);
+    const { startDate, endDate } = getDateFilters(
+      period,
+      customStartDate,
+      customEndDate,
+    );
 
     const mustFilters: any[] = [
       {
@@ -133,7 +160,12 @@ export class ElasticReportsAggregationService {
       });
     }
 
-    const { query, aggregations } = buildLeaderboardQuery(mustFilters, mustNotFilters, page, limit);
+    const { query, aggregations } = buildLeaderboardQuery(
+      mustFilters,
+      mustNotFilters,
+      page,
+      limit,
+    );
 
     const res = await this.esService.search({
       index: INDEX_NAME,
@@ -142,7 +174,9 @@ export class ElasticReportsAggregationService {
       aggregations: aggregations as any,
     });
 
-    const { total, leaderboard } = parseLeaderboardAggregations(res.aggregations as any);
+    const { total, leaderboard } = parseLeaderboardAggregations(
+      res.aggregations as any,
+    );
 
     return {
       data: leaderboard,

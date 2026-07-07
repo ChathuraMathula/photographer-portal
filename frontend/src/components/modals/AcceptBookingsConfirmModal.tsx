@@ -15,7 +15,11 @@ type Props = {
   onCancel: () => void;
 };
 
-export function AcceptBookingsConfirmModal({ open, onConfirm, onCancel }: Props) {
+export function AcceptBookingsConfirmModal({
+  open,
+  onConfirm,
+  onCancel,
+}: Props) {
   return (
     <AlertDialog open={open} onOpenChange={(v) => !v && onCancel()}>
       <AlertDialogContent className="max-w-sm">
@@ -27,7 +31,9 @@ export function AcceptBookingsConfirmModal({ open, onConfirm, onCancel }: Props)
             Pause Booking Requests?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-body-small text-zinc-500 leading-relaxed">
-            Prospective clients will not be able to submit booking requests, but they can still see your profile details and your offline status message.
+            Prospective clients will not be able to submit booking requests, but
+            they can still see your profile details and your offline status
+            message.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

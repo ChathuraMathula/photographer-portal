@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -80,7 +86,7 @@ export default function UserSettingsPage() {
             reminderEmailsEnabled: reminderEmails,
             inAppNotificationsEnabled: inAppNotifications,
           },
-        })
+        }),
       );
 
       // Save TopBar preferences to photographer profile if context is available
@@ -89,15 +95,18 @@ export default function UserSettingsPage() {
         context.setShowAcceptBookingsInTopbar(localShowAcceptBookings);
 
         // Directly patch the profile to avoid using stale state via handleSaveProfile
-        await context.authFetch(`${API}/photographers/${context.userId}/profile`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            showManualBookingInTopbar: localShowManualBooking,
-            showAcceptBookingsInTopbar: localShowAcceptBookings,
-          }),
-          credentials: "include",
-        });
+        await context.authFetch(
+          `${API}/photographers/${context.userId}/profile`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              showManualBookingInTopbar: localShowManualBooking,
+              showAcceptBookingsInTopbar: localShowAcceptBookings,
+            }),
+            credentials: "include",
+          },
+        );
       }
 
       toast.success("Settings updated successfully!");
@@ -118,19 +127,18 @@ export default function UserSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
-
       {/* Header */}
       <div>
         <h1 className="text-title-large text-primary-dark dark:text-white flex items-center gap-2">
           User Settings
         </h1>
         <p className="text-body-small text-zinc-500 mt-1">
-          Customize your platform notification options, alert triggers, and preferences.
+          Customize your platform notification options, alert triggers, and
+          preferences.
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-
         {/* Main Settings Panel */}
         <div className="md:col-span-2 space-y-6">
           <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
@@ -140,11 +148,11 @@ export default function UserSettingsPage() {
                 Notification Preferences
               </CardTitle>
               <CardDescription className="text-xs">
-                Choose how and when you want to receive communications from the photographer portal.
+                Choose how and when you want to receive communications from the
+                photographer portal.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-
               {/* Option 1: General Emails */}
               <div className="flex items-start justify-between p-4 rounded-xl border border-zinc-150/40 bg-zinc-50/20 dark:bg-zinc-950/20 dark:border-zinc-850/60">
                 <div className="space-y-1 pr-4">
@@ -152,7 +160,8 @@ export default function UserSettingsPage() {
                     Transactional Emails
                   </Label>
                   <p className="text-body-caption text-zinc-500 leading-normal">
-                    Receive instant notifications for reservation confirmations, proposals, invoices, and message logs.
+                    Receive instant notifications for reservation confirmations,
+                    proposals, invoices, and message logs.
                   </p>
                 </div>
                 <Switch
@@ -168,7 +177,8 @@ export default function UserSettingsPage() {
                     Deadline Reminders
                   </Label>
                   <p className="text-body-caption text-zinc-500 leading-normal">
-                    Trigger automatic background payment reminders and upcoming booking reminders for photographers and customers.
+                    Trigger automatic background payment reminders and upcoming
+                    booking reminders for photographers and customers.
                   </p>
                 </div>
                 <Switch
@@ -184,7 +194,8 @@ export default function UserSettingsPage() {
                     In-App Alerts
                   </Label>
                   <p className="text-body-caption text-zinc-500 leading-normal">
-                    Enable the notification bell badge inside the dashboard toolbar to see real-time updates while active.
+                    Enable the notification bell badge inside the dashboard
+                    toolbar to see real-time updates while active.
                   </p>
                 </div>
                 <Switch
@@ -192,7 +203,6 @@ export default function UserSettingsPage() {
                   onCheckedChange={setInAppNotifications}
                 />
               </div>
-
             </CardContent>
           </Card>
 
@@ -230,12 +240,12 @@ export default function UserSettingsPage() {
             </CardHeader>
             <CardContent className="text-body-caption text-zinc-500 space-y-3 leading-relaxed">
               <p>
-                Notification alerts are sent to the verified email address linked to your profile credentials.
+                Notification alerts are sent to the verified email address
+                linked to your profile credentials.
               </p>
             </CardContent>
           </Card>
         </div>
-
       </div>
     </div>
   );

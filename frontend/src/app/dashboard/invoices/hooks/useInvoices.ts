@@ -6,7 +6,12 @@ import { type InvoiceItem, type InvoiceSettings } from "../types";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
-export function useInvoices(authFetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>) {
+export function useInvoices(
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit | undefined,
+  ) => Promise<Response>,
+) {
   const [invoices, setInvoices] = useState<InvoiceItem[]>([]);
   const [settings, setSettings] = useState<InvoiceSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,19 +27,24 @@ export function useInvoices(authFetch: (input: RequestInfo | URL, init?: Request
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const invRes = await authFetch(`${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`, { credentials: "include" });
+      const invRes = await authFetch(
+        `${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`,
+        { credentials: "include" },
+      );
       if (!invRes.ok) throw new Error("Failed to load invoices list");
       const invData = await invRes.json();
       setInvoices(invData.data || []);
       setTotalPages(invData.totalPages || 1);
-      
+
       if (invData.kpis) {
         setTotalInvoiced(invData.kpis.totalInvoiced || 0);
         setTotalSettled(invData.kpis.totalSettled || 0);
         setOutstanding(invData.kpis.outstanding || 0);
       }
 
-      const settingsRes = await authFetch(`${API}/invoices/settings`, { credentials: "include" });
+      const settingsRes = await authFetch(`${API}/invoices/settings`, {
+        credentials: "include",
+      });
       if (!settingsRes.ok) throw new Error("Failed to load invoice settings");
       const settingsData = await settingsRes.json();
       setSettings(settingsData);
@@ -60,7 +70,7 @@ export function useInvoices(authFetch: (input: RequestInfo | URL, init?: Request
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to download PDF invoice");
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -103,7 +113,9 @@ export function useInvoices(authFetch: (input: RequestInfo | URL, init?: Request
     });
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.message || "Failed to update custom invoice settings.");
+      throw new Error(
+        data.message || "Failed to update custom invoice settings.",
+      );
     }
     const data = await res.json();
     setSettings(data);

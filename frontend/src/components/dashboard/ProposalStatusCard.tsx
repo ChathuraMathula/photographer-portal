@@ -8,7 +8,11 @@ import { useProposalStatus } from "./proposal-status/hooks/useProposalStatus";
 import { ProposalDetails } from "./proposal-status/components/ProposalDetails";
 import { ProposalPaymentDetails } from "./proposal-status/components/ProposalPaymentDetails";
 
-export function ProposalStatusCard({ reservation }: { reservation: Reservation }) {
+export function ProposalStatusCard({
+  reservation,
+}: {
+  reservation: Reservation;
+}) {
   const isExpired = !!(
     reservation.status === "PROPOSED" &&
     reservation.paymentDeadline &&
@@ -35,7 +39,7 @@ export function ProposalStatusCard({ reservation }: { reservation: Reservation }
       </CardHeader>
       <CardContent className="text-body-small pt-4 space-y-3">
         <ProposalDetails reservation={reservation} isExpired={isExpired} />
-        
+
         <ProposalPaymentDetails
           reservation={reservation}
           totalAmount={totalAmount}

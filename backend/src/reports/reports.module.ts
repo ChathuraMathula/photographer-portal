@@ -20,11 +20,11 @@ import { User } from '../entities/user.entity';
   ],
   controllers: [ReportsController],
   providers: [
-    ReportsService, 
+    ReportsService,
     ReportsAggregationService,
     ElasticReportsAggregationService,
     AnalyticsSyncService,
-    AnalyticsSyncSubscriber
+    AnalyticsSyncSubscriber,
   ],
 })
 export class ReportsModule {}

@@ -1,7 +1,7 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
   page: number;
@@ -10,7 +10,12 @@ interface PaginationProps {
   className?: string;
 }
 
-export function Pagination({ page, totalPages, onPageChange, className }: PaginationProps) {
+export function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+  className,
+}: PaginationProps) {
   const handlePrev = () => {
     if (page > 1) onPageChange(page - 1);
   };
@@ -27,7 +32,7 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
-      
+
       const start = Math.max(2, page - 1);
       const end = Math.min(totalPages - 1, page + 1);
 
@@ -84,7 +89,7 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
               "h-9 w-9 p-0 rounded-lg text-xs font-semibold shrink-0 cursor-pointer flex items-center justify-center",
               isCurrent
                 ? "bg-primary text-white"
-                : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900",
             )}
             aria-current={isCurrent ? "page" : undefined}
           >

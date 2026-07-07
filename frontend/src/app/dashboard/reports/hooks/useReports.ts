@@ -59,8 +59,10 @@ export type PaginatedBookingsData = {
 
 export function useReports() {
   const context = usePhotographerDashboardContext();
-  const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly" | "custom">("monthly");
-  
+  const [period, setPeriod] = useState<
+    "weekly" | "monthly" | "yearly" | "custom"
+  >("monthly");
+
   // Custom Date States
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -72,13 +74,18 @@ export function useReports() {
   });
 
   // Specific Year and Month selection states
-  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState(() => (new Date().getMonth() + 1).toString().padStart(2, "0"));
+  const [selectedYear, setSelectedYear] = useState(() =>
+    new Date().getFullYear().toString(),
+  );
+  const [selectedMonth, setSelectedMonth] = useState(() =>
+    (new Date().getMonth() + 1).toString().padStart(2, "0"),
+  );
 
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  
+
   // Bookings Log Pagination State
-  const [bookingsData, setBookingsData] = useState<PaginatedBookingsData | null>(null);
+  const [bookingsData, setBookingsData] =
+    useState<PaginatedBookingsData | null>(null);
   const [bookingsPage, setBookingsPage] = useState(1);
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const bookingsLimit = 10;
@@ -97,7 +104,10 @@ export function useReports() {
         end: `${selectedYear}-12-31`,
       };
     } else if (period === "monthly") {
-      const lastDay = new Date(Number(selectedYear), Number(selectedMonth), 0).getDate().toString().padStart(2, "0");
+      const lastDay = new Date(Number(selectedYear), Number(selectedMonth), 0)
+        .getDate()
+        .toString()
+        .padStart(2, "0");
       return {
         start: `${selectedYear}-${selectedMonth}-01`,
         end: `${selectedYear}-${selectedMonth}-${lastDay}`,
@@ -113,7 +123,7 @@ export function useReports() {
     } else {
       setRefreshing(true);
     }
-    
+
     // Reset page to 1 when period/date changes
     setBookingsPage(1);
 

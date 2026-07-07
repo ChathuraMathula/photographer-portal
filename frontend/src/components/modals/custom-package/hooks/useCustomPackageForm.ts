@@ -9,17 +9,27 @@ interface FormProps {
   onClose: () => void;
 }
 
-export function useCustomPackageForm({ initialValues, onSubmit, onClose }: FormProps) {
+export function useCustomPackageForm({
+  initialValues,
+  onSubmit,
+  onClose,
+}: FormProps) {
   const [name, setName] = useState(initialValues?.name || "");
-  const [description, setDescription] = useState(initialValues?.description || "");
-  const [price, setPrice] = useState(initialValues?.price || 0);
-  const [durationHours, setDurationHours] = useState(initialValues?.durationHours || 1);
-  const [depositType, setDepositType] = useState<"universal" | "fixed" | "percentage">(
-    initialValues?.depositType || "universal"
+  const [description, setDescription] = useState(
+    initialValues?.description || "",
   );
-  const [depositValue, setDepositValue] = useState(initialValues?.depositValue || 0);
+  const [price, setPrice] = useState(initialValues?.price || 0);
+  const [durationHours, setDurationHours] = useState(
+    initialValues?.durationHours || 1,
+  );
+  const [depositType, setDepositType] = useState<
+    "universal" | "fixed" | "percentage"
+  >(initialValues?.depositType || "universal");
+  const [depositValue, setDepositValue] = useState(
+    initialValues?.depositValue || 0,
+  );
   const [includesText, setIncludesText] = useState(
-    initialValues?.includes ? initialValues.includes.join(", ") : ""
+    initialValues?.includes ? initialValues.includes.join(", ") : "",
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -29,7 +39,8 @@ export function useCustomPackageForm({ initialValues, onSubmit, onClose }: FormP
 
     if (!name.trim()) newErrors.name = "Package name is required";
     if (price <= 0) newErrors.price = "Price must be positive";
-    if (durationHours <= 0) newErrors.durationHours = "Duration must be positive";
+    if (durationHours <= 0)
+      newErrors.durationHours = "Duration must be positive";
 
     if (depositType === "fixed" && depositValue > price) {
       newErrors.depositValue = "Deposit cannot exceed package price";

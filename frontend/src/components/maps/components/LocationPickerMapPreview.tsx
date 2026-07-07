@@ -11,15 +11,36 @@ type Props<T extends LocationPickerFormValues> = {
   onMapPickerChange: (lat: number, lon: number) => Promise<void>;
 };
 
-export function LocationPickerMapPreview<T extends LocationPickerFormValues>({ formik, isRequired, onMapPickerChange }: Props<T>) {
+export function LocationPickerMapPreview<T extends LocationPickerFormValues>({
+  formik,
+  isRequired,
+  onMapPickerChange,
+}: Props<T>) {
   return (
     <div className="space-y-2">
       <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-        Venue Location Map Preview {isRequired && <span className="text-red-500">*</span>}
+        Venue Location Map Preview{" "}
+        {isRequired && <span className="text-red-500">*</span>}
       </Label>
       <OSMMapPicker
-        lat={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1] || "") || undefined : undefined}
-        lon={formik.values.locationMapLink ? parseFloat(formik.values.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2] || "") || undefined : undefined}
+        lat={
+          formik.values.locationMapLink
+            ? parseFloat(
+                formik.values.locationMapLink.match(
+                  /q=(-?\d+\.\d+),(-?\d+\.\d+)/,
+                )?.[1] || "",
+              ) || undefined
+            : undefined
+        }
+        lon={
+          formik.values.locationMapLink
+            ? parseFloat(
+                formik.values.locationMapLink.match(
+                  /q=(-?\d+\.\d+),(-?\d+\.\d+)/,
+                )?.[2] || "",
+              ) || undefined
+            : undefined
+        }
         city={formik.values.city}
         district={formik.values.district}
         onChange={onMapPickerChange}
@@ -27,10 +48,19 @@ export function LocationPickerMapPreview<T extends LocationPickerFormValues>({ f
       />
       {formik.values.locationMapLink && (
         <p className="text-[10px] text-zinc-400 font-medium truncate mt-1">
-          Generated Coordinates Link: <span className="text-zinc-650 dark:text-zinc-400 font-mono">{formik.values.locationMapLink}</span>
+          Generated Coordinates Link:{" "}
+          <span className="text-zinc-650 dark:text-zinc-400 font-mono">
+            {formik.values.locationMapLink}
+          </span>
         </p>
       )}
-      <FieldError msg={(formik.touched as any).locationMapLink ? (formik.errors as any).locationMapLink : undefined} />
+      <FieldError
+        msg={
+          (formik.touched as any).locationMapLink
+            ? (formik.errors as any).locationMapLink
+            : undefined
+        }
+      />
     </div>
   );
 }

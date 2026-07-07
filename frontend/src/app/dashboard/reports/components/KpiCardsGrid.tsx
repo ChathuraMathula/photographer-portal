@@ -20,21 +20,27 @@ export function KpiCardsGrid({ summary }: KpiCardsGridProps) {
       {/* Potential Volume Card */}
       <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Potential Volume</CardTitle>
+          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            Potential Volume
+          </CardTitle>
           <DollarSign className="h-4 w-4 text-zinc-400" />
         </CardHeader>
         <CardContent>
           <div className="text-title-medium font-bold text-zinc-900 dark:text-white">
             LKR {summary.potentialRevenueLkr.toLocaleString()}
           </div>
-          <p className="text-[10px] text-zinc-400 mt-1">Total contract values in range</p>
+          <p className="text-[10px] text-zinc-400 mt-1">
+            Total contract values in range
+          </p>
         </CardContent>
       </Card>
 
       {/* Paid Earnings Card */}
       <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Paid Earnings</CardTitle>
+          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            Paid Earnings
+          </CardTitle>
           <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-500" />
         </CardHeader>
         <CardContent>
@@ -50,28 +56,36 @@ export function KpiCardsGrid({ summary }: KpiCardsGridProps) {
       {/* Total Bookings Card */}
       <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Bookings</CardTitle>
+          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            Total Bookings
+          </CardTitle>
           <Calendar className="h-4 w-4 text-zinc-400" />
         </CardHeader>
         <CardContent>
           <div className="text-title-medium font-bold text-zinc-900 dark:text-white">
             {summary.totalBookings}
           </div>
-          <p className="text-[10px] text-zinc-400 mt-1">Reservations submitted</p>
+          <p className="text-[10px] text-zinc-400 mt-1">
+            Reservations submitted
+          </p>
         </CardContent>
       </Card>
 
       {/* Conversion Ratio Card */}
       <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Conversion Ratio</CardTitle>
+          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            Conversion Ratio
+          </CardTitle>
           <Percent className="h-4 w-4 text-blue-600 dark:text-blue-500" />
         </CardHeader>
         <CardContent>
           <div className="text-title-medium font-bold text-zinc-900 dark:text-white">
             {summary.conversionRate}%
           </div>
-          <p className="text-[10px] text-zinc-400 mt-1">Confirmed/Completed ratio</p>
+          <p className="text-[10px] text-zinc-400 mt-1">
+            Confirmed/Completed ratio
+          </p>
         </CardContent>
       </Card>
     </div>

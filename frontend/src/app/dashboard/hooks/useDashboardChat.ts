@@ -8,16 +8,26 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 interface UseDashboardChatProps {
   socket: any;
   selectedRes: Reservation | null;
-  authFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>;
 }
 
-export function useDashboardChat({ socket, selectedRes, authFetch }: UseDashboardChatProps) {
+export function useDashboardChat({
+  socket,
+  selectedRes,
+  authFetch,
+}: UseDashboardChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messageText, setMessageText] = useState("");
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    setTimeout(
+      () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }),
+      100,
+    );
   };
 
   useEffect(() => {
@@ -26,7 +36,9 @@ export function useDashboardChat({ socket, selectedRes, authFetch }: UseDashboar
       return;
     }
 
-    authFetch(`${API}/reservations/${selectedRes.id}/messages`, { credentials: "include" })
+    authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => {
         setMessages(data);

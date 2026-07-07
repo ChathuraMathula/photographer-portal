@@ -1,13 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { type ChatMessage } from "@/types";
 
-export function useChatState(messages: ChatMessage[], reservationId?: string, myRole?: string) {
+export function useChatState(
+  messages: ChatMessage[],
+  reservationId?: string,
+  myRole?: string,
+) {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const lastResIdRef = useRef<string | null>(null);
-  const [initialLastViewed, setInitialLastViewed] = useState<string | null>(null);
+  const [initialLastViewed, setInitialLastViewed] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
-    setTimeout(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 100);
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   }, [messages]);
 
   useEffect(() => {
@@ -18,7 +26,9 @@ export function useChatState(messages: ChatMessage[], reservationId?: string, my
         const stored = localStorage.getItem(key);
         setInitialLastViewed(stored || new Date().toISOString());
 
-        const timer = setTimeout(() => { localStorage.setItem(key, new Date().toISOString()); }, 2000);
+        const timer = setTimeout(() => {
+          localStorage.setItem(key, new Date().toISOString());
+        }, 2000);
         return () => clearTimeout(timer);
       }
     } else {
@@ -34,10 +44,14 @@ export function useChatState(messages: ChatMessage[], reservationId?: string, my
   }, [messages.length, reservationId, myRole]);
 
   const firstUnreadIndex = messages.findIndex(
-    (msg) => msg.sender !== myRole && initialLastViewed && new Date(msg.timestamp).getTime() > new Date(initialLastViewed).getTime()
+    (msg) =>
+      msg.sender !== myRole &&
+      initialLastViewed &&
+      new Date(msg.timestamp).getTime() > new Date(initialLastViewed).getTime(),
   );
 
-  const unreadCount = firstUnreadIndex !== -1 ? messages.length - firstUnreadIndex : 0;
+  const unreadCount =
+    firstUnreadIndex !== -1 ? messages.length - firstUnreadIndex : 0;
 
   return { chatEndRef, firstUnreadIndex, unreadCount };
 }

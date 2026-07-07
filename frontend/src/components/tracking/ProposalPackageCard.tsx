@@ -1,32 +1,92 @@
 import { type Package } from "@/types";
 
-type Props = { pkg: Package; isSelected: boolean; isConfirmed: boolean; isMySelection: boolean; onSelect: (id: string) => void; };
+type Props = {
+  pkg: Package;
+  isSelected: boolean;
+  isConfirmed: boolean;
+  isMySelection: boolean;
+  onSelect: (id: string) => void;
+};
 
-export function ProposalPackageCard({ pkg, isSelected, isConfirmed, isMySelection, onSelect }: Props) {
+export function ProposalPackageCard({
+  pkg,
+  isSelected,
+  isConfirmed,
+  isMySelection,
+  onSelect,
+}: Props) {
   const borderClass = isConfirmed
-    ? isMySelection ? "border-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/10 cursor-default" : "border-zinc-200 dark:border-zinc-800 opacity-60 pointer-events-none"
-    : isSelected ? "border-primary-dark bg-zinc-50/50 dark:border-white dark:bg-zinc-900 cursor-pointer shadow-md" : "border-zinc-200 hover:border-primary-light dark:border-zinc-800 cursor-pointer";
+    ? isMySelection
+      ? "border-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/10 cursor-default"
+      : "border-zinc-200 dark:border-zinc-800 opacity-60 pointer-events-none"
+    : isSelected
+      ? "border-primary-dark bg-zinc-50/50 dark:border-white dark:bg-zinc-900 cursor-pointer shadow-md"
+      : "border-zinc-200 hover:border-primary-light dark:border-zinc-800 cursor-pointer";
 
   return (
-    <div onClick={() => !isConfirmed && onSelect(pkg.id)} className={`group relative flex flex-col justify-between p-5 rounded-xl border transition-all ${borderClass}`}>
+    <div
+      onClick={() => !isConfirmed && onSelect(pkg.id)}
+      className={`group relative flex flex-col justify-between p-5 rounded-xl border transition-all ${borderClass}`}
+    >
       <div>
         <div className="flex justify-between items-start gap-2">
-          <h4 className="text-body-base-bold text-zinc-950 dark:text-white group-hover:text-zinc-900 dark:group-hover:text-zinc-100">{pkg.isCustom && <span className="text-amber-500 mr-1">⭐</span>}{pkg.name}</h4>
+          <h4 className="text-body-base-bold text-zinc-950 dark:text-white group-hover:text-zinc-900 dark:group-hover:text-zinc-100">
+            {pkg.isCustom && <span className="text-amber-500 mr-1">⭐</span>}
+            {pkg.name}
+          </h4>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            {pkg.isCustom && <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-850 dark:bg-amber-950/30 dark:text-amber-400">Custom</span>}
-            {isMySelection && <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-body-caption font-semibold text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">Selected</span>}
+            {pkg.isCustom && (
+              <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-850 dark:bg-amber-950/30 dark:text-amber-400">
+                Custom
+              </span>
+            )}
+            {isMySelection && (
+              <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-body-caption font-semibold text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
+                Selected
+              </span>
+            )}
           </div>
         </div>
-        {pkg.description && <p className="text-body-small-s text-zinc-500 mt-1.5 line-clamp-3 leading-relaxed">{pkg.description}</p>}
-        <p className="text-body-caption text-zinc-400 mt-2">Duration: {pkg.durationHours} hr(s)</p>
-        {pkg.includes.length > 0 && <ul className="text-body-caption text-zinc-500 space-y-1 mt-3 pl-4 list-disc">{pkg.includes.slice(0, 3).map((inc) => <li key={inc}>{inc}</li>)}</ul>}
+        {pkg.description && (
+          <p className="text-body-small-s text-zinc-500 mt-1.5 line-clamp-3 leading-relaxed">
+            {pkg.description}
+          </p>
+        )}
+        <p className="text-body-caption text-zinc-400 mt-2">
+          Duration: {pkg.durationHours} hr(s)
+        </p>
+        {pkg.includes.length > 0 && (
+          <ul className="text-body-caption text-zinc-500 space-y-1 mt-3 pl-4 list-disc">
+            {pkg.includes.slice(0, 3).map((inc) => (
+              <li key={inc}>{inc}</li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="border-t border-zinc-100 dark:border-zinc-800/80 pt-3 mt-4 flex items-center justify-between">
-        <div className="flex items-baseline gap-1"><span className="text-body-caption font-semibold text-zinc-400">LKR</span><span className="text-title-base text-zinc-950 dark:text-white font-bold">{(pkg.priceInCents / 100).toLocaleString()}</span></div>
-        {pkg.customDepositAmountInCents !== undefined && pkg.customDepositAmountInCents !== null ? (
-          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-450 px-2 py-0.5 rounded border border-emerald-200/50 dark:border-emerald-900/50">LKR {((pkg.customDepositAmountInCents ?? 0) / 100).toLocaleString()} Proposed Deposit</span>
-        ) : pkg.depositType && pkg.depositType !== "universal" && (
-          <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-700/50">{pkg.depositType === "fixed" ? `LKR ${((pkg.depositValue ?? 0) / 100).toLocaleString()} Deposit` : `${pkg.depositValue}% Deposit`}</span>
+        <div className="flex items-baseline gap-1">
+          <span className="text-body-caption font-semibold text-zinc-400">
+            LKR
+          </span>
+          <span className="text-title-base text-zinc-950 dark:text-white font-bold">
+            {(pkg.priceInCents / 100).toLocaleString()}
+          </span>
+        </div>
+        {pkg.customDepositAmountInCents !== undefined &&
+        pkg.customDepositAmountInCents !== null ? (
+          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-450 px-2 py-0.5 rounded border border-emerald-200/50 dark:border-emerald-900/50">
+            LKR {((pkg.customDepositAmountInCents ?? 0) / 100).toLocaleString()}{" "}
+            Proposed Deposit
+          </span>
+        ) : (
+          pkg.depositType &&
+          pkg.depositType !== "universal" && (
+            <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200/50 dark:border-zinc-700/50">
+              {pkg.depositType === "fixed"
+                ? `LKR ${((pkg.depositValue ?? 0) / 100).toLocaleString()} Deposit`
+                : `${pkg.depositValue}% Deposit`}
+            </span>
+          )
         )}
       </div>
     </div>

@@ -15,7 +15,9 @@ export function ManualBookingTimeFields({ formik }: Props) {
   return (
     <>
       <div className="space-y-2">
-        <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Date</Label>
+        <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+          Date
+        </Label>
         <CalendarPicker
           value={formik.values.date}
           onChange={(val) => formik.setFieldValue("date", val)}
@@ -26,16 +28,22 @@ export function ManualBookingTimeFields({ formik }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Start Time</Label>
+          <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+            Start Time
+          </Label>
           <TimeSelect
             value={formik.values.startTime}
             onChange={(val) => formik.setFieldValue("startTime", val)}
             placeholder="Select start"
-            error={formik.touched.startTime ? formik.errors.startTime : undefined}
+            error={
+              formik.touched.startTime ? formik.errors.startTime : undefined
+            }
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">End Time</Label>
+          <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+            End Time
+          </Label>
           <TimeSelect
             value={formik.values.endTime}
             onChange={(val) => formik.setFieldValue("endTime", val)}

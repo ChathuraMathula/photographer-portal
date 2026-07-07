@@ -20,7 +20,9 @@ export function useTracking() {
   const [verifying, setVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState("");
 
-  const [reservation, setReservation] = useState<TrackingReservation | null>(null);
+  const [reservation, setReservation] = useState<TrackingReservation | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,14 +51,17 @@ export function useTracking() {
     if (!token || !verifiedEmail) return;
     setLoading(true);
     setError("");
-    fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
+    fetch(
+      `${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`,
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Could not fetch reservation details");
         return res.json() as Promise<TrackingReservation>;
       })
       .then((data) => {
         setReservation(data);
-        if (data.clientSelectedPackageId) setSelectedPkgId(data.clientSelectedPackageId);
+        if (data.clientSelectedPackageId)
+          setSelectedPkgId(data.clientSelectedPackageId);
         setLoading(false);
       })
       .catch((err) => {
@@ -66,7 +71,10 @@ export function useTracking() {
   }, [token, verifiedEmail]);
 
   const scrollToBottom = () => {
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    setTimeout(
+      () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }),
+      100,
+    );
   };
 
   // 3. Chat + Socket.io
@@ -77,7 +85,7 @@ export function useTracking() {
     setMessages,
     setReservation,
     socketRef,
-    scrollToBottom
+    scrollToBottom,
   );
 
   const actions = useTrackingActions(
@@ -88,19 +96,22 @@ export function useTracking() {
     setVerifying,
     setReservation,
     setConfirming,
-    setCancelling
+    setCancelling,
   );
 
   const refetchReservation = () => {
     if (!token || !verifiedEmail) return;
-    fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
+    fetch(
+      `${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`,
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Could not fetch reservation details");
         return res.json() as Promise<TrackingReservation>;
       })
       .then((data) => {
         setReservation(data);
-        if (data.clientSelectedPackageId) setSelectedPkgId(data.clientSelectedPackageId);
+        if (data.clientSelectedPackageId)
+          setSelectedPkgId(data.clientSelectedPackageId);
       })
       .catch(console.error);
   };
@@ -134,7 +145,8 @@ export function useTracking() {
       actions.handleSendMessage(messageText);
       setMessageText("");
     },
-    handleConfirmReservation: () => actions.handleConfirmReservation(selectedPkgId),
+    handleConfirmReservation: () =>
+      actions.handleConfirmReservation(selectedPkgId),
     handleCancelReservation: actions.handleCancelReservation,
     getDeadlineText,
     setReservation,

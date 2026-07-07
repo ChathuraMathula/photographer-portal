@@ -55,12 +55,17 @@ export function CountdownTimer({ deadline }: Props) {
             : "bg-amber-100 text-amber-800 dark:bg-amber-950/20 dark:text-amber-400"
         }`}
       >
-        <Clock className={`h-3.5 w-3.5 ${isUrgent ? "animate-spin" : ""}`} style={{ animationDuration: isUrgent ? "4s" : "0s" }} />
+        <Clock
+          className={`h-3.5 w-3.5 ${isUrgent ? "animate-spin" : ""}`}
+          style={{ animationDuration: isUrgent ? "4s" : "0s" }}
+        />
         <span>Slot locked: </span>
         <span className="tracking-wider">
           {formattedHours}h {formattedMinutes}m {formattedSeconds}s
         </span>
-        <span className="text-body-caption uppercase font-bold opacity-90 shrink-0">remaining</span>
+        <span className="text-body-caption uppercase font-bold opacity-90 shrink-0">
+          remaining
+        </span>
       </span>
     </div>
   );

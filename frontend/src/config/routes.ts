@@ -1,13 +1,25 @@
 import { UserRole } from "@/store/slices/authSlice";
 
 // Exact-match public routes
-export const PUBLIC_ROUTES = ["/", "/login", "/about", "/test-accounts", "/forgot-password", "/reset-password"];
+export const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/about",
+  "/test-accounts",
+  "/forgot-password",
+  "/reset-password",
+];
 
 // Prefix-match public routes — /book/:slug and /book/track/:token are always public
 export const PUBLIC_PREFIXES = ["/book"];
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  [UserRole.SUPER_ADMIN]: ["/dashboard", "/users", "/photographers", "/settings"],
+  [UserRole.SUPER_ADMIN]: [
+    "/dashboard",
+    "/users",
+    "/photographers",
+    "/settings",
+  ],
   [UserRole.ADMIN]: ["/dashboard", "/users"],
   [UserRole.PHOTOGRAPHER]: ["/dashboard", "/reservations", "/profile"],
 };

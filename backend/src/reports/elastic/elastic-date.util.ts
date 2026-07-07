@@ -28,7 +28,7 @@ export function getDateFilters(
 export function getTimelineInterval(startDate: Date, endDate: Date) {
   const diffMs = endDate.getTime() - startDate.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  
+
   let interval = 'month';
   let format = 'MMM yyyy';
   if (diffDays <= 8) {

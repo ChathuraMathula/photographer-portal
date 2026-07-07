@@ -1,4 +1,10 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Settings, PlusSquare, CalendarCheck } from "lucide-react";
 
@@ -42,7 +48,8 @@ export function TopBarPreferencesCard({
               </p>
             </div>
             <p className="text-[11px] text-zinc-500 max-w-sm">
-              Show the availability toggle in the top bar to easily pause or resume incoming bookings.
+              Show the availability toggle in the top bar to easily pause or
+              resume incoming bookings.
             </p>
           </div>
           <Switch
@@ -62,7 +69,8 @@ export function TopBarPreferencesCard({
               </p>
             </div>
             <p className="text-[11px] text-zinc-500 max-w-sm">
-              Show the shortcut to manually log offline bookings from anywhere in the dashboard.
+              Show the shortcut to manually log offline bookings from anywhere
+              in the dashboard.
             </p>
           </div>
           <Switch

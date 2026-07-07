@@ -5,18 +5,36 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Eye, EyeOff, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  Loader2,
+  CheckCircle2,
+  ArrowRight,
+} from "lucide-react";
 import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 const ResetPasswordSchema = Yup.object().shape({
-  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
-  confirmPassword: Yup.string().oneOf([Yup.ref("password")], "Passwords must match").required("Confirm password is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
 });
 
 function ResetPasswordForm() {
@@ -80,7 +98,8 @@ function ResetPasswordForm() {
         <CardHeader className="text-center">
           <CardTitle className="text-red-500">Invalid Link</CardTitle>
           <CardDescription>
-            This password reset link is invalid, expired, or has already been used.
+            This password reset link is invalid, expired, or has already been
+            used.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
@@ -115,7 +134,8 @@ function ResetPasswordForm() {
                 Password Updated!
               </h4>
               <p className="text-xs text-emerald-800 dark:text-emerald-500 leading-relaxed font-medium pb-2">
-                Your new password is now active. You can log in using your updated credentials.
+                Your new password is now active. You can log in using your
+                updated credentials.
               </p>
               <Link href="/login" className="block pt-2">
                 <Button className="w-full h-11 rounded-xl font-bold bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center gap-2 cursor-pointer">
@@ -128,7 +148,10 @@ function ResetPasswordForm() {
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             {/* New Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label
+                htmlFor="password"
+                className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+              >
                 New Password
               </Label>
               <div className="relative">
@@ -138,7 +161,9 @@ function ResetPasswordForm() {
                   placeholder="••••••••"
                   {...formik.getFieldProps("password")}
                   className={`h-11 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-                    formik.touched.password && formik.errors.password ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+                    formik.touched.password && formik.errors.password
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : ""
                   }`}
                 />
                 <button
@@ -146,17 +171,26 @@ function ResetPasswordForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-650 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               {formik.touched.password && formik.errors.password && (
-                <p className="text-body-caption text-red-500 mt-1">{formik.errors.password}</p>
+                <p className="text-body-caption text-red-500 mt-1">
+                  {formik.errors.password}
+                </p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+              >
                 Confirm Password
               </Label>
               <div className="relative">
@@ -166,7 +200,10 @@ function ResetPasswordForm() {
                   placeholder="••••••••"
                   {...formik.getFieldProps("confirmPassword")}
                   className={`h-11 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-                    formik.touched.confirmPassword && formik.errors.confirmPassword ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+                    formik.touched.confirmPassword &&
+                    formik.errors.confirmPassword
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : ""
                   }`}
                 />
                 <button
@@ -174,12 +211,19 @@ function ResetPasswordForm() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-650 transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
-              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                <p className="text-body-caption text-red-500 mt-1">{formik.errors.confirmPassword}</p>
-              )}
+              {formik.touched.confirmPassword &&
+                formik.errors.confirmPassword && (
+                  <p className="text-body-caption text-red-500 mt-1">
+                    {formik.errors.confirmPassword}
+                  </p>
+                )}
             </div>
 
             <Button
@@ -205,11 +249,13 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300">
-      <Suspense fallback={
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex h-64 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+          </div>
+        }
+      >
         <ResetPasswordForm />
       </Suspense>
     </main>

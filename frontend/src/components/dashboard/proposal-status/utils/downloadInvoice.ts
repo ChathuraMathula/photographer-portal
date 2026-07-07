@@ -2,11 +2,17 @@
 
 import { toast } from "sonner";
 
-export async function downloadInvoice(reservationId: string, apiBaseUrl: string) {
+export async function downloadInvoice(
+  reservationId: string,
+  apiBaseUrl: string,
+) {
   try {
-    const response = await fetch(`${apiBaseUrl}/invoices/${reservationId}/download`, {
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${apiBaseUrl}/invoices/${reservationId}/download`,
+      {
+        credentials: "include",
+      },
+    );
     if (!response.ok) throw new Error("Failed to download PDF invoice");
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);

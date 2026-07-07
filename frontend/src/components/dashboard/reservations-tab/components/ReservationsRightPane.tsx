@@ -21,7 +21,9 @@ interface ReservationsRightPaneProps {
   handleProposeQuotation: () => void;
   handleRejectRequest: () => void;
   packageDeposits: Record<string, string>;
-  setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setPackageDeposits: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   customPackage: CustomPackageValues | null;
   setCustomPackage: (val: CustomPackageValues | null) => void;
   customPackageDeposit: string;
@@ -35,16 +37,19 @@ export function ReservationsRightPane(props: ReservationsRightPaneProps) {
     return (
       <div className="lg:col-span-2 space-y-4">
         <div className="h-[400px] flex items-center justify-center border border-dashed rounded-xl text-zinc-400 text-body-small-s">
-          Select a reservation from the list to view details, proposal forms, and client chat thread.
+          Select a reservation from the list to view details, proposal forms,
+          and client chat thread.
         </div>
       </div>
     );
   }
 
   const showProposeCard =
-    props.selectedRes.status === "PENDING" || props.selectedRes.status === "PROPOSED";
+    props.selectedRes.status === "PENDING" ||
+    props.selectedRes.status === "PROPOSED";
   const showStatusCard =
-    props.selectedRes.status === "PROPOSED" || props.selectedRes.status === "CONFIRMED";
+    props.selectedRes.status === "PROPOSED" ||
+    props.selectedRes.status === "CONFIRMED";
 
   return (
     <div className="lg:col-span-2 space-y-4">
@@ -58,7 +63,9 @@ export function ReservationsRightPane(props: ReservationsRightPaneProps) {
           />
         )}
 
-        {showStatusCard && <ProposalStatusCard reservation={props.selectedRes} />}
+        {showStatusCard && (
+          <ProposalStatusCard reservation={props.selectedRes} />
+        )}
       </div>
     </div>
   );

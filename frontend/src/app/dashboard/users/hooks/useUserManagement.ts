@@ -32,7 +32,7 @@ const CreateUserSchema = Yup.object().shape({
 export function useUserManagement() {
   const dispatch = useDispatch();
   const { role: loggedInRole, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
 
   const handleLogout = async () => {
@@ -94,10 +94,12 @@ export function useUserManagement() {
       if (roleFilter !== "ALL") params.append("role", roleFilter);
       if (statusFilter !== "ALL") params.append("status", statusFilter);
 
-      const res = await authFetch(`${API}/users?${params.toString()}`, { credentials: "include" });
+      const res = await authFetch(`${API}/users?${params.toString()}`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load users");
-      
+
       setUsers(data.data || []);
       setTotalPages(data.totalPages || 1);
       setTotal(data.total || 0);
@@ -115,7 +117,15 @@ export function useUserManagement() {
     ) {
       fetchUsers();
     }
-  }, [isAuthenticated, loggedInRole, page, limit, debouncedSearch, roleFilter, statusFilter]);
+  }, [
+    isAuthenticated,
+    loggedInRole,
+    page,
+    limit,
+    debouncedSearch,
+    roleFilter,
+    statusFilter,
+  ]);
 
   const handleToggleActive = async (userId: string) => {
     try {
@@ -126,7 +136,9 @@ export function useUserManagement() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to toggle status");
       setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, isActive: data.isActive } : u))
+        prev.map((u) =>
+          u.id === userId ? { ...u, isActive: data.isActive } : u,
+        ),
       );
     } catch (err: any) {
       toast.error(err.message || "Error updating user status");

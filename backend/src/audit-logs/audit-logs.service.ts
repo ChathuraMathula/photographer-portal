@@ -33,7 +33,14 @@ export class AuditLogsService {
     startDate?: string;
     endDate?: string;
   }) {
-    const { page = 1, limit = 10, action, userEmail, startDate, endDate } = filters;
+    const {
+      page = 1,
+      limit = 10,
+      action,
+      userEmail,
+      startDate,
+      endDate,
+    } = filters;
     const skip = (page - 1) * limit;
     const where: any = {};
 

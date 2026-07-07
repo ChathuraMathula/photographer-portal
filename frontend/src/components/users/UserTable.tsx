@@ -9,11 +9,18 @@ type Props = {
   loggedInRole: string;
 };
 
-export function UserTable({ users, onToggleActive, loggedInUserId, loggedInRole }: Props) {
+export function UserTable({
+  users,
+  onToggleActive,
+  loggedInUserId,
+  loggedInRole,
+}: Props) {
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden">
       <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/20">
-        <CardTitle className="text-title-medium text-primary-dark dark:text-white">Registered Users</CardTitle>
+        <CardTitle className="text-title-medium text-primary-dark dark:text-white">
+          Registered Users
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">

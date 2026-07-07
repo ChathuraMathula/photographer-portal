@@ -12,33 +12,97 @@ import { Payment, PaymentStatus } from '../entities/payment.entity';
 const tok = () => crypto.randomBytes(32).toString('hex');
 
 const lankanFirstNames = [
-  'Priyantha', 'Kanishka', 'Nuwan', 'Chathura', 'Dilshan', 'Ruwan', 'Sajith', 'Tharindu',
-  'Roshan', 'Suresh', 'Amila', 'Nilanka', 'Sandun', 'Chamara', 'Dinesh', 'Indika',
-  'Manoj', 'Anushka', 'Pathum', 'Gayan', 'Priya', 'Amali', 'Sanduni', 'Nadeesha',
-  'Dilhani', 'Nilmini', 'Kanchana', 'Shenali', 'Kavindi', 'Hiruni', 'Hashini', 'Tharushi',
-  'Udari', 'Sachini', 'Hansini', 'Yashodha', 'Oshadi', 'Devni', 'Maneesha', 'Oshini'
+  'Priyantha',
+  'Kanishka',
+  'Nuwan',
+  'Chathura',
+  'Dilshan',
+  'Ruwan',
+  'Sajith',
+  'Tharindu',
+  'Roshan',
+  'Suresh',
+  'Amila',
+  'Nilanka',
+  'Sandun',
+  'Chamara',
+  'Dinesh',
+  'Indika',
+  'Manoj',
+  'Anushka',
+  'Pathum',
+  'Gayan',
+  'Priya',
+  'Amali',
+  'Sanduni',
+  'Nadeesha',
+  'Dilhani',
+  'Nilmini',
+  'Kanchana',
+  'Shenali',
+  'Kavindi',
+  'Hiruni',
+  'Hashini',
+  'Tharushi',
+  'Udari',
+  'Sachini',
+  'Hansini',
+  'Yashodha',
+  'Oshadi',
+  'Devni',
+  'Maneesha',
+  'Oshini',
 ];
 
 const lankanLastNames = [
-  'Perera', 'Fernando', 'Silva', 'Jayasinghe', 'Wijewardene', 'Gunasekara', 'Alwis',
-  'Ratnayake', 'Cooray', 'Liyanage', 'Wickramasinghe', 'Jayawardena', 'Senanayake',
-  'Rajapakse', 'Premadasa', 'Goonetilleke', 'Disanayaka', 'Herath', 'Samaraweera',
-  'Karunaratne', 'Ranasinghe', 'Mendis', 'Rodrigo', 'Peiris', 'Fonseka', 'Amarasinghe'
+  'Perera',
+  'Fernando',
+  'Silva',
+  'Jayasinghe',
+  'Wijewardene',
+  'Gunasekara',
+  'Alwis',
+  'Ratnayake',
+  'Cooray',
+  'Liyanage',
+  'Wickramasinghe',
+  'Jayawardena',
+  'Senanayake',
+  'Rajapakse',
+  'Premadasa',
+  'Goonetilleke',
+  'Disanayaka',
+  'Herath',
+  'Samaraweera',
+  'Karunaratne',
+  'Ranasinghe',
+  'Mendis',
+  'Rodrigo',
+  'Peiris',
+  'Fonseka',
+  'Amarasinghe',
 ];
 
-const eventTypes = ['Wedding', 'Portrait', 'Engagement', 'Corporate Event', 'Newborn', 'Maternity'];
+const eventTypes = [
+  'Wedding',
+  'Portrait',
+  'Engagement',
+  'Corporate Event',
+  'Newborn',
+  'Maternity',
+];
 
 const cities = [
   { name: 'Colombo', district: 'Colombo', lat: 6.9271, lon: 79.8612 },
   { name: 'Kandy', district: 'Kandy', lat: 7.2906, lon: 80.6337 },
-  { name: 'Galle', district: 'Galle', lat: 6.0535, lon: 80.2210 },
+  { name: 'Galle', district: 'Galle', lat: 6.0535, lon: 80.221 },
   { name: 'Negombo', district: 'Gampaha', lat: 7.2008, lon: 79.8737 },
   { name: 'Bentota', district: 'Galle', lat: 6.4285, lon: 79.9997 },
   { name: 'Hikkaduwa', district: 'Galle', lat: 6.1396, lon: 80.1063 },
   { name: 'Nuwara Eliya', district: 'Nuwara Eliya', lat: 6.9497, lon: 80.7828 },
   { name: 'Kurunegala', district: 'Kurunegala', lat: 7.4818, lon: 80.3609 },
   { name: 'Matara', district: 'Matara', lat: 5.9549, lon: 80.5469 },
-  { name: 'Kalutara', district: 'Kalutara', lat: 6.5854, lon: 79.9607 }
+  { name: 'Kalutara', district: 'Kalutara', lat: 6.5854, lon: 79.9607 },
 ];
 
 export async function seedSarahData(
@@ -48,7 +112,9 @@ export async function seedSarahData(
   const manager = dataSource.manager;
 
   console.log('🔍 Checking if Sarah exists in system...');
-  let sarah = await manager.findOne(User, { where: { email: 'sarah@photoportal.com' } });
+  let sarah = await manager.findOne(User, {
+    where: { email: 'sarah@photoportal.com' },
+  });
 
   const hash = await bcrypt.hash('Photographer123!', 10);
 
@@ -84,14 +150,40 @@ export async function seedSarahData(
   await manager.delete(Reservation, { photographerId: sarah.id });
 
   // Ensure Sarah has packages
-  console.log('📦 Setting up Sarah\'s core packages...');
-  let sarahPackages = await manager.find(Package, { where: { photographerId: sarah.id } });
+  console.log("📦 Setting up Sarah's core packages...");
+  let sarahPackages = await manager.find(Package, {
+    where: { photographerId: sarah.id },
+  });
   if (sarahPackages.length === 0) {
     const defaultPackages = [
-      { name: 'Basic Portrait Session', desc: '1 hour outdoor session.', price: 1500000, duration: 1, specs: ['Portrait'] },
-      { name: 'Gold Wedding Day', desc: 'Full wedding day coverage.', price: 18500000, duration: 8, specs: ['Wedding'] },
-      { name: 'Premium Engagement', desc: 'Beautiful pre-wedding couple shoot.', price: 4500000, duration: 3, specs: ['Engagement'] },
-      { name: 'Luxury Maternity Shoot', desc: 'Pre-birth outdoor and studio photos.', price: 3500000, duration: 2, specs: ['Maternity'] }
+      {
+        name: 'Basic Portrait Session',
+        desc: '1 hour outdoor session.',
+        price: 1500000,
+        duration: 1,
+        specs: ['Portrait'],
+      },
+      {
+        name: 'Gold Wedding Day',
+        desc: 'Full wedding day coverage.',
+        price: 18500000,
+        duration: 8,
+        specs: ['Wedding'],
+      },
+      {
+        name: 'Premium Engagement',
+        desc: 'Beautiful pre-wedding couple shoot.',
+        price: 4500000,
+        duration: 3,
+        specs: ['Engagement'],
+      },
+      {
+        name: 'Luxury Maternity Shoot',
+        desc: 'Pre-birth outdoor and studio photos.',
+        price: 3500000,
+        duration: 2,
+        specs: ['Maternity'],
+      },
     ];
 
     for (const pkg of defaultPackages) {
@@ -101,24 +193,32 @@ export async function seedSarahData(
         description: pkg.desc,
         priceInCents: pkg.price,
         durationHours: pkg.duration,
-        includes: ['High Resolution Digital Downloads', 'Professional Retouching', 'Online Gallery'],
+        includes: [
+          'High Resolution Digital Downloads',
+          'Professional Retouching',
+          'Online Gallery',
+        ],
         isActive: true,
         depositType: 'percentage',
         depositValue: 20,
       });
       await manager.save(Package, dbPkg);
     }
-    sarahPackages = await manager.find(Package, { where: { photographerId: sarah.id } });
+    sarahPackages = await manager.find(Package, {
+      where: { photographerId: sarah.id },
+    });
   }
 
   // Create 100 Sri Lankan customers
   console.log('👥 Seeding Sri Lankan test customers...');
   const customers: Customer[] = [];
   for (let i = 0; i < 100; i++) {
-    const first = lankanFirstNames[Math.floor(Math.random() * lankanFirstNames.length)];
-    const last = lankanLastNames[Math.floor(Math.random() * lankanLastNames.length)];
+    const first =
+      lankanFirstNames[Math.floor(Math.random() * lankanFirstNames.length)];
+    const last =
+      lankanLastNames[Math.floor(Math.random() * lankanLastNames.length)];
     const email = `${first.toLowerCase()}.${last.toLowerCase()}.${i}@example.com`;
-    
+
     // Check if customer already exists
     let customer = await manager.findOne(Customer, { where: { email } });
     if (!customer) {
@@ -135,10 +235,12 @@ export async function seedSarahData(
   }
 
   // Generating Reservations across years 2024, 2025, 2026, 2027
-  console.log('📅 Generating years of non-colliding reservations & payments...');
+  console.log(
+    '📅 Generating years of non-colliding reservations & payments...',
+  );
   const years = [2024, 2025, 2026, 2027];
   const currentDate = new Date();
-  
+
   let reservationCount = 0;
   let paymentCount = 0;
 
@@ -151,11 +253,14 @@ export async function seedSarahData(
       for (const day of daysOfEvent) {
         const eventDate = new Date(year, month, day);
         const isPast = eventDate < currentDate;
-        
+
         // Randomly pick customer, package, and event type
-        const customer = customers[Math.floor(Math.random() * customers.length)];
-        const pkg = sarahPackages[Math.floor(Math.random() * sarahPackages.length)];
-        const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+        const customer =
+          customers[Math.floor(Math.random() * customers.length)];
+        const pkg =
+          sarahPackages[Math.floor(Math.random() * sarahPackages.length)];
+        const eventType =
+          eventTypes[Math.floor(Math.random() * eventTypes.length)];
         const cityObj = cities[Math.floor(Math.random() * cities.length)];
 
         // Set status
@@ -163,20 +268,34 @@ export async function seedSarahData(
         if (!isPast) {
           const rand = Math.random();
           if (year === 2027) {
-            status = rand < 0.4 ? ReservationStatus.CONFIRMED :
-                     rand < 0.7 ? ReservationStatus.PENDING :
-                     rand < 0.9 ? ReservationStatus.PROPOSED : ReservationStatus.CANCELLED;
+            status =
+              rand < 0.4
+                ? ReservationStatus.CONFIRMED
+                : rand < 0.7
+                  ? ReservationStatus.PENDING
+                  : rand < 0.9
+                    ? ReservationStatus.PROPOSED
+                    : ReservationStatus.CANCELLED;
           } else {
-            status = rand < 0.7 ? ReservationStatus.CONFIRMED :
-                     rand < 0.85 ? ReservationStatus.PENDING : ReservationStatus.PROPOSED;
+            status =
+              rand < 0.7
+                ? ReservationStatus.CONFIRMED
+                : rand < 0.85
+                  ? ReservationStatus.PENDING
+                  : ReservationStatus.PROPOSED;
           }
         }
 
         // Reservation time slots
         const startTime = '09:00';
-        const endTime = pkg.durationHours === 1 ? '10:00' :
-                        pkg.durationHours === 2 ? '11:00' :
-                        pkg.durationHours === 3 ? '12:00' : '17:00';
+        const endTime =
+          pkg.durationHours === 1
+            ? '10:00'
+            : pkg.durationHours === 2
+              ? '11:00'
+              : pkg.durationHours === 3
+                ? '12:00'
+                : '17:00';
 
         const totalAmountInCents = pkg.priceInCents;
         const advancePaymentPriceInCents = Math.round(totalAmountInCents * 0.2); // 20% advance
@@ -206,7 +325,7 @@ export async function seedSarahData(
               durationHours: pkg.durationHours,
               description: pkg.description,
               includes: pkg.includes,
-            }
+            },
           ],
           usePackageWiseDeposit: true,
           createdAt: new Date(eventDate.getTime() - 30 * 24 * 60 * 60 * 1000), // Created 30 days prior
@@ -216,13 +335,22 @@ export async function seedSarahData(
         reservationCount++;
 
         // Add Payments for Confirmed/Completed Bookings
-        if (status === ReservationStatus.CONFIRMED || status === ReservationStatus.COMPLETED) {
+        if (
+          status === ReservationStatus.CONFIRMED ||
+          status === ReservationStatus.COMPLETED
+        ) {
           const cardBrands = ['Visa', 'Mastercard', 'Amex', 'Offline Payment'];
-          const cardBrand = cardBrands[Math.floor(Math.random() * cardBrands.length)];
-          const cardLast4 = cardBrand === 'Offline Payment' ? 'Cash' : String(Math.floor(1000 + Math.random() * 9000));
+          const cardBrand =
+            cardBrands[Math.floor(Math.random() * cardBrands.length)];
+          const cardLast4 =
+            cardBrand === 'Offline Payment'
+              ? 'Cash'
+              : String(Math.floor(1000 + Math.random() * 9000));
 
           // 1. Advance Deposit Payment
-          const depositDate = new Date(reservation.createdAt.getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day after request
+          const depositDate = new Date(
+            reservation.createdAt.getTime() + 1 * 24 * 60 * 60 * 1000,
+          ); // 1 day after request
           const depositPayment = manager.create(Payment, {
             reservationId: reservation.id,
             amountInCents: advancePaymentPriceInCents,

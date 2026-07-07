@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { type MenuItem } from "../layout/constants";
 
-export function useDashboardLayout(activeTab: string, menuItems?: MenuItem[], defaultMenu: MenuItem[] = []) {
+export function useDashboardLayout(
+  activeTab: string,
+  menuItems?: MenuItem[],
+  defaultMenu: MenuItem[] = [],
+) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);

@@ -604,57 +604,202 @@ export async function seedDatabase(
   }
 
   // ── 7. Bulk Sri Lankan Seed Data (Thousands) ───────────────────────────────
-  console.log('  Generating bulk Sri Lankan photographers, customers, and reservations...');
+  console.log(
+    '  Generating bulk Sri Lankan photographers, customers, and reservations...',
+  );
 
   const lkFirstNames = [
-    'Pathum', 'Chathura', 'Dilshan', 'Kanishka', 'Nadeeka', 'Roshan', 'Ruwan', 'Priya', 'Kasun', 'Tharindu',
-    'Amali', 'Suresh', 'Nadeesha', 'Isuru', 'Sanduni', 'Thilina', 'Lahiru', 'Anushka', 'Sajith', 'Kavinda',
-    'Chamara', 'Dhanushka', 'Dinuka', 'Nipuna', 'Oshada', 'Geeth', 'Harsha', 'Milan', 'Nuwan', 'Ranil',
-    'Sachith', 'Upul', 'Yohan', 'Asanka', 'Mahesh', 'Duminda', 'Kelum', 'Pramod', 'Gayan', 'Buddhika',
-    'Sameera', 'Indika', 'Pradeep', 'Sanjeewa', 'Nalin', 'Dinesh', 'Manoj', 'Priyanthi', 'Nilanthi',
-    'Samanthi', 'Tharushi', 'Kavindi', 'Chamari', 'Dilini', 'Hashini', 'Menaka', 'Sajini', 'Hansini',
-    'Malkanthi', 'Oshadi', 'Gayani', 'Madu', 'Sachini', 'Yoshini', 'Nilmini', 'Erandi', 'Bhagya',
-    'Dilrukshi', 'Ishara', 'Sandamali', 'Piyumi', 'Shashika', 'Upeksha', 'Dilani', 'Ruwani', 'Chathurika'
+    'Pathum',
+    'Chathura',
+    'Dilshan',
+    'Kanishka',
+    'Nadeeka',
+    'Roshan',
+    'Ruwan',
+    'Priya',
+    'Kasun',
+    'Tharindu',
+    'Amali',
+    'Suresh',
+    'Nadeesha',
+    'Isuru',
+    'Sanduni',
+    'Thilina',
+    'Lahiru',
+    'Anushka',
+    'Sajith',
+    'Kavinda',
+    'Chamara',
+    'Dhanushka',
+    'Dinuka',
+    'Nipuna',
+    'Oshada',
+    'Geeth',
+    'Harsha',
+    'Milan',
+    'Nuwan',
+    'Ranil',
+    'Sachith',
+    'Upul',
+    'Yohan',
+    'Asanka',
+    'Mahesh',
+    'Duminda',
+    'Kelum',
+    'Pramod',
+    'Gayan',
+    'Buddhika',
+    'Sameera',
+    'Indika',
+    'Pradeep',
+    'Sanjeewa',
+    'Nalin',
+    'Dinesh',
+    'Manoj',
+    'Priyanthi',
+    'Nilanthi',
+    'Samanthi',
+    'Tharushi',
+    'Kavindi',
+    'Chamari',
+    'Dilini',
+    'Hashini',
+    'Menaka',
+    'Sajini',
+    'Hansini',
+    'Malkanthi',
+    'Oshadi',
+    'Gayani',
+    'Madu',
+    'Sachini',
+    'Yoshini',
+    'Nilmini',
+    'Erandi',
+    'Bhagya',
+    'Dilrukshi',
+    'Ishara',
+    'Sandamali',
+    'Piyumi',
+    'Shashika',
+    'Upeksha',
+    'Dilani',
+    'Ruwani',
+    'Chathurika',
   ];
 
   const lkLastNames = [
-    'Perera', 'Jayasinghe', 'Goonetilleke', 'Alwis', 'Silva', 'Ranasinghe', 'Cooray', 'Liyanage',
-    'Wickramasinghe', 'Jayawardena', 'Fernando', 'Ratnayake', 'Wijewardene', 'Gunasekara', 'Senanayake',
-    'Rajapaksa', 'Herath', 'Bandara', 'Karunaratne', 'Dissanayake', 'Edirisinghe', 'Peiris', 'Rodrigo',
-    'Mendis', 'Fonseka', 'Samaranayake', 'Abeyasinghe', 'Weerasinghe', 'Attanayake', 'Gunawardena',
-    'Premadasa', 'Kumarasinghe', 'Pathirana', 'Siriwardena', 'Hettiarachchi', 'Munasinghe', 'Tennakoon',
-    'Kariyawasam'
+    'Perera',
+    'Jayasinghe',
+    'Goonetilleke',
+    'Alwis',
+    'Silva',
+    'Ranasinghe',
+    'Cooray',
+    'Liyanage',
+    'Wickramasinghe',
+    'Jayawardena',
+    'Fernando',
+    'Ratnayake',
+    'Wijewardene',
+    'Gunasekara',
+    'Senanayake',
+    'Rajapaksa',
+    'Herath',
+    'Bandara',
+    'Karunaratne',
+    'Dissanayake',
+    'Edirisinghe',
+    'Peiris',
+    'Rodrigo',
+    'Mendis',
+    'Fonseka',
+    'Samaranayake',
+    'Abeyasinghe',
+    'Weerasinghe',
+    'Attanayake',
+    'Gunawardena',
+    'Premadasa',
+    'Kumarasinghe',
+    'Pathirana',
+    'Siriwardena',
+    'Hettiarachchi',
+    'Munasinghe',
+    'Tennakoon',
+    'Kariyawasam',
   ];
 
   const lkLocations = [
-    { district: 'Colombo', city: 'Colombo', loc: 'Viharamahadevi Park, Colombo' },
+    {
+      district: 'Colombo',
+      city: 'Colombo',
+      loc: 'Viharamahadevi Park, Colombo',
+    },
     { district: 'Colombo', city: 'Dehiwala', loc: 'Dehiwala Beach, Dehiwala' },
-    { district: 'Colombo', city: 'Mount Lavinia', loc: 'Mount Lavinia Hotel, Mount Lavinia' },
+    {
+      district: 'Colombo',
+      city: 'Mount Lavinia',
+      loc: 'Mount Lavinia Hotel, Mount Lavinia',
+    },
     { district: 'Colombo', city: 'Moratuwa', loc: 'Bolgoda Lake, Moratuwa' },
     { district: 'Colombo', city: 'Kotte', loc: 'Diyatha Uyana, Battaramulla' },
     { district: 'Kandy', city: 'Kandy', loc: 'Kandy Lake Round, Kandy' },
-    { district: 'Kandy', city: 'Peradeniya', loc: 'Royal Botanical Gardens, Peradeniya' },
+    {
+      district: 'Kandy',
+      city: 'Peradeniya',
+      loc: 'Royal Botanical Gardens, Peradeniya',
+    },
     { district: 'Galle', city: 'Galle', loc: 'Galle Fort, Galle' },
     { district: 'Galle', city: 'Unawatuna', loc: 'Jungle Beach, Unawatuna' },
-    { district: 'Gampaha', city: 'Gampaha', loc: 'Henarathgoda Botanical Garden, Gampaha' },
+    {
+      district: 'Gampaha',
+      city: 'Gampaha',
+      loc: 'Henarathgoda Botanical Garden, Gampaha',
+    },
     { district: 'Gampaha', city: 'Negombo', loc: 'Negombo Beach, Negombo' },
-    { district: 'Kurunegala', city: 'Kurunegala', loc: 'Ethagala Rock, Kurunegala' },
-    { district: 'Jaffna', city: 'Jaffna', loc: 'Nallur Kandaswamy Temple, Jaffna' },
+    {
+      district: 'Kurunegala',
+      city: 'Kurunegala',
+      loc: 'Ethagala Rock, Kurunegala',
+    },
+    {
+      district: 'Jaffna',
+      city: 'Jaffna',
+      loc: 'Nallur Kandaswamy Temple, Jaffna',
+    },
     { district: 'Matara', city: 'Mirissa', loc: 'Coconut Tree Hill, Mirissa' },
-    { district: 'Nuwara Eliya', city: 'Nuwara Eliya', loc: 'Gregory Lake, Nuwara Eliya' },
+    {
+      district: 'Nuwara Eliya',
+      city: 'Nuwara Eliya',
+      loc: 'Gregory Lake, Nuwara Eliya',
+    },
     { district: 'Kalutara', city: 'Panadura', loc: 'Panadura Beach, Panadura' },
     { district: 'Badulla', city: 'Ella', loc: 'Nine Arch Bridge, Ella' },
-    { district: 'Trincomalee', city: 'Trincomalee', loc: 'Nilaveli Beach, Trincomalee' }
+    {
+      district: 'Trincomalee',
+      city: 'Trincomalee',
+      loc: 'Nilaveli Beach, Trincomalee',
+    },
   ];
 
-  const specsList = ['Wedding', 'Portrait', 'Corporate Event', 'Conference', 'Family', 'Newborn', 'Maternity', 'Fashion', 'Product', 'Travel'];
+  const specsList = [
+    'Wedding',
+    'Portrait',
+    'Corporate Event',
+    'Conference',
+    'Family',
+    'Newborn',
+    'Maternity',
+    'Fashion',
+    'Product',
+    'Travel',
+  ];
 
   const lkBios = [
     'Capturing raw emotions and beautiful moments across Sri Lanka.',
     'Professional visual storyteller specializing in weddings and lifestyle portraits.',
     'Event and commercial photographer with over 5 years of industry experience.',
     'Dedicated to framing your memories in the most aesthetic way possible.',
-    'Bringing a unique creative vision to product, fashion, and portrait sessions.'
+    'Bringing a unique creative vision to product, fashion, and portrait sessions.',
   ];
 
   const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -744,7 +889,10 @@ export async function seedDatabase(
   }
   console.log('  Inserting photographer profiles into database...');
   for (let i = 0; i < bulkProfiles.length; i += insertChunkSize) {
-    await manager.insert(PhotographerProfile, bulkProfiles.slice(i, i + insertChunkSize));
+    await manager.insert(
+      PhotographerProfile,
+      bulkProfiles.slice(i, i + insertChunkSize),
+    );
   }
   console.log('  Inserting packages into database...');
   for (let i = 0; i < bulkPackages.length; i += insertChunkSize) {
@@ -795,7 +943,14 @@ export async function seedDatabase(
     ReservationStatus.COMPLETED,
   ];
 
-  const eventTypes = ['Wedding', 'Portrait', 'Corporate Event', 'Conference', 'Maternity', 'Newborn'];
+  const eventTypes = [
+    'Wedding',
+    'Portrait',
+    'Corporate Event',
+    'Conference',
+    'Maternity',
+    'Newborn',
+  ];
 
   console.log(`  Generating ${numReservations} reservations...`);
   const bulkReservations: Reservation[] = [];
@@ -830,7 +985,8 @@ export async function seedDatabase(
       reservationToken: crypto.randomUUID(),
       totalAmountInCents: totalAmount,
       advancePaymentPriceInCents: advanceAmount,
-      paymentDeadline: status === ReservationStatus.PROPOSED ? daysFromNow(2) : undefined,
+      paymentDeadline:
+        status === ReservationStatus.PROPOSED ? daysFromNow(2) : undefined,
       clientSelectedPackageId: pkg.id,
       selectedPackages: [pkg],
     });
@@ -875,7 +1031,10 @@ export async function seedDatabase(
   console.log('  Inserting reservations into database...');
   const resChunkSize = 2000;
   for (let i = 0; i < bulkReservations.length; i += resChunkSize) {
-    await manager.insert(Reservation, bulkReservations.slice(i, i + resChunkSize));
+    await manager.insert(
+      Reservation,
+      bulkReservations.slice(i, i + resChunkSize),
+    );
   }
 
   console.log('  Inserting payments into database...');

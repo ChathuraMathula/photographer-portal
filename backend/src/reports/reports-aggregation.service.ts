@@ -127,7 +127,10 @@ export class ReportsAggregationService {
       count,
     }));
 
-    const packageCounts: Record<string, { count: number; revenueCents: number }> = {};
+    const packageCounts: Record<
+      string,
+      { count: number; revenueCents: number }
+    > = {};
     reservations
       .filter(
         (res) =>
@@ -159,7 +162,10 @@ export class ReportsAggregationService {
       }))
       .sort((a, b) => b.revenueLkr - a.revenueLkr);
 
-    const timelineMap: Record<string, { bookings: number; revenueLkr: number }> = {};
+    const timelineMap: Record<
+      string,
+      { bookings: number; revenueLkr: number }
+    > = {};
     const diffMs = endDate.getTime() - startDate.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
@@ -310,7 +316,10 @@ export class ReportsAggregationService {
         totalSuspended,
       };
 
-      const photographerStats: Record<string, { name: string; email: string; bookings: number; revenueCents: number }> = {};
+      const photographerStats: Record<
+        string,
+        { name: string; email: string; bookings: number; revenueCents: number }
+      > = {};
 
       reservations
         .filter(
@@ -349,13 +358,13 @@ export class ReportsAggregationService {
         .sort((a, b) => b.revenueLkr - a.revenueLkr);
     }
 
-    const locationData = reservations.map(res => ({
+    const locationData = reservations.map((res) => ({
       id: res.id,
       eventType: res.eventType,
       locationMapLink: res.locationMapLink,
       district: res.district,
       city: res.city,
-      location: res.location
+      location: res.location,
     }));
 
     return {
@@ -412,7 +421,8 @@ export class ReportsAggregationService {
 
     const skip = (page - 1) * limit;
 
-    const qb = this.reservationRepository.createQueryBuilder('reservation')
+    const qb = this.reservationRepository
+      .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.photographer', 'photographer')
       .select('photographer.id', 'id')
       .addSelect('photographer.firstName', 'firstName')
@@ -422,14 +432,16 @@ export class ReportsAggregationService {
       .addSelect('SUM(reservation.totalAmountInCents)', 'totalAmountInCents')
       .where('reservation.date >= :startDate', { startDate })
       .andWhere('reservation.date <= :endDate', { endDate })
-      .andWhere('reservation.status NOT IN (:...statuses)', { statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED] })
+      .andWhere('reservation.status NOT IN (:...statuses)', {
+        statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED],
+      })
       .andWhere('photographer.id IS NOT NULL');
 
     if (search) {
       const searchPattern = `%${search.toLowerCase()}%`;
       qb.andWhere(
         '(LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search OR LOWER(photographer.email) LIKE :search)',
-        { search: searchPattern }
+        { search: searchPattern },
       );
     }
 
@@ -443,19 +455,22 @@ export class ReportsAggregationService {
 
     const rawResults = await qb.getRawMany();
 
-    const countQb = this.reservationRepository.createQueryBuilder('reservation')
+    const countQb = this.reservationRepository
+      .createQueryBuilder('reservation')
       .leftJoin('reservation.photographer', 'photographer')
       .select('COUNT(DISTINCT photographer.id)', 'total')
       .where('reservation.date >= :startDate', { startDate })
       .andWhere('reservation.date <= :endDate', { endDate })
-      .andWhere('reservation.status NOT IN (:...statuses)', { statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED] })
+      .andWhere('reservation.status NOT IN (:...statuses)', {
+        statuses: [ReservationStatus.CANCELLED, ReservationStatus.REJECTED],
+      })
       .andWhere('photographer.id IS NOT NULL');
-      
+
     if (search) {
       const searchPattern = `%${search.toLowerCase()}%`;
       countQb.andWhere(
         '(LOWER(photographer.firstName) LIKE :search OR LOWER(photographer.lastName) LIKE :search OR LOWER(photographer.email) LIKE :search)',
-        { search: searchPattern }
+        { search: searchPattern },
       );
     }
 

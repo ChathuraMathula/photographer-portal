@@ -14,23 +14,25 @@ type EndpointDirectoryProps = {
 };
 
 const CATEGORY_COUNTS = Object.fromEntries(
-  CATEGORIES.map(cat => [cat, ENDPOINTS.filter(ep => ep.category === cat).length])
+  CATEGORIES.map((cat) => [
+    cat,
+    ENDPOINTS.filter((ep) => ep.category === cat).length,
+  ]),
 );
 
 export function EndpointDirectory({
   activeCategory,
   setActiveCategory,
-  prefillPlayground
+  prefillPlayground,
 }: EndpointDirectoryProps) {
   const [search, setSearch] = useState("");
 
-  const filtered = ENDPOINTS.filter(ep =>
-    ep.category === activeCategory &&
-    (
-      ep.path.toLowerCase().includes(search.toLowerCase()) ||
-      ep.description.toLowerCase().includes(search.toLowerCase()) ||
-      ep.method.toLowerCase().includes(search.toLowerCase())
-    )
+  const filtered = ENDPOINTS.filter(
+    (ep) =>
+      ep.category === activeCategory &&
+      (ep.path.toLowerCase().includes(search.toLowerCase()) ||
+        ep.description.toLowerCase().includes(search.toLowerCase()) ||
+        ep.method.toLowerCase().includes(search.toLowerCase())),
   );
 
   return (
@@ -41,10 +43,13 @@ export function EndpointDirectory({
       {/* Category tab bar — horizontal scroll on mobile */}
       <div className="mb-4 -mx-1 overflow-x-auto">
         <div className="flex gap-1.5 px-1 pb-1 min-w-max">
-          {CATEGORIES.map(cat => (
+          {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              onClick={() => { setActiveCategory(cat); setSearch(""); }}
+              onClick={() => {
+                setActiveCategory(cat);
+                setSearch("");
+              }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-body-caption font-semibold cursor-pointer transition-all whitespace-nowrap ${
                 activeCategory === cat
                   ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm"
@@ -52,11 +57,13 @@ export function EndpointDirectory({
               }`}
             >
               {cat}
-              <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center leading-none ${
-                activeCategory === cat
-                  ? "bg-white/20 text-white dark:bg-black/20 dark:text-zinc-900"
-                  : "bg-zinc-150 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
-              }`}>
+              <span
+                className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center leading-none ${
+                  activeCategory === cat
+                    ? "bg-white/20 text-white dark:bg-black/20 dark:text-zinc-900"
+                    : "bg-zinc-150 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                }`}
+              >
                 {CATEGORY_COUNTS[cat]}
               </span>
             </button>
@@ -70,7 +77,7 @@ export function EndpointDirectory({
         <input
           type="text"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search ${activeCategory} endpoints…`}
           className="w-full h-9 pl-9 pr-8 text-body-caption border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary-dark/30"
         />
@@ -110,14 +117,23 @@ export function EndpointDirectory({
                 </span>
               </div>
 
-              <p className="text-body-small text-zinc-555 dark:text-zinc-400 leading-relaxed">{ep.description}</p>
+              <p className="text-body-small text-zinc-555 dark:text-zinc-400 leading-relaxed">
+                {ep.description}
+              </p>
 
               {/* Footer row */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-850">
                 <div className="text-body-caption text-zinc-405 font-medium">
                   {ep.defaultBody && <span>📥 Payload template available</span>}
-                  {!ep.defaultBody && ep.defaultQuery && <span>🔍 Query keys: {ep.defaultQuery.map(q => q.key).join(", ")}</span>}
-                  {!ep.defaultBody && !ep.defaultQuery && <span>⚡ Simple request — no body required</span>}
+                  {!ep.defaultBody && ep.defaultQuery && (
+                    <span>
+                      🔍 Query keys:{" "}
+                      {ep.defaultQuery.map((q) => q.key).join(", ")}
+                    </span>
+                  )}
+                  {!ep.defaultBody && !ep.defaultQuery && (
+                    <span>⚡ Simple request — no body required</span>
+                  )}
                 </div>
                 <button
                   onClick={() => prefillPlayground(ep)}

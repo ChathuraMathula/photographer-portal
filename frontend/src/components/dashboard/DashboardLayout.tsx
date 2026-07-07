@@ -35,17 +35,62 @@ export function DashboardLayout({
   topbarActions,
 }: DashboardLayoutProps) {
   useLockBodyScroll();
-  const { isCollapsed, handleSetCollapsed, isMobileOpen, setIsMobileOpen, showLogoutModal, setShowLogoutModal, items, activeLabel } = useDashboardLayout(activeTab, menuItems, PHOTOGRAPHER_MENU);
+  const {
+    isCollapsed,
+    handleSetCollapsed,
+    isMobileOpen,
+    setIsMobileOpen,
+    showLogoutModal,
+    setShowLogoutModal,
+    items,
+    activeLabel,
+  } = useDashboardLayout(activeTab, menuItems, PHOTOGRAPHER_MENU);
 
   return (
     <div className="h-screen w-screen flex bg-zinc-50 font-sans antialiased text-zinc-900 overflow-hidden">
-      <DesktopSidebar isCollapsed={isCollapsed} userName={userName} userRole={userRole} items={items} activeTab={activeTab} onTabChange={onTabChange} onLogoutRequest={() => setShowLogoutModal(true)} />
-      <MobileSidebarDrawer isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} userName={userName} items={items} activeTab={activeTab} onTabChange={onTabChange} onLogoutRequest={() => setShowLogoutModal(true)} />
+      <DesktopSidebar
+        isCollapsed={isCollapsed}
+        userName={userName}
+        userRole={userRole}
+        items={items}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        onLogoutRequest={() => setShowLogoutModal(true)}
+      />
+      <MobileSidebarDrawer
+        isOpen={isMobileOpen}
+        onClose={() => setIsMobileOpen(false)}
+        userName={userName}
+        items={items}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        onLogoutRequest={() => setShowLogoutModal(true)}
+      />
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <TopbarHeader isCollapsed={isCollapsed} setIsCollapsed={handleSetCollapsed} setIsMobileOpen={setIsMobileOpen} activeLabel={activeLabel} notificationBell={notificationBell} topbarActions={topbarActions} profileImageUrl={profileImageUrl} userName={userName} userRole={userRole} onTabChange={onTabChange} />
-        <main className="flex-1 overflow-y-auto focus:outline-none bg-zinc-50 p-4 sm:p-6 lg:p-8">{children}</main>
+        <TopbarHeader
+          isCollapsed={isCollapsed}
+          setIsCollapsed={handleSetCollapsed}
+          setIsMobileOpen={setIsMobileOpen}
+          activeLabel={activeLabel}
+          notificationBell={notificationBell}
+          topbarActions={topbarActions}
+          profileImageUrl={profileImageUrl}
+          userName={userName}
+          userRole={userRole}
+          onTabChange={onTabChange}
+        />
+        <main className="flex-1 overflow-y-auto focus:outline-none bg-zinc-50 p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
-      <LogoutConfirmModal open={showLogoutModal} onConfirm={() => { setShowLogoutModal(false); onLogout(); }} onCancel={() => setShowLogoutModal(false)} />
+      <LogoutConfirmModal
+        open={showLogoutModal}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          onLogout();
+        }}
+        onCancel={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 }

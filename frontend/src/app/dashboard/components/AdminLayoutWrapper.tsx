@@ -6,9 +6,23 @@ import { usePathname, useRouter } from "next/navigation";
 import { logout, UserRole } from "@/store/slices/authSlice";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
-import { ClipboardList, LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
+import {
+  ClipboardList,
+  LayoutDashboard,
+  Users,
+  BarChart3,
+  UserCog,
+} from "lucide-react";
 
-export function AdminLayoutWrapper({ children, firstName, role }: { children: React.ReactNode; firstName: string; role: string }) {
+export function AdminLayoutWrapper({
+  children,
+  firstName,
+  role,
+}: {
+  children: React.ReactNode;
+  firstName: string;
+  role: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
@@ -48,7 +62,11 @@ export function AdminLayoutWrapper({ children, firstName, role }: { children: Re
   ];
 
   if (role === UserRole.SUPER_ADMIN) {
-    menuItems.push({ id: "audit-logs", label: "Audit Logs", icon: ClipboardList });
+    menuItems.push({
+      id: "audit-logs",
+      label: "Audit Logs",
+      icon: ClipboardList,
+    });
   }
 
   return (

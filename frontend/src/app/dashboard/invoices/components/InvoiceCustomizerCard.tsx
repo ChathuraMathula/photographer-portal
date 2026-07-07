@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Palette, Receipt } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,13 +30,23 @@ export function InvoiceCustomizerCard({
   settings,
   onSave,
 }: InvoiceCustomizerCardProps) {
-  const [invoiceTitle, setInvoiceTitle] = useState(settings.invoiceTitle || "INVOICE");
-  const [invoiceColor, setInvoiceColor] = useState(settings.invoiceColor || "#2563eb");
+  const [invoiceTitle, setInvoiceTitle] = useState(
+    settings.invoiceTitle || "INVOICE",
+  );
+  const [invoiceColor, setInvoiceColor] = useState(
+    settings.invoiceColor || "#2563eb",
+  );
   const [invoiceNotes, setInvoiceNotes] = useState(settings.invoiceNotes || "");
-  const [invoiceLogoText, setInvoiceLogoText] = useState(settings.invoiceLogoText || "");
+  const [invoiceLogoText, setInvoiceLogoText] = useState(
+    settings.invoiceLogoText || "",
+  );
   const [invoicePhone, setInvoicePhone] = useState(settings.invoicePhone || "");
-  const [invoiceTaxRate, setInvoiceTaxRate] = useState(settings.invoiceTaxRate || 0);
-  const [invoiceInstructions, setInvoiceInstructions] = useState(settings.invoiceInstructions || "");
+  const [invoiceTaxRate, setInvoiceTaxRate] = useState(
+    settings.invoiceTaxRate || 0,
+  );
+  const [invoiceInstructions, setInvoiceInstructions] = useState(
+    settings.invoiceInstructions || "",
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -80,7 +96,9 @@ export function InvoiceCustomizerCard({
         <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
           {/* Invoice Header Title */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Header Document Title</label>
+            <label className="font-bold text-zinc-550 block">
+              Header Document Title
+            </label>
             <input
               type="text"
               value={invoiceTitle}
@@ -93,7 +111,9 @@ export function InvoiceCustomizerCard({
 
           {/* Branding Studio Name */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Branding Logo Text (Studio Name)</label>
+            <label className="font-bold text-zinc-550 block">
+              Branding Logo Text (Studio Name)
+            </label>
             <input
               type="text"
               value={invoiceLogoText}
@@ -105,7 +125,9 @@ export function InvoiceCustomizerCard({
 
           {/* Studio Phone Number */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Business Contact Phone</label>
+            <label className="font-bold text-zinc-550 block">
+              Business Contact Phone
+            </label>
             <input
               type="text"
               value={invoicePhone}
@@ -117,7 +139,9 @@ export function InvoiceCustomizerCard({
 
           {/* Tax / VAT Percentage */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">VAT / Tax Percentage Rate (%)</label>
+            <label className="font-bold text-zinc-550 block">
+              VAT / Tax Percentage Rate (%)
+            </label>
             <input
               type="number"
               min="0"
@@ -132,7 +156,9 @@ export function InvoiceCustomizerCard({
 
           {/* Theme Accent Color */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Invoice Accent Theme Color</label>
+            <label className="font-bold text-zinc-550 block">
+              Invoice Accent Theme Color
+            </label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -140,13 +166,17 @@ export function InvoiceCustomizerCard({
                 onChange={(e) => setInvoiceColor(e.target.value)}
                 className="h-10 w-16 p-0 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent cursor-pointer overflow-hidden"
               />
-              <span className="font-mono text-[11px] text-zinc-500">{invoiceColor.toUpperCase()}</span>
+              <span className="font-mono text-[11px] text-zinc-500">
+                {invoiceColor.toUpperCase()}
+              </span>
             </div>
           </div>
 
           {/* Fulfillment Instructions & Next Steps */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Fulfillment Instructions (Next Steps)</label>
+            <label className="font-bold text-zinc-550 block">
+              Fulfillment Instructions (Next Steps)
+            </label>
             <textarea
               value={invoiceInstructions}
               onChange={(e) => setInvoiceInstructions(e.target.value)}
@@ -158,7 +188,9 @@ export function InvoiceCustomizerCard({
 
           {/* Custom Footer Notes */}
           <div className="space-y-1.5 text-left">
-            <label className="font-bold text-zinc-550 block">Custom Footer Notes & Terms</label>
+            <label className="font-bold text-zinc-550 block">
+              Custom Footer Notes & Terms
+            </label>
             <textarea
               value={invoiceNotes}
               onChange={(e) => setInvoiceNotes(e.target.value)}

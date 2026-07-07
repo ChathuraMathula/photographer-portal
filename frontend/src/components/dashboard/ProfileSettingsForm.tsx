@@ -35,9 +35,15 @@ export function ProfileSettingsForm({
   onToggleAvailability,
 }: ProfileSettingsFormProps) {
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300">
-      <AcceptBookingsToggle profileAvailability={profileAvailability} onToggleAvailability={onToggleAvailability} />
-      
+    <form
+      onSubmit={onSubmit}
+      className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300"
+    >
+      <AcceptBookingsToggle
+        profileAvailability={profileAvailability}
+        onToggleAvailability={onToggleAvailability}
+      />
+
       {bookingSlug && <BookingPageLinkCard bookingSlug={bookingSlug} />}
 
       <BiographyCard
@@ -61,7 +67,9 @@ export function ProfileSettingsForm({
         locationMapLink={locationMapLink}
         onLocationMapLinkChange={onLocationMapLinkChange}
         showMapPreviewOnBookingPage={showMapPreviewOnBookingPage}
-        onShowMapPreviewOnBookingPageChange={onShowMapPreviewOnBookingPageChange}
+        onShowMapPreviewOnBookingPageChange={
+          onShowMapPreviewOnBookingPageChange
+        }
       />
 
       <EventTypesCard
@@ -72,7 +80,10 @@ export function ProfileSettingsForm({
       />
 
       <div className="flex justify-end pt-2">
-        <Button type="submit" className="btn btn-primary h-11 px-8 font-semibold shadow-md cursor-pointer hover:shadow-lg transition-all">
+        <Button
+          type="submit"
+          className="btn btn-primary h-11 px-8 font-semibold shadow-md cursor-pointer hover:shadow-lg transition-all"
+        >
           Save Profile
         </Button>
       </div>

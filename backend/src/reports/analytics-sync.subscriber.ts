@@ -20,8 +20,6 @@ export class AnalyticsSyncSubscriber implements EntitySubscriberInterface {
     dataSource.subscribers.push(this);
   }
 
-
-
   async afterInsert(event: InsertEvent<any>) {
     await this.handleEvent(event.entity);
   }
@@ -37,9 +35,15 @@ export class AnalyticsSyncSubscriber implements EntitySubscriberInterface {
   private async handleEvent(entity: any) {
     if (!entity) return;
 
-    if (entity instanceof Reservation || entity.constructor?.name === 'Reservation') {
+    if (
+      entity instanceof Reservation ||
+      entity.constructor?.name === 'Reservation'
+    ) {
       await this.syncService.syncReservation(entity.id);
-    } else if (entity instanceof Payment || entity.constructor?.name === 'Payment') {
+    } else if (
+      entity instanceof Payment ||
+      entity.constructor?.name === 'Payment'
+    ) {
       if (entity.reservationId) {
         await this.syncService.syncReservation(entity.reservationId);
       }

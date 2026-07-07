@@ -47,7 +47,10 @@ export function EmailVerificationScreen({
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label
+                htmlFor="email"
+                className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+              >
                 Email Address
               </Label>
               <Input

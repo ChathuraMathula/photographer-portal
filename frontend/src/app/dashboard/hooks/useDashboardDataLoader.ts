@@ -33,7 +33,12 @@ export function useDashboardDataLoader({
     cardPaymentsCount: 0,
   });
 
-  const loadTransactions = async (paramsObj?: { page?: number; search?: string; status?: string; method?: string }) => {
+  const loadTransactions = async (paramsObj?: {
+    page?: number;
+    search?: string;
+    status?: string;
+    method?: string;
+  }) => {
     setTransactionsLoading(true);
     try {
       const pageNum = paramsObj?.page || 1;
@@ -41,10 +46,15 @@ export function useDashboardDataLoader({
       params.append("page", pageNum.toString());
       params.append("limit", "15");
       if (paramsObj?.search) params.append("search", paramsObj.search);
-      if (paramsObj?.status && paramsObj.status !== "ALL") params.append("status", paramsObj.status);
-      if (paramsObj?.method && paramsObj.method !== "ALL") params.append("method", paramsObj.method);
+      if (paramsObj?.status && paramsObj.status !== "ALL")
+        params.append("status", paramsObj.status);
+      if (paramsObj?.method && paramsObj.method !== "ALL")
+        params.append("method", paramsObj.method);
 
-      const res = await authFetch(`${API}/payments/photographer?${params.toString()}`, { credentials: "include" });
+      const res = await authFetch(
+        `${API}/payments/photographer?${params.toString()}`,
+        { credentials: "include" },
+      );
       if (res.ok) {
         const data = await res.json();
         setTransactions(data.data || []);
@@ -86,18 +96,28 @@ export function useDashboardDataLoader({
         profile.setBookingSlug(profData.bookingSlug || "");
         profile.setProfileImageUrl(profData.profileImageUrl || "");
         profile.setAllowedEventTypes(profData.allowedEventTypes || []);
-        profile.setAllowCustomEventTypes(profData.allowCustomEventTypes !== false);
-        profile.setUniversalDepositType(profData.universalDepositType || "fixed");
+        profile.setAllowCustomEventTypes(
+          profData.allowCustomEventTypes !== false,
+        );
+        profile.setUniversalDepositType(
+          profData.universalDepositType || "fixed",
+        );
         profile.setUniversalDepositValue(
           profData.universalDepositType === "percentage"
-            ? profData.universalDepositValue ?? 10
-            : (profData.universalDepositValue ?? 500000) / 100
+            ? (profData.universalDepositValue ?? 10)
+            : (profData.universalDepositValue ?? 500000) / 100,
         );
         profile.setOfflineMessage(profData.offlineMessage || "");
-        profile.setShowManualBookingInTopbar(profData.showManualBookingInTopbar !== false);
-        profile.setShowAcceptBookingsInTopbar(profData.showAcceptBookingsInTopbar !== false);
-        if (typeof profile.setShowMapPreviewOnBookingPage === 'function') {
-          profile.setShowMapPreviewOnBookingPage(profData.showMapPreviewOnBookingPage !== false);
+        profile.setShowManualBookingInTopbar(
+          profData.showManualBookingInTopbar !== false,
+        );
+        profile.setShowAcceptBookingsInTopbar(
+          profData.showAcceptBookingsInTopbar !== false,
+        );
+        if (typeof profile.setShowMapPreviewOnBookingPage === "function") {
+          profile.setShowMapPreviewOnBookingPage(
+            profData.showMapPreviewOnBookingPage !== false,
+          );
         }
       }
     } catch (err) {

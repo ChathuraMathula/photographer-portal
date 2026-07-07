@@ -24,27 +24,41 @@ export function ProposalPaymentDetails({
   onLogCashClick,
   onDownloadInvoice,
 }: ProposalPaymentDetailsProps) {
-  if (reservation.status !== "CONFIRMED" && reservation.status !== "COMPLETED") {
+  if (
+    reservation.status !== "CONFIRMED" &&
+    reservation.status !== "COMPLETED"
+  ) {
     return null;
   }
 
   return (
     <div className="space-y-2 pt-1">
       <p className="text-zinc-655 dark:text-zinc-400">
-        <strong className="text-zinc-800 dark:text-zinc-200">Advance Requested:</strong> LKR{" "}
+        <strong className="text-zinc-800 dark:text-zinc-200">
+          Advance Requested:
+        </strong>{" "}
+        LKR{" "}
         {((reservation.advancePaymentPriceInCents ?? 0) / 100).toLocaleString()}
       </p>
       <p className="text-zinc-655 dark:text-zinc-400">
-        <strong className="text-zinc-800 dark:text-zinc-200">Total Price:</strong> LKR {(totalAmount / 100).toLocaleString()}
+        <strong className="text-zinc-800 dark:text-zinc-200">
+          Total Price:
+        </strong>{" "}
+        LKR {(totalAmount / 100).toLocaleString()}
       </p>
       <p className="text-zinc-655 dark:text-zinc-400">
-        <strong className="text-zinc-800 dark:text-zinc-200">Total Settled:</strong> LKR {(totalPaid / 100).toLocaleString()}
+        <strong className="text-zinc-800 dark:text-zinc-200">
+          Total Settled:
+        </strong>{" "}
+        LKR {(totalPaid / 100).toLocaleString()}
       </p>
 
       {reservation.status === "CONFIRMED" && remainingBalance > 0 && (
         <div className="bg-amber-50/50 border border-amber-200/50 p-3 rounded-xl flex items-center justify-between mt-2">
           <div>
-            <p className="text-[10px] font-bold text-amber-800 dark:text-amber-500 uppercase">Balance Due</p>
+            <p className="text-[10px] font-bold text-amber-800 dark:text-amber-500 uppercase">
+              Balance Due
+            </p>
             <p className="font-bold text-amber-700 text-body-small-s">
               LKR {(remainingBalance / 100).toLocaleString()}
             </p>

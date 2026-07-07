@@ -7,7 +7,11 @@ type Props = {
   onSelect: (res: Reservation) => void;
 };
 
-export function ReservationListItem({ reservation: res, isSelected, onSelect }: Props) {
+export function ReservationListItem({
+  reservation: res,
+  isSelected,
+  onSelect,
+}: Props) {
   const getUnreadCount = () => {
     if (!res.messages || res.messages.length === 0) return 0;
     const key = `chat_last_viewed_photographer_${res.id}`;
@@ -15,7 +19,7 @@ export function ReservationListItem({ reservation: res, isSelected, onSelect }: 
     return res.messages.filter(
       (msg) =>
         msg.sender === "CUSTOMER" &&
-        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime()
+        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime(),
     ).length;
   };
 

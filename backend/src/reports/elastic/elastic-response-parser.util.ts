@@ -3,12 +3,19 @@ export function parseReportAggregations(
   totalBookings: number,
   photographerId: string | undefined,
 ) {
-  const potentialRevenueCents = aggs.total_potential_revenue.sum_revenue.value || 0;
+  const potentialRevenueCents =
+    aggs.total_potential_revenue.sum_revenue.value || 0;
   const paidRevenueCents = aggs.total_paid_revenue.value || 0;
-  const pendingRevenueCents = Math.max(0, potentialRevenueCents - paidRevenueCents);
+  const pendingRevenueCents = Math.max(
+    0,
+    potentialRevenueCents - paidRevenueCents,
+  );
 
   const successfulBookings = aggs.successful_bookings.doc_count;
-  const conversionRate = totalBookings > 0 ? Math.round((successfulBookings / totalBookings) * 100) : 0;
+  const conversionRate =
+    totalBookings > 0
+      ? Math.round((successfulBookings / totalBookings) * 100)
+      : 0;
 
   const statusDistribution = aggs.status_distribution.buckets.map((b: any) => ({
     name: b.key,
@@ -20,11 +27,13 @@ export function parseReportAggregations(
     count: b.doc_count,
   }));
 
-  const packages = aggs.packages.by_package.buckets.map((b: any) => ({
-    name: b.key,
-    count: b.doc_count,
-    revenueLkr: (b.revenue.value || 0) / 100,
-  })).sort((a: any, b: any) => b.revenueLkr - a.revenueLkr);
+  const packages = aggs.packages.by_package.buckets
+    .map((b: any) => ({
+      name: b.key,
+      count: b.doc_count,
+      revenueLkr: (b.revenue.value || 0) / 100,
+    }))
+    .sort((a: any, b: any) => b.revenueLkr - a.revenueLkr);
 
   const timeline = aggs.timeline.buckets.map((b: any) => ({
     label: b.key_as_string,
@@ -34,13 +43,15 @@ export function parseReportAggregations(
 
   let photographerLeaderboard: any[] = [];
   if (!photographerId && aggs.photographers) {
-    photographerLeaderboard = aggs.photographers.buckets.map((b: any) => ({
-      id: b.key,
-      name: b.name.buckets[0]?.key || 'Unknown',
-      email: b.email.buckets[0]?.key || '',
-      bookingsCount: b.doc_count,
-      revenueLkr: (b.revenue.value || 0) / 100,
-    })).sort((a: any, b: any) => b.revenueLkr - a.revenueLkr);
+    photographerLeaderboard = aggs.photographers.buckets
+      .map((b: any) => ({
+        id: b.key,
+        name: b.name.buckets[0]?.key || 'Unknown',
+        email: b.email.buckets[0]?.key || '',
+        bookingsCount: b.doc_count,
+        revenueLkr: (b.revenue.value || 0) / 100,
+      }))
+      .sort((a: any, b: any) => b.revenueLkr - a.revenueLkr);
   }
 
   return {

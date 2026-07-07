@@ -63,7 +63,7 @@ export type LocationInsightsSummary = {
  *  - https://maps.google.com/?q=lat,lon
  */
 export function extractCoordsFromMapLink(
-  url: string | undefined | null
+  url: string | undefined | null,
 ): { lat: number; lon: number } | null {
   if (!url) return null;
 
@@ -94,15 +94,14 @@ export function buildMapPoints(bookings: RawBooking[]): MapPoint[] {
   for (const b of bookings) {
     const coords = extractCoordsFromMapLink(b.locationMapLink);
     if (!coords) continue;
-    const clientName =
-      b.customer
-        ? `${b.customer.firstName} ${b.customer.lastName}`
-        : b.clientName || 'Client';
+    const clientName = b.customer
+      ? `${b.customer.firstName} ${b.customer.lastName}`
+      : b.clientName || "Client";
     points.push({
       lat: coords.lat,
       lon: coords.lon,
       label: `${clientName} · ${b.eventType}`,
-      eventType: b.eventType || 'Other',
+      eventType: b.eventType || "Other",
       date: b.date,
       district: b.district,
       city: b.city,
@@ -119,7 +118,7 @@ export function buildDistrictStats(bookings: RawBooking[]): DistrictStat[] {
     if (!district) continue;
     if (!map[district]) map[district] = { district, count: 0, eventTypes: {} };
     map[district].count++;
-    const et = b.eventType || 'Other';
+    const et = b.eventType || "Other";
     map[district].eventTypes[et] = (map[district].eventTypes[et] || 0) + 1;
   }
   return Object.values(map).sort((a, b) => b.count - a.count);
@@ -143,15 +142,17 @@ export function buildLocationInsights(
   bookings: RawBooking[],
   districtStats: DistrictStat[],
   cityStats: CityStat[],
-  mapPoints: MapPoint[]
+  mapPoints: MapPoint[],
 ): LocationInsightsSummary {
   const totalBookings = bookings.length;
   const totalWithLocation = bookings.filter(
-    (b) => b.district || b.city || b.location || b.locationMapLink
+    (b) => b.district || b.city || b.location || b.locationMapLink,
   ).length;
   const totalWithCoords = mapPoints.length;
   const coveragePercent =
-    totalBookings > 0 ? Math.round((totalWithLocation / totalBookings) * 100) : 0;
+    totalBookings > 0
+      ? Math.round((totalWithLocation / totalBookings) * 100)
+      : 0;
   return {
     topDistrict: districtStats[0]?.district ?? null,
     topCity: cityStats[0]?.city ?? null,

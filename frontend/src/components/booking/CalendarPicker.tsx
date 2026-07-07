@@ -22,7 +22,11 @@ export function CalendarPicker({ value, onChange, today, error }: Props) {
     if (!value) return "Select preferred date";
     const dateObj = new Date(value);
     if (isNaN(dateObj.getTime())) return value;
-    return dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    return dateObj.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   const handlePrevMonth = () => {

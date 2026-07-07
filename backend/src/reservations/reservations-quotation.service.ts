@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Brackets } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
@@ -30,12 +34,18 @@ export class ReservationsQuotationService {
     private readonly emailService: EmailService,
   ) {}
 
-  async proposeQuotation(reservation: Reservation, dto: ProposeQuotationDto, user: JwtUser) {
+  async proposeQuotation(
+    reservation: Reservation,
+    dto: ProposeQuotationDto,
+    user: JwtUser,
+  ) {
     if (
       reservation.status !== ReservationStatus.PENDING &&
       reservation.status !== ReservationStatus.PROPOSED
     ) {
-      throw new BadRequestException('Can only propose quotation for pending or proposed requests');
+      throw new BadRequestException(
+        'Can only propose quotation for pending or proposed requests',
+      );
     }
 
     const packageIds = dto.packageIds || [];
@@ -51,19 +61,30 @@ export class ReservationsQuotationService {
     }
 
     if (pkgs.length === 0 && !dto.customPackage) {
-      throw new BadRequestException('Must select at least one package or include a custom package');
+      throw new BadRequestException(
+        'Must select at least one package or include a custom package',
+      );
     }
 
     const conflicts = await this.reservationRepository
       .createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', { photographerId: reservation.photographerId })
+      .where('res.photographerId = :photographerId', {
+        photographerId: reservation.photographerId,
+      })
       .andWhere('res.date = :date', { date: reservation.date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', { startTime: reservation.startTime, endTime: reservation.endTime })
-      .andWhere('res.status = :confirmedStatus', { confirmedStatus: ReservationStatus.CONFIRMED })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+        startTime: reservation.startTime,
+        endTime: reservation.endTime,
+      })
+      .andWhere('res.status = :confirmedStatus', {
+        confirmedStatus: ReservationStatus.CONFIRMED,
+      })
       .getMany();
 
     if (conflicts.length > 0) {
-      throw new BadRequestException('This time slot is already booked and confirmed.');
+      throw new BadRequestException(
+        'This time slot is already booked and confirmed.',
+      );
     }
 
     reservation.status = ReservationStatus.PROPOSED;
@@ -72,7 +93,10 @@ export class ReservationsQuotationService {
     reservation.usePackageWiseDeposit = dto.usePackageWiseDeposit ?? false;
 
     const selectedPkgsMapped = pkgs.map((p) => {
-      const customDeposit = dto.packageDeposits && dto.packageDeposits[p.id] !== undefined ? dto.packageDeposits[p.id] : null;
+      const customDeposit =
+        dto.packageDeposits && dto.packageDeposits[p.id] !== undefined
+          ? dto.packageDeposits[p.id]
+          : null;
       return {
         id: p.id,
         name: p.name,
@@ -90,7 +114,10 @@ export class ReservationsQuotationService {
     if (dto.customPackage) {
       const cp = dto.customPackage;
       const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const customDeposit = dto.packageDeposits && dto.packageDeposits['custom'] !== undefined ? dto.packageDeposits['custom'] : null;
+      const customDeposit =
+        dto.packageDeposits && dto.packageDeposits['custom'] !== undefined
+          ? dto.packageDeposits['custom']
+          : null;
 
       selectedPkgsMapped.push({
         id: customId,
@@ -113,8 +140,12 @@ export class ReservationsQuotationService {
 
     await this.reservationRepository.save(reservation);
 
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationUpdated', reservation);
 
     const trackingLink = `http://localhost:4000/book/track/${reservation.reservationToken}`;
     await this.emailService.sendQuotationProposed(
@@ -128,7 +159,11 @@ export class ReservationsQuotationService {
     return reservation;
   }
 
-  async rejectReservation(reservation: Reservation, dto: RejectReservationDto, user: JwtUser) {
+  async rejectReservation(
+    reservation: Reservation,
+    dto: RejectReservationDto,
+    user: JwtUser,
+  ) {
     if (reservation.status !== ReservationStatus.PENDING) {
       throw new BadRequestException('Can only reject pending requests');
     }
@@ -138,8 +173,12 @@ export class ReservationsQuotationService {
 
     await this.reservationRepository.save(reservation);
 
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', reservation);
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationUpdated', reservation);
 
     await this.emailService.sendReservationRejected(
       reservation.customer.email,
@@ -147,7 +186,9 @@ export class ReservationsQuotationService {
       dto.rejectionReason,
     );
 
-    const profile = await this.profileRepository.findOneBy({ userId: user.userId });
+    const profile = await this.profileRepository.findOneBy({
+      userId: user.userId,
+    });
     if (profile) {
       this.chatGateway.broadcastAvailabilityChange(
         profile.bookingSlug,

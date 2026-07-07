@@ -70,13 +70,16 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       if (typeof window !== "undefined") {
         try {
-          localStorage.setItem("auth_user", JSON.stringify({
-            id: state.id,
-            email: state.email,
-            role: state.role,
-            firstName: state.firstName,
-            isAuthenticated: true,
-          }));
+          localStorage.setItem(
+            "auth_user",
+            JSON.stringify({
+              id: state.id,
+              email: state.email,
+              role: state.role,
+              firstName: state.firstName,
+              isAuthenticated: true,
+            }),
+          );
         } catch (err) {
           console.error("Failed to save auth state to localStorage", err);
         }

@@ -8,7 +8,12 @@ type Props = {
   onToggle: () => void;
 };
 
-export function NotificationBellButton({ inAppNotificationsEnabled, unreadCount, isOpen, onToggle }: Props) {
+export function NotificationBellButton({
+  inAppNotificationsEnabled,
+  unreadCount,
+  isOpen,
+  onToggle,
+}: Props) {
   if (!inAppNotificationsEnabled) {
     return (
       <button

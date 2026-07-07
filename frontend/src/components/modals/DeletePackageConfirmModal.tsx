@@ -29,7 +29,10 @@ export function DeletePackageConfirmModal({ pkg, onConfirm, onCancel }: Props) {
             Delete package?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-body-small text-zinc-500 leading-relaxed">
-            Are you sure you want to delete <span className="font-semibold text-zinc-800">{pkg?.name}</span>? This action cannot be undone and this package option will be permanently removed.
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-zinc-800">{pkg?.name}</span>?
+            This action cannot be undone and this package option will be
+            permanently removed.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

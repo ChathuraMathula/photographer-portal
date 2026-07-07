@@ -23,10 +23,15 @@ export function BookingDetailsLocation({ reservation }: LocationProps) {
           </p>
         </div>
       </div>
-      
-      {(reservation.location || reservation.locationMapLink || reservation.city || reservation.district) && (
+
+      {(reservation.location ||
+        reservation.locationMapLink ||
+        reservation.city ||
+        reservation.district) && (
         <div className="mt-3.5">
-          <p className="text-body-caption font-semibold text-zinc-400 mb-2">Location Map Preview</p>
+          <p className="text-body-caption font-semibold text-zinc-400 mb-2">
+            Location Map Preview
+          </p>
           <OSMMapPreview
             location={reservation.location}
             city={reservation.city}

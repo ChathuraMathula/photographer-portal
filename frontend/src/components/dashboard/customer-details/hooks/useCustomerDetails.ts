@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 
-export function useCustomerDetails(reservationId: string, reservationToken: string) {
+export function useCustomerDetails(
+  reservationId: string,
+  reservationToken: string,
+) {
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -19,8 +22,12 @@ export function useCustomerDetails(reservationId: string, reservationToken: stri
   const handleCopyLink = async () => {
     try {
       const originUrl =
-        typeof window !== "undefined" ? window.location.origin : "http://localhost:4000";
-      await navigator.clipboard.writeText(`${originUrl}/book/track/${reservationToken}`);
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost:4000";
+      await navigator.clipboard.writeText(
+        `${originUrl}/book/track/${reservationToken}`,
+      );
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
     } catch (err) {

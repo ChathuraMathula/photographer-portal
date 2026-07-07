@@ -9,14 +9,14 @@ interface ReservationUpdatedContext {
 
 export function handleReservationUpdated(
   updatedRes: Reservation,
-  ctx: ReservationUpdatedContext
+  ctx: ReservationUpdatedContext,
 ) {
   ctx.reservationsState.setReservations((prev: Reservation[]) =>
-    prev.map((r) => (r.id === updatedRes.id ? updatedRes : r))
+    prev.map((r) => (r.id === updatedRes.id ? updatedRes : r)),
   );
 
   ctx.reservationsState.setSelectedRes((prev: Reservation | null) =>
-    prev && prev.id === updatedRes.id ? updatedRes : prev
+    prev && prev.id === updatedRes.id ? updatedRes : prev,
   );
 
   ctx.loadTransactions();

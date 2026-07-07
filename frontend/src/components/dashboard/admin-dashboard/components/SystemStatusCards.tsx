@@ -13,7 +13,9 @@ export function SystemStatusCards() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-title-medium text-emerald-600">Active &amp; Sync</p>
+          <p className="text-title-medium text-emerald-600">
+            Active &amp; Sync
+          </p>
           <p className="text-body-caption text-zinc-400 mt-1 leading-normal">
             PostgreSQL DB connected successfully
           </p>

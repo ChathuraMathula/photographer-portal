@@ -9,6 +9,10 @@ import { ReservationsModule } from '../reservations/reservations.module';
 @Module({
   imports: [DatabaseModule, ReservationsModule],
   controllers: [BookingsController],
-  providers: [BookingsService, BookingsValidationService, BookingsLifecycleService],
+  providers: [
+    BookingsService,
+    BookingsValidationService,
+    BookingsLifecycleService,
+  ],
 })
 export class BookingsModule {}

@@ -10,10 +10,7 @@ import { User } from '../entities/user.entity';
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Reservation, User]),
-    RabbitMQModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Reservation, User]), RabbitMQModule],
   controllers: [EmailController],
   providers: [EmailService, EmailWorkerService, RemindersService],
   exports: [EmailService],

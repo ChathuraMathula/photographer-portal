@@ -1,7 +1,11 @@
 import React from "react";
 import { type PhotographerProfile } from "@/types";
 
-export function PhotographerHeaderInfo({ profile }: { profile: PhotographerProfile }) {
+export function PhotographerHeaderInfo({
+  profile,
+}: {
+  profile: PhotographerProfile;
+}) {
   return (
     <div className="flex flex-col sm:flex-row gap-5 p-5 items-center sm:items-start text-center sm:text-left">
       {profile.profileImageUrl ? (

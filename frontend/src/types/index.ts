@@ -24,12 +24,7 @@ export type Customer = {
 };
 
 export type ReservationStatus =
-  | "PENDING"
-  | "PROPOSED"
-  | "REJECTED"
-  | "CONFIRMED"
-  | "CANCELLED"
-  | "COMPLETED";
+  "PENDING" | "PROPOSED" | "REJECTED" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 
 export type Reservation = {
   id: string;

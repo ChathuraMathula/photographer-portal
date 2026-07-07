@@ -26,21 +26,16 @@ export function usePhotographerDashboard() {
   const resId = searchParams.get("id");
 
   // 1. Auth Hook
-  const {
-    firstName,
-    role,
-    userId,
-    isAuthenticated,
-    handleLogout,
-    authFetch,
-  } = useDashboardAuth();
+  const { firstName, role, userId, isAuthenticated, handleLogout, authFetch } =
+    useDashboardAuth();
 
   const [forceOpenChat, setForceOpenChat] = useState(0);
 
   // States managed in main hook for coordination
   const [activeTab, setActiveTab] = useState<Tab>("reservations");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendarSelectedRes, setCalendarSelectedRes] = useState<Reservation | null>(null);
+  const [calendarSelectedRes, setCalendarSelectedRes] =
+    useState<Reservation | null>(null);
   const [showManualModal, setShowManualModal] = useState(false);
 
   // 2. Notifications Hook

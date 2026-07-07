@@ -1,12 +1,25 @@
 import { LogOut, Settings } from "lucide-react";
 
-type Props = { activeTab: string; onTabChange: (tab: string) => void; onClose: () => void; onLogoutRequest: () => void; };
+type Props = {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  onClose: () => void;
+  onLogoutRequest: () => void;
+};
 
-export function MobileSidebarFooter({ activeTab, onTabChange, onClose, onLogoutRequest }: Props) {
+export function MobileSidebarFooter({
+  activeTab,
+  onTabChange,
+  onClose,
+  onLogoutRequest,
+}: Props) {
   return (
     <div className="space-y-1.5 pt-4 border-t border-zinc-200/50">
       <button
-        onClick={() => { onTabChange("settings"); onClose(); }}
+        onClick={() => {
+          onTabChange("settings");
+          onClose();
+        }}
         aria-label="User Settings"
         className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-body-small-s font-medium transition-all duration-200 cursor-pointer ${activeTab === "settings" ? "bg-zinc-100 text-zinc-900" : "text-zinc-600 hover:bg-zinc-50"}`}
       >

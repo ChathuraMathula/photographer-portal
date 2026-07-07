@@ -66,7 +66,9 @@ export default function ProfilePage() {
       onCityChange={setCity}
       onDistrictChange={setDistrict}
       onLocationMapLinkChange={setLocationMapLink}
-      onShowMapPreviewOnBookingPageChange={context.setShowMapPreviewOnBookingPage}
+      onShowMapPreviewOnBookingPageChange={
+        context.setShowMapPreviewOnBookingPage
+      }
       onSubmit={handleSaveProfile}
       profileImageUrl={profileImageUrl}
       onProfileImageUrlChange={setProfileImageUrl}
@@ -85,4 +87,3 @@ export default function ProfilePage() {
     />
   );
 }
-

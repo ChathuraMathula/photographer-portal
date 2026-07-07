@@ -20,7 +20,8 @@ export function BookingDetailsMeta({
   handleCopyId,
   handleCopyLink,
 }: MetaProps) {
-  const rowClass = "flex items-center gap-3 text-body-small text-zinc-650 dark:text-zinc-350";
+  const rowClass =
+    "flex items-center gap-3 text-body-small text-zinc-650 dark:text-zinc-350";
   const labelClass = "text-zinc-400 font-medium w-24 shrink-0";
 
   return (
@@ -45,12 +46,16 @@ export function BookingDetailsMeta({
         <div className={rowClass}>
           <Mail className="h-4.5 w-4.5 text-zinc-400 shrink-0" />
           <span className={labelClass}>Email</span>
-          <span className="font-medium truncate">{reservation.customer.email}</span>
+          <span className="font-medium truncate">
+            {reservation.customer.email}
+          </span>
         </div>
         <div className={rowClass}>
           <Phone className="h-4.5 w-4.5 text-zinc-400 shrink-0" />
           <span className={labelClass}>Phone</span>
-          <span className="font-medium">{reservation.customer.phone || "Not given"}</span>
+          <span className="font-medium">
+            {reservation.customer.phone || "Not given"}
+          </span>
         </div>
         <div className={rowClass}>
           <Calendar className="h-4.5 w-4.5 text-zinc-400 shrink-0" />
@@ -62,12 +67,16 @@ export function BookingDetailsMeta({
         <div className={rowClass}>
           <Clock className="h-4.5 w-4.5 text-zinc-400 shrink-0" />
           <span className={labelClass}>Time Slot</span>
-          <span className="font-medium">{reservation.startTime} - {reservation.endTime}</span>
+          <span className="font-medium">
+            {reservation.startTime} - {reservation.endTime}
+          </span>
         </div>
         <div className={rowClass}>
           <Tag className="h-4.5 w-4.5 text-zinc-400 shrink-0" />
           <span className={labelClass}>Event Type</span>
-          <span className="font-semibold text-zinc-850 dark:text-zinc-200">{reservation.eventType}</span>
+          <span className="font-semibold text-zinc-850 dark:text-zinc-200">
+            {reservation.eventType}
+          </span>
         </div>
       </div>
     </div>

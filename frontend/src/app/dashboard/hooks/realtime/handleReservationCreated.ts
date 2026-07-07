@@ -11,7 +11,7 @@ interface ReservationCreatedContext {
 
 export function handleReservationCreated(
   newRes: Reservation,
-  ctx: ReservationCreatedContext
+  ctx: ReservationCreatedContext,
 ) {
   ctx.reservationsState.setReservations((prev: Reservation[]) => {
     if (prev.some((r) => r.id === newRes.id)) return prev;
@@ -32,5 +32,7 @@ export function handleReservationCreated(
   ]);
 
   ctx.loadTransactions();
-  toast.info(`New booking request from ${newRes.customer?.firstName ?? "Client"}!`);
+  toast.info(
+    `New booking request from ${newRes.customer?.firstName ?? "Client"}!`,
+  );
 }

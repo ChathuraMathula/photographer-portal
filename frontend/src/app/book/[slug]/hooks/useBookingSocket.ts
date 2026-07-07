@@ -8,7 +8,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 export function useBookingSocket(
   slug: string,
-  setProfile: React.Dispatch<React.SetStateAction<PhotographerProfile | null>>
+  setProfile: React.Dispatch<React.SetStateAction<PhotographerProfile | null>>,
 ) {
   useEffect(() => {
     if (!slug) return;

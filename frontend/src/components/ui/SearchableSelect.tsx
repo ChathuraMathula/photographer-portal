@@ -32,7 +32,10 @@ export function SearchableSelect({
   // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -52,7 +55,7 @@ export function SearchableSelect({
   const selectedOption = options.find((opt) => opt.value === value);
 
   const filteredOptions = options.filter((opt) =>
-    opt.name.toLowerCase().includes(searchTerm.toLowerCase())
+    opt.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -67,7 +70,9 @@ export function SearchableSelect({
         <span className="truncate font-medium">
           {selectedOption ? selectedOption.name : placeholder}
         </span>
-        <ChevronDown className={`h-4 w-4 text-zinc-400 transition-transform duration-200 shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`h-4 w-4 text-zinc-400 transition-transform duration-200 shrink-0 ml-2 ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {/* Popover Content */}
@@ -99,11 +104,15 @@ export function SearchableSelect({
                       setOpen(false);
                     }}
                     className={`w-full px-3 py-2.5 flex items-center justify-between hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60 transition-colors text-left cursor-pointer ${
-                      isSelected ? "bg-zinc-50 dark:bg-zinc-850 font-bold text-zinc-900 dark:text-white" : ""
+                      isSelected
+                        ? "bg-zinc-50 dark:bg-zinc-850 font-bold text-zinc-900 dark:text-white"
+                        : ""
                     }`}
                   >
                     <span className="truncate">{opt.name}</span>
-                    {isSelected && <Check className="h-3.5 w-3.5 text-zinc-900 dark:text-white shrink-0 ml-2" />}
+                    {isSelected && (
+                      <Check className="h-3.5 w-3.5 text-zinc-900 dark:text-white shrink-0 ml-2" />
+                    )}
                   </button>
                 );
               })

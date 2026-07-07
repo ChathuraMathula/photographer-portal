@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { type Reservation } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
-import { generateCalendarDays, formatDateLocal } from "../utils/calendarHelpers";
+import {
+  generateCalendarDays,
+  formatDateLocal,
+} from "../utils/calendarHelpers";
 
 export function useBookingCalendarState(
   reservations: Reservation[],
   currentDate: Date,
-  onDateChange?: (date: Date) => void
+  onDateChange?: (date: Date) => void,
 ) {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
@@ -20,28 +23,39 @@ export function useBookingCalendarState(
 
   useEffect(() => {
     const today = new Date();
-    if (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() === today.getMonth()) {
+    if (
+      currentDate.getFullYear() === today.getFullYear() &&
+      currentDate.getMonth() === today.getMonth()
+    ) {
       setSelectedDay(today);
     } else {
-      setSelectedDay(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+      setSelectedDay(
+        new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+      );
     }
   }, [currentDate]);
 
   const handleMonthChange = (val: string) => {
-    if (onDateChange) onDateChange(new Date(currentDate.getFullYear(), parseInt(val), 1));
+    if (onDateChange)
+      onDateChange(new Date(currentDate.getFullYear(), parseInt(val), 1));
   };
 
   const handleYearChange = (val: string) => {
-    if (onDateChange) onDateChange(new Date(parseInt(val), currentDate.getMonth(), 1));
+    if (onDateChange)
+      onDateChange(new Date(parseInt(val), currentDate.getMonth(), 1));
   };
 
   const getReservationsForDay = (day: Date) => {
     const formatted = formatDateLocal(day);
     return reservations.filter((r) => {
-      const resDate = typeof r.date === "string" ? r.date.split("T")[0] : formatDateLocal(new Date(r.date));
+      const resDate =
+        typeof r.date === "string"
+          ? r.date.split("T")[0]
+          : formatDateLocal(new Date(r.date));
       if (resDate !== formatted) return false;
       if (statusFilter !== "ALL" && r.status !== statusFilter) return false;
-      if (eventTypeFilter !== "ALL" && r.eventType !== eventTypeFilter) return false;
+      if (eventTypeFilter !== "ALL" && r.eventType !== eventTypeFilter)
+        return false;
 
       if (debouncedSearch.trim() !== "") {
         const q = debouncedSearch.toLowerCase();
@@ -49,7 +63,13 @@ export function useBookingCalendarState(
         const last = r.customer?.lastName?.toLowerCase() ?? "";
         const loc = r.location?.toLowerCase() ?? "";
         const type = r.eventType.toLowerCase();
-        if (!first.includes(q) && !last.includes(q) && !loc.includes(q) && !type.includes(q)) return false;
+        if (
+          !first.includes(q) &&
+          !last.includes(q) &&
+          !loc.includes(q) &&
+          !type.includes(q)
+        )
+          return false;
       }
       return true;
     });

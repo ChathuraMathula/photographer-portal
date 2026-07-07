@@ -18,7 +18,9 @@ import { Reservation } from '../entities/reservation.entity';
     origin: '*',
   },
 })
-export class ChatWorkerGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatWorkerGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server!: Server;
 

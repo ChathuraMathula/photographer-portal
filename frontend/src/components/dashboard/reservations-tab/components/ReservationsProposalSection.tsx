@@ -19,7 +19,9 @@ interface ReservationsProposalSectionProps {
   handleProposeQuotation: () => void;
   handleRejectRequest: () => void;
   packageDeposits: Record<string, string>;
-  setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setPackageDeposits: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   customPackage: CustomPackageValues | null;
   setCustomPackage: (val: CustomPackageValues | null) => void;
   customPackageDeposit: string;
@@ -28,7 +30,9 @@ interface ReservationsProposalSectionProps {
   setIsCustomPackageSelected: (val: boolean) => void;
 }
 
-export function ReservationsProposalSection(props: ReservationsProposalSectionProps) {
+export function ReservationsProposalSection(
+  props: ReservationsProposalSectionProps,
+) {
   const onTogglePackage = (id: string, checked: boolean) => {
     if (checked) {
       props.setSelectedPkgIds((prev) => [...prev, id]);

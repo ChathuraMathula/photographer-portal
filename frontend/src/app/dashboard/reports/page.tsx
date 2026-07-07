@@ -17,7 +17,11 @@ export default function ReportsPage() {
   // Fetch data on mount/change if role is photographer
   useEffect(() => {
     if (role === UserRole.PHOTOGRAPHER && reportsHook.hasContext) {
-      if (reportsHook.period === "custom" && (!reportsHook.startDate || !reportsHook.endDate)) return;
+      if (
+        reportsHook.period === "custom" &&
+        (!reportsHook.startDate || !reportsHook.endDate)
+      )
+        return;
       reportsHook.loadStats(reportsHook.reportData === null);
     }
   }, [
@@ -27,7 +31,7 @@ export default function ReportsPage() {
     reportsHook.selectedYear,
     reportsHook.selectedMonth,
     reportsHook.hasContext,
-    role
+    role,
   ]);
 
   // If Admin or Super Admin, render Admin reports directly

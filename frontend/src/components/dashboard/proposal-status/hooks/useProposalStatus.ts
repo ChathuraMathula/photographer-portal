@@ -35,7 +35,10 @@ export function useProposalStatus(reservation: Reservation) {
   };
 
   useEffect(() => {
-    if (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") {
+    if (
+      reservation.status === "CONFIRMED" ||
+      reservation.status === "COMPLETED"
+    ) {
       fetchPayments();
     }
   }, [reservation.id, reservation.status, paymentsUpdatedTrigger]);
@@ -44,10 +47,13 @@ export function useProposalStatus(reservation: Reservation) {
     if (!context || !reservation.id) return;
     setFulfilling(true);
     try {
-      const res = await context.authFetch(`${API}/payments/${reservation.id}/manual-fulfill`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const res = await context.authFetch(
+        `${API}/payments/${reservation.id}/manual-fulfill`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
       if (res.ok) {
         toast.success("Cash payment logged and invoice emailed successfully!");
         fetchPayments();

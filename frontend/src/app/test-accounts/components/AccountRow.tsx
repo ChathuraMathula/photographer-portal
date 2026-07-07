@@ -25,14 +25,18 @@ export function AccountRow({ account, index, copiedId, onCopy }: Props) {
   return (
     <div className="p-6 flex flex-col md:flex-row md:items-start gap-4 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-all">
       {/* Icon wrapper */}
-      <div className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl ${account.iconBg} ${account.iconColor}`}>
+      <div
+        className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl ${account.iconBg} ${account.iconColor}`}
+      >
         {account.icon}
       </div>
 
       {/* Details */}
       <div className="flex-1 space-y-1">
         <div className="flex items-center gap-2">
-          <span className={`text-[10px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-full ${account.iconBg} ${account.iconColor}`}>
+          <span
+            className={`text-[10px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-full ${account.iconBg} ${account.iconColor}`}
+          >
             {account.role}
           </span>
           <h4 className="text-body-small-bold font-bold text-zinc-900 dark:text-white">

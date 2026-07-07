@@ -1,19 +1,19 @@
 - [x] Package-Specific Deposit Logic (Backend & Customer Tracking)
-    - [x] Modify `proposeQuotation` in `reservations.service.ts` to snapshot package deposit columns
-    - [x] Add Sri Lankan bank card BIN mappings on backend and frontend
-    - [x] Update backend checkout logic in `payments.service.ts` to calculate dynamic package deposit amount, identify SL banks, and save correct transaction records
-    - [x] Update `ProposalSection.tsx` and `PaymentSandboxModal.tsx` to compute dynamic deposit amounts on client side
-    - [x] Integrate Sri Lankan credit cards simulation choices in `PaymentSandboxModal.tsx`
+  - [x] Modify `proposeQuotation` in `reservations.service.ts` to snapshot package deposit columns
+  - [x] Add Sri Lankan bank card BIN mappings on backend and frontend
+  - [x] Update backend checkout logic in `payments.service.ts` to calculate dynamic package deposit amount, identify SL banks, and save correct transaction records
+  - [x] Update `ProposalSection.tsx` and `PaymentSandboxModal.tsx` to compute dynamic deposit amounts on client side
+  - [x] Integrate Sri Lankan credit cards simulation choices in `PaymentSandboxModal.tsx`
 - [x] Enhanced Manual Bookings (Photographer Dashboard)
-    - [x] Update `manualFormik` validation schema and state hooks in `usePhotographerDashboard.ts`
-    - [x] Add Package, locationMapLink, total price, and advance payment inputs in `ManualBookingModal.tsx`
-    - [x] Implement auto-fill pricing and deposit calculator when selecting a package in `ManualBookingModal.tsx`
+  - [x] Update `manualFormik` validation schema and state hooks in `usePhotographerDashboard.ts`
+  - [x] Add Package, locationMapLink, total price, and advance payment inputs in `ManualBookingModal.tsx`
+  - [x] Implement auto-fill pricing and deposit calculator when selecting a package in `ManualBookingModal.tsx`
 - [x] Refactor Profile Settings Layout (Separate Cards)
-    - [x] Refactor `ProfileSettingsForm.tsx` into five clear visual `Card` blocks
+  - [x] Refactor `ProfileSettingsForm.tsx` into five clear visual `Card` blocks
 - [x] Developer Transactions Log Dashboard Tab
-    - [x] Implement `GET /payments/photographer` endpoint in `payments.controller.ts` & `payments.service.ts`
-    - [x] Expose `transactions` list fetching in dashboard hooks
-    - [x] Expose `Transactions` tab in `DashboardLayout.tsx`
-    - [x] Build the `frontend/src/app/dashboard/transactions/page.tsx` page to render transaction logs
+  - [x] Implement `GET /payments/photographer` endpoint in `payments.controller.ts` & `payments.service.ts`
+  - [x] Expose `transactions` list fetching in dashboard hooks
+  - [x] Expose `Transactions` tab in `DashboardLayout.tsx`
+  - [x] Build the `frontend/src/app/dashboard/transactions/page.tsx` page to render transaction logs
 - [x] Verification & Build
-    - [x] Build frontend and backend to ensure all TypeScript typings compile correctly
+  - [x] Build frontend and backend to ensure all TypeScript typings compile correctly

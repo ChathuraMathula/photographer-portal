@@ -29,18 +29,17 @@ export function FloatingChatWidget({
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
-  const { showFloatingChat, setShowFloatingChat, unreadCount } = useFloatingChatState({
-    selectedRes,
-    messages,
-    forceOpen,
-    chatRef,
-    buttonRef,
-  });
+  const { showFloatingChat, setShowFloatingChat, unreadCount } =
+    useFloatingChatState({
+      selectedRes,
+      messages,
+      forceOpen,
+      chatRef,
+      buttonRef,
+    });
 
-  const { position, isDraggingRef, handleMouseDown, handleTouchStart } = useFloatingChatDrag(
-    buttonRef,
-    chatRef
-  );
+  const { position, isDraggingRef, handleMouseDown, handleTouchStart } =
+    useFloatingChatDrag(buttonRef, chatRef);
 
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isDraggingRef.current) {

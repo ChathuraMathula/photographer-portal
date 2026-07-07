@@ -9,12 +9,21 @@ type Props = {
   onCancel: () => void;
 };
 
-export function SuspendConfirmModal({ open, isDeactivating, fullName, loading, onConfirm, onCancel }: Props) {
+export function SuspendConfirmModal({
+  open,
+  isDeactivating,
+  fullName,
+  loading,
+  onConfirm,
+  onCancel,
+}: Props) {
   if (!open) return null;
 
   return (
     <ConfirmationModal
-      title={isDeactivating ? `Suspend ${fullName}?` : `Reactivate ${fullName}?`}
+      title={
+        isDeactivating ? `Suspend ${fullName}?` : `Reactivate ${fullName}?`
+      }
       description={
         isDeactivating
           ? `Suspending ${fullName} will immediately revoke their portal access and log them out of all active sessions. Are you sure you want to proceed?`

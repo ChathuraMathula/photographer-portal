@@ -10,12 +10,8 @@ import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const {
-    firstName,
-    role,
-    isAuthenticated,
-    handleLogout,
-  } = usePhotographerDashboard();
+  const { firstName, role, isAuthenticated, handleLogout } =
+    usePhotographerDashboard();
 
   useEffect(() => {
     if (isAuthenticated && role === UserRole.PHOTOGRAPHER) {
@@ -36,7 +32,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-      <div className="animate-pulse text-zinc-500 font-medium">Redirecting...</div>
+      <div className="animate-pulse text-zinc-500 font-medium">
+        Redirecting...
+      </div>
     </div>
   );
 }

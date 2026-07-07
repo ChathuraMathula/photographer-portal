@@ -4,14 +4,23 @@ import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
 import { Payment } from '../entities/payment.entity';
 import { EmailService } from '../email/email.service';
-import { generateInvoicePdf, InvoiceData } from '../reports/invoices-pdf-generator';
+import {
+  generateInvoicePdf,
+  InvoiceData,
+} from '../reports/invoices-pdf-generator';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class StripeHelperService {
   constructor(private readonly emailService: EmailService) {}
 
-  async simulateStripeCharge(cardNumber: string): Promise<{ status: PaymentStatus; errorMsg?: string; resolvedCardBrand: string }> {
+  async simulateStripeCharge(
+    cardNumber: string,
+  ): Promise<{
+    status: PaymentStatus;
+    errorMsg?: string;
+    resolvedCardBrand: string;
+  }> {
     const normalizedCard = cardNumber.replace(/\s+/g, '');
 
     if (normalizedCard.length !== 16 || !/^\d+$/.test(normalizedCard)) {
@@ -42,7 +51,8 @@ export class StripeHelperService {
       if (cardNum.startsWith('405659')) return 'Commercial Bank (Visa)';
       if (cardNum.startsWith('525496')) return 'Commercial Bank (Mastercard)';
       if (cardNum.startsWith('490822')) return 'Hatton National Bank (Visa)';
-      if (cardNum.startsWith('510526')) return 'Hatton National Bank (Mastercard)';
+      if (cardNum.startsWith('510526'))
+        return 'Hatton National Bank (Mastercard)';
       if (cardNum.startsWith('400586')) return 'Bank of Ceylon (Visa)';
       if (cardNum.startsWith('549040')) return 'Bank of Ceylon (Mastercard)';
       if (cardNum.startsWith('415668')) return 'Seylan Bank (Visa)';
@@ -65,7 +75,7 @@ export class StripeHelperService {
   async sendInvoiceAndNotify(
     reservation: Reservation,
     allPayments: Payment[],
-    profileRepository: Repository<PhotographerProfile>
+    profileRepository: Repository<PhotographerProfile>,
   ) {
     const profile = await profileRepository.findOne({
       where: { userId: reservation.photographerId },

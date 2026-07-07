@@ -11,14 +11,18 @@ export function useTrackingSocket(
   verifiedEmail: string | null,
   token: string,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setReservation: React.Dispatch<React.SetStateAction<TrackingReservation | null>>,
+  setReservation: React.Dispatch<
+    React.SetStateAction<TrackingReservation | null>
+  >,
   socketRef: React.MutableRefObject<Socket | null>,
-  scrollToBottom: () => void
+  scrollToBottom: () => void,
 ) {
   useEffect(() => {
     if (!reservation?.id || !verifiedEmail || !token) return;
-    
-    fetch(`${API}/bookings/track/${token}/messages?email=${encodeURIComponent(verifiedEmail)}`)
+
+    fetch(
+      `${API}/bookings/track/${token}/messages?email=${encodeURIComponent(verifiedEmail)}`,
+    )
       .then((r) => r.json())
       .then((data) => {
         setMessages(data);
@@ -54,7 +58,9 @@ export function useTrackingSocket(
     });
 
     socket.on("transactionLogged", () => {
-      fetch(`${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`)
+      fetch(
+        `${API}/bookings/track/${token}?email=${encodeURIComponent(verifiedEmail)}`,
+      )
         .then((res) => {
           if (!res.ok) throw new Error("Could not refetch");
           return res.json() as Promise<TrackingReservation>;
@@ -69,5 +75,13 @@ export function useTrackingSocket(
       socket.emit("leaveReservation", { reservationId: reservation.id });
       socket.disconnect();
     };
-  }, [reservation?.id, verifiedEmail, token, setMessages, setReservation, socketRef, scrollToBottom]);
+  }, [
+    reservation?.id,
+    verifiedEmail,
+    token,
+    setMessages,
+    setReservation,
+    socketRef,
+    scrollToBottom,
+  ]);
 }

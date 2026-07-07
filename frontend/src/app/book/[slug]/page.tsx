@@ -6,7 +6,12 @@ import { PhotographerHeader } from "@/components/booking/PhotographerHeader";
 import { AvailabilityForm } from "@/components/booking/AvailabilityForm";
 import { CustomerDetailsForm } from "@/components/booking/CustomerDetailsForm";
 import { BookingConfirmed } from "@/components/booking/BookingConfirmed";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function BookingPage() {
   const {
@@ -26,7 +31,8 @@ export default function BookingPage() {
 
   // ── Render states ──────────────────────────────────────────────────────────
 
-  if (pageState === "loading") return <LoadingSpinner text="Checking availability..." />;
+  if (pageState === "loading")
+    return <LoadingSpinner text="Checking availability..." />;
 
   if (pageState === "not-found" || !profile) {
     return (
@@ -34,7 +40,9 @@ export default function BookingPage() {
         <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle>Not found</CardTitle>
-            <CardDescription>This booking link is invalid or has expired.</CardDescription>
+            <CardDescription>
+              This booking link is invalid or has expired.
+            </CardDescription>
           </CardHeader>
         </Card>
       </main>
@@ -53,7 +61,8 @@ export default function BookingPage() {
                 Bookings Temporarily Closed
               </CardTitle>
               <CardDescription className="text-body-small text-amber-800 dark:text-amber-500 mt-2 font-medium leading-relaxed">
-                {profile.offlineMessage || "I am not currently accepting new booking requests at this time. Please check back later or get in touch through my portfolio."}
+                {profile.offlineMessage ||
+                  "I am not currently accepting new booking requests at this time. Please check back later or get in touch through my portfolio."}
               </CardDescription>
             </CardHeader>
           </Card>

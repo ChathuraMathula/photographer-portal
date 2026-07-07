@@ -21,14 +21,24 @@ type Props = {
 };
 
 export function BookingCalendar(props: Props) {
-  const state = useBookingCalendarState(props.reservations, props.currentDate, props.onDateChange);
+  const state = useBookingCalendarState(
+    props.reservations,
+    props.currentDate,
+    props.onDateChange,
+  );
   const mobileSliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (mobileSliderRef.current) {
-      const activeBtn = mobileSliderRef.current.querySelector('[data-active="true"]');
+      const activeBtn = mobileSliderRef.current.querySelector(
+        '[data-active="true"]',
+      );
       if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        activeBtn.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
       }
     }
   }, [state.selectedDay]);
@@ -54,7 +64,10 @@ export function BookingCalendar(props: Props) {
         selectedDay={state.selectedDay}
         loading={props.loading || false}
         getReservationsForDay={state.getReservationsForDay}
-        onDayClick={(day) => { state.setSelectedDay(day); props.onDayClick(day); }}
+        onDayClick={(day) => {
+          state.setSelectedDay(day);
+          props.onDayClick(day);
+        }}
         onDayReservationClick={props.onDayReservationClick}
       />
 

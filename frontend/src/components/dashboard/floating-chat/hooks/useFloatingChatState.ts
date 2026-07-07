@@ -57,7 +57,7 @@ export function useFloatingChatState({
     return msgs.filter(
       (msg) =>
         msg.sender === "CUSTOMER" &&
-        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime()
+        new Date(msg.timestamp).getTime() > new Date(lastViewed).getTime(),
     ).length;
   };
 

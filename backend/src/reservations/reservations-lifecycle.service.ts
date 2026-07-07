@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import * as crypto from 'crypto';
@@ -36,26 +41,38 @@ export class ReservationsLifecycleService {
 
   async createManualBooking(dto: CreateManualBookingDto, user: JwtUser) {
     if (user.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Only Photographers can create manual bookings');
+      throw new ForbiddenException(
+        'Only Photographers can create manual bookings',
+      );
     }
 
     if (dto.startTime >= dto.endTime) {
       throw new BadRequestException('startTime must be before endTime');
     }
 
-    const profile = await this.profileRepository.findOneBy({ userId: user.userId });
+    const profile = await this.profileRepository.findOneBy({
+      userId: user.userId,
+    });
     if (!profile) throw new NotFoundException('Photographer profile not found');
 
     const now = new Date();
     const conflicts = await this.reservationRepository
       .createQueryBuilder('res')
-      .where('res.photographerId = :photographerId', { photographerId: user.userId })
+      .where('res.photographerId = :photographerId', {
+        photographerId: user.userId,
+      })
       .andWhere('res.date = :date', { date: dto.date })
-      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', { startTime: dto.startTime, endTime: dto.endTime })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+      })
       .andWhere(
         new Brackets((qb) => {
           qb.where('res.status IN (:...activeStatuses)', {
-            activeStatuses: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
+            activeStatuses: [
+              ReservationStatus.PENDING,
+              ReservationStatus.CONFIRMED,
+            ],
           }).orWhere(
             'res.status = :proposedStatus AND (res.paymentDeadline IS NULL OR res.paymentDeadline > :now)',
             { proposedStatus: ReservationStatus.PROPOSED, now },
@@ -68,7 +85,9 @@ export class ReservationsLifecycleService {
       throw new BadRequestException('The requested time slot is not available');
     }
 
-    let customer = await this.customerRepository.findOneBy({ email: dto.email });
+    let customer = await this.customerRepository.findOneBy({
+      email: dto.email,
+    });
     if (!customer) {
       customer = this.customerRepository.create({
         firstName: dto.firstName,
@@ -134,7 +153,9 @@ export class ReservationsLifecycleService {
 
     reservation.customer = customer;
 
-    this.chatGateway.server.to(`photographer_${user.userId}`).emit('reservationCreated', reservation);
+    this.chatGateway.server
+      .to(`photographer_${user.userId}`)
+      .emit('reservationCreated', reservation);
     this.chatGateway.broadcastAvailabilityChange(
       profile.bookingSlug,
       dto.date,

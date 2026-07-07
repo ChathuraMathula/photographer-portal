@@ -135,7 +135,11 @@ export class UsersService {
       qb.andWhere('user.role = :role', { role: query.role });
     }
 
-    if (query.status !== undefined && query.status !== '' && query.status !== 'ALL') {
+    if (
+      query.status !== undefined &&
+      query.status !== '' &&
+      query.status !== 'ALL'
+    ) {
       const isActive = query.status === 'active';
       qb.andWhere('user.isActive = :isActive', { isActive });
     }
@@ -256,7 +260,7 @@ export class UsersService {
 
     let finalSlug: string | null = null;
     const profile = await this.profileRepository.findOneBy({ userId });
-    
+
     if (profile && updates.bookingSlug) {
       if (profile.bookingSlug !== updates.bookingSlug) {
         const existing = await this.profileRepository.findOneBy({
@@ -270,17 +274,17 @@ export class UsersService {
       }
       finalSlug = profile.bookingSlug;
     }
-    
+
     await this.auditLogsService.logAction(
       'USER_DETAILS_UPDATED',
       `User ${userId} details (name/slug) were updated by super admin`,
       userId,
     );
 
-    return { 
-      firstName: user.firstName, 
-      lastName: user.lastName, 
-      bookingSlug: finalSlug 
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      bookingSlug: finalSlug,
     };
   }
 }

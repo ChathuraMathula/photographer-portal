@@ -21,13 +21,17 @@ export function CustomerTrackingBlock({
   handleCopyLink,
 }: CustomerTrackingBlockProps) {
   const originUrl =
-    typeof window !== "undefined" ? window.location.origin : "http://localhost:4000";
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:4000";
 
   return (
     <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800/80 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-body-caption font-semibold text-zinc-400">Reservation ID</p>
+          <p className="text-body-caption font-semibold text-zinc-400">
+            Reservation ID
+          </p>
           <p className="font-mono text-body-caption font-semibold text-zinc-700 dark:text-zinc-300 select-all">
             {reservationId}
           </p>
@@ -53,7 +57,9 @@ export function CustomerTrackingBlock({
 
       {reservationToken && (
         <div className="pt-3 border-t border-zinc-200/50 dark:border-zinc-850">
-          <p className="text-body-caption font-semibold text-zinc-400 mb-1.5">Client Tracking Link</p>
+          <p className="text-body-caption font-semibold text-zinc-400 mb-1.5">
+            Client Tracking Link
+          </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 block truncate rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-2.5 text-body-caption select-all text-zinc-655 dark:text-zinc-350">
               {`${originUrl}/book/track/${reservationToken}`}

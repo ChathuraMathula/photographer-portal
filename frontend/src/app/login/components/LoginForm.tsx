@@ -35,7 +35,8 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
                 Account Suspended
               </p>
               <p className="text-body-caption text-red-600 dark:text-red-500 mt-0.5">
-                Your account has been deactivated by an administrator. Please contact support for assistance.
+                Your account has been deactivated by an administrator. Please
+                contact support for assistance.
               </p>
             </div>
           </div>
@@ -49,7 +50,10 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+          <Label
+            htmlFor="email"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
             Email
           </Label>
           <Input
@@ -58,16 +62,23 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
             placeholder="you@example.com"
             {...formik.getFieldProps("email")}
             className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-              formik.touched.email && formik.errors.email ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+              formik.touched.email && formik.errors.email
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : ""
             }`}
           />
           {formik.touched.email && formik.errors.email && (
-            <p className="text-body-caption text-red-500 mt-1">{formik.errors.email}</p>
+            <p className="text-body-caption text-red-500 mt-1">
+              {formik.errors.email}
+            </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+          <Label
+            htmlFor="password"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
             Password
           </Label>
           <div className="relative">
@@ -77,7 +88,9 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
               placeholder="••••••••"
               {...formik.getFieldProps("password")}
               className={`h-11 md:h-12 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-                formik.touched.password && formik.errors.password ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+                formik.touched.password && formik.errors.password
+                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                  : ""
               }`}
             />
             <button
@@ -93,7 +106,9 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
             </button>
           </div>
           {formik.touched.password && formik.errors.password && (
-            <p className="text-body-caption text-red-500 mt-1">{formik.errors.password}</p>
+            <p className="text-body-caption text-red-500 mt-1">
+              {formik.errors.password}
+            </p>
           )}
         </div>
 

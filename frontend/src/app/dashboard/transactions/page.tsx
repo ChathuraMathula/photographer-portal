@@ -2,8 +2,21 @@
 
 import React, { useEffect } from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CreditCard, DollarSign, Wallet, CheckCircle, XCircle, Search } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  CreditCard,
+  DollarSign,
+  Wallet,
+  CheckCircle,
+  XCircle,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
@@ -65,7 +78,8 @@ export default function TransactionsPage() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div>
         <p className="text-body-caption text-zinc-550 dark:text-zinc-400 mt-1">
-          Monitor your customer bookings card checkout logs and manual offline cash transactions.
+          Monitor your customer bookings card checkout logs and manual offline
+          cash transactions.
         </p>
       </div>
 
@@ -179,17 +193,32 @@ export default function TransactionsPage() {
               <table className="w-full text-left text-body-small border-collapse">
                 <thead>
                   <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-855">
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Transaction ID</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Method</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Transaction ID
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Method
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 animate-pulse">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <tr key={`skeleton-row-${i}`} className="hover:bg-zinc-50/10 transition-colors">
+                    <tr
+                      key={`skeleton-row-${i}`}
+                      className="hover:bg-zinc-50/10 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="h-4 w-28 bg-zinc-150/50 dark:bg-zinc-850/50 rounded" />
                         <div className="h-3 w-40 bg-zinc-150/50 dark:bg-zinc-850/50 rounded mt-1.5" />
@@ -231,12 +260,24 @@ export default function TransactionsPage() {
               <table className="w-full text-left text-body-small border-collapse">
                 <thead>
                   <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-855">
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Transaction ID</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Method</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Transaction ID
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Method
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850">
@@ -245,14 +286,16 @@ export default function TransactionsPage() {
                       ? `${txn.reservation.customer.firstName} ${txn.reservation.customer.lastName}`
                       : "Manual Client";
                     const isSuccess = txn.status === "SUCCESS";
-                    
+
                     return (
                       <tr
                         key={txn.id}
                         className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/20 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-semibold text-zinc-855 dark:text-zinc-200">{custName}</div>
+                          <div className="font-semibold text-zinc-855 dark:text-zinc-200">
+                            {custName}
+                          </div>
                           <div className="text-[10px] text-zinc-400 mt-0.5">
                             {txn.reservation?.customer?.email || "No email"}
                           </div>
@@ -271,12 +314,16 @@ export default function TransactionsPage() {
                           )}
                         </td>
                         <td className="px-6 py-4 font-bold text-zinc-900 dark:text-white">
-                          LKR {((txn.amountInCents || 0) / 100).toLocaleString()}
+                          LKR{" "}
+                          {((txn.amountInCents || 0) / 100).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400 text-xs">
                           {new Date(txn.createdAt).toLocaleDateString()}
                           <span className="text-[10px] block text-zinc-400 mt-0.5">
-                            {new Date(txn.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(txn.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -309,8 +356,15 @@ export default function TransactionsPage() {
       {transactionsTotalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm gap-4">
           <div className="text-body-caption text-zinc-500">
-            Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsPage}</span> of{" "}
-            <span className="font-semibold text-zinc-800 dark:text-zinc-200">{transactionsTotalPages}</span> ({transactionsTotal} total transactions)
+            Showing page{" "}
+            <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+              {transactionsPage}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+              {transactionsTotalPages}
+            </span>{" "}
+            ({transactionsTotal} total transactions)
           </div>
           <Pagination
             page={transactionsPage}

@@ -14,44 +14,72 @@ export function ManualBookingClientFields({ formik }: Props) {
     <>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="mb-firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Client First Name</Label>
+          <Label
+            htmlFor="mb-firstName"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Client First Name
+          </Label>
           <Input
             id="mb-firstName"
             {...formik.getFieldProps("firstName")}
             className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.firstName && formik.errors.firstName ? "border-red-500" : ""}`}
           />
-          <FieldError msg={formik.touched.firstName ? formik.errors.firstName : undefined} />
+          <FieldError
+            msg={formik.touched.firstName ? formik.errors.firstName : undefined}
+          />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="mb-lastName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Client Last Name</Label>
+          <Label
+            htmlFor="mb-lastName"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Client Last Name
+          </Label>
           <Input
             id="mb-lastName"
             {...formik.getFieldProps("lastName")}
             className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.lastName && formik.errors.lastName ? "border-red-500" : ""}`}
           />
-          <FieldError msg={formik.touched.lastName ? formik.errors.lastName : undefined} />
+          <FieldError
+            msg={formik.touched.lastName ? formik.errors.lastName : undefined}
+          />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="mb-email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Email</Label>
+          <Label
+            htmlFor="mb-email"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Email
+          </Label>
           <Input
             id="mb-email"
             type="email"
             {...formik.getFieldProps("email")}
             className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.email && formik.errors.email ? "border-red-500" : ""}`}
           />
-          <FieldError msg={formik.touched.email ? formik.errors.email : undefined} />
+          <FieldError
+            msg={formik.touched.email ? formik.errors.email : undefined}
+          />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="mb-phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Phone</Label>
+          <Label
+            htmlFor="mb-phone"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Phone
+          </Label>
           <Input
             id="mb-phone"
             {...formik.getFieldProps("phone")}
             className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.phone && formik.errors.phone ? "border-red-500" : ""}`}
           />
-          <FieldError msg={formik.touched.phone ? formik.errors.phone : undefined} />
+          <FieldError
+            msg={formik.touched.phone ? formik.errors.phone : undefined}
+          />
         </div>
       </div>
     </>

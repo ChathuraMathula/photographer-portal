@@ -1,6 +1,12 @@
 "use client";
 
-import { RefreshCw, Server, Activity, CheckCircle2, ChevronDown } from "lucide-react";
+import {
+  RefreshCw,
+  Server,
+  Activity,
+  CheckCircle2,
+  ChevronDown,
+} from "lucide-react";
 import { useApiTester } from "./hooks/useApiTester";
 import { AuthorizationGate } from "./components/AuthorizationGate";
 import { EndpointDirectory } from "./components/EndpointDirectory";
@@ -40,13 +46,12 @@ export default function ApiTesterPage() {
     handleLogin,
     selectSeedAccount,
     prefillPlayground,
-    executeRequest
+    executeRequest,
   } = useApiTester();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-3 sm:p-6 md:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
-
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-5 sm:p-6 rounded-2xl shadow-sm">
           <div className="min-w-0">
@@ -55,24 +60,35 @@ export default function ApiTesterPage() {
               <span>API Documentation &amp; Testing Console</span>
             </h1>
             <p className="text-body-small text-zinc-555 mt-1 max-w-2xl">
-              Inspect backend route specifications, authorization permissions, parameters, and send simulated payloads in real-time.
+              Inspect backend route specifications, authorization permissions,
+              parameters, and send simulated payloads in real-time.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2 items-center shrink-0">
             {/* Server health badge */}
             <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl">
-              <Activity className={`h-4 w-4 ${
-                serverHealth === "online"
-                  ? "text-emerald-500 animate-pulse"
-                  : serverHealth === "offline"
-                    ? "text-red-500"
-                    : "text-zinc-400 animate-spin"
-              }`} />
+              <Activity
+                className={`h-4 w-4 ${
+                  serverHealth === "online"
+                    ? "text-emerald-500 animate-pulse"
+                    : serverHealth === "offline"
+                      ? "text-red-500"
+                      : "text-zinc-400 animate-spin"
+                }`}
+              />
               <span className="text-body-small-s font-semibold whitespace-nowrap">
-                {serverHealth === "online" ? "Online" : serverHealth === "offline" ? "Offline" : "Checking…"}
+                {serverHealth === "online"
+                  ? "Online"
+                  : serverHealth === "offline"
+                    ? "Offline"
+                    : "Checking…"}
               </span>
-              <button onClick={checkHealth} className="text-zinc-400 hover:text-zinc-600 cursor-pointer" title="Refresh health">
+              <button
+                onClick={checkHealth}
+                className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                title="Refresh health"
+              >
                 <RefreshCw className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -81,7 +97,9 @@ export default function ApiTesterPage() {
             {session && (
               <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400 px-3 py-1.5 rounded-xl text-body-small-s font-semibold">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
-                <span className="truncate max-w-[180px]">{session.name} · {session.role}</span>
+                <span className="truncate max-w-[180px]">
+                  {session.name} · {session.role}
+                </span>
               </div>
             )}
 
@@ -97,7 +115,6 @@ export default function ApiTesterPage() {
 
         {/* ── Two-column workspace ────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
           {/* Left: Auth + Endpoint Directory */}
           <div className="lg:col-span-7 space-y-6">
             <AuthorizationGate
@@ -120,7 +137,10 @@ export default function ApiTesterPage() {
           </div>
 
           {/* Right: Execution Playground + Response Console */}
-          <div id="api-playground" className="lg:col-span-5 space-y-6 lg:sticky lg:top-6">
+          <div
+            id="api-playground"
+            className="lg:col-span-5 space-y-6 lg:sticky lg:top-6"
+          >
             <ExecutionPlayground
               reqMethod={reqMethod}
               setReqMethod={setReqMethod}
@@ -144,7 +164,6 @@ export default function ApiTesterPage() {
               />
             </ExecutionPlayground>
           </div>
-
         </div>
       </div>
     </div>

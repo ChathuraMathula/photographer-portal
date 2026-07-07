@@ -66,38 +66,38 @@ export default function ReservationsPage() {
       </header>
 
       <ReservationsTabContent
-      reservations={reservations}
-      packages={packages}
-      selectedRes={selectedRes}
-      setSelectedRes={setSelectedRes}
-      selectedPkgIds={selectedPkgIds}
-      setSelectedPkgIds={setSelectedPkgIds}
-      quotationNotes={quotationNotes}
-      setQuotationNotes={setQuotationNotes}
-      rejectionReason={rejectionReason}
-      setRejectionReason={setRejectionReason}
-      showRejectForm={showRejectForm}
-      setShowRejectForm={setShowRejectForm}
-      handleProposeQuotation={handleProposeQuotation}
-      handleRejectRequest={handleRejectRequest}
-      packageDeposits={packageDeposits}
-      setPackageDeposits={setPackageDeposits}
-      customPackage={customPackage}
-      setCustomPackage={setCustomPackage}
-      customPackageDeposit={customPackageDeposit}
-      setCustomPackageDeposit={setCustomPackageDeposit}
-      isCustomPackageSelected={isCustomPackageSelected}
-      setIsCustomPackageSelected={setIsCustomPackageSelected}
-      page={page}
-      setPage={setPage}
-      totalPages={totalPages}
-      total={total}
-      search={search}
-      setSearch={setSearch}
-      statusFilter={statusFilter}
-      setStatusFilter={setStatusFilter}
-      reservationsLoading={reservationsLoading}
-    />
+        reservations={reservations}
+        packages={packages}
+        selectedRes={selectedRes}
+        setSelectedRes={setSelectedRes}
+        selectedPkgIds={selectedPkgIds}
+        setSelectedPkgIds={setSelectedPkgIds}
+        quotationNotes={quotationNotes}
+        setQuotationNotes={setQuotationNotes}
+        rejectionReason={rejectionReason}
+        setRejectionReason={setRejectionReason}
+        showRejectForm={showRejectForm}
+        setShowRejectForm={setShowRejectForm}
+        handleProposeQuotation={handleProposeQuotation}
+        handleRejectRequest={handleRejectRequest}
+        packageDeposits={packageDeposits}
+        setPackageDeposits={setPackageDeposits}
+        customPackage={customPackage}
+        setCustomPackage={setCustomPackage}
+        customPackageDeposit={customPackageDeposit}
+        setCustomPackageDeposit={setCustomPackageDeposit}
+        isCustomPackageSelected={isCustomPackageSelected}
+        setIsCustomPackageSelected={setIsCustomPackageSelected}
+        page={page}
+        setPage={setPage}
+        totalPages={totalPages}
+        total={total}
+        search={search}
+        setSearch={setSearch}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        reservationsLoading={reservationsLoading}
+      />
     </div>
   );
 }

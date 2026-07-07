@@ -24,10 +24,13 @@ export function CustomPackageDepositRules({
       <h3 className="text-body-small-s font-semibold text-zinc-800 dark:text-zinc-200">
         Advanced Payment Policy
       </h3>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="cust-depositType" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+          <Label
+            htmlFor="cust-depositType"
+            className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+          >
             Deposit Rule
           </Label>
           <select
@@ -44,8 +47,13 @@ export function CustomPackageDepositRules({
 
         {depositType !== "universal" && (
           <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
-            <Label htmlFor="cust-depositValue" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-              {depositType === "fixed" ? "Deposit Value (LKR)" : "Deposit Value (%)"}
+            <Label
+              htmlFor="cust-depositValue"
+              className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+            >
+              {depositType === "fixed"
+                ? "Deposit Value (LKR)"
+                : "Deposit Value (%)"}
             </Label>
             <Input
               id="cust-depositValue"
@@ -55,7 +63,9 @@ export function CustomPackageDepositRules({
               onChange={(e) => setDepositValue(Number(e.target.value))}
               className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
             />
-            {errors.depositValue && <p className="text-red-500 text-xs mt-1">{errors.depositValue}</p>}
+            {errors.depositValue && (
+              <p className="text-red-500 text-xs mt-1">{errors.depositValue}</p>
+            )}
           </div>
         )}
       </div>

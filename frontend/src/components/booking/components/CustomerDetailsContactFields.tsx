@@ -13,7 +13,10 @@ export function CustomerDetailsContactFields({ formik }: Props) {
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+        <Label
+          htmlFor="email"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
           Email <span className="text-red-500">*</span>
         </Label>
         <Input
@@ -25,11 +28,16 @@ export function CustomerDetailsContactFields({ formik }: Props) {
             formik.touched.email && formik.errors.email ? "border-red-500" : ""
           }`}
         />
-        <FieldError msg={formik.touched.email ? formik.errors.email : undefined} />
+        <FieldError
+          msg={formik.touched.email ? formik.errors.email : undefined}
+        />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+        <Label
+          htmlFor="phone"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
           Phone <span className="text-red-500">*</span>
         </Label>
         <Input
@@ -41,7 +49,9 @@ export function CustomerDetailsContactFields({ formik }: Props) {
             formik.touched.phone && formik.errors.phone ? "border-red-500" : ""
           }`}
         />
-        <FieldError msg={formik.touched.phone ? formik.errors.phone : undefined} />
+        <FieldError
+          msg={formik.touched.phone ? formik.errors.phone : undefined}
+        />
       </div>
     </>
   );

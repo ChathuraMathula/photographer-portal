@@ -20,7 +20,9 @@ export class AnalyticsSyncService implements OnModuleInit {
   }
 
   private async initIndex() {
-    const indexExists = await this.esService.indices.exists({ index: INDEX_NAME });
+    const indexExists = await this.esService.indices.exists({
+      index: INDEX_NAME,
+    });
     if (!indexExists) {
       await this.esService.indices.create({
         index: INDEX_NAME,
@@ -61,24 +63,33 @@ export class AnalyticsSyncService implements OnModuleInit {
 
     if (!res) {
       // If deleted, remove from ES
-      await this.esService.delete({ index: INDEX_NAME, id: reservationId }).catch(() => {});
+      await this.esService
+        .delete({ index: INDEX_NAME, id: reservationId })
+        .catch(() => {});
       return;
     }
 
     let pkgName = 'Custom/Quotation';
-    if (res.selectedPackages && Array.isArray(res.selectedPackages) && res.selectedPackages.length > 0) {
+    if (
+      res.selectedPackages &&
+      Array.isArray(res.selectedPackages) &&
+      res.selectedPackages.length > 0
+    ) {
       pkgName = res.selectedPackages[0].name || pkgName;
     }
 
-    const paidAmountInCents = res.payments
-      ?.filter((p) => p.status === PaymentStatus.SUCCESS)
-      .reduce((sum, p) => sum + p.amountInCents, 0) || 0;
+    const paidAmountInCents =
+      res.payments
+        ?.filter((p) => p.status === PaymentStatus.SUCCESS)
+        .reduce((sum, p) => sum + p.amountInCents, 0) || 0;
 
     const doc = {
       id: res.id,
       date: res.date,
       photographerId: res.photographerId,
-      photographerName: res.photographer ? `${res.photographer.firstName} ${res.photographer.lastName}` : 'Unknown',
+      photographerName: res.photographer
+        ? `${res.photographer.firstName} ${res.photographer.lastName}`
+        : 'Unknown',
       photographerEmail: res.photographer?.email || '',
       customerId: res.customerId,
       status: res.status,
@@ -102,8 +113,12 @@ export class AnalyticsSyncService implements OnModuleInit {
   }
 
   async bulkSyncAll() {
-    const reservations = await this.reservationRepository.find({ select: { id: true } });
-    console.log(`[Elasticsearch] Starting bulk sync of ${reservations.length} reservations...`);
+    const reservations = await this.reservationRepository.find({
+      select: { id: true },
+    });
+    console.log(
+      `[Elasticsearch] Starting bulk sync of ${reservations.length} reservations...`,
+    );
     for (const r of reservations) {
       await this.syncReservation(r.id);
     }

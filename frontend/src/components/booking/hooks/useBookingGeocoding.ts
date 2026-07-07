@@ -7,7 +7,7 @@ export function useBookingGeocoding() {
     setGeocodingStatus("Resolving nearest city & district from coordinates...");
     try {
       const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
       );
       if (geoRes.ok) {
         const geoJson = await geoRes.json();
@@ -21,10 +21,10 @@ export function useBookingGeocoding() {
           addr.hamlet ||
           "";
         const resDistrict = addr.county || addr.state || "";
-        
+
         if (resCity && resDistrict) {
           setGeocodingStatus(
-            "City & District auto-detected from coordinates. Please define the exact Venue details."
+            "City & District auto-detected from coordinates. Please define the exact Venue details.",
           );
           return { city: resCity, district: resDistrict };
         } else {
@@ -40,13 +40,16 @@ export function useBookingGeocoding() {
     return null;
   };
 
-  const fetchCoordsFromCityDistrict = async (city: string, district: string) => {
+  const fetchCoordsFromCityDistrict = async (
+    city: string,
+    district: string,
+  ) => {
     try {
       const query = [city, district, "Sri Lanka"].filter(Boolean).join(", ");
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-          query
-        )}&format=json&limit=1&accept-language=en`
+          query,
+        )}&format=json&limit=1&accept-language=en`,
       );
       if (res.ok) {
         const data = await res.json();

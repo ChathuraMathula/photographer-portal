@@ -39,7 +39,11 @@ export function ReservationsLeftPane({
     setSelectedRes(res);
     setShowRejectForm(false);
     if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", `/dashboard/reservations?id=${res.id}`);
+      window.history.replaceState(
+        null,
+        "",
+        `/dashboard/reservations?id=${res.id}`,
+      );
     }
   };
 

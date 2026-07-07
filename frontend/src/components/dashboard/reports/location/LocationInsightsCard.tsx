@@ -16,12 +16,20 @@ type StatTileProps = {
   accent?: string;
 };
 
-function StatTile({ icon, label, value, sub, accent = "text-zinc-900 dark:text-white" }: StatTileProps) {
+function StatTile({
+  icon,
+  label,
+  value,
+  sub,
+  accent = "text-zinc-900 dark:text-white",
+}: StatTileProps) {
   return (
     <div className="flex items-start gap-3 bg-zinc-50/60 dark:bg-zinc-800/40 rounded-xl p-4 border border-zinc-200/50 dark:border-zinc-700/50">
       <div className="mt-0.5 text-zinc-400">{icon}</div>
       <div className="min-w-0">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-0.5">{label}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-0.5">
+          {label}
+        </p>
         <p className={`text-sm font-extrabold truncate ${accent}`}>{value}</p>
         {sub && <p className="text-[10px] text-zinc-400 mt-0.5">{sub}</p>}
       </div>
@@ -67,7 +75,11 @@ export function LocationInsightsCard({ insights }: Props) {
         label="Location Coverage"
         value={`${coveragePercent}%`}
         sub={`${totalWithLocation} of ${totalBookings} have location`}
-        accent={coveragePercent >= 75 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}
+        accent={
+          coveragePercent >= 75
+            ? "text-emerald-700 dark:text-emerald-400"
+            : "text-amber-700 dark:text-amber-400"
+        }
       />
     </div>
   );

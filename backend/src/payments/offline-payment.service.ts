@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentStatus, Payment } from '../entities/payment.entity';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Repository } from 'typeorm';
@@ -15,11 +19,11 @@ export class OfflinePaymentService {
   ) {}
 
   async fulfillOfflinePayment(
-    reservationId: string, 
+    reservationId: string,
     photographerId: string,
     reservationRepo: Repository<Reservation>,
     paymentRepo: Repository<Payment>,
-    profileRepo: Repository<PhotographerProfile>
+    profileRepo: Repository<PhotographerProfile>,
   ) {
     const reservation = await reservationRepo.findOne({
       where: { id: reservationId, photographerId },
@@ -31,7 +35,9 @@ export class OfflinePaymentService {
     }
 
     if (reservation.status !== ReservationStatus.CONFIRMED) {
-      throw new BadRequestException('Can only fulfill payments for Confirmed bookings.');
+      throw new BadRequestException(
+        'Can only fulfill payments for Confirmed bookings.',
+      );
     }
 
     const successfulPayments = await paymentRepo.find({
@@ -41,7 +47,8 @@ export class OfflinePaymentService {
       (sum, p) => sum + p.amountInCents,
       0,
     );
-    const remainingAmountInCents = (reservation.totalAmountInCents || 0) - totalPaidInCents;
+    const remainingAmountInCents =
+      (reservation.totalAmountInCents || 0) - totalPaidInCents;
 
     if (remainingAmountInCents <= 0) {
       throw new BadRequestException('Reservation is already fully paid.');
@@ -71,12 +78,24 @@ export class OfflinePaymentService {
       totalPaidInCents: updatedTotalPaidInCents,
     };
 
-    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('reservationUpdated', emitData);
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('reservationUpdated', emitData);
-    this.chatGateway.server.to(`photographer_${reservation.photographerId}`).emit('transactionLogged', { reservationId: reservation.id });
-    this.chatGateway.server.to(`reservation_${reservation.id}`).emit('transactionLogged', { reservationId: reservation.id });
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('reservationUpdated', emitData);
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('reservationUpdated', emitData);
+    this.chatGateway.server
+      .to(`photographer_${reservation.photographerId}`)
+      .emit('transactionLogged', { reservationId: reservation.id });
+    this.chatGateway.server
+      .to(`reservation_${reservation.id}`)
+      .emit('transactionLogged', { reservationId: reservation.id });
 
-    await this.stripeHelper.sendInvoiceAndNotify(reservation, [...successfulPayments, payment], profileRepo);
+    await this.stripeHelper.sendInvoiceAndNotify(
+      reservation,
+      [...successfulPayments, payment],
+      profileRepo,
+    );
 
     return {
       status: reservation.status,

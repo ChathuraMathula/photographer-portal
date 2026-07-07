@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Check, Copy, ExternalLink } from "lucide-react";
 
 type Props = {
@@ -10,7 +16,11 @@ type Props = {
   origin: string;
 };
 
-export function BookingConfirmed({ photographerFirstName, trackingToken, origin }: Props) {
+export function BookingConfirmed({
+  photographerFirstName,
+  trackingToken,
+  origin,
+}: Props) {
   const [copied, setCopied] = useState(false);
   const trackUrl = `${origin}/book/track/${trackingToken}`;
 
@@ -34,7 +44,8 @@ export function BookingConfirmed({ photographerFirstName, trackingToken, origin 
           Request Submitted!
         </CardTitle>
         <CardDescription className="text-body-small text-zinc-500 mt-1 max-w-sm mx-auto">
-          Your request has been sent to {photographerFirstName}. They will contact you to confirm the details.
+          Your request has been sent to {photographerFirstName}. They will
+          contact you to confirm the details.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-2 pb-6 px-6">

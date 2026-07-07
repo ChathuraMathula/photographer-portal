@@ -9,7 +9,10 @@ import { type CustomPackageValues } from "@/components/modals/CustomPackageModal
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 interface UseDashboardReservationsProps {
-  authFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>;
   loadPhotographerData: () => Promise<void>;
   packages: Package[];
   universalDepositType: string;
@@ -40,7 +43,9 @@ export function useDashboardReservations({
   const [calendarLoading, setCalendarLoading] = useState(false);
 
   // Calendar specific state to prevent pulling all 100k
-  const [calendarReservations, setCalendarReservations] = useState<Reservation[]>([]);
+  const [calendarReservations, setCalendarReservations] = useState<
+    Reservation[]
+  >([]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -59,7 +64,9 @@ export function useDashboardReservations({
       if (debouncedSearch) params.append("search", debouncedSearch);
       if (statusFilter !== "ALL") params.append("status", statusFilter);
 
-      const res = await authFetch(`${API}/reservations?${params.toString()}`, { credentials: "include" });
+      const res = await authFetch(`${API}/reservations?${params.toString()}`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const data = await res.json();
         setReservations(data.data || []);
@@ -73,13 +80,18 @@ export function useDashboardReservations({
     }
   };
 
-  const fetchCalendarReservations = async (startStr: string, endStr: string) => {
+  const fetchCalendarReservations = async (
+    startStr: string,
+    endStr: string,
+  ) => {
     setCalendarLoading(true);
     try {
       const params = new URLSearchParams();
       params.append("startDate", startStr);
       params.append("endDate", endStr);
-      const res = await authFetch(`${API}/reservations?${params.toString()}`, { credentials: "include" });
+      const res = await authFetch(`${API}/reservations?${params.toString()}`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const data = await res.json();
         setCalendarReservations(data || []);
@@ -100,10 +112,13 @@ export function useDashboardReservations({
   const [quotationNotes, setQuotationNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
-  const [packageDeposits, setPackageDeposits] = useState<Record<string, string>>({});
+  const [packageDeposits, setPackageDeposits] = useState<
+    Record<string, string>
+  >({});
 
   // Custom package states
-  const [customPackage, setCustomPackage] = useState<CustomPackageValues | null>(null);
+  const [customPackage, setCustomPackage] =
+    useState<CustomPackageValues | null>(null);
   const [customPackageDeposit, setCustomPackageDeposit] = useState("");
   const [isCustomPackageSelected, setIsCustomPackageSelected] = useState(false);
 
@@ -137,12 +152,15 @@ export function useDashboardReservations({
             if (depType === "fixed") {
               depositLkr = (selected.depositValue ?? 0) / 100;
             } else if (depType === "percentage") {
-              depositLkr = ((selected.priceInCents / 100) * (selected.depositValue ?? 0)) / 100;
+              depositLkr =
+                ((selected.priceInCents / 100) * (selected.depositValue ?? 0)) /
+                100;
             } else {
               if (universalDepositType === "fixed") {
                 depositLkr = universalDepositValue;
               } else {
-                depositLkr = ((selected.priceInCents / 100) * universalDepositValue) / 100;
+                depositLkr =
+                  ((selected.priceInCents / 100) * universalDepositValue) / 100;
               }
             }
             updated[id] = String(Math.round(depositLkr));
@@ -177,8 +195,12 @@ export function useDashboardReservations({
 
   const handleProposeQuotation = async () => {
     if (!selectedRes) return;
-    if (selectedPkgIds.length === 0 && !(customPackage && isCustomPackageSelected)) return;
-    
+    if (
+      selectedPkgIds.length === 0 &&
+      !(customPackage && isCustomPackageSelected)
+    )
+      return;
+
     try {
       const centsDeposits: Record<string, number> = {};
       Object.entries(packageDeposits).forEach(([pkgId, val]) => {
@@ -191,32 +213,39 @@ export function useDashboardReservations({
       if (customPackage && isCustomPackageSelected && customPackageDeposit) {
         const numVal = Number(customPackageDeposit);
         if (!isNaN(numVal)) {
-          centsDeposits['custom'] = Math.round(numVal * 100);
+          centsDeposits["custom"] = Math.round(numVal * 100);
         }
       }
 
-      const res = await authFetch(`${API}/reservations/${selectedRes.id}/propose`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          packageIds: selectedPkgIds,
-          advancePaymentPriceInCents: 0,
-          quotationNotes,
-          packageDeposits: centsDeposits,
-          customPackage: (customPackage && isCustomPackageSelected) ? {
-            name: customPackage.name,
-            description: customPackage.description,
-            priceInCents: customPackage.price * 100,
-            durationHours: customPackage.durationHours,
-            includes: customPackage.includes,
-            depositType: customPackage.depositType,
-            depositValue: customPackage.depositValue,
-          } : undefined,
-        }),
-        credentials: "include",
-      });
+      const res = await authFetch(
+        `${API}/reservations/${selectedRes.id}/propose`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            packageIds: selectedPkgIds,
+            advancePaymentPriceInCents: 0,
+            quotationNotes,
+            packageDeposits: centsDeposits,
+            customPackage:
+              customPackage && isCustomPackageSelected
+                ? {
+                    name: customPackage.name,
+                    description: customPackage.description,
+                    priceInCents: customPackage.price * 100,
+                    durationHours: customPackage.durationHours,
+                    includes: customPackage.includes,
+                    depositType: customPackage.depositType,
+                    depositValue: customPackage.depositValue,
+                  }
+                : undefined,
+          }),
+          credentials: "include",
+        },
+      );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to propose packages");
+      if (!res.ok)
+        throw new Error(data.message || "Failed to propose packages");
       setSelectedPkgIds([]);
       setQuotationNotes("");
       setCustomPackage(null);
@@ -233,12 +262,15 @@ export function useDashboardReservations({
   const handleRejectRequest = async () => {
     if (!selectedRes || !rejectionReason.trim()) return;
     try {
-      const res = await authFetch(`${API}/reservations/${selectedRes.id}/reject`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rejectionReason }),
-        credentials: "include",
-      });
+      const res = await authFetch(
+        `${API}/reservations/${selectedRes.id}/reject`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rejectionReason }),
+          credentials: "include",
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to reject");
       setRejectionReason("");

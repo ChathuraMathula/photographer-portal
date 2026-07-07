@@ -11,9 +11,11 @@ export function useTrackingActions(
   setVerifiedEmail: React.Dispatch<React.SetStateAction<string | null>>,
   setVerificationError: React.Dispatch<React.SetStateAction<string>>,
   setVerifying: React.Dispatch<React.SetStateAction<boolean>>,
-  setReservation: React.Dispatch<React.SetStateAction<TrackingReservation | null>>,
+  setReservation: React.Dispatch<
+    React.SetStateAction<TrackingReservation | null>
+  >,
   setConfirming: React.Dispatch<React.SetStateAction<boolean>>,
-  setCancelling: React.Dispatch<React.SetStateAction<boolean>>
+  setCancelling: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   const handleVerifyEmail = async (emailInput: string) => {
     setVerifying(true);
@@ -55,12 +57,21 @@ export function useTrackingActions(
       const res = await fetch(`${API}/bookings/track/${token}/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifiedEmail, packageId: selectedPkgId }),
+        body: JSON.stringify({
+          email: verifiedEmail,
+          packageId: selectedPkgId,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Confirmation failed");
       setReservation((prev) =>
-        prev ? { ...prev, status: "CONFIRMED", clientSelectedPackageId: selectedPkgId } : null
+        prev
+          ? {
+              ...prev,
+              status: "CONFIRMED",
+              clientSelectedPackageId: selectedPkgId,
+            }
+          : null,
       );
     } catch (err: any) {
       toast.error(err.message || "Failed to confirm reservation");
@@ -81,7 +92,7 @@ export function useTrackingActions(
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Cancellation failed");
       setReservation((prev) =>
-        prev ? { ...prev, status: "CANCELLED" } : null
+        prev ? { ...prev, status: "CANCELLED" } : null,
       );
       toast.success("Reservation cancelled successfully!");
     } catch (err: any) {

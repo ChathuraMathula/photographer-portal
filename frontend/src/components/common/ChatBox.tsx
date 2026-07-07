@@ -29,12 +29,20 @@ export function ChatBox({
   reservationId,
   photographerFirstName,
 }: Props) {
-  const { chatEndRef, firstUnreadIndex, unreadCount } = useChatState(messages, reservationId, myRole);
+  const { chatEndRef, firstUnreadIndex, unreadCount } = useChatState(
+    messages,
+    reservationId,
+    myRole,
+  );
 
   return (
     <div className="flex flex-col h-[500px] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-      <ChatBoxHeader unreadCount={unreadCount} title={title} description={description} />
-      
+      <ChatBoxHeader
+        unreadCount={unreadCount}
+        title={title}
+        description={description}
+      />
+
       <ChatBoxMessageList
         messages={messages}
         myRole={myRole}
@@ -42,7 +50,7 @@ export function ChatBox({
         firstUnreadIndex={firstUnreadIndex}
         chatEndRef={chatEndRef}
       />
-      
+
       <ChatBoxInput
         messageText={messageText}
         onMessageChange={onMessageChange}

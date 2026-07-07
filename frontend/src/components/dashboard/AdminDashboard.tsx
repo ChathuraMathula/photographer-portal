@@ -23,11 +23,7 @@ type Props = {
   onLogout: () => void;
 };
 
-export function AdminDashboard({
-  firstName,
-  role,
-  onTabChange,
-}: Props) {
+export function AdminDashboard({ firstName, role, onTabChange }: Props) {
   const router = useRouter();
   const { start } = useTopLoadingBar();
 

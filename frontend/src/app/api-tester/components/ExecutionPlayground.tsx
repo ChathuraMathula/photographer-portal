@@ -31,15 +31,14 @@ export function ExecutionPlayground({
   setReqBody,
   executing,
   executeRequest,
-  children
+  children,
 }: ExecutionPlaygroundProps) {
   return (
-    <CardLayout 
-      title="Execution Playground" 
+    <CardLayout
+      title="Execution Playground"
       desc="Construct and execute live HTTP requests directly into the local port 4001 backend."
     >
       <div className="space-y-4">
-        
         {/* Method & Path inputs */}
         <div className="flex flex-wrap gap-2">
           <select
@@ -53,7 +52,9 @@ export function ExecutionPlayground({
             <option value="DELETE">DELETE</option>
           </select>
           <div className="flex-1 min-w-[160px] relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body-caption font-semibold text-zinc-400 font-mono pointer-events-none select-none">/api</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body-caption font-semibold text-zinc-400 font-mono pointer-events-none select-none">
+              /api
+            </span>
             <Input
               value={reqPath}
               onChange={(e) => setReqPath(e.target.value)}
@@ -66,17 +67,23 @@ export function ExecutionPlayground({
         {/* Query Parameters Section */}
         <div className="space-y-2 border border-zinc-150 dark:border-zinc-850 p-3 rounded-xl bg-zinc-50/20">
           <div className="flex justify-between items-center pb-1">
-            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Query Parameters</Label>
+            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Query Parameters
+            </Label>
             <button
               type="button"
-              onClick={() => setQueryParams([...queryParams, { key: "", value: "" }])}
+              onClick={() =>
+                setQueryParams([...queryParams, { key: "", value: "" }])
+              }
               className="text-body-caption font-semibold text-primary-light hover:underline hover:text-primary-dark cursor-pointer"
             >
               + Add Param
             </button>
           </div>
           {queryParams.length === 0 ? (
-            <p className="text-body-caption text-zinc-455 italic">No query parameters appended.</p>
+            <p className="text-body-caption text-zinc-455 italic">
+              No query parameters appended.
+            </p>
           ) : (
             <div className="space-y-2 max-h-[160px] overflow-y-auto pr-0.5">
               {queryParams.map((param, index) => (
@@ -122,7 +129,9 @@ export function ExecutionPlayground({
         {/* Request JSON Body Section */}
         {reqMethod !== "GET" && (
           <div className="space-y-1.5">
-            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Request Body (JSON)</Label>
+            <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+              Request Body (JSON)
+            </Label>
             <textarea
               rows={7}
               value={reqBody}
@@ -139,11 +148,11 @@ export function ExecutionPlayground({
           disabled={executing}
           className="btn btn-primary w-full min-w-0 max-w-none md:max-w-none h-11 py-0 shadow-sm gap-2"
         >
-          <Send className="h-4 w-4" /> {executing ? "Executing Request..." : "Send Request"}
+          <Send className="h-4 w-4" />{" "}
+          {executing ? "Executing Request..." : "Send Request"}
         </Button>
 
         {children}
-
       </div>
     </CardLayout>
   );

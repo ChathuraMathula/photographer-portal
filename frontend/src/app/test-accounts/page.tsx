@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AccountRow } from "./components/AccountRow";
@@ -23,10 +29,9 @@ export default function TestAccountsPage() {
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
       <div className="w-full max-w-2xl space-y-6">
-        
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link 
+          <Link
             href="/login"
             className="inline-flex items-center gap-2 text-xs text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
           >
@@ -44,7 +49,8 @@ export default function TestAccountsPage() {
               Demo Portal Test Accounts
             </CardTitle>
             <CardDescription className="text-body-small text-zinc-500 dark:text-zinc-405 mt-2">
-              Use the credentials below to log into the portal under various user roles.
+              Use the credentials below to log into the portal under various
+              user roles.
             </CardDescription>
           </CardHeader>
           <CardContent className="divide-y divide-zinc-100 dark:divide-zinc-850 p-0">

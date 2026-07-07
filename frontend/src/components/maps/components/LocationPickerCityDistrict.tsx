@@ -12,11 +12,17 @@ type Props<T extends LocationPickerFormValues> = {
   hasError: boolean;
 };
 
-export function LocationPickerCityDistrict<T extends LocationPickerFormValues>({ formik, isRequired, onNominatimSelect, hasError }: Props<T>) {
+export function LocationPickerCityDistrict<T extends LocationPickerFormValues>({
+  formik,
+  isRequired,
+  onNominatimSelect,
+  hasError,
+}: Props<T>) {
   return (
     <div className="space-y-2">
       <Label className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-        City &amp; District {isRequired && <span className="text-red-500">*</span>}
+        City &amp; District{" "}
+        {isRequired && <span className="text-red-500">*</span>}
       </Label>
       <NominatimSelect
         cityValue={formik.values.city}
@@ -24,7 +30,13 @@ export function LocationPickerCityDistrict<T extends LocationPickerFormValues>({
         onSelect={onNominatimSelect}
         error={hasError ? "Error" : undefined}
       />
-      <FieldError msg={hasError ? ((formik.errors as any).city || (formik.errors as any).district) : undefined} />
+      <FieldError
+        msg={
+          hasError
+            ? (formik.errors as any).city || (formik.errors as any).district
+            : undefined
+        }
+      />
     </div>
   );
 }

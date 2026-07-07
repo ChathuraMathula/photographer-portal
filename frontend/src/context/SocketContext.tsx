@@ -13,10 +13,17 @@ interface SocketContextType {
   connected: boolean;
 }
 
-const SocketContext = createContext<SocketContextType>({ socket: null, connected: false });
+const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  connected: false,
+});
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, id: userId, role } = useSelector((state: RootState) => state.auth);
+  const {
+    isAuthenticated,
+    id: userId,
+    role,
+  } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
@@ -40,7 +47,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     socketInstance.on("connect", () => {
       setConnected(true);
-      console.log(`🔌 Global WebSocket Connected: ${socketInstance.id} (User: ${userId}, Role: ${role})`);
+      console.log(
+        `🔌 Global WebSocket Connected: ${socketInstance.id} (User: ${userId}, Role: ${role})`,
+      );
 
       // Join personal user room for account-level events
       if (userId) {

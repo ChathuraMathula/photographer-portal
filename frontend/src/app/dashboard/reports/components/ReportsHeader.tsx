@@ -51,9 +51,12 @@ export function ReportsHeader({
   return (
     <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
       <div>
-        <h2 className="text-title-medium font-extrabold text-zinc-900 dark:text-white leading-none">Reports & Analytics</h2>
+        <h2 className="text-title-medium font-extrabold text-zinc-900 dark:text-white leading-none">
+          Reports & Analytics
+        </h2>
         <p className="text-body-caption text-zinc-500 mt-1.5">
-          Analyze revenue margins, booking trends, package popularity, and event distribution.
+          Analyze revenue margins, booking trends, package popularity, and event
+          distribution.
         </p>
       </div>
 
@@ -78,16 +81,26 @@ export function ReportsHeader({
         {/* Yearly Range Selector */}
         {period === "yearly" && setSelectedYear && (
           <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
-            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">Select Year</span>
+            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">
+              Select Year
+            </span>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
               <SelectTrigger className="h-8 w-[100px] border-none bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:ring-0 cursor-pointer text-xs font-semibold text-zinc-850 dark:text-zinc-200">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                <SelectItem value="2024" className="cursor-pointer">2024</SelectItem>
-                <SelectItem value="2025" className="cursor-pointer">2025</SelectItem>
-                <SelectItem value="2026" className="cursor-pointer">2026</SelectItem>
-                <SelectItem value="2027" className="cursor-pointer">2027</SelectItem>
+                <SelectItem value="2024" className="cursor-pointer">
+                  2024
+                </SelectItem>
+                <SelectItem value="2025" className="cursor-pointer">
+                  2025
+                </SelectItem>
+                <SelectItem value="2026" className="cursor-pointer">
+                  2026
+                </SelectItem>
+                <SelectItem value="2027" className="cursor-pointer">
+                  2027
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -96,24 +109,50 @@ export function ReportsHeader({
         {/* Monthly Range Selector */}
         {period === "monthly" && setSelectedMonth && setSelectedYear && (
           <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
-            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">Select Month</span>
+            <span className="text-[10px] text-zinc-400 font-semibold px-2 uppercase whitespace-nowrap">
+              Select Month
+            </span>
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger className="h-8 w-[120px] border-none bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:ring-0 cursor-pointer border-r border-zinc-200 dark:border-zinc-700/50 rounded-none pr-4 text-xs font-semibold text-zinc-850 dark:text-zinc-200">
                 <SelectValue placeholder="Month" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                <SelectItem value="01" className="cursor-pointer">January</SelectItem>
-                <SelectItem value="02" className="cursor-pointer">February</SelectItem>
-                <SelectItem value="03" className="cursor-pointer">March</SelectItem>
-                <SelectItem value="04" className="cursor-pointer">April</SelectItem>
-                <SelectItem value="05" className="cursor-pointer">May</SelectItem>
-                <SelectItem value="06" className="cursor-pointer">June</SelectItem>
-                <SelectItem value="07" className="cursor-pointer">July</SelectItem>
-                <SelectItem value="08" className="cursor-pointer">August</SelectItem>
-                <SelectItem value="09" className="cursor-pointer">September</SelectItem>
-                <SelectItem value="10" className="cursor-pointer">October</SelectItem>
-                <SelectItem value="11" className="cursor-pointer">November</SelectItem>
-                <SelectItem value="12" className="cursor-pointer">December</SelectItem>
+                <SelectItem value="01" className="cursor-pointer">
+                  January
+                </SelectItem>
+                <SelectItem value="02" className="cursor-pointer">
+                  February
+                </SelectItem>
+                <SelectItem value="03" className="cursor-pointer">
+                  March
+                </SelectItem>
+                <SelectItem value="04" className="cursor-pointer">
+                  April
+                </SelectItem>
+                <SelectItem value="05" className="cursor-pointer">
+                  May
+                </SelectItem>
+                <SelectItem value="06" className="cursor-pointer">
+                  June
+                </SelectItem>
+                <SelectItem value="07" className="cursor-pointer">
+                  July
+                </SelectItem>
+                <SelectItem value="08" className="cursor-pointer">
+                  August
+                </SelectItem>
+                <SelectItem value="09" className="cursor-pointer">
+                  September
+                </SelectItem>
+                <SelectItem value="10" className="cursor-pointer">
+                  October
+                </SelectItem>
+                <SelectItem value="11" className="cursor-pointer">
+                  November
+                </SelectItem>
+                <SelectItem value="12" className="cursor-pointer">
+                  December
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -121,10 +160,18 @@ export function ReportsHeader({
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                <SelectItem value="2024" className="cursor-pointer">2024</SelectItem>
-                <SelectItem value="2025" className="cursor-pointer">2025</SelectItem>
-                <SelectItem value="2026" className="cursor-pointer">2026</SelectItem>
-                <SelectItem value="2027" className="cursor-pointer">2027</SelectItem>
+                <SelectItem value="2024" className="cursor-pointer">
+                  2024
+                </SelectItem>
+                <SelectItem value="2025" className="cursor-pointer">
+                  2025
+                </SelectItem>
+                <SelectItem value="2026" className="cursor-pointer">
+                  2026
+                </SelectItem>
+                <SelectItem value="2027" className="cursor-pointer">
+                  2027
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -139,7 +186,9 @@ export function ReportsHeader({
               onChange={onStartDateChange}
               maxDate={endDate || undefined}
             />
-            <span className="text-zinc-300 dark:text-zinc-700 text-sm font-light">—</span>
+            <span className="text-zinc-300 dark:text-zinc-700 text-sm font-light">
+              —
+            </span>
             <DatePickerInput
               label="To"
               value={endDate}

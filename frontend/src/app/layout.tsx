@@ -21,7 +21,8 @@ const lato = Lato({
 
 export const metadata: Metadata = {
   title: "Photographer Reservation Portal",
-  description: "Manage client bookings, package proposals, and real-time chat details",
+  description:
+    "Manage client bookings, package proposals, and real-time chat details",
 };
 
 export default function RootLayout({
@@ -46,9 +47,7 @@ export default function RootLayout({
         >
           <ReduxProvider>
             <SocketProvider>
-              <TopLoadingBarProvider>
-                {children}
-              </TopLoadingBarProvider>
+              <TopLoadingBarProvider>{children}</TopLoadingBarProvider>
             </SocketProvider>
           </ReduxProvider>
           <Toaster />

@@ -69,17 +69,19 @@ export class ReportsService {
       whereClause.photographerId = photographerId;
     }
 
-    const [reservations, total] = await this.reservationRepository.findAndCount({
-      where: whereClause,
-      relations: {
-        customer: true,
+    const [reservations, total] = await this.reservationRepository.findAndCount(
+      {
+        where: whereClause,
+        relations: {
+          customer: true,
+        },
+        order: {
+          date: 'ASC',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
       },
-      order: {
-        date: 'ASC',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    );
 
     const rawBookings = reservations.map((res) => ({
       id: res.id,
@@ -161,4 +163,3 @@ export class ReportsService {
     );
   }
 }
-

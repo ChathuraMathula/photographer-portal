@@ -6,7 +6,7 @@ export function useMapCenter(
   lat: number | undefined,
   lon: number | undefined,
   iframeRef: RefObject<HTMLIFrameElement | null>,
-  onChange: (lat: number, lon: number) => void
+  onChange: (lat: number, lon: number) => void,
 ) {
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,10 @@ export function useMapCenter(
       setLoading(true);
       try {
         const query = [city, district, "Sri Lanka"].filter(Boolean).join(", ");
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`, { headers: { "Accept-Language": "en" } });
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+          { headers: { "Accept-Language": "en" } },
+        );
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0 && active) {
@@ -27,7 +30,10 @@ export function useMapCenter(
             const newLon = parseFloat(data[0].lon);
             if (!isNaN(newLat) && !isNaN(newLon)) {
               onChange(newLat, newLon);
-              iframeRef.current?.contentWindow?.postMessage({ type: "OSM_MAP_PAN", lat: newLat, lon: newLon }, "*");
+              iframeRef.current?.contentWindow?.postMessage(
+                { type: "OSM_MAP_PAN", lat: newLat, lon: newLon },
+                "*",
+              );
             }
           }
         }
@@ -39,7 +45,9 @@ export function useMapCenter(
     }
 
     centerOnCity();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [city, district, lat, lon, iframeRef, onChange]);
 
   return { loading };

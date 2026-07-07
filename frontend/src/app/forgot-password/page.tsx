@@ -4,7 +4,14 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +21,9 @@ import Link from "next/link";
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 const ForgotPasswordSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email address").required("Email is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
 });
 
 export default function ForgotPasswordPage() {
@@ -42,7 +51,9 @@ export default function ForgotPasswordPage() {
         }
 
         setSuccess(true);
-        toast.success("If the email exists, a password reset link has been sent!");
+        toast.success(
+          "If the email exists, a password reset link has been sent!",
+        );
       } catch (err: any) {
         toast.error(err.message || "An error occurred. Please try again.");
       } finally {
@@ -54,10 +65,9 @@ export default function ForgotPasswordPage() {
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="w-full max-w-md space-y-6">
-        
         {/* Header */}
         <div className="flex items-center justify-between px-2">
-          <Link 
+          <Link
             href="/login"
             className="inline-flex items-center gap-2 text-xs text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
           >
@@ -75,7 +85,8 @@ export default function ForgotPasswordPage() {
               Forgot Password
             </CardTitle>
             <CardDescription className="text-body-small text-zinc-500 dark:text-zinc-400 mt-2">
-              Enter your account email below. If it exists in the system, we will send you a password reset link.
+              Enter your account email below. If it exists in the system, we
+              will send you a password reset link.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -89,14 +100,19 @@ export default function ForgotPasswordPage() {
                     Reset Link Dispatched
                   </h4>
                   <p className="text-xs text-emerald-800 dark:text-emerald-500 leading-relaxed font-medium">
-                    Please check your mailbox (including Maildev at localhost:1080) for instructions to complete your password update.
+                    Please check your mailbox (including Maildev at
+                    localhost:1080) for instructions to complete your password
+                    update.
                   </p>
                 </div>
               </div>
             ) : (
               <form onSubmit={formik.handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+                  <Label
+                    htmlFor="email"
+                    className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+                  >
                     Email Address
                   </Label>
                   <div className="relative">
@@ -106,13 +122,17 @@ export default function ForgotPasswordPage() {
                       placeholder="name@example.com"
                       {...formik.getFieldProps("email")}
                       className={`h-11 rounded-xl pr-10 border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-                        formik.touched.email && formik.errors.email ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+                        formik.touched.email && formik.errors.email
+                          ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                          : ""
                       }`}
                     />
                     <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                   </div>
                   {formik.touched.email && formik.errors.email && (
-                    <p className="text-body-caption text-red-500 mt-1">{formik.errors.email}</p>
+                    <p className="text-body-caption text-red-500 mt-1">
+                      {formik.errors.email}
+                    </p>
                   )}
                 </div>
 

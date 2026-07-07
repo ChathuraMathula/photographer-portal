@@ -1,6 +1,6 @@
 import { MessageSquare } from "lucide-react";
 
-type Props = { unreadCount: number; title: string; description: string; };
+type Props = { unreadCount: number; title: string; description: string };
 
 export function ChatBoxHeader({ unreadCount, title, description }: Props) {
   return (

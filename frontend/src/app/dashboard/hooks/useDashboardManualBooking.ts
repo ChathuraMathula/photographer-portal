@@ -26,18 +26,22 @@ const ManualBookingSchema = Yup.object().shape({
     }),
   startTime: Yup.string()
     .required("Start time is required")
-    .test("not-past-time", "Start time cannot be in the past", function (value) {
-      if (!value) return false;
-      const { date } = this.parent;
-      if (!date) return true;
-      const today = new Date();
-      const todayStr = today.toLocaleDateString("en-CA");
-      if (date === todayStr) {
-        const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
-        return value >= currentTime;
-      }
-      return true;
-    }),
+    .test(
+      "not-past-time",
+      "Start time cannot be in the past",
+      function (value) {
+        if (!value) return false;
+        const { date } = this.parent;
+        if (!date) return true;
+        const today = new Date();
+        const todayStr = today.toLocaleDateString("en-CA");
+        if (date === todayStr) {
+          const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
+          return value >= currentTime;
+        }
+        return true;
+      },
+    ),
   endTime: Yup.string()
     .required("End time is required")
     .test("after-start", "End time must be after start time", function (v) {
@@ -47,7 +51,9 @@ const ManualBookingSchema = Yup.object().shape({
   location: Yup.string().required("Venue / Location address is required"),
   city: Yup.string().required("City is required"),
   district: Yup.string().required("District is required"),
-  locationMapLink: Yup.string().url("Must be a valid URL").required("Map pin location is required"),
+  locationMapLink: Yup.string()
+    .url("Must be a valid URL")
+    .required("Map pin location is required"),
   coordinates: Yup.string()
     .nullable()
     .optional()
@@ -61,16 +67,27 @@ const ManualBookingSchema = Yup.object().shape({
         const lat = parseFloat(match[1]);
         const lon = parseFloat(match[2]);
         return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-      }
+      },
     ),
   notes: Yup.string().optional().nullable(),
   packageId: Yup.string().optional().nullable(),
-  advancePaymentLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
-  totalAmountLkr: Yup.number().typeError("Must be a number").min(0, "Cannot be negative").optional().nullable(),
+  advancePaymentLkr: Yup.number()
+    .typeError("Must be a number")
+    .min(0, "Cannot be negative")
+    .optional()
+    .nullable(),
+  totalAmountLkr: Yup.number()
+    .typeError("Must be a number")
+    .min(0, "Cannot be negative")
+    .optional()
+    .nullable(),
 });
 
 interface UseDashboardManualBookingProps {
-  authFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>;
   loadPhotographerData: () => Promise<void>;
   setShowManualModal: (show: boolean) => void;
 }
@@ -133,7 +150,8 @@ export function useDashboardManualBooking({
           credentials: "include",
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to book manual reservation");
+        if (!res.ok)
+          throw new Error(data.message || "Failed to book manual reservation");
         setShowManualModal(false);
         resetForm();
         await loadPhotographerData();

@@ -41,12 +41,13 @@ export class BookingsLifecycleService {
       );
     }
 
-    const { available, profile } = await this.validationService.checkAvailability(
-      slug,
-      dto.date,
-      dto.startTime,
-      dto.endTime,
-    );
+    const { available, profile } =
+      await this.validationService.checkAvailability(
+        slug,
+        dto.date,
+        dto.startTime,
+        dto.endTime,
+      );
     if (!available || !profile) {
       throw new BadRequestException('The requested time slot is not available');
     }

@@ -8,9 +8,17 @@ type Props = {
   disabled?: boolean;
 };
 
-export function ChatBoxInput({ messageText, onMessageChange, onSend, disabled }: Props) {
+export function ChatBoxInput({
+  messageText,
+  onMessageChange,
+  onSend,
+  disabled,
+}: Props) {
   return (
-    <form onSubmit={onSend} className="p-2 border-t border-zinc-100 dark:border-zinc-800 flex gap-1.5">
+    <form
+      onSubmit={onSend}
+      className="p-2 border-t border-zinc-100 dark:border-zinc-800 flex gap-1.5"
+    >
       <Input
         placeholder="Type a message..."
         value={messageText}

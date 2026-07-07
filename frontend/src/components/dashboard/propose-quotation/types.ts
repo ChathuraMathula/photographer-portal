@@ -16,7 +16,9 @@ export type ProposeQuotationCardProps = {
   onPropose: () => void;
   onReject: () => void;
   packageDeposits: Record<string, string>;
-  setPackageDeposits: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setPackageDeposits: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   customPackage: CustomPackageValues | null;
   setCustomPackage: (val: CustomPackageValues | null) => void;
   customPackageDeposit: string;

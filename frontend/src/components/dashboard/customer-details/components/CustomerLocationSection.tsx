@@ -22,13 +22,20 @@ export function CustomerLocationSection({
   city,
   district,
 }: CustomerLocationSectionProps) {
-  const hasLocationDetails = !!(location || locationMapLink || city || district);
+  const hasLocationDetails = !!(
+    location ||
+    locationMapLink ||
+    city ||
+    district
+  );
 
   return (
     <>
       <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
         <div>
-          <p className="text-body-caption font-semibold text-zinc-400">Date &amp; Location</p>
+          <p className="text-body-caption font-semibold text-zinc-400">
+            Date &amp; Location
+          </p>
           <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
             {startTime} - {endTime}
           </p>
@@ -62,7 +69,9 @@ export function CustomerLocationSection({
 
       {hasLocationDetails && (
         <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800">
-          <p className="text-body-caption font-semibold text-zinc-400 mb-2">Location Map Preview</p>
+          <p className="text-body-caption font-semibold text-zinc-400 mb-2">
+            Location Map Preview
+          </p>
           <OSMMapPreview
             location={location}
             city={city}

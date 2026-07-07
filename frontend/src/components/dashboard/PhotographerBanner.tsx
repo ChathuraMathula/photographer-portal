@@ -30,7 +30,9 @@ export function PhotographerBanner({
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-body-small-s font-semibold text-zinc-550 dark:text-zinc-400">Accepting bookings:</span>
+          <span className="text-body-small-s font-semibold text-zinc-550 dark:text-zinc-400">
+            Accepting bookings:
+          </span>
           <button
             onClick={() => {
               if (profileAvailability) {
@@ -40,7 +42,9 @@ export function PhotographerBanner({
               }
             }}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              profileAvailability ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"
+              profileAvailability
+                ? "bg-emerald-500"
+                : "bg-zinc-300 dark:bg-zinc-700"
             }`}
           >
             <span

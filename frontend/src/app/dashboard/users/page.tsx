@@ -23,12 +23,14 @@ import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 
 export default function UserManagementPage() {
   const dispatch = useDispatch();
-  const router   = useRouter();
+  const router = useRouter();
   const { start } = useTopLoadingBar();
 
-  const { firstName, role: authRole, id: loggedInUserId } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const {
+    firstName,
+    role: authRole,
+    id: loggedInUserId,
+  } = useSelector((state: RootState) => state.auth);
 
   const {
     loggedInRole,
@@ -164,14 +166,26 @@ export default function UserManagementPage() {
         <div className="text-center py-12 text-red-500">{error}</div>
       ) : (
         <div className="space-y-4">
-          <UserTable users={users} onToggleActive={handleToggleActive} loggedInUserId={loggedInUserId ?? ""} loggedInRole={loggedInRole as UserRole} />
-          
+          <UserTable
+            users={users}
+            onToggleActive={handleToggleActive}
+            loggedInUserId={loggedInUserId ?? ""}
+            loggedInRole={loggedInRole as UserRole}
+          />
+
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm gap-4">
               <div className="text-body-caption text-zinc-500">
-                Showing page <span className="font-semibold text-zinc-800 dark:text-zinc-200">{page}</span> of{" "}
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{totalPages}</span> ({total} total users)
+                Showing page{" "}
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                  {page}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                  {totalPages}
+                </span>{" "}
+                ({total} total users)
               </div>
               <Pagination
                 page={page}

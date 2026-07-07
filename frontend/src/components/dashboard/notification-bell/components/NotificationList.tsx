@@ -8,13 +8,20 @@ type Props = {
   onNotificationClick: (item: NotificationItem) => void;
 };
 
-export function NotificationList({ notifications, onNotificationClick }: Props) {
+export function NotificationList({
+  notifications,
+  onNotificationClick,
+}: Props) {
   if (notifications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
         <Bell className="h-8 w-8 text-zinc-350 dark:text-zinc-600 mb-2" />
-        <p className="text-body-caption font-semibold text-zinc-400">All caught up!</p>
-        <p className="text-[10px] text-zinc-500 mt-0.5">No recent notifications received.</p>
+        <p className="text-body-caption font-semibold text-zinc-400">
+          All caught up!
+        </p>
+        <p className="text-[10px] text-zinc-500 mt-0.5">
+          No recent notifications received.
+        </p>
       </div>
     );
   }
@@ -33,12 +40,18 @@ export function NotificationList({ notifications, onNotificationClick }: Props) 
             <span className="absolute left-2.5 top-5 h-2 w-2 rounded-full bg-[#0e2d5c] dark:bg-white" />
           )}
 
-          <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-            item.type === "chat"
-              ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
-              : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-          }`}>
-            {item.type === "chat" ? <MessageSquare className="h-4 w-4" /> : <Calendar className="h-4 w-4" />}
+          <div
+            className={`p-2 rounded-lg shrink-0 mt-0.5 ${
+              item.type === "chat"
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
+                : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+            }`}
+          >
+            {item.type === "chat" ? (
+              <MessageSquare className="h-4 w-4" />
+            ) : (
+              <Calendar className="h-4 w-4" />
+            )}
           </div>
 
           <div className="flex-1 min-w-0 space-y-0.5">

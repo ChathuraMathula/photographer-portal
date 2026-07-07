@@ -49,7 +49,9 @@ export function CalendarMobileStrip({
               {day.getDate()}
             </span>
             {dayRes.length > 0 && (
-              <span className={`h-1 w-1 rounded-full mt-1 ${isSelected ? 'bg-white dark:bg-zinc-950' : 'bg-blue-600'}`} />
+              <span
+                className={`h-1 w-1 rounded-full mt-1 ${isSelected ? "bg-white dark:bg-zinc-950" : "bg-blue-600"}`}
+              />
             )}
           </button>
         );

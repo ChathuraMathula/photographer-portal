@@ -5,11 +5,23 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { UserRole } from "@/store/slices/authSlice";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, RefreshCw, Filter, Search, ClipboardList } from "lucide-react";
+import {
+  Loader2,
+  RefreshCw,
+  Filter,
+  Search,
+  ClipboardList,
+} from "lucide-react";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import { Pagination } from "@/components/ui/pagination";
 
@@ -30,7 +42,7 @@ export default function AuditLogsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  
+
   // Filters
   const [actionFilter, setActionFilter] = useState("");
   const [emailSearch, setEmailSearch] = useState("");
@@ -54,7 +66,7 @@ export default function AuditLogsPage() {
 
       if (!res.ok) throw new Error("Failed to load audit logs");
       const json = await res.json();
-      
+
       // If the backend returned paginated data (has .data property)
       if (json.data && Array.isArray(json.data)) {
         setLogs(json.data);
@@ -107,7 +119,6 @@ export default function AuditLogsPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
-      
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -115,7 +126,8 @@ export default function AuditLogsPage() {
             System Audit Logs
           </h1>
           <p className="text-body-small text-zinc-500 mt-1">
-            Super Administrator console to monitor user logins, profile alterations, password recoveries, and activity logs.
+            Super Administrator console to monitor user logins, profile
+            alterations, password recoveries, and activity logs.
           </p>
         </div>
         <Button
@@ -138,9 +150,13 @@ export default function AuditLogsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
-          
           <div className="space-y-1.5">
-            <Label htmlFor="actionFilter" className="text-xs font-semibold text-zinc-650 dark:text-zinc-350">Action Type</Label>
+            <Label
+              htmlFor="actionFilter"
+              className="text-xs font-semibold text-zinc-650 dark:text-zinc-350"
+            >
+              Action Type
+            </Label>
             <select
               id="actionFilter"
               value={actionFilter}
@@ -149,8 +165,12 @@ export default function AuditLogsPage() {
             >
               <option value="">All Actions</option>
               <option value="LOGIN_SUCCESS">LOGIN_SUCCESS</option>
-              <option value="FORGOT_PASSWORD_REQUEST">FORGOT_PASSWORD_REQUEST</option>
-              <option value="PASSWORD_RESET_SUCCESS">PASSWORD_RESET_SUCCESS</option>
+              <option value="FORGOT_PASSWORD_REQUEST">
+                FORGOT_PASSWORD_REQUEST
+              </option>
+              <option value="PASSWORD_RESET_SUCCESS">
+                PASSWORD_RESET_SUCCESS
+              </option>
               <option value="USER_CREATED">USER_CREATED</option>
               <option value="USER_STATUS_TOGGLED">USER_STATUS_TOGGLED</option>
               <option value="SETTINGS_UPDATED">SETTINGS_UPDATED</option>
@@ -159,7 +179,12 @@ export default function AuditLogsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="emailSearch" className="text-xs font-semibold text-zinc-650 dark:text-zinc-350">User Email</Label>
+            <Label
+              htmlFor="emailSearch"
+              className="text-xs font-semibold text-zinc-650 dark:text-zinc-350"
+            >
+              User Email
+            </Label>
             <div className="relative">
               <Input
                 id="emailSearch"
@@ -203,7 +228,6 @@ export default function AuditLogsPage() {
               Apply Filters
             </Button>
           </div>
-
         </CardContent>
       </Card>
 
@@ -222,10 +246,12 @@ export default function AuditLogsPage() {
           {loading && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px] rounded-b-xl">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="text-zinc-500 font-medium">Fetching log data...</span>
+              <span className="text-zinc-500 font-medium">
+                Fetching log data...
+              </span>
             </div>
           )}
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -239,28 +265,38 @@ export default function AuditLogsPage() {
               <tbody className="divide-y divide-zinc-150/30 dark:divide-zinc-850/40 text-xs">
                 {logs.length === 0 && !loading ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-16 text-zinc-400 italic">
+                    <td
+                      colSpan={4}
+                      className="text-center py-16 text-zinc-400 italic"
+                    >
                       No audit log entries matching filters were found.
                     </td>
                   </tr>
                 ) : (
                   logs.map((log) => (
-                    <tr 
-                      key={log.id} 
+                    <tr
+                      key={log.id}
                       className="hover:bg-zinc-50/30 dark:hover:bg-zinc-950/10 transition-colors"
                     >
                       <td className="py-4 px-6 font-mono text-[11px] text-zinc-400">
                         {new Date(log.createdAt).toLocaleString()}
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getActionBadgeColor(log.action)}`}>
+                        <span
+                          className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getActionBadgeColor(log.action)}`}
+                        >
                           {log.action}
                         </span>
                       </td>
                       <td className="py-4 px-6 font-semibold text-zinc-700 dark:text-zinc-300">
-                        {log.userEmail || <span className="text-zinc-400 italic">System</span>}
+                        {log.userEmail || (
+                          <span className="text-zinc-400 italic">System</span>
+                        )}
                       </td>
-                      <td className="py-4 px-6 text-zinc-600 dark:text-zinc-400 max-w-sm truncate" title={log.details}>
+                      <td
+                        className="py-4 px-6 text-zinc-600 dark:text-zinc-400 max-w-sm truncate"
+                        title={log.details}
+                      >
                         {log.details}
                       </td>
                     </tr>
@@ -281,7 +317,6 @@ export default function AuditLogsPage() {
           )}
         </CardContent>
       </Card>
-
     </div>
   );
 }

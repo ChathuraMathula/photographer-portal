@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 interface UserSettingsContextValue {
   inAppNotificationsEnabled: boolean;
@@ -18,8 +24,13 @@ export function useUserSettings() {
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
-export function UserSettingsProvider({ children }: { children: React.ReactNode }) {
-  const [inAppNotificationsEnabled, setInAppNotificationsEnabled] = useState(true);
+export function UserSettingsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [inAppNotificationsEnabled, setInAppNotificationsEnabled] =
+    useState(true);
 
   const refreshSettings = useCallback(() => {
     fetch(`${API}/users/settings`, { credentials: "include" })
@@ -45,11 +56,14 @@ export function UserSettingsProvider({ children }: { children: React.ReactNode }
       }
     };
     window.addEventListener("user-settings-saved" as any, handler);
-    return () => window.removeEventListener("user-settings-saved" as any, handler);
+    return () =>
+      window.removeEventListener("user-settings-saved" as any, handler);
   }, []);
 
   return (
-    <UserSettingsContext.Provider value={{ inAppNotificationsEnabled, refreshSettings }}>
+    <UserSettingsContext.Provider
+      value={{ inAppNotificationsEnabled, refreshSettings }}
+    >
       {children}
     </UserSettingsContext.Provider>
   );

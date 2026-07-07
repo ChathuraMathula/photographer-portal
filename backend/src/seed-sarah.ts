@@ -11,7 +11,9 @@ async function bootstrap() {
 
   try {
     await seedSarahData(app);
-    console.log('\n✅ Sarah Johnson database seeding completed successfully.\n');
+    console.log(
+      '\n✅ Sarah Johnson database seeding completed successfully.\n',
+    );
   } catch (err) {
     console.error('\n❌ Sarah Johnson seeding failed:', err);
     process.exit(1);

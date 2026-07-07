@@ -13,7 +13,10 @@ export function CustomerDetailsNameFields({ formik }: Props) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="firstName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+        <Label
+          htmlFor="firstName"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
           First Name <span className="text-red-500">*</span>
         </Label>
         <Input
@@ -21,13 +24,20 @@ export function CustomerDetailsNameFields({ formik }: Props) {
           placeholder="John"
           {...formik.getFieldProps("firstName")}
           className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
-            formik.touched.firstName && formik.errors.firstName ? "border-red-500" : ""
+            formik.touched.firstName && formik.errors.firstName
+              ? "border-red-500"
+              : ""
           }`}
         />
-        <FieldError msg={formik.touched.firstName ? formik.errors.firstName : undefined} />
+        <FieldError
+          msg={formik.touched.firstName ? formik.errors.firstName : undefined}
+        />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="lastName" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
+        <Label
+          htmlFor="lastName"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
           Last Name <span className="text-red-500">*</span>
         </Label>
         <Input
@@ -35,10 +45,14 @@ export function CustomerDetailsNameFields({ formik }: Props) {
           placeholder="Doe"
           {...formik.getFieldProps("lastName")}
           className={`h-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${
-            formik.touched.lastName && formik.errors.lastName ? "border-red-500" : ""
+            formik.touched.lastName && formik.errors.lastName
+              ? "border-red-500"
+              : ""
           }`}
         />
-        <FieldError msg={formik.touched.lastName ? formik.errors.lastName : undefined} />
+        <FieldError
+          msg={formik.touched.lastName ? formik.errors.lastName : undefined}
+        />
       </div>
     </div>
   );

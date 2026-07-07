@@ -13,7 +13,11 @@ import { PackageFormModal } from "@/components/modals/PackageFormModal";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { useUserSettings } from "@/context/UserSettingsContext";
 
-export function PhotographerLayoutWrapper({ children }: { children: React.ReactNode }) {
+export function PhotographerLayoutWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const { start } = useTopLoadingBar();
@@ -116,9 +120,7 @@ export function PhotographerLayoutWrapper({ children }: { children: React.ReactN
         />
       }
     >
-      <div className="space-y-6">
-        {children}
-      </div>
+      <div className="space-y-6">{children}</div>
 
       {calendarSelectedRes && (
         <BookingDetailsModal

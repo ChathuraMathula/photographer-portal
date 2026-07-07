@@ -13,7 +13,7 @@ interface MessageReceivedContext {
 
 export function handleMessageReceived(
   { reservationId, message }: { reservationId: string; message: any },
-  ctx: MessageReceivedContext
+  ctx: MessageReceivedContext,
 ) {
   ctx.reservationsState.setReservations((prev: Reservation[]) =>
     prev.map((r) => {
@@ -23,7 +23,7 @@ export function handleMessageReceived(
         return { ...r, messages: [...currentMessages, message] };
       }
       return r;
-    })
+    }),
   );
 
   ctx.reservationsState.setSelectedRes((prev: Reservation | null) => {
@@ -57,7 +57,7 @@ export function handleMessageReceived(
           label: "Reply",
           onClick: () => {
             const res = ctx.reservationsState.reservations.find(
-              (r: Reservation) => r.id === reservationId
+              (r: Reservation) => r.id === reservationId,
             );
             if (res) {
               ctx.reservationsState.setSelectedRes(res);
@@ -67,7 +67,7 @@ export function handleMessageReceived(
           },
         },
         duration: 6000,
-      }
+      },
     );
   }
 }

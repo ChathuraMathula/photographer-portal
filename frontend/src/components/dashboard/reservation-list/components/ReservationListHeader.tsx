@@ -12,11 +12,19 @@ type Props = {
   setStatusFilter: (val: string) => void;
 };
 
-export function ReservationListHeader({ total, search, setSearch, statusFilter, setStatusFilter }: Props) {
+export function ReservationListHeader({
+  total,
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
+}: Props) {
   return (
     <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/20 shrink-0">
       <div className="flex justify-between items-center">
-        <CardTitle className="text-body-base-bold text-primary-dark dark:text-white">Requests List</CardTitle>
+        <CardTitle className="text-body-base-bold text-primary-dark dark:text-white">
+          Requests List
+        </CardTitle>
         <span className="inline-flex rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-body-caption font-semibold text-zinc-700 dark:text-zinc-300">
           Total: {total}
         </span>

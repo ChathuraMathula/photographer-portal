@@ -17,9 +17,12 @@ export function useBooking() {
   const slug = params?.slug as string;
 
   const [profile, setProfile] = useState<PhotographerProfile | null>(null);
-  const [pageState, setPageState] = useState<"loading" | "ready" | "not-found">("loading");
+  const [pageState, setPageState] = useState<"loading" | "ready" | "not-found">(
+    "loading",
+  );
   const [step, setStep] = useState<Step>("availability");
-  const [availabilityChecked, setAvailabilityChecked] = useState<AvailabilityValues | null>(null);
+  const [availabilityChecked, setAvailabilityChecked] =
+    useState<AvailabilityValues | null>(null);
   const [availabilityError, setAvailabilityError] = useState("");
   const [trackingToken, setTrackingToken] = useState("");
   const [origin, setOrigin] = useState("");
@@ -65,13 +68,26 @@ export function useBooking() {
         setAvailabilityChecked(values);
         setStep("details");
       } else {
-        setAvailabilityError(data.reason ?? "This time slot is not available. Please try another.");
+        setAvailabilityError(
+          data.reason ?? "This time slot is not available. Please try another.",
+        );
       }
     },
   });
 
   const detailsFormik = useFormik({
-    initialValues: { firstName: "", lastName: "", email: "", phone: "", location: "", city: "", district: "", locationMapLink: "", coordinates: "", notes: "" },
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      location: "",
+      city: "",
+      district: "",
+      locationMapLink: "",
+      coordinates: "",
+      notes: "",
+    },
     validationSchema: DetailsSchema,
     onSubmit: async (values, { setStatus }) => {
       if (!availabilityChecked) return;

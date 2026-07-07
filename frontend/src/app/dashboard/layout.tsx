@@ -9,9 +9,15 @@ import { UserSettingsProvider } from "@/context/UserSettingsContext";
 import { PhotographerLayoutWrapper } from "./components/PhotographerLayoutWrapper";
 import { AdminLayoutWrapper } from "./components/AdminLayoutWrapper";
 
-export default function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
+export default function DashboardLayoutWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [mounted, setMounted] = React.useState(false);
-  const { role, isAuthenticated, firstName } = useSelector((state: RootState) => state.auth);
+  const { role, isAuthenticated, firstName } = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   React.useEffect(() => {
     setMounted(true);
@@ -20,7 +26,9 @@ export default function DashboardLayoutWrapper({ children }: { children: React.R
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <div className="animate-pulse text-zinc-500 font-medium">Loading...</div>
+        <div className="animate-pulse text-zinc-500 font-medium">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -51,4 +59,3 @@ export default function DashboardLayoutWrapper({ children }: { children: React.R
 
   return <>{children}</>;
 }
-

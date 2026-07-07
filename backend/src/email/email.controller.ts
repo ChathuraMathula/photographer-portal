@@ -19,7 +19,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendBookingReceived')
-  async handleSendBookingReceived(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendBookingReceived(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendBookingReceived(
         data.customerEmail,
@@ -30,7 +33,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendQuotationProposed')
-  async handleSendQuotationProposed(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendQuotationProposed(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendQuotationProposed(
         data.customerEmail,
@@ -43,7 +49,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendReservationRejected')
-  async handleSendReservationRejected(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendReservationRejected(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendReservationRejected(
         data.customerEmail,
@@ -54,7 +63,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendReservationConfirmed')
-  async handleSendReservationConfirmed(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendReservationConfirmed(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendReservationConfirmed(
         data.photographerEmail,
@@ -70,7 +82,11 @@ export class EmailController {
   async handleSendInvoice(@Payload() data: any, @Ctx() context: RmqContext) {
     await this.handleAck(context, async () => {
       let pdfBuffer = data.pdfBuffer;
-      if (pdfBuffer && pdfBuffer.type === 'Buffer' && Array.isArray(pdfBuffer.data)) {
+      if (
+        pdfBuffer &&
+        pdfBuffer.type === 'Buffer' &&
+        Array.isArray(pdfBuffer.data)
+      ) {
         pdfBuffer = Buffer.from(pdfBuffer.data);
       }
       await this.emailWorkerService.sendInvoice(
@@ -83,7 +99,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendAccountDeactivated')
-  async handleSendAccountDeactivated(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendAccountDeactivated(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendAccountDeactivated(
         data.userEmail,
@@ -93,7 +112,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendResetPasswordEmail')
-  async handleSendResetPasswordEmail(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendResetPasswordEmail(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendResetPasswordEmail(
         data.userEmail,
@@ -104,7 +126,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendPaymentReminder')
-  async handleSendPaymentReminder(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendPaymentReminder(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendPaymentReminder(
         data.customerEmail,
@@ -117,7 +142,10 @@ export class EmailController {
   }
 
   @EventPattern('email.sendUpcomingBookingReminder')
-  async handleSendUpcomingBookingReminder(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleSendUpcomingBookingReminder(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     await this.handleAck(context, async () => {
       await this.emailWorkerService.sendUpcomingBookingReminder(
         data.email,

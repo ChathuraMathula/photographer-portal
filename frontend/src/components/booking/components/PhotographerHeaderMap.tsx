@@ -2,8 +2,13 @@ import React from "react";
 import { type PhotographerProfile } from "@/types";
 import { OSMMapPicker } from "@/components/maps/OSMMapPicker";
 
-export function PhotographerHeaderMap({ profile }: { profile: PhotographerProfile }) {
-  if (!profile.showMapPreviewOnBookingPage || !profile.locationMapLink) return null;
+export function PhotographerHeaderMap({
+  profile,
+}: {
+  profile: PhotographerProfile;
+}) {
+  if (!profile.showMapPreviewOnBookingPage || !profile.locationMapLink)
+    return null;
 
   const latMatch = profile.locationMapLink.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
   const lat = latMatch ? parseFloat(latMatch[1]) : undefined;

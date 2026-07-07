@@ -33,20 +33,35 @@ export function useDashboardRealtime({
   router,
 }: Props) {
   useEffect(() => {
-    if (!socket || !isAuthenticated || role !== UserRole.PHOTOGRAPHER || !userId) {
+    if (
+      !socket ||
+      !isAuthenticated ||
+      role !== UserRole.PHOTOGRAPHER ||
+      !userId
+    ) {
       return;
     }
 
     socket.emit("joinPhotographerDashboard", { photographerId: userId });
 
     const onCreated = (res: any) =>
-      handleReservationCreated(res, { reservationsState, setNotifications, loadTransactions });
+      handleReservationCreated(res, {
+        reservationsState,
+        setNotifications,
+        loadTransactions,
+      });
 
     const onUpdated = (res: any) =>
       handleReservationUpdated(res, { reservationsState, loadTransactions });
 
     const onMessage = (data: any) =>
-      handleMessageReceived(data, { reservationsState, chat, setNotifications, setForceOpenChat, router });
+      handleMessageReceived(data, {
+        reservationsState,
+        chat,
+        setNotifications,
+        setForceOpenChat,
+        router,
+      });
 
     const onTransaction = (data: any) =>
       handleTransactionLogged(data, { loadTransactions, reservationsState });

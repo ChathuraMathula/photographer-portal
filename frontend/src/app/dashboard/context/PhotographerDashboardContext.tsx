@@ -5,9 +5,15 @@ import { usePhotographerDashboard } from "../hooks/usePhotographerDashboard";
 
 type DashboardContextType = ReturnType<typeof usePhotographerDashboard>;
 
-const PhotographerDashboardContext = createContext<DashboardContextType | null>(null);
+const PhotographerDashboardContext = createContext<DashboardContextType | null>(
+  null,
+);
 
-export function PhotographerDashboardProvider({ children }: { children: React.ReactNode }) {
+export function PhotographerDashboardProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const value = usePhotographerDashboard();
 
   return (

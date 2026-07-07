@@ -7,16 +7,23 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 interface UseDashboardProfileProps {
   userId: string | null;
-  authFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>;
 }
 
-export function useDashboardProfile({ userId, authFetch }: UseDashboardProfileProps) {
+export function useDashboardProfile({
+  userId,
+  authFetch,
+}: UseDashboardProfileProps) {
   const [profileBio, setProfileBio] = useState("");
   const [profileLocation, setProfileLocation] = useState("");
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
   const [locationMapLink, setLocationMapLink] = useState("");
-  const [showMapPreviewOnBookingPage, setShowMapPreviewOnBookingPage] = useState(true);
+  const [showMapPreviewOnBookingPage, setShowMapPreviewOnBookingPage] =
+    useState(true);
   const [profilePortfolio, setProfilePortfolio] = useState("");
   const [profileAvailability, setProfileAvailability] = useState(true);
   const [bookingSlug, setBookingSlug] = useState("");
@@ -26,8 +33,10 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
   const [universalDepositType, setUniversalDepositType] = useState("fixed");
   const [universalDepositValue, setUniversalDepositValue] = useState(5000);
   const [offlineMessage, setOfflineMessage] = useState("");
-  const [showManualBookingInTopbar, setShowManualBookingInTopbar] = useState(true);
-  const [showAcceptBookingsInTopbar, setShowAcceptBookingsInTopbar] = useState(true);
+  const [showManualBookingInTopbar, setShowManualBookingInTopbar] =
+    useState(true);
+  const [showAcceptBookingsInTopbar, setShowAcceptBookingsInTopbar] =
+    useState(true);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,10 +82,13 @@ export function useDashboardProfile({ userId, authFetch }: UseDashboardProfilePr
   const handleToggleAvailability = async () => {
     if (!userId) return;
     try {
-      const res = await authFetch(`${API}/photographers/${userId}/toggle-availability`, {
-        method: "PATCH",
-        credentials: "include",
-      });
+      const res = await authFetch(
+        `${API}/photographers/${userId}/toggle-availability`,
+        {
+          method: "PATCH",
+          credentials: "include",
+        },
+      );
       if (res.ok) {
         const data = await res.json();
         setProfileAvailability(data.isAvailableForBooking);

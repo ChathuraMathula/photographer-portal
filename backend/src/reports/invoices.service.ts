@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
@@ -22,32 +19,44 @@ export class InvoicesService {
   ) {}
 
   async getInvoices(photographerId: string, page = 1, limit = 10, search = '') {
-    const qb = this.reservationRepository.createQueryBuilder('reservation')
+    const qb = this.reservationRepository
+      .createQueryBuilder('reservation')
       .select('reservation.id', 'id')
       .addSelect('reservation.totalAmountInCents', 'totalAmountInCents')
       .addSelect('COALESCE(SUM(payments.amountInCents), 0)', 'totalPaid')
       .leftJoin('reservation.customer', 'customer')
-      .leftJoin('reservation.payments', 'payments', 'payments.status = :paymentStatus', { paymentStatus: PaymentStatus.SUCCESS })
+      .leftJoin(
+        'reservation.payments',
+        'payments',
+        'payments.status = :paymentStatus',
+        { paymentStatus: PaymentStatus.SUCCESS },
+      )
       .where('reservation.photographerId = :photographerId', { photographerId })
-      .andWhere('reservation.status IN (:...statuses)', { statuses: [ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED] })
+      .andWhere('reservation.status IN (:...statuses)', {
+        statuses: [ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED],
+      })
       .groupBy('reservation.id')
       .addGroupBy('reservation.totalAmountInCents');
 
     if (search) {
       qb.andWhere(
         '(LOWER(customer.firstName) || " " || LOWER(customer.lastName) LIKE LOWER(:search) OR LOWER(customer.email) LIKE LOWER(:search) OR LOWER(reservation.eventType) LIKE LOWER(:search) OR LOWER(reservation.id) LIKE LOWER(:search))',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
     const aggregated = await qb.getRawMany();
 
     let fullyPaidIds = aggregated
-      .filter(row => row.totalPaid >= (row.totalAmountInCents || 1))
-      .map(row => row.id);
+      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
+      .map((row) => row.id);
 
-    const totalInvoiced = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + ((row.totalAmountInCents || 0) / 100), 0);
-    const totalSettled = aggregated.filter(row => row.totalPaid >= (row.totalAmountInCents || 1)).reduce((sum, row) => sum + (row.totalPaid / 100), 0);
+    const totalInvoiced = aggregated
+      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
+      .reduce((sum, row) => sum + (row.totalAmountInCents || 0) / 100, 0);
+    const totalSettled = aggregated
+      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
+      .reduce((sum, row) => sum + row.totalPaid / 100, 0);
     const outstanding = Math.max(0, totalInvoiced - totalSettled);
     const kpis = { totalInvoiced, totalSettled, outstanding };
 
@@ -66,8 +75,13 @@ export class InvoicesService {
     });
 
     const data = reservations.map((res) => {
-      const resPayments = (res.payments || []).filter(p => p.status === PaymentStatus.SUCCESS);
-      const totalPaid = resPayments.reduce((sum, p) => sum + p.amountInCents, 0);
+      const resPayments = (res.payments || []).filter(
+        (p) => p.status === PaymentStatus.SUCCESS,
+      );
+      const totalPaid = resPayments.reduce(
+        (sum, p) => sum + p.amountInCents,
+        0,
+      );
       return {
         reservation: res,
         payments: resPayments,
@@ -131,7 +145,10 @@ export class InvoicesService {
   }
 
   async generateInvoicePdfDoc(reservationId: string, photographerId?: string) {
-    return this.invoiceGenerationService.generateInvoicePdfDoc(reservationId, photographerId);
+    return this.invoiceGenerationService.generateInvoicePdfDoc(
+      reservationId,
+      photographerId,
+    );
   }
 
   async generateInvoicePdfDocByToken(token: string) {
@@ -139,7 +156,9 @@ export class InvoicesService {
   }
 
   async resendInvoice(reservationId: string, photographerId: string) {
-    return this.invoiceGenerationService.resendInvoice(reservationId, photographerId);
+    return this.invoiceGenerationService.resendInvoice(
+      reservationId,
+      photographerId,
+    );
   }
 }
-

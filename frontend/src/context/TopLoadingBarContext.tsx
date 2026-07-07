@@ -8,9 +8,15 @@ interface TopLoadingBarContextType {
   done: () => void;
 }
 
-const TopLoadingBarContext = createContext<TopLoadingBarContextType | null>(null);
+const TopLoadingBarContext = createContext<TopLoadingBarContextType | null>(
+  null,
+);
 
-export function TopLoadingBarProvider({ children }: { children: React.ReactNode }) {
+export function TopLoadingBarProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
@@ -57,7 +63,7 @@ export function TopLoadingBarProvider({ children }: { children: React.ReactNode 
       if (anchor) {
         const href = anchor.getAttribute("href");
         const targetAttr = anchor.getAttribute("target");
-        
+
         // Ensure it's a valid local route navigation and not an external / same page / blank target link
         if (
           href &&
@@ -93,7 +99,9 @@ export function TopLoadingBarProvider({ children }: { children: React.ReactNode 
 export function useTopLoadingBar() {
   const context = useContext(TopLoadingBarContext);
   if (!context) {
-    throw new Error("useTopLoadingBar must be used within a TopLoadingBarProvider");
+    throw new Error(
+      "useTopLoadingBar must be used within a TopLoadingBarProvider",
+    );
   }
   return context;
 }

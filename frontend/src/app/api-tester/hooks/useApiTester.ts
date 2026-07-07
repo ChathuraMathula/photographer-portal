@@ -3,16 +3,19 @@ import { Endpoint, SeedAccount, SessionInfo, QueryParam } from "../types";
 import { API } from "../constants";
 
 export function useApiTester() {
-  const [activeCategory, setActiveCategory] = useState<Endpoint["category"]>("Auth & Health");
-  const [serverHealth, setServerHealth] = useState<"checking" | "online" | "offline">("checking");
+  const [activeCategory, setActiveCategory] =
+    useState<Endpoint["category"]>("Auth & Health");
+  const [serverHealth, setServerHealth] = useState<
+    "checking" | "online" | "offline"
+  >("checking");
   const [session, setSession] = useState<SessionInfo>(null);
-  
+
   // Playground state
   const [reqPath, setReqPath] = useState("/health");
   const [reqMethod, setReqMethod] = useState<Endpoint["method"]>("GET");
   const [queryParams, setQueryParams] = useState<QueryParam[]>([]);
   const [reqBody, setReqBody] = useState("");
-  
+
   // Custom auth inputs
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPass, setLoginPass] = useState("");
@@ -24,7 +27,9 @@ export function useApiTester() {
   const [executing, setExecuting] = useState(false);
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
   const [responseStatusText, setResponseStatusText] = useState("");
-  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [responseHeaders, setResponseHeaders] = useState<
+    Record<string, string>
+  >({});
   const [responseData, setResponseData] = useState<string>("");
   const [latency, setLatency] = useState<number | null>(null);
 
@@ -75,7 +80,7 @@ export function useApiTester() {
         setSession({
           email: data.user.email,
           role: data.user.role,
-          name: `${data.user.firstName} ${data.user.lastName}`
+          name: `${data.user.firstName} ${data.user.lastName}`,
         });
         setAuthSuccess(`Logged in as ${data.user.firstName}! Cookie set.`);
         // Pre-fill next tester run
@@ -108,7 +113,7 @@ export function useApiTester() {
             setSession({
               email: data.user.email,
               role: data.user.role,
-              name: `${data.user.firstName} ${data.user.lastName}`
+              name: `${data.user.firstName} ${data.user.lastName}`,
             });
             setAuthSuccess(`Quick login successful: ${data.user.firstName}`);
             setAuthError("");
@@ -116,7 +121,9 @@ export function useApiTester() {
             setAuthError(data.message || "Quick login failed");
           }
         })
-        .catch(() => setAuthError("Network error: Could not reach backend server"))
+        .catch(() =>
+          setAuthError("Network error: Could not reach backend server"),
+        )
         .finally(() => setLoggingIn(false));
     }, 50);
   };
@@ -128,7 +135,9 @@ export function useApiTester() {
     setQueryParams(endpoint.defaultQuery ? [...endpoint.defaultQuery] : []);
     setReqBody(endpoint.defaultBody || "");
     // scroll to playground container
-    document.getElementById("api-playground")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("api-playground")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Run Request in playground
@@ -145,9 +154,14 @@ export function useApiTester() {
     // Construct Query String
     let targetUrl = `${API}${reqPath}`;
     if (queryParams.length > 0) {
-      const activeQueries = queryParams.filter(q => q.key.trim() !== "");
+      const activeQueries = queryParams.filter((q) => q.key.trim() !== "");
       if (activeQueries.length > 0) {
-        const qs = activeQueries.map(q => `${encodeURIComponent(q.key)}=${encodeURIComponent(q.value)}`).join("&");
+        const qs = activeQueries
+          .map(
+            (q) =>
+              `${encodeURIComponent(q.key)}=${encodeURIComponent(q.value)}`,
+          )
+          .join("&");
         targetUrl = `${targetUrl}?${qs}`;
       }
     }
@@ -163,7 +177,7 @@ export function useApiTester() {
         headers,
         body: reqMethod !== "GET" && reqBody ? reqBody : undefined,
         // Send cookie credentials
-        credentials: "include"
+        credentials: "include",
       });
 
       const endTime = performance.now();
@@ -191,11 +205,18 @@ export function useApiTester() {
       setLatency(Math.round(endTime - startTime));
       setResponseStatus(0);
       setResponseStatusText("Network Error / Connection Refused");
-      setResponseData(JSON.stringify({
-        error: "Failed to connect to the backend API.",
-        suggestion: "Ensure the NestJS backend server is running locally at http://localhost:4001.",
-        details: err?.message || String(err)
-      }, null, 2));
+      setResponseData(
+        JSON.stringify(
+          {
+            error: "Failed to connect to the backend API.",
+            suggestion:
+              "Ensure the NestJS backend server is running locally at http://localhost:4001.",
+            details: err?.message || String(err),
+          },
+          null,
+          2,
+        ),
+      );
     } finally {
       setExecuting(false);
     }
@@ -233,6 +254,6 @@ export function useApiTester() {
     handleLogin,
     selectSeedAccount,
     prefillPlayground,
-    executeRequest
+    executeRequest,
   };
 }

@@ -12,7 +12,10 @@ const AdminProfileSchema = Yup.object().shape({
   lastName: Yup.string().required("Last name is required"),
   phone: Yup.string(),
   password: Yup.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: Yup.string().oneOf([Yup.ref("password")], "Passwords must match"),
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref("password")],
+    "Passwords must match",
+  ),
 });
 
 export function useAdminProfile() {
@@ -21,17 +24,41 @@ export function useAdminProfile() {
   const [saving, setSaving] = useState(false);
 
   const formik = useFormik({
-    initialValues: { firstName: "", lastName: "", email: "", role: "", phone: "", password: "", confirmPassword: "" },
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      role: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+    },
     validationSchema: AdminProfileSchema,
     onSubmit: async (values) => {
       setSaving(true);
       try {
-        const body: any = { firstName: values.firstName, lastName: values.lastName, phone: values.phone };
+        const body: any = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          phone: values.phone,
+        };
         if (values.password) body.password = values.password;
-        const res = await fetch(`${API}/users/me`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), credentials: "include" });
+        const res = await fetch(`${API}/users/me`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to update profile");
         const data = await res.json();
-        dispatch(setCredentials({ id: data.id, email: data.email, role: data.role, firstName: data.firstName }));
+        dispatch(
+          setCredentials({
+            id: data.id,
+            email: data.email,
+            role: data.role,
+            firstName: data.firstName,
+          }),
+        );
         toast.success("Profile settings updated successfully!");
         formik.setFieldValue("password", "");
         formik.setFieldValue("confirmPassword", "");
@@ -49,7 +76,15 @@ export function useAdminProfile() {
         const res = await fetch(`${API}/users/me`, { credentials: "include" });
         if (!res.ok) throw new Error("Could not load user profile");
         const data = await res.json();
-        formik.setValues({ firstName: data.firstName, lastName: data.lastName, email: data.email, role: data.role, phone: data.phone || "", password: "", confirmPassword: "" });
+        formik.setValues({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          role: data.role,
+          phone: data.phone || "",
+          password: "",
+          confirmPassword: "",
+        });
       } catch (err: any) {
         toast.error(err.message || "Failed to load profile");
       } finally {
@@ -57,7 +92,7 @@ export function useAdminProfile() {
       }
     };
     fetchMe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { formik, loading, saving };

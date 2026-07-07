@@ -21,7 +21,9 @@ export function PackageCard({ pkg, onEdit, onDelete }: Props) {
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm flex flex-col justify-between overflow-hidden rounded-xl">
       <CardHeader className="pb-3 bg-zinc-50/20 border-b border-zinc-100 dark:border-zinc-850">
         <div className="flex justify-between items-start gap-2">
-          <CardTitle className="text-title-base text-primary-dark dark:text-white">{pkg.name}</CardTitle>
+          <CardTitle className="text-title-base text-primary-dark dark:text-white">
+            {pkg.name}
+          </CardTitle>
           <div className="flex gap-1">
             <Button
               size="icon"

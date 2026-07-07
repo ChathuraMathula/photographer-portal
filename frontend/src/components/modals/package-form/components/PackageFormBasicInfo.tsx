@@ -11,22 +11,38 @@ type Props = {
   onIncludesChange: (v: string) => void;
 };
 
-export function PackageFormBasicInfo({ formik, includesText, onIncludesChange }: Props) {
+export function PackageFormBasicInfo({
+  formik,
+  includesText,
+  onIncludesChange,
+}: Props) {
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="pkg-name" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Package Name</Label>
+        <Label
+          htmlFor="pkg-name"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
+          Package Name
+        </Label>
         <Input
           id="pkg-name"
           placeholder="e.g. Bronze Portrait Package"
           {...formik.getFieldProps("name")}
           className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
         />
-        <FieldError msg={formik.touched.name ? formik.errors.name : undefined} />
+        <FieldError
+          msg={formik.touched.name ? formik.errors.name : undefined}
+        />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pkg-description" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">Description</Label>
+        <Label
+          htmlFor="pkg-description"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
+          Description
+        </Label>
         <textarea
           id="pkg-description"
           rows={2}
@@ -37,8 +53,12 @@ export function PackageFormBasicInfo({ formik, includesText, onIncludesChange }:
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pkg-includes" className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300">
-          Included Items <span className="text-zinc-400 font-normal">(comma separated)</span>
+        <Label
+          htmlFor="pkg-includes"
+          className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
+        >
+          Included Items{" "}
+          <span className="text-zinc-400 font-normal">(comma separated)</span>
         </Label>
         <Input
           id="pkg-includes"
@@ -47,7 +67,9 @@ export function PackageFormBasicInfo({ formik, includesText, onIncludesChange }:
           onChange={(e) => onIncludesChange(e.target.value)}
           className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
         />
-        <p className="text-body-caption text-zinc-455 mt-1 pl-1">Separate items by comma.</p>
+        <p className="text-body-caption text-zinc-455 mt-1 pl-1">
+          Separate items by comma.
+        </p>
       </div>
     </>
   );
