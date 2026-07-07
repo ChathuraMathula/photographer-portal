@@ -41,6 +41,10 @@ export default function ReservationsPage() {
     setSearch,
     statusFilter,
     setStatusFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
     reservationsLoading,
     firstName,
   } = context;
@@ -96,6 +100,10 @@ export default function ReservationsPage() {
         setSearch={setSearch}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         reservationsLoading={reservationsLoading}
       />
     </div>

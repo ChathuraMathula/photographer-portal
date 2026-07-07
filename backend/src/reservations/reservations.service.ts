@@ -61,6 +61,8 @@ export class ReservationsService {
       status?: string;
       startDate?: string;
       endDate?: string;
+      sortBy?: string;
+      sortOrder?: string;
     } = {},
   ) {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -104,7 +106,18 @@ export class ReservationsService {
       );
     }
 
-    qb.orderBy('res.date', 'DESC').addOrderBy('res.startTime', 'ASC');
+    const ALLOWED_SORT_FIELDS: Record<string, string> = {
+      date: 'res.date',
+      createdAt: 'res.createdAt',
+      eventType: 'res.eventType',
+      status: 'res.status',
+    };
+    const sortField =
+      ALLOWED_SORT_FIELDS[queryOptions.sortBy || ''] || 'res.createdAt';
+    const sortDir =
+      queryOptions.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    qb.orderBy(sortField, sortDir).addOrderBy('res.startTime', 'ASC');
 
     if (queryOptions.startDate && queryOptions.endDate) {
       return qb.getMany();

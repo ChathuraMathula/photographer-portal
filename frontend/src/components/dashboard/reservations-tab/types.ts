@@ -35,5 +35,9 @@ export type ReservationsTabContentProps = {
   setSearch: (val: string) => void;
   statusFilter: string;
   setStatusFilter: (val: string) => void;
+  sortBy: string;
+  setSortBy: (val: string) => void;
+  sortOrder: string;
+  setSortOrder: (val: string) => void;
   reservationsLoading: boolean;
 };

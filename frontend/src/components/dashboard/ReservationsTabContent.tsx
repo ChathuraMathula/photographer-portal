@@ -20,6 +20,10 @@ export function ReservationsTabContent(props: ReservationsTabContentProps) {
         setSearch={props.setSearch}
         statusFilter={props.statusFilter}
         setStatusFilter={props.setStatusFilter}
+        sortBy={props.sortBy}
+        setSortBy={props.setSortBy}
+        sortOrder={props.sortOrder}
+        setSortOrder={props.setSortOrder}
         reservationsLoading={props.reservationsLoading}
       />
       <ReservationsRightPane

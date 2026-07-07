@@ -17,6 +17,10 @@ type Props = {
   setSearch: (val: string) => void;
   statusFilter: string;
   setStatusFilter: (val: string) => void;
+  sortBy: string;
+  setSortBy: (val: string) => void;
+  sortOrder: string;
+  setSortOrder: (val: string) => void;
   loading: boolean;
 };
 
@@ -32,6 +36,10 @@ export function ReservationList({
   setSearch,
   statusFilter,
   setStatusFilter,
+  sortBy,
+  setSortBy,
+  sortOrder,
+  setSortOrder,
   loading,
 }: Props) {
   return (
@@ -42,6 +50,10 @@ export function ReservationList({
         setSearch={setSearch}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
       />
       <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden">
         {loading ? (

@@ -38,6 +38,8 @@ export function useDashboardReservations({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("DESC");
   const [loading, setLoading] = useState(false);
 
   const [calendarLoading, setCalendarLoading] = useState(false);
@@ -63,6 +65,8 @@ export function useDashboardReservations({
       params.append("limit", limit.toString());
       if (debouncedSearch) params.append("search", debouncedSearch);
       if (statusFilter !== "ALL") params.append("status", statusFilter);
+      params.append("sortBy", sortBy);
+      params.append("sortOrder", sortOrder);
 
       const res = await authFetch(`${API}/reservations?${params.toString()}`, {
         credentials: "include",
@@ -105,7 +109,7 @@ export function useDashboardReservations({
 
   useEffect(() => {
     fetchReservations();
-  }, [page, debouncedSearch, statusFilter]);
+  }, [page, debouncedSearch, statusFilter, sortBy, sortOrder]);
 
   // Proposal / rejection form states
   const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);
@@ -317,6 +321,10 @@ export function useDashboardReservations({
     setSearch,
     statusFilter,
     setStatusFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
     loading,
     calendarReservations,
     fetchCalendarReservations,

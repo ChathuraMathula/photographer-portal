@@ -45,6 +45,8 @@ export class ReservationsController {
     @Query('status') status?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
   ) {
     return this.reservationsService.findAll(req.user, {
       page: page ? parseInt(page, 10) : undefined,
@@ -53,6 +55,8 @@ export class ReservationsController {
       status,
       startDate,
       endDate,
+      sortBy,
+      sortOrder,
     });
   }
 

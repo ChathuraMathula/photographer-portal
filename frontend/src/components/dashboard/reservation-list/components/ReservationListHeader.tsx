@@ -1,8 +1,17 @@
 import React from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+
+const SORT_OPTIONS = [
+  { name: "Newest First", value: "createdAt|DESC" },
+  { name: "Oldest First", value: "createdAt|ASC" },
+  { name: "Event Date ↓", value: "date|DESC" },
+  { name: "Event Date ↑", value: "date|ASC" },
+  { name: "Status A–Z", value: "status|ASC" },
+  { name: "Event Type A–Z", value: "eventType|ASC" },
+];
 
 type Props = {
   total: number;
@@ -10,6 +19,10 @@ type Props = {
   setSearch: (val: string) => void;
   statusFilter: string;
   setStatusFilter: (val: string) => void;
+  sortBy: string;
+  setSortBy: (val: string) => void;
+  sortOrder: string;
+  setSortOrder: (val: string) => void;
 };
 
 export function ReservationListHeader({
@@ -18,7 +31,19 @@ export function ReservationListHeader({
   setSearch,
   statusFilter,
   setStatusFilter,
+  sortBy,
+  setSortBy,
+  sortOrder,
+  setSortOrder,
 }: Props) {
+  const sortValue = `${sortBy}|${sortOrder}`;
+
+  const handleSortChange = (val: string) => {
+    const [field, order] = val.split("|");
+    setSortBy(field);
+    setSortOrder(order);
+  };
+
   return (
     <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/20 shrink-0">
       <div className="flex justify-between items-center">
@@ -30,6 +55,7 @@ export function ReservationListHeader({
         </span>
       </div>
       <div className="flex flex-col gap-2 mt-3">
+        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
           <input
@@ -51,6 +77,8 @@ export function ReservationListHeader({
             </Button>
           )}
         </div>
+
+        {/* Status filter */}
         <SearchableSelect
           options={[
             { name: "All Statuses", value: "ALL" },
@@ -66,6 +94,18 @@ export function ReservationListHeader({
           placeholder="Select Status"
           searchPlaceholder="Search status..."
         />
+
+        {/* Sort order */}
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+          <SearchableSelect
+            options={SORT_OPTIONS}
+            value={sortValue}
+            onValueChange={handleSortChange}
+            placeholder="Sort by..."
+            searchPlaceholder="Search sort..."
+          />
+        </div>
       </div>
     </CardHeader>
   );

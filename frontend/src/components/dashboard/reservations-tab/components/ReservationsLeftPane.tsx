@@ -17,6 +17,10 @@ interface ReservationsLeftPaneProps {
   setSearch: (val: string) => void;
   statusFilter: string;
   setStatusFilter: (val: string) => void;
+  sortBy: string;
+  setSortBy: (val: string) => void;
+  sortOrder: string;
+  setSortOrder: (val: string) => void;
   reservationsLoading: boolean;
 }
 
@@ -33,6 +37,10 @@ export function ReservationsLeftPane({
   setSearch,
   statusFilter,
   setStatusFilter,
+  sortBy,
+  setSortBy,
+  sortOrder,
+  setSortOrder,
   reservationsLoading,
 }: ReservationsLeftPaneProps) {
   const handleSelectReservation = (res: Reservation) => {
@@ -61,6 +69,10 @@ export function ReservationsLeftPane({
         setSearch={setSearch}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         loading={reservationsLoading}
       />
     </div>
