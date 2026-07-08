@@ -33,8 +33,10 @@ export class InvoicesService {
       .addSelect('reservation.totalAmountInCents', 'totalAmountInCents')
       .addSelect('COALESCE(SUM(payments.amountInCents), 0)', 'totalPaid')
       .addSelect('reservation.date', 'date')
+      .addSelect('reservation.eventType', 'eventType')
       .addSelect('customer.firstName', 'firstName')
       .addSelect('customer.lastName', 'lastName')
+      .addSelect('customer.email', 'email')
       .leftJoin('reservation.customer', 'customer')
       .leftJoin(
         'reservation.payments',
@@ -49,21 +51,11 @@ export class InvoicesService {
       .groupBy('reservation.id')
       .addGroupBy('reservation.totalAmountInCents')
       .addGroupBy('reservation.date')
+      .addGroupBy('reservation.eventType')
       .addGroupBy('customer.id')
       .addGroupBy('customer.firstName')
-      .addGroupBy('customer.lastName');
-
-    if (search) {
-      qb.andWhere(
-        `(
-          LOWER(customer.firstName || ' ' || customer.lastName) LIKE LOWER(:search)
-          OR LOWER(customer.email) LIKE LOWER(:search)
-          OR LOWER(reservation.eventType) LIKE LOWER(:search)
-          OR LOWER(reservation.id) LIKE LOWER(:search)
-        )`,
-        { search: `%${search}%` },
-      );
-    }
+      .addGroupBy('customer.lastName')
+      .addGroupBy('customer.email');
 
     if (filterDate) {
       qb.andWhere('reservation.date = :filterDate', { filterDate });
@@ -71,7 +63,21 @@ export class InvoicesService {
 
     const aggregated = await qb.getRawMany();
 
-    const fullyPaidRows = aggregated.filter(
+    // In-memory search filter (avoids PostgreSQL camelCase column quoting issues)
+    const searchLower = search.trim().toLowerCase();
+    const searchFiltered = searchLower
+      ? aggregated.filter((row) => {
+          const fullName = `${row.firstName || ''} ${row.lastName || ''}`.toLowerCase();
+          return (
+            fullName.includes(searchLower) ||
+            (row.email || '').toLowerCase().includes(searchLower) ||
+            (row.eventType || '').toLowerCase().includes(searchLower) ||
+            (row.id || '').toLowerCase().includes(searchLower)
+          );
+        })
+      : aggregated;
+
+    const fullyPaidRows = searchFiltered.filter(
       (row) => Number(row.totalPaid) >= (Number(row.totalAmountInCents) || 1),
     );
 
