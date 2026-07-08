@@ -53,6 +53,7 @@ export default function ReservationsPage() {
   useEffect(() => {
     const id = searchParams.get("id");
     const fromCalendar = searchParams.get("fromCalendar");
+    const fromNotification = searchParams.get("fromNotification");
     const urlPage = searchParams.get("page");
 
     if (urlPage) {
@@ -62,13 +63,13 @@ export default function ReservationsPage() {
       }
     }
 
-    if (id && fromCalendar === "true") {
+    if (id && (fromCalendar === "true" || fromNotification === "true")) {
       setSearch(id);
       setStatusFilter("ALL");
       setSortBy("date");
       setSortOrder("DESC");
       
-      // Remove fromCalendar from the URL so it doesn't trigger again on reload
+      // Remove flags from the URL so it doesn't trigger again on reload
       router.replace(`/dashboard/reservations?id=${id}`, { scroll: false });
     }
   }, [searchParams, router, setSearch, setStatusFilter, setSortBy, setSortOrder, page, setPage]);

@@ -7,6 +7,7 @@ interface ReservationCreatedContext {
   reservationsState: any;
   setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
   loadTransactions: () => Promise<void>;
+  router: any;
 }
 
 export function handleReservationCreated(
@@ -34,5 +35,15 @@ export function handleReservationCreated(
   ctx.loadTransactions();
   toast.info(
     `New booking request from ${newRes.customer?.firstName ?? "Client"}!`,
+    {
+      action: {
+        label: "View",
+        onClick: () => {
+          ctx.reservationsState.setSelectedRes(newRes);
+          ctx.router.push(`/dashboard/reservations?id=${newRes.id}&fromNotification=true`);
+        },
+      },
+      duration: 6000,
+    }
   );
 }

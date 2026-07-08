@@ -63,6 +63,7 @@ export function useDashboardRealtime({
         reservationsState: reservationsStateRef.current,
         setNotifications: setNotificationsRef.current,
         loadTransactions: loadTransactionsRef.current,
+        router: routerRef.current,
       });
 
     const onUpdated = (res: any) =>

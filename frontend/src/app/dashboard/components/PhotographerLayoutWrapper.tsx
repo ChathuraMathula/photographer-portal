@@ -105,7 +105,7 @@ export function PhotographerLayoutWrapper({
               if (type === "chat") {
                 setForceOpenChat((prev) => prev + 1);
               }
-              router.push(`/dashboard/reservations?id=${resId}`);
+              router.push(`/dashboard/reservations?id=${resId}&fromNotification=true`);
             }
           }}
         />

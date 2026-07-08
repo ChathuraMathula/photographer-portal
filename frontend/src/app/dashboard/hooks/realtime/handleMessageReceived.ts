@@ -62,7 +62,7 @@ export function handleMessageReceived(
             if (res) {
               ctx.reservationsState.setSelectedRes(res);
               ctx.setForceOpenChat((prev: number) => prev + 1);
-              ctx.router.push(`/dashboard/reservations?id=${reservationId}`);
+              ctx.router.push(`/dashboard/reservations?id=${reservationId}&fromNotification=true`);
             }
           },
         },
