@@ -45,7 +45,7 @@ export function ReservationList(props: Props) {
       />
       <div
         className={`flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden transition-opacity duration-200 ${
-          loading && reservations.length > 0 ? "opacity-50 pointer-events-none" : ""
+          loading && reservations.length > 0 ? "opacity-50" : ""
         }`}
       >
         {loading && reservations.length === 0 ? (

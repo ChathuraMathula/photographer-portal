@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
 import { UserRole } from "@/store/slices/authSlice";
@@ -24,6 +24,7 @@ export function usePhotographerDashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resId = searchParams.get("id");
+  const localSelectionRef = useRef(false);
 
   // 1. Auth Hook
   const { firstName, role, userId, isAuthenticated, handleLogout, authFetch } =
@@ -129,6 +130,10 @@ export function usePhotographerDashboard() {
 
   useEffect(() => {
     if (!resId || !isAuthenticated) return;
+    if (localSelectionRef.current) {
+      localSelectionRef.current = false;
+      return;
+    }
     // Already selected – nothing to do
     if (reservationsState.selectedRes?.id === resId) return;
 
@@ -178,7 +183,10 @@ export function usePhotographerDashboard() {
     reservations: reservationsState.reservations,
     packages: packagesState.packages,
     selectedRes: reservationsState.selectedRes,
-    setSelectedRes: reservationsState.selectReservation,
+    setSelectedRes: (res: Reservation | null) => {
+      localSelectionRef.current = true;
+      reservationsState.selectReservation(res);
+    },
     messages: chat.messages,
     messageText: chat.messageText,
     setMessageText: chat.setMessageText,

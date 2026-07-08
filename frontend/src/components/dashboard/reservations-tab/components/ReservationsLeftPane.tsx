@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { type Reservation } from "@/types";
 import { ReservationList } from "../../ReservationList";
 
@@ -43,24 +44,18 @@ export function ReservationsLeftPane({
   setSortOrder,
   reservationsLoading,
 }: ReservationsLeftPaneProps) {
+  const router = useRouter();
+
   const handleSelectReservation = (res: Reservation) => {
     setSelectedRes(res);
     setShowRejectForm(false);
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("id", res.id);
-      url.searchParams.set("page", page.toString());
-      window.history.replaceState(null, "", url.toString());
-    }
+    router.replace(`/dashboard/reservations?id=${res.id}&page=${page}`, { scroll: false });
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("page", newPage.toString());
-      window.history.replaceState(null, "", url.toString());
-    }
+    const idParam = selectedRes ? `&id=${selectedRes.id}` : "";
+    router.replace(`/dashboard/reservations?page=${newPage}${idParam}`, { scroll: false });
   };
 
   return (
