@@ -102,11 +102,11 @@ export function PhotographerLayoutWrapper({
             const res = reservations.find((r) => r.id === resId);
             if (res) {
               setSelectedRes(res);
-              if (type === "chat") {
-                setForceOpenChat((prev) => prev + 1);
-              }
-              router.push(`/dashboard/reservations?id=${resId}&fromNotification=true`);
             }
+            if (type === "chat") {
+              setForceOpenChat((prev) => prev + 1);
+            }
+            router.push(`/dashboard/reservations?id=${resId}&fromNotification=true`);
           }}
         />
       }

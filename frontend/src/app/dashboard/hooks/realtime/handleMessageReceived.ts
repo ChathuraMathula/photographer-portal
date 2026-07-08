@@ -61,9 +61,9 @@ export function handleMessageReceived(
             );
             if (res) {
               ctx.reservationsState.setSelectedRes(res);
-              ctx.setForceOpenChat((prev: number) => prev + 1);
-              ctx.router.push(`/dashboard/reservations?id=${reservationId}&fromNotification=true`);
             }
+            ctx.setForceOpenChat((prev: number) => prev + 1);
+            ctx.router.push(`/dashboard/reservations?id=${reservationId}&fromNotification=true`);
           },
         },
         duration: 6000,
