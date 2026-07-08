@@ -47,7 +47,7 @@ export function useDashboardDataLoader({
       const pageNum = paramsObj?.page || 1;
       const params = new URLSearchParams();
       params.append("page", pageNum.toString());
-      params.append("limit", "15");
+      params.append("limit", "10");
       if (paramsObj?.search) params.append("search", paramsObj.search);
       if (paramsObj?.status && paramsObj.status !== "ALL")
         params.append("status", paramsObj.status);
