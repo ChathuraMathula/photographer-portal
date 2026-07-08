@@ -2,8 +2,9 @@ import React from "react";
 import { type Reservation } from "@/types";
 import { Card } from "@/components/ui/card";
 import { ReservationListItem } from "./ReservationListItem";
-import { Pagination } from "@/components/ui/pagination";
 import { ReservationListHeader } from "./reservation-list/components/ReservationListHeader";
+import { ReservationListItemSkeleton } from "./reservation-list/components/ReservationListItemSkeleton";
+import { ReservationListPagination } from "./reservation-list/components/ReservationListPagination";
 
 type Props = {
   reservations: Reservation[];
@@ -24,42 +25,33 @@ type Props = {
   loading: boolean;
 };
 
-export function ReservationList({
-  reservations,
-  selectedId,
-  onSelect,
-  page,
-  setPage,
-  totalPages,
-  total,
-  search,
-  setSearch,
-  statusFilter,
-  setStatusFilter,
-  sortBy,
-  setSortBy,
-  sortOrder,
-  setSortOrder,
-  loading,
-}: Props) {
+export function ReservationList(props: Props) {
+  const {
+    reservations, selectedId, onSelect, page, setPage, totalPages, total, loading
+  } = props;
+
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm h-[650px] flex flex-col rounded-xl overflow-visible">
       <ReservationListHeader
         total={total}
-        search={search}
-        setSearch={setSearch}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
+        search={props.search}
+        setSearch={props.setSearch}
+        statusFilter={props.statusFilter}
+        setStatusFilter={props.setStatusFilter}
+        sortBy={props.sortBy}
+        setSortBy={props.setSortBy}
+        sortOrder={props.sortOrder}
+        setSortOrder={props.setSortOrder}
       />
-      <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-zinc-400 text-body-small animate-pulse">
-            Loading reservations...
-          </div>
+      <div
+        className={`flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden transition-opacity duration-200 ${
+          loading && reservations.length > 0 ? "opacity-50 pointer-events-none" : ""
+        }`}
+      >
+        {loading && reservations.length === 0 ? (
+          Array.from({ length: 5 }).map((_, idx) => (
+            <ReservationListItemSkeleton key={idx} />
+          ))
         ) : reservations.length === 0 ? (
           <div className="p-8 text-center text-zinc-400 text-body-small">
             No reservations found.
@@ -77,17 +69,11 @@ export function ReservationList({
       </div>
 
       {totalPages > 1 && (
-        <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/20 shrink-0 flex items-center justify-between gap-2 overflow-x-auto">
-          <span className="text-[11px] text-zinc-450 whitespace-nowrap">
-            Page {page} of {totalPages}
-          </span>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            className="scale-90 origin-right shrink-0"
-          />
-        </div>
+        <ReservationListPagination
+          page={page}
+          totalPages={totalPages}
+          setPage={setPage}
+        />
       )}
     </Card>
   );
