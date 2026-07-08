@@ -533,6 +533,7 @@ export async function seedDatabase(
           : undefined,
       clientSelectedPackageId: packages[spec.pkgIdx].id,
       selectedPackages: [packages[spec.pkgIdx]],
+      isRead: true,
     });
     await manager.save(Reservation, reservation);
 
@@ -598,6 +599,7 @@ export async function seedDatabase(
         sender: msg.sender as any,
         senderName: msg.senderName,
         content: msg.text,
+        isRead: true,
       });
       await manager.save(Message, dbMsg);
     }

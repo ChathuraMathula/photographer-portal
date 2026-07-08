@@ -45,7 +45,7 @@ export function usePhotographerDashboard() {
     handleMarkAsRead,
     handleMarkAllAsRead,
     handleClearAllNotifications,
-  } = useDashboardNotifications();
+  } = useDashboardNotifications({ authFetch, isAuthenticated, role });
 
   // 3. Profile Hook
   const profile = useDashboardProfile({ userId, authFetch });
@@ -151,6 +151,18 @@ export function usePhotographerDashboard() {
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resId, isAuthenticated, reservationsState.reservations]);
+
+  useEffect(() => {
+    if (reservationsState.selectedRes && notifications.length > 0) {
+      const hasUnreadChat = notifications.some(
+        (n) => n.type === "chat" && !n.read && n.referenceId === reservationsState.selectedRes!.id
+      );
+      if (hasUnreadChat) {
+        setForceOpenChat((prev) => prev + 1);
+        handleMarkAsRead(notifications.find(n => n.type === "chat" && !n.read && n.referenceId === reservationsState.selectedRes!.id)!.id);
+      }
+    }
+  }, [reservationsState.selectedRes, notifications, handleMarkAsRead]);
 
   const chatDisabled =
     reservationsState.selectedRes?.status === "CANCELLED" ||

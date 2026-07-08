@@ -118,4 +118,7 @@ export class Reservation {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column({ type: 'boolean', default: false })
+  isRead!: boolean;
 }

@@ -328,7 +328,8 @@ export async function seedSarahData(
             },
           ],
           usePackageWiseDeposit: true,
-          createdAt: new Date(eventDate.getTime() - 30 * 24 * 60 * 60 * 1000), // Created 30 days prior
+          createdAt: new Date(eventDate.getTime() - 30 * 24 * 60 * 60 * 1000),
+          isRead: true,
         });
 
         await manager.save(Reservation, reservation);

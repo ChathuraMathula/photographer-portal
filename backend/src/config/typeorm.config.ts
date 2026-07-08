@@ -7,6 +7,7 @@ import { Package } from '../entities/package.entity';
 import { Customer } from '../entities/customer.entity';
 import { Reservation } from '../entities/reservation.entity';
 import { Message } from '../entities/message.entity';
+import { Payment } from '../entities/payment.entity';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
@@ -31,6 +32,7 @@ export default new DataSource({
     Customer,
     Reservation,
     Message,
+    Payment,
   ],
   migrations: ['src/migrations/*.ts', 'dist/migrations/*.js'],
   synchronize: false,

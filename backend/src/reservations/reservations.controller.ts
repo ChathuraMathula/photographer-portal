@@ -69,6 +69,12 @@ export class ReservationsController {
     return this.reservationsService.createManualBooking(dto, req.user);
   }
 
+  @Get('notifications/unread')
+  @Roles(UserRole.PHOTOGRAPHER)
+  getUnreadNotifications(@Req() req: RequestWithUser) {
+    return this.reservationsService.getUnreadNotifications(req.user);
+  }
+
   @Get(':id')
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
   findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
@@ -109,5 +115,17 @@ export class ReservationsController {
     @Req() req: RequestWithUser,
   ) {
     return this.reservationsService.sendMessage(id, content, req.user);
+  }
+
+  @Patch(':id/read')
+  @Roles(UserRole.PHOTOGRAPHER)
+  markReservationAsRead(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.reservationsService.markReservationAsRead(id, req.user);
+  }
+
+  @Patch(':id/messages/read')
+  @Roles(UserRole.PHOTOGRAPHER)
+  markMessagesAsRead(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.reservationsService.markMessagesAsRead(id, req.user);
   }
 }

@@ -224,4 +224,45 @@ export class ReservationsService {
 
     return message;
   }
+
+  async getUnreadNotifications(user: JwtUser) {
+    const unreadReservations = await this.reservationRepository.find({
+      where: {
+        photographerId: user.userId,
+        isRead: false,
+      },
+      relations: { customer: true },
+    });
+
+    const unreadMessages = await this.messageRepository.find({
+      where: {
+        reservation: {
+          photographerId: user.userId,
+        },
+        sender: 'CUSTOMER',
+        isRead: false,
+      },
+      relations: { reservation: true },
+    });
+
+    return {
+      reservations: unreadReservations,
+      messages: unreadMessages,
+    };
+  }
+
+  async markReservationAsRead(id: string, user: JwtUser) {
+    const reservation = await this.findOne(id, user);
+    reservation.isRead = true;
+    return this.reservationRepository.save(reservation);
+  }
+
+  async markMessagesAsRead(id: string, user: JwtUser) {
+    await this.findOne(id, user); // Verify ownership
+    await this.messageRepository.update(
+      { reservationId: id, sender: 'CUSTOMER', isRead: false },
+      { isRead: true },
+    );
+    return { success: true };
+  }
 }
