@@ -16,16 +16,28 @@ import {
 } from "@/components/ui/select";
 import { useInvoices } from "./hooks/useInvoices";
 
+// Outer guard — only renders inner component once context is ready.
+// This pattern prevents a React Rules of Hooks violation where useInvoices
+// was called conditionally (after an early return), causing remounts on search.
 export default function InvoicesPage() {
   const context = usePhotographerDashboardContext();
-
   if (!context) return null;
-  const { authFetch } = context;
+  return <InvoicesPageInner authFetch={context.authFetch} />;
+}
 
+function InvoicesPageInner({
+  authFetch,
+}: {
+  authFetch: (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>;
+}) {
   const {
     invoices,
     settings,
     loading,
+    refreshing,
     resendingId,
     searchTerm,
     setSearchTerm,
@@ -46,6 +58,7 @@ export default function InvoicesPage() {
     handleSaveSettings,
   } = useInvoices(authFetch);
 
+  // Only block the UI on the very first load (before settings exist)
   if (loading || !settings) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
@@ -62,7 +75,7 @@ export default function InvoicesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-4 gap-4">
         <div>
           <h2 className="text-title-medium font-extrabold text-zinc-900 dark:text-white leading-none">
-            Invoices & Statements
+            Invoices &amp; Statements
           </h2>
           <p className="text-body-caption text-zinc-400 mt-1.5">
             Manage your customer invoice statements, log off-cash payments, and
@@ -202,12 +215,15 @@ export default function InvoicesPage() {
             </div>
           </div>
 
-          <InvoicesListTable
-            invoices={invoices}
-            onDownload={handleDownload}
-            onResend={handleResend}
-            resendingId={resendingId}
-          />
+          {/* Table — stays mounted; dims smoothly during search refresh */}
+          <div className={`transition-opacity duration-200 ${refreshing ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+            <InvoicesListTable
+              invoices={invoices}
+              onDownload={handleDownload}
+              onResend={handleResend}
+              resendingId={resendingId}
+            />
+          </div>
 
           {totalPages > 1 && (
             <div className="pt-4 flex justify-center">

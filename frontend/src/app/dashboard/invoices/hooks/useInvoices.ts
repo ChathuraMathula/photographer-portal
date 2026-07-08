@@ -14,9 +14,11 @@ export function useInvoices(
 ) {
   const [invoices, setInvoices] = useState<InvoiceItem[]>([]);
   const [settings, setSettings] = useState<InvoiceSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);   // true only on first load
+  const [refreshing, setRefreshing] = useState(false); // true on search/filter re-fetches
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalInvoiced, setTotalInvoiced] = useState(0);
@@ -25,13 +27,18 @@ export function useInvoices(
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [filterDate, setFilterDate] = useState("");
+  const [initialised, setInitialised] = useState(false);
   const itemsPerPage = 10;
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
     try {
       const invRes = await authFetch(
-        `${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}&sortBy=${sortBy}&sortOrder=${sortOrder}&filterDate=${filterDate}`,
+        `${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(debouncedSearch)}&sortBy=${sortBy}&sortOrder=${sortOrder}&filterDate=${filterDate}`,
         { credentials: "include" },
       );
       if (!invRes.ok) throw new Error("Failed to load invoices list");
@@ -45,27 +52,49 @@ export function useInvoices(
         setOutstanding(invData.kpis.outstanding || 0);
       }
 
-      const settingsRes = await authFetch(`${API}/invoices/settings`, {
-        credentials: "include",
-      });
-      if (!settingsRes.ok) throw new Error("Failed to load invoice settings");
-      const settingsData = await settingsRes.json();
-      setSettings(settingsData);
+      // Only fetch settings on first load
+      if (isInitial) {
+        const settingsRes = await authFetch(`${API}/invoices/settings`, {
+          credentials: "include",
+        });
+        if (!settingsRes.ok) throw new Error("Failed to load invoice settings");
+        const settingsData = await settingsRes.json();
+        setSettings(settingsData);
+        setInitialised(true);
+      }
     } catch (err) {
       console.error(err);
       toast.error("Could not load invoices dashboard.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, [authFetch, currentPage, searchTerm, itemsPerPage, sortBy, sortOrder, filterDate]);
+  }, [authFetch, currentPage, debouncedSearch, itemsPerPage, sortBy, sortOrder, filterDate]);
 
+  // Initial load
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadData(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fetch when filters/page change (after initial load)
+  useEffect(() => {
+    if (!initialised) return;
+    loadData(false);
+  }, [loadData, initialised]);
+
+  // Debounce the search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterDate, sortBy, sortOrder]);
+  }, [filterDate, sortBy, sortOrder]);
 
   const handleDownload = async (resId: string) => {
     try {
@@ -129,6 +158,7 @@ export function useInvoices(
     invoices,
     settings,
     loading,
+    refreshing,
     resendingId,
     searchTerm,
     setSearchTerm,
