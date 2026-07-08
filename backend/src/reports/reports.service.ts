@@ -1,89 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { Payment, PaymentStatus } from '../entities/payment.entity';
-import {
-  buildFinancialReportPdf,
-  buildBookingsReportPdf,
-  buildLocationReportPdf,
-} from './reports-pdf-builder';
+import { Reservation } from '../entities/reservation.entity';
+import { buildFinancialReportPdf, buildBookingsReportPdf, buildLocationReportPdf } from './reports-pdf-builder';
 import { ReportsAggregationService } from './reports-aggregation.service';
-import { ElasticReportsAggregationService } from './elastic-reports-aggregation.service';
+import { getDateRange } from './database/date-range.util';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
-    @InjectRepository(Payment)
-    private readonly paymentRepository: Repository<Payment>,
-    private readonly aggregationService: ElasticReportsAggregationService,
+    private readonly aggregationService: ReportsAggregationService,
   ) {}
 
-  async generateReportData(
-    photographerId: string | undefined,
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    customStartDate?: string,
-    customEndDate?: string,
-  ) {
-    return this.aggregationService.generateReportData(
-      photographerId,
-      period,
-      customStartDate,
-      customEndDate,
-    );
+  async generateReportData(photoId: string | undefined, period: any, start?: string, end?: string) {
+    return this.aggregationService.generateReportData(photoId, period, start, end);
   }
 
-  async getReportBookings(
-    photographerId: string | undefined,
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    page: number,
-    limit: number,
-    customStartDate?: string,
-    customEndDate?: string,
-  ) {
-    const today = new Date();
-    let startDate = new Date();
-    let endDate = new Date();
+  async getReportBookings(photoId: string | undefined, period: any, page: number, limit: number, start?: string, end?: string) {
+    const { startDate, endDate } = getDateRange(period, start, end);
+    const where: any = { date: Between(startDate, endDate) };
+    if (photoId) where.photographerId = photoId;
 
-    if (customStartDate && customEndDate) {
-      startDate = new Date(customStartDate);
-      endDate = new Date(customEndDate);
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
-    } else {
-      if (period === 'weekly') {
-        startDate.setDate(today.getDate() - 7);
-      } else if (period === 'monthly') {
-        startDate.setDate(today.getDate() - 30);
-      } else if (period === 'yearly') {
-        startDate.setDate(today.getDate() - 365);
-      }
-    }
+    const [reservations, total] = await this.reservationRepository.findAndCount({
+      where,
+      relations: { customer: true },
+      order: { date: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
-    const whereClause: any = {
-      date: Between(startDate, endDate),
-    };
-    if (photographerId) {
-      whereClause.photographerId = photographerId;
-    }
-
-    const [reservations, total] = await this.reservationRepository.findAndCount(
-      {
-        where: whereClause,
-        relations: {
-          customer: true,
-        },
-        order: {
-          date: 'ASC',
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-      },
-    );
-
-    const rawBookings = reservations.map((res) => ({
+    const data = reservations.map((res) => ({
       id: res.id,
       clientName: `${res.customer.firstName} ${res.customer.lastName}`,
       date: res.date,
@@ -92,74 +40,22 @@ export class ReportsService {
       status: res.status,
     }));
 
-    return {
-      data: rawBookings,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
   }
 
-  async generateFinancialReportPdf(
-    photographerId: string | undefined,
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    customStartDate?: string,
-    customEndDate?: string,
-  ): Promise<any> {
-    const data = await this.generateReportData(
-      photographerId,
-      period,
-      customStartDate,
-      customEndDate,
-    );
-    return buildFinancialReportPdf(data, period);
+  async generateFinancialReportPdf(photoId: any, period: any, start?: string, end?: string) {
+    return buildFinancialReportPdf(await this.generateReportData(photoId, period, start, end), period);
   }
 
-  async generateBookingsReportPdf(
-    photographerId: string | undefined,
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    customStartDate?: string,
-    customEndDate?: string,
-  ): Promise<any> {
-    const data = await this.generateReportData(
-      photographerId,
-      period,
-      customStartDate,
-      customEndDate,
-    );
-    return buildBookingsReportPdf(data, period);
+  async generateBookingsReportPdf(photoId: any, period: any, start?: string, end?: string) {
+    return buildBookingsReportPdf(await this.generateReportData(photoId, period, start, end), period);
   }
 
-  async generateLocationReportPdf(
-    photographerId: string | undefined,
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    customStartDate?: string,
-    customEndDate?: string,
-  ): Promise<any> {
-    const data = await this.generateReportData(
-      photographerId,
-      period,
-      customStartDate,
-      customEndDate,
-    );
-    return buildLocationReportPdf(data, period);
+  async generateLocationReportPdf(photoId: any, period: any, start?: string, end?: string) {
+    return buildLocationReportPdf(await this.generateReportData(photoId, period, start, end), period);
   }
 
-  async getPhotographerLeaderboard(
-    period: 'weekly' | 'monthly' | 'yearly' | 'custom',
-    page: number,
-    limit: number,
-    search?: string,
-    customStartDate?: string,
-    customEndDate?: string,
-  ) {
-    return this.aggregationService.getPhotographerLeaderboard(
-      period,
-      page,
-      limit,
-      search,
-      customStartDate,
-      customEndDate,
-    );
+  async getPhotographerLeaderboard(period: any, page: number, limit: number, search?: string, start?: string, end?: string) {
+    return this.aggregationService.getPhotographerLeaderboard(period, page, limit, search, start, end);
   }
 }

@@ -1,32 +1,18 @@
-﻿import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ReportsService } from './reports.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Reservation } from '../entities/reservation.entity';
-import { Payment } from '../entities/payment.entity';
-import { User } from '../entities/user.entity';
+import { ReportsAggregationService } from './reports-aggregation.service';
 
 describe('ReportsService', () => {
   let service: ReportsService;
-  let reservationRepositoryMock: any;
-  let paymentRepositoryMock: any;
-  let userRepositoryMock: any;
+  let reportsAggregationServiceMock: any;
 
   beforeEach(async () => {
-    reservationRepositoryMock = {
-      find: jest.fn().mockResolvedValue([]),
-    };
-
-    paymentRepositoryMock = {
-      createQueryBuilder: jest.fn().mockReturnValue({
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
+    reportsAggregationServiceMock = {
+      generateReportData: jest.fn().mockResolvedValue({
+        summary: { totalBookings: 0, conversionRate: 0 },
       }),
-    };
-
-    userRepositoryMock = {
-      find: jest.fn().mockResolvedValue([]),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -34,13 +20,12 @@ describe('ReportsService', () => {
         ReportsService,
         {
           provide: getRepositoryToken(Reservation),
-          useValue: reservationRepositoryMock,
+          useValue: {},
         },
         {
-          provide: getRepositoryToken(Payment),
-          useValue: paymentRepositoryMock,
+          provide: ReportsAggregationService,
+          useValue: reportsAggregationServiceMock,
         },
-        { provide: getRepositoryToken(User), useValue: userRepositoryMock },
       ],
     }).compile();
 
