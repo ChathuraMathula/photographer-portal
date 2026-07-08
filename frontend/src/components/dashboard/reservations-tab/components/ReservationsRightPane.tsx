@@ -49,7 +49,8 @@ export function ReservationsRightPane(props: ReservationsRightPaneProps) {
     props.selectedRes.status === "PROPOSED";
   const showStatusCard =
     props.selectedRes.status === "PROPOSED" ||
-    props.selectedRes.status === "CONFIRMED";
+    props.selectedRes.status === "CONFIRMED" ||
+    props.selectedRes.status === "COMPLETED";
 
   return (
     <div className="lg:col-span-2 space-y-4">
