@@ -53,6 +53,14 @@ export default function ReservationsPage() {
   useEffect(() => {
     const id = searchParams.get("id");
     const fromCalendar = searchParams.get("fromCalendar");
+    const urlPage = searchParams.get("page");
+
+    if (urlPage) {
+      const parsedPage = parseInt(urlPage, 10);
+      if (!isNaN(parsedPage) && parsedPage !== page) {
+        setPage(parsedPage);
+      }
+    }
 
     if (id && fromCalendar === "true") {
       setSearch(id);
@@ -63,7 +71,7 @@ export default function ReservationsPage() {
       // Remove fromCalendar from the URL so it doesn't trigger again on reload
       router.replace(`/dashboard/reservations?id=${id}`, { scroll: false });
     }
-  }, [searchParams, router, setSearch, setStatusFilter, setSortBy, setSortOrder]);
+  }, [searchParams, router, setSearch, setStatusFilter, setSortBy, setSortOrder, page, setPage]);
 
   return (
     <div className="space-y-6">

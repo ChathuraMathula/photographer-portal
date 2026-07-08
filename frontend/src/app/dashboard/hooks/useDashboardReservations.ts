@@ -50,12 +50,13 @@ export function useDashboardReservations({
   >([]);
 
   useEffect(() => {
+    if (search === debouncedSearch) return;
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
     }, 400);
     return () => clearTimeout(handler);
-  }, [search]);
+  }, [search, debouncedSearch]);
 
   const fetchReservations = async () => {
     setLoading(true);

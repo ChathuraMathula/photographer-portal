@@ -31,12 +31,14 @@ export function useDashboardChat({
   };
 
   useEffect(() => {
-    if (!socket || !selectedRes) {
+    if (!socket || !selectedRes?.id) {
       setMessages([]);
       return;
     }
 
-    authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
+    const reservationId = selectedRes.id;
+
+    authFetch(`${API}/reservations/${reservationId}/messages`, {
       credentials: "include",
     })
       .then((r) => r.json())
@@ -46,7 +48,7 @@ export function useDashboardChat({
       })
       .catch(console.error);
 
-    socket.emit("joinReservation", { reservationId: selectedRes.id });
+    socket.emit("joinReservation", { reservationId });
 
     const handleMessage = (msg: ChatMessage) => {
       setMessages((prev) => [...prev, msg]);
@@ -56,10 +58,10 @@ export function useDashboardChat({
     socket.on("message", handleMessage);
 
     return () => {
-      socket.emit("leaveReservation", { reservationId: selectedRes.id });
+      socket.emit("leaveReservation", { reservationId });
       socket.off("message", handleMessage);
     };
-  }, [socket, selectedRes]);
+  }, [socket, selectedRes?.id]);
 
   const handleSendChatMessage = async (e: React.FormEvent) => {
     e.preventDefault();

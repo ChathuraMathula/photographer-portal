@@ -10,7 +10,7 @@ type Props = {
   selectedId: string | undefined;
   onSelect: (res: Reservation) => void;
   page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (val: number) => void;
   totalPages: number;
   total: number;
   search: string;

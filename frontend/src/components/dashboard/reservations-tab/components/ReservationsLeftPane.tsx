@@ -47,11 +47,19 @@ export function ReservationsLeftPane({
     setSelectedRes(res);
     setShowRejectForm(false);
     if (typeof window !== "undefined") {
-      window.history.replaceState(
-        null,
-        "",
-        `/dashboard/reservations?id=${res.id}`,
-      );
+      const url = new URL(window.location.href);
+      url.searchParams.set("id", res.id);
+      url.searchParams.set("page", page.toString());
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("page", newPage.toString());
+      window.history.replaceState(null, "", url.toString());
     }
   };
 
@@ -62,7 +70,7 @@ export function ReservationsLeftPane({
         selectedId={selectedRes?.id}
         onSelect={handleSelectReservation}
         page={page}
-        setPage={setPage}
+        setPage={handlePageChange}
         totalPages={totalPages}
         total={total}
         search={search}
