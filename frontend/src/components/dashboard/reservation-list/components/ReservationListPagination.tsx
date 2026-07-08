@@ -11,21 +11,10 @@ export function ReservationListPagination({
   totalPages,
   setPage,
 }: ReservationListPaginationProps) {
-  const getPageNumbers = () => {
-    const pages: number[] = [];
-    if (totalPages <= 3) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      if (page === 1) {
-        pages.push(1, 2, 3);
-      } else if (page === totalPages) {
-        pages.push(totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        pages.push(page - 1, page, page + 1);
-      }
-    }
-    return pages;
-  };
+  const blockSize = 3;
+  const currentBlock = Math.floor((page - 1) / blockSize);
+  const startPage = currentBlock * blockSize + 1;
+  const pageSlots = [startPage, startPage + 1, startPage + 2];
 
   return (
     <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/20 shrink-0 flex items-center justify-between gap-2">
@@ -43,14 +32,18 @@ export function ReservationListPagination({
           </svg>
         </button>
 
-        {getPageNumbers().map((p) => {
+        {pageSlots.map((p) => {
+          const exists = p <= totalPages;
           const isCurrent = p === page;
           return (
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`h-7 w-7 rounded-md text-xs font-semibold flex items-center justify-center cursor-pointer transition-colors ${
-                isCurrent
+              disabled={!exists}
+              className={`h-7 w-7 rounded-md text-xs font-semibold flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                !exists
+                  ? "opacity-0 pointer-events-none"
+                  : isCurrent
                   ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900"
                   : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
               }`}
