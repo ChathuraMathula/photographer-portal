@@ -72,6 +72,12 @@ export function PhotographerLayoutWrapper({
   React.useEffect(() => {
     if (prevPathnameRef.current !== pathname) {
       prevPathnameRef.current = pathname;
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        if (pathname.endsWith("/reservations") && params.has("id")) {
+          return;
+        }
+      }
       setSelectedRes(null);
     }
   }, [pathname, setSelectedRes]);

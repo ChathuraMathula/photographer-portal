@@ -51,6 +51,12 @@ export function useDashboardReservations({
 
   useEffect(() => {
     if (search === debouncedSearch) return;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search);
+    if (isUuid) {
+      setDebouncedSearch(search);
+      setPage(1);
+      return;
+    }
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
