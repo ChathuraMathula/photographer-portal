@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Search, DollarSign, CreditCard, Wallet, CheckCircle, XCircle } from "lucide-react";
+import { Search, DollarSign, CreditCard, Wallet, CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import {
@@ -214,6 +214,26 @@ export default function TransactionsPage() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Reset Filters */}
+        {(searchTerm || filterDate || statusFilter !== "ALL" || methodFilter !== "ALL" || sortBy !== "date" || sortOrder !== "DESC") && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm("");
+              setFilterDate("");
+              setStatusFilter("ALL");
+              setMethodFilter("ALL");
+              setSortBy("date");
+              setSortOrder("DESC");
+              setTransactionsPage(1);
+            }}
+            className="h-8 px-3 flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Reset
+          </button>
+        )}
       </div>
 
       {/* Transactions Table */}

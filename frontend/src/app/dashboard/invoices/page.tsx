@@ -4,7 +4,7 @@ import React from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
 import { InvoicesListTable } from "./components/InvoicesListTable";
 import { InvoiceCustomizerCard } from "./components/InvoiceCustomizerCard";
-import { Search, DollarSign, CheckCircle2, AlertCircle } from "lucide-react";
+import { Search, DollarSign, CheckCircle2, AlertCircle, RotateCcw } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import {
@@ -182,6 +182,23 @@ export default function InvoicesPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Reset Filters */}
+              {(searchTerm || filterDate || sortBy !== "date" || sortOrder !== "DESC") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterDate("");
+                    setSortBy("date");
+                    setSortOrder("DESC");
+                  }}
+                  className="h-8 px-3 flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all shrink-0"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Reset
+                </button>
+              )}
             </div>
           </div>
 

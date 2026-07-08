@@ -55,7 +55,12 @@ export class InvoicesService {
 
     if (search) {
       qb.andWhere(
-        '(LOWER(customer."firstName") || \' \' || LOWER(customer."lastName") LIKE LOWER(:search) OR LOWER(customer.email) LIKE LOWER(:search) OR LOWER(reservation."eventType") LIKE LOWER(:search) OR LOWER(reservation.id) LIKE LOWER(:search))',
+        `(
+          LOWER(customer.firstName || ' ' || customer.lastName) LIKE LOWER(:search)
+          OR LOWER(customer.email) LIKE LOWER(:search)
+          OR LOWER(reservation.eventType) LIKE LOWER(:search)
+          OR LOWER(reservation.id) LIKE LOWER(:search)
+        )`,
         { search: `%${search}%` },
       );
     }

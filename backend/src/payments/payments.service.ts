@@ -267,7 +267,13 @@ export class PaymentsService {
     if (query.search) {
       const searchPattern = `%${query.search.toLowerCase()}%`;
       qb.andWhere(
-        '(LOWER(customer."firstName") LIKE :search OR LOWER(customer."lastName") LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(payment.transactionId) LIKE :search OR LOWER(payment.cardBrand) LIKE :search)',
+        `(
+          LOWER(customer.firstName) LIKE :search
+          OR LOWER(customer.lastName) LIKE :search
+          OR LOWER(customer.email) LIKE :search
+          OR LOWER(payment.transactionId) LIKE :search
+          OR LOWER(payment.cardBrand) LIKE :search
+        )`,
         { search: searchPattern },
       );
     }
