@@ -58,6 +58,9 @@ export class PaymentsController {
     @Query('search') search?: string,
     @Query('status') status?: string,
     @Query('method') method?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+    @Query('filterDate') filterDate?: string,
   ) {
     return this.paymentsService.getPhotographerTransactions(req.user.userId, {
       page: page ? parseInt(page, 10) : undefined,
@@ -65,6 +68,9 @@ export class PaymentsController {
       search,
       status,
       method,
+      sortBy,
+      sortOrder,
+      filterDate,
     });
   }
 

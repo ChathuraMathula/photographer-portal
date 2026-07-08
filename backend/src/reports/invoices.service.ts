@@ -18,12 +18,23 @@ export class InvoicesService {
     private readonly invoiceGenerationService: InvoiceGenerationService,
   ) {}
 
-  async getInvoices(photographerId: string, page = 1, limit = 10, search = '') {
+  async getInvoices(
+    photographerId: string,
+    page = 1,
+    limit = 10,
+    search = '',
+    sortBy = 'date',
+    sortOrder = 'DESC',
+    filterDate = '',
+  ) {
     const qb = this.reservationRepository
       .createQueryBuilder('reservation')
       .select('reservation.id', 'id')
       .addSelect('reservation.totalAmountInCents', 'totalAmountInCents')
       .addSelect('COALESCE(SUM(payments.amountInCents), 0)', 'totalPaid')
+      .addSelect('reservation.date', 'date')
+      .addSelect('customer.firstName', 'firstName')
+      .addSelect('customer.lastName', 'lastName')
       .leftJoin('reservation.customer', 'customer')
       .leftJoin(
         'reservation.payments',
@@ -36,33 +47,62 @@ export class InvoicesService {
         statuses: [ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED],
       })
       .groupBy('reservation.id')
-      .addGroupBy('reservation.totalAmountInCents');
+      .addGroupBy('reservation.totalAmountInCents')
+      .addGroupBy('reservation.date')
+      .addGroupBy('customer.id')
+      .addGroupBy('customer.firstName')
+      .addGroupBy('customer.lastName');
 
     if (search) {
       qb.andWhere(
-        '(LOWER(customer.firstName) || " " || LOWER(customer.lastName) LIKE LOWER(:search) OR LOWER(customer.email) LIKE LOWER(:search) OR LOWER(reservation.eventType) LIKE LOWER(:search) OR LOWER(reservation.id) LIKE LOWER(:search))',
+        '(LOWER(customer."firstName") || \' \' || LOWER(customer."lastName") LIKE LOWER(:search) OR LOWER(customer.email) LIKE LOWER(:search) OR LOWER(reservation."eventType") LIKE LOWER(:search) OR LOWER(reservation.id) LIKE LOWER(:search))',
         { search: `%${search}%` },
       );
     }
 
+    if (filterDate) {
+      qb.andWhere('reservation.date = :filterDate', { filterDate });
+    }
+
     const aggregated = await qb.getRawMany();
 
-    let fullyPaidIds = aggregated
-      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
-      .map((row) => row.id);
+    const fullyPaidRows = aggregated.filter(
+      (row) => Number(row.totalPaid) >= (Number(row.totalAmountInCents) || 1),
+    );
 
-    const totalInvoiced = aggregated
-      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
-      .reduce((sum, row) => sum + (row.totalAmountInCents || 0) / 100, 0);
-    const totalSettled = aggregated
-      .filter((row) => row.totalPaid >= (row.totalAmountInCents || 1))
-      .reduce((sum, row) => sum + row.totalPaid / 100, 0);
+    const totalInvoiced = fullyPaidRows.reduce(
+      (sum, row) => sum + (Number(row.totalAmountInCents) || 0) / 100,
+      0,
+    );
+    const totalSettled = fullyPaidRows.reduce(
+      (sum, row) => sum + Number(row.totalPaid) / 100,
+      0,
+    );
     const outstanding = Math.max(0, totalInvoiced - totalSettled);
     const kpis = { totalInvoiced, totalSettled, outstanding };
 
-    const total = fullyPaidIds.length;
+    // Sort in-memory
+    if (sortBy === 'name') {
+      fullyPaidRows.sort((a, b) => {
+        const nameA = `${a.firstName || ''} ${a.lastName || ''}`.trim().toLowerCase();
+        const nameB = `${b.firstName || ''} ${b.lastName || ''}`.trim().toLowerCase();
+        if (sortOrder === 'ASC') return nameA.localeCompare(nameB);
+        return nameB.localeCompare(nameA);
+      });
+    } else {
+      // Default: date
+      fullyPaidRows.sort((a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        if (sortOrder === 'ASC') return dateA - dateB;
+        return dateB - dateA;
+      });
+    }
+
+    const total = fullyPaidRows.length;
     const totalPages = Math.ceil(total / limit);
-    const paginatedIds = fullyPaidIds.slice((page - 1) * limit, page * limit);
+    const paginatedRows = fullyPaidRows.slice((page - 1) * limit, page * limit);
+    const paginatedIds = paginatedRows.map((row) => row.id);
 
     if (paginatedIds.length === 0) {
       return { data: [], total, page, totalPages, kpis };
@@ -71,8 +111,10 @@ export class InvoicesService {
     const reservations = await this.reservationRepository.find({
       where: { id: In(paginatedIds) },
       relations: { customer: true, payments: true },
-      order: { date: 'DESC' },
     });
+
+    // Sort to match paginatedIds order
+    reservations.sort((a, b) => paginatedIds.indexOf(a.id) - paginatedIds.indexOf(b.id));
 
     const data = reservations.map((res) => {
       const resPayments = (res.payments || []).filter(

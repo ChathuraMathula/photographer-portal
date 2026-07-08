@@ -218,6 +218,9 @@ export class PaymentsService {
       search?: string;
       status?: string;
       method?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      filterDate?: string;
     } = {},
   ) {
     const page = query.page || 1;
@@ -228,8 +231,16 @@ export class PaymentsService {
       .createQueryBuilder('payment')
       .leftJoinAndSelect('payment.reservation', 'res')
       .leftJoinAndSelect('res.customer', 'customer')
-      .where('res.photographerId = :photographerId', { photographerId })
-      .orderBy('payment.createdAt', 'DESC');
+      .where('res.photographerId = :photographerId', { photographerId });
+
+    // Handle sorting
+    const sortBy = query.sortBy || 'date';
+    const sortOrder = (query.sortOrder === 'ASC' ? 'ASC' : 'DESC') as 'ASC' | 'DESC';
+    if (sortBy === 'amount') {
+      qb.orderBy('payment.amountInCents', sortOrder);
+    } else {
+      qb.orderBy('payment.createdAt', sortOrder);
+    }
 
     if (query.status && query.status !== 'ALL') {
       qb.andWhere('payment.status = :status', { status: query.status });
@@ -247,10 +258,16 @@ export class PaymentsService {
       }
     }
 
+    if (query.filterDate) {
+      qb.andWhere('DATE(payment.createdAt) = :filterDate', {
+        filterDate: query.filterDate,
+      });
+    }
+
     if (query.search) {
       const searchPattern = `%${query.search.toLowerCase()}%`;
       qb.andWhere(
-        '(LOWER(customer.firstName) LIKE :search OR LOWER(customer.lastName) LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(payment.transactionId) LIKE :search OR LOWER(payment.cardBrand) LIKE :search)',
+        '(LOWER(customer."firstName") LIKE :search OR LOWER(customer."lastName") LIKE :search OR LOWER(customer.email) LIKE :search OR LOWER(payment.transactionId) LIKE :search OR LOWER(payment.cardBrand) LIKE :search)',
         { search: searchPattern },
       );
     }

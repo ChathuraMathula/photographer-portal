@@ -22,13 +22,16 @@ export function useInvoices(
   const [totalInvoiced, setTotalInvoiced] = useState(0);
   const [totalSettled, setTotalSettled] = useState(0);
   const [outstanding, setOutstanding] = useState(0);
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("DESC");
+  const [filterDate, setFilterDate] = useState("");
   const itemsPerPage = 10;
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const invRes = await authFetch(
-        `${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`,
+        `${API}/invoices?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}&sortBy=${sortBy}&sortOrder=${sortOrder}&filterDate=${filterDate}`,
         { credentials: "include" },
       );
       if (!invRes.ok) throw new Error("Failed to load invoices list");
@@ -54,7 +57,7 @@ export function useInvoices(
     } finally {
       setLoading(false);
     }
-  }, [authFetch, currentPage, searchTerm, itemsPerPage]);
+  }, [authFetch, currentPage, searchTerm, itemsPerPage, sortBy, sortOrder, filterDate]);
 
   useEffect(() => {
     loadData();
@@ -62,7 +65,7 @@ export function useInvoices(
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, filterDate, sortBy, sortOrder]);
 
   const handleDownload = async (resId: string) => {
     try {
@@ -135,6 +138,12 @@ export function useInvoices(
     totalInvoiced,
     totalSettled,
     outstanding,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    filterDate,
+    setFilterDate,
     handleDownload,
     handleResend,
     handleSaveSettings,

@@ -37,6 +37,9 @@ export class InvoicesController {
     @Query('page') page: string,
     @Query('limit') limit: string,
     @Query('search') search: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+    @Query('filterDate') filterDate?: string,
   ) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
@@ -45,6 +48,9 @@ export class InvoicesController {
       pageNum,
       limitNum,
       search,
+      sortBy,
+      sortOrder,
+      filterDate,
     );
   }
 

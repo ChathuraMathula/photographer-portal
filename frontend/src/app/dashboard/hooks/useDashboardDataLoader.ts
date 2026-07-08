@@ -38,6 +38,9 @@ export function useDashboardDataLoader({
     search?: string;
     status?: string;
     method?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    filterDate?: string;
   }) => {
     setTransactionsLoading(true);
     try {
@@ -50,6 +53,9 @@ export function useDashboardDataLoader({
         params.append("status", paramsObj.status);
       if (paramsObj?.method && paramsObj.method !== "ALL")
         params.append("method", paramsObj.method);
+      if (paramsObj?.sortBy) params.append("sortBy", paramsObj.sortBy);
+      if (paramsObj?.sortOrder) params.append("sortOrder", paramsObj.sortOrder);
+      if (paramsObj?.filterDate) params.append("filterDate", paramsObj.filterDate);
 
       const res = await authFetch(
         `${API}/payments/photographer?${params.toString()}`,

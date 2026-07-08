@@ -9,17 +9,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  CreditCard,
-  DollarSign,
-  Wallet,
-  CheckCircle,
-  XCircle,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Search, DollarSign, CreditCard, Wallet, CheckCircle, XCircle } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
+import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import {
   Select,
   SelectContent,
@@ -46,8 +38,11 @@ export default function TransactionsPage() {
   // Filter States
   const [searchTerm, setSearchTerm] = React.useState("");
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState("ALL"); // ALL, SUCCESS, FAILED
-  const [methodFilter, setMethodFilter] = React.useState("ALL"); // ALL, CARD, CASH
+  const [statusFilter, setStatusFilter] = React.useState("ALL");
+  const [methodFilter, setMethodFilter] = React.useState("ALL");
+  const [sortBy, setSortBy] = React.useState("date");
+  const [sortOrder, setSortOrder] = React.useState("DESC");
+  const [filterDate, setFilterDate] = React.useState("");
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -63,8 +58,11 @@ export default function TransactionsPage() {
       search: debouncedSearch,
       status: statusFilter,
       method: methodFilter,
+      sortBy,
+      sortOrder,
+      filterDate,
     });
-  }, [transactionsPage, debouncedSearch, statusFilter, methodFilter]);
+  }, [transactionsPage, debouncedSearch, statusFilter, methodFilter, sortBy, sortOrder, filterDate]);
 
   // Compute stats from server aggregations
   const totalCollectedLkr = (transactionStats?.totalRevenueInCents || 0) / 100;
@@ -138,8 +136,9 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
-        <div className="flex-1 w-full relative">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm flex flex-wrap gap-3 items-center">
+        {/* Search */}
+        <div className="flex-1 min-w-[180px] relative">
           <input
             type="text"
             placeholder="Search by customer name, email, transaction ID or method..."
@@ -149,31 +148,71 @@ export default function TransactionsPage() {
           />
           <Search className="absolute left-3 top-2 h-4 w-4 text-zinc-400" />
         </div>
-        <div className="w-full sm:w-auto flex gap-3">
-          <div className="flex-1 sm:flex-initial">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Statuses</SelectItem>
-                <SelectItem value="SUCCESS">Success</SelectItem>
-                <SelectItem value="FAILED">Declined</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 sm:flex-initial">
-            <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
-                <SelectValue placeholder="All Methods" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Methods</SelectItem>
-                <SelectItem value="CARD">Card Payments</SelectItem>
-                <SelectItem value="CASH">Cash / Offline</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
+        {/* Status Filter */}
+        <div className="w-[140px] shrink-0">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value="SUCCESS">Success</SelectItem>
+              <SelectItem value="FAILED">Declined</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Method Filter */}
+        <div className="w-[140px] shrink-0">
+          <Select value={methodFilter} onValueChange={setMethodFilter}>
+            <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectValue placeholder="All Methods" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Methods</SelectItem>
+              <SelectItem value="CARD">Card Payments</SelectItem>
+              <SelectItem value="CASH">Cash / Offline</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date Filter */}
+        <div className="shrink-0">
+          <DatePickerInput
+            label="Filter date:"
+            value={filterDate}
+            onChange={(val) => {
+              setFilterDate(val);
+              setTransactionsPage(1);
+            }}
+          />
+        </div>
+
+        {/* Sort By */}
+        <div className="w-[120px] shrink-0">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date">Date</SelectItem>
+              <SelectItem value="amount">Amount</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Sort Order */}
+        <div className="w-[100px] shrink-0">
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-full h-8 px-3 text-body-small bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-700">
+              <SelectValue placeholder="Order" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="DESC">Newest</SelectItem>
+              <SelectItem value="ASC">Oldest</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

@@ -6,6 +6,14 @@ import { InvoicesListTable } from "./components/InvoicesListTable";
 import { InvoiceCustomizerCard } from "./components/InvoiceCustomizerCard";
 import { Search, DollarSign, CheckCircle2, AlertCircle } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
+import { DatePickerInput } from "@/components/ui/DatePickerInput";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useInvoices } from "./hooks/useInvoices";
 
 export default function InvoicesPage() {
@@ -27,6 +35,12 @@ export default function InvoicesPage() {
     totalInvoiced,
     totalSettled,
     outstanding,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    filterDate,
+    setFilterDate,
     handleDownload,
     handleResend,
     handleSaveSettings,
@@ -116,21 +130,58 @@ export default function InvoicesPage() {
 
         {/* Invoices List Table & Filter */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
             <h3 className="text-body-base-bold font-bold text-zinc-850 dark:text-zinc-200">
               Generated Ledger Statements
             </h3>
 
-            {/* Search Filter Input */}
-            <div className="relative max-w-xs w-full">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by client or event..."
-                className="w-full h-9 pl-9 pr-3 text-xs border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium"
-              />
-              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-400" />
+            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+              {/* Search Filter Input */}
+              <div className="relative max-w-[200px] w-full min-w-[150px]">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by client or event..."
+                  className="w-full h-8 pl-8 pr-3 text-xs border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-medium"
+                />
+                <Search className="absolute left-2.5 top-2.5 h-3 w-3 text-zinc-400" />
+              </div>
+
+              {/* Date Filter */}
+              <div className="shrink-0">
+                <DatePickerInput
+                  label="Filter:"
+                  value={filterDate}
+                  onChange={setFilterDate}
+                />
+              </div>
+
+              {/* Sort By Select */}
+              <div className="w-[110px]">
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full h-8 px-2 text-xs bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">Date</SelectItem>
+                    <SelectItem value="name">Client Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Order Select */}
+              <div className="w-[100px]">
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="w-full h-8 px-2 text-xs bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400">
+                    <SelectValue placeholder="Order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DESC">Desc</SelectItem>
+                    <SelectItem value="ASC">Asc</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
