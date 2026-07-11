@@ -19,8 +19,8 @@ async function generateReport() {
 
         console.log('Generating DOCX file using md-to-docx...');
         
-        // Outputting to _Final to bypass the file lock if V2 is open in MS Word
-        const outputPath = path.join(__dirname, '..', '..', 'Dissertation_Photographer_Portal_Final.docx');
+        // Outputting to V3 to bypass the file lock if V2/Final is open in MS Word
+        const outputPath = path.join(__dirname, '..', '..', 'Dissertation_Photographer_Portal_Final_V2.docx');
         
         // Use npx md-to-docx to convert the combined markdown
         execSync(`npx md-to-docx combined_report.md "${outputPath}"`, { stdio: 'inherit' });

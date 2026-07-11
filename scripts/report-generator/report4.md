@@ -33,23 +33,24 @@ This is the core business logic of the system. It tests the complex State Machin
 | :--- | :--- | :--- | :--- | :--- |
 | **01** | Customer selects a package, picks an available date (green) on the calendar, fills in event details, and clicks submit. | The system should create a `PENDING` reservation in PostgreSQL. The date on the calendar should instantly turn red (unavailable) for other users. | Reservation was successfully created. Calendar updated immediately to reflect the booked date. | Pass |
 | **02** | Photographer logs into their dashboard and clicks on the newly created `PENDING` reservation to propose a quote. | The system should allow the photographer to input an estimated price. The status should change to `PROPOSED`, and an email should be dispatched. | Status updated to `PROPOSED`. Customer received an automated email with a tracking link. | Pass |
-| **03** | Customer opens the tracking link, reviews the quote, and uploads a mock payment slip. | The system should save the payment details and notify the photographer that verification is required. | Slip was uploaded successfully. Photographer dashboard highlighted the reservation requiring review. | Pass |
-| **04** | Photographer reviews the payment slip and clicks "Confirm Reservation". | The system should update the status to `CONFIRMED`. The date remains permanently blocked on the calendar. | Status updated to `CONFIRMED`. Customer received final confirmation email. | Pass |
+| **03** | Customer opens the tracking link (`/book/track/[token]`), reviews the quote, and processes a deposit payment via Stripe. | The system should save the payment details and notify the photographer that verification is required. | Payment was processed successfully. Photographer dashboard highlighted the reservation requiring review. | Pass |
+| **04** | Photographer reviews the payment record and clicks "Confirm Reservation". | The system should update the status to `CONFIRMED`. The date remains permanently blocked on the calendar. | Status updated to `CONFIRMED`. Customer received final confirmation email. | Pass |
 
-### 5.3.3 Real-Time Chat Operation Test Cases
-Testing the WebSocket integration to ensure reliable communication.
+### 5.3.3 Real-Time Chat & Super Admin Operation Test Cases
+Testing the WebSocket integration to ensure reliable communication and Super Admin privileges.
 
 | Test Case | Tasks Performed | Expected Result | Real Result | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **01** | Customer navigates to a reservation and types a message into the chat window. | The message should be sent instantly over the WebSocket connection and saved in the PostgreSQL `messages` table. | Message sent successfully and persisted in the database. | Pass |
 | **02** | Photographer has the reservation dashboard open while the customer sends a message. | The photographer's UI should update instantly with the new message without requiring a page refresh. | Message appeared instantly on the photographer's screen via Socket.io. | Pass |
-| **03** | User attempts to access a chat room for a reservation that does not belong to them. | The backend WebSocket gateway should verify the JWT and reject the connection, emitting an unauthorized event. | Connection rejected immediately. Error emitted to the malicious client. | Pass |
+| **03** | Super Admin logs in and navigates to the Audit Logs page. | The Super Admin should see a comprehensive list of all system actions, including the recent reservation state changes. | Audit logs populated successfully, detailing the exact timestamps and user emails of the reservation changes. | Pass |
+| **04** | Super Admin modifies a photographer's booking slug from `john-doe` to `johndoe-photography`. | The old `/book/john-doe` URL should return a 404, and the new URL should serve the portfolio. | Profile successfully loaded on the new URL. Old URL returned a 404 Not Found error. | Pass |
 
 ## 5.4 User Acceptance Testing (UAT)
 User Acceptance Testing was carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
 
 **Feedback and Observations:**
-- **Photographer Feedback**: The photographer found the reservation management dashboard incredibly intuitive. They specifically noted that the color-coded calendar (Available, Pending, Confirmed) made it easy to visualize their monthly schedule at a single glance. They also heavily praised the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solved their problem of scattered social media messages.
+- **Photographer Feedback**: The photographer found the reservation management dashboard incredibly intuitive. They specifically noted that the color-coded calendar (Available, Pending, Confirmed) made it easy to visualize their monthly schedule at a single glance. They heavily praised the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solved their problem of scattered social media messages. They also loved the OpenStreetMap geographical cluster view, which allowed them to easily see where most of their bookings were located.
 - **Customer Feedback**: The customer user found the step-by-step modal interfaces for making a booking very easy to use on their smartphone. They appreciated the immediate email notifications and the live chat, stating it provided a highly professional feel compared to traditional phone bookings.
 
 # Chapter 6 - Conclusion
@@ -57,7 +58,7 @@ User Acceptance Testing was carried out by providing access to the deployed syst
 ## 6.1 Critical Evaluation
 The primary objective of the implemented date reservation and management system was to simplify and speed up the process of making reservations to hire a photographer online. By critically evaluating the final deliverable against the initial requirements, it is clear that the project was a resounding success. 
 
-Typically, independent photographers rely on fragmented phone calls, social media messages, and handwritten diaries to manage their business. This manual process is slow, highly inaccurate, and frustrating for both the photographer and the client. The newly developed web-based "Photographer Portal" successfully overcomes these difficulties. It provides a centralized, secure, and automated platform that handles everything from the initial customer inquiry, to real-time chat negotiations, to the final payment confirmation. The use of a robust PostgreSQL database ensures that double-bookings are technically impossible, while the integration of an asynchronous RabbitMQ email system guarantees that clients are always kept in the loop regarding their reservation status.
+Typically, independent photographers rely on fragmented phone calls, social media messages, and handwritten diaries to manage their business. This manual process is slow, highly inaccurate, and frustrating for both the photographer and the client. The newly developed web-based "Photographer Portal" successfully overcomes these difficulties. It provides a centralized, secure, and automated platform that handles everything from the initial customer inquiry, to real-time chat negotiations, to the final payment confirmation via Stripe. The use of a robust PostgreSQL database ensures that double-bookings are technically impossible, while the integration of an asynchronous RabbitMQ email system guarantees that clients are always kept in the loop regarding their reservation status.
 
 ## 6.2 Lessons Learnt and Personal Reflection
 This project served as a profound learning experience, allowing me to apply theoretical software engineering concepts to a complex, real-world problem.
@@ -69,9 +70,8 @@ This project served as a profound learning experience, allowing me to apply theo
 ## 6.3 Future Improvements
 While the current system robustly meets all its core objectives, software is never truly "finished." Several enhancements could be explored in future iterations to further increase the system's value:
 
-1. **Live Payment Gateway Integration**: Currently, the system relies on manual verification of uploaded payment slips. Integrating a live payment gateway (such as a full Stripe Checkout or PayPal integration) would allow deposits to be verified and reservations to be confirmed instantly without photographer intervention.
-2. **Automated PDF Invoice Generation**: Implementing a feature that automatically generates a commercial PDF invoice and emails it to the customer upon reservation confirmation would further professionalize the photographer's business operations.
-3. **SMS Notifications**: While the current system relies heavily on email, integrating an SMS gateway (like Twilio) to send instant text message alerts for upcoming bookings would significantly reduce client no-shows.
+1. **Automated PDF Invoice Generation**: Implementing a feature that automatically generates a commercial PDF invoice and emails it to the customer upon reservation confirmation would further professionalize the photographer's business operations.
+2. **SMS Notifications**: While the current system relies heavily on email, integrating an SMS gateway (like Twilio) to send instant text message alerts for upcoming bookings would significantly reduce client no-shows.
 
 # References
 [1] Ian Sommerville, *Software Engineering*, 10th ed, Pearson Education Limited, 2016.
@@ -113,7 +113,7 @@ This section provides technical documentation to guide developers or administrat
    *(The frontend application will now be running on `http://localhost:4000`)*
 
 ## Appendix B - User Manual
-The system has three primary user roles: Admin, Photographer, and Customer.
+The system has distinct primary user roles: Super Admin, Photographer, and Customer.
 
 **For Customers (Booking a Date):**
 1. Navigate to the photographer's public booking URL (e.g., `http://localhost:4000/book/john-doe`).
@@ -121,7 +121,7 @@ The system has three primary user roles: Admin, Photographer, and Customer.
 3. Click the **"Book a Session"** button to open the interactive calendar.
 4. Select any available date (marked in green).
 5. Fill out the secure reservation form with your event details (location, time, type of event) and click submit.
-6. You will receive an automated email containing a secure tracking link. Use this link to monitor your booking status, upload your payment slip, and use the Real-Time Chat to talk to the photographer.
+6. You will receive an automated email containing a secure tracking link (`/book/track/[token]`). Use this link to monitor your booking status, process your deposit payment via Stripe, and use the Real-Time Chat to talk directly to the photographer.
 
 **For Photographers (Managing Reservations):**
 1. Navigate to the system login page (`http://localhost:4000/login`) and log in using your provided credentials.
@@ -129,13 +129,13 @@ The system has three primary user roles: Admin, Photographer, and Customer.
 3. Your calendar will display all bookings. Click on any `PENDING` reservation (marked in yellow).
 4. Review the customer's event details and input your estimated price and required advance deposit amount. Click "Send Quote".
 5. Use the attached Chat Window to discuss any specific details live with the client.
-6. Once the customer uploads a payment slip, the reservation will require your review. Click the reservation, verify the payment slip photo, and click "Confirm Reservation". The date will now be permanently secured (red on the calendar).
+6. Once the customer processes the payment, the reservation will require your final review. Click the reservation, verify the payment record, and click "Confirm Reservation". The date will now be permanently secured (red on the calendar).
 
 ## Appendix C - Management Reports
-The Photographer Portal generates aggregated analytical reports to assist the Admin and Photographer in making informed business decisions.
+The Photographer Portal generates aggregated analytical reports to assist the Super Admins and Photographers in making informed business decisions.
 
-**Location Analytics:**
-The system provides a geographical heat map that aggregates all confirmed reservations based on the district and city. This allows the photographer to visually identify which regions generate the most business, enabling them to target their marketing efforts more effectively.
+**Location Analytics (OpenStreetMap):**
+The system provides a geographical heat map that aggregates all confirmed reservations based on the district and city. It renders clustered markers representing reservation locations directly onto Leaflet widgets using OpenStreetMap tile sets. This allows the photographer to visually identify which regions generate the most business.
 
 **Earnings Dashboard:**
 The system automatically tracks the total monetary value of all `CONFIRMED` reservations. It provides a visual chart on the dashboard displaying the monthly revenue, alongside counts of new, pending, and completed reservations. This ensures the photographer has a clear, real-time overview of their business's financial health without needing external accounting software.

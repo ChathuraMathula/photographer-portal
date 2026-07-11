@@ -17,7 +17,7 @@ Photography is a broad area that has become a widely respected profession since 
 
 This project focuses on completely automating the business process of reserving dates online, enabling real-time communication, and managing financial payments. The primary goal is to assist the photographer in reducing administrative time and costs, while significantly increasing the efficiency and accuracy of the reservation process. To solve these issues, a robust, web-based date reservation and management system—the "Photographer Portal"—was built entirely from scratch. The system showcases all necessary details customers need to select a package, offers a real-time messaging interface for direct communication, and seamlessly manages the state of reservations. 
 
-This project was executed using the traditional monolithic Waterfall software development life cycle, as the core system requirements were fixed and designed upfront. The system was developed using a modern technology stack: React.js and Next.js for the frontend, and NestJS (Node.js) for the backend API. While the project initially began with MongoDB, it was deliberately migrated to PostgreSQL to strictly enforce the complex relational integrity required by financial transactions and reservations. Furthermore, WebSockets were utilized to implement a live chat feature. 
+This project was executed using the traditional monolithic Waterfall software development life cycle, as the core system requirements were fixed and designed upfront. The system was developed using a modern technology stack: React 19 and Next.js 16 (App Router) for the frontend, and NestJS 11 (Node.js) for the backend API. While the project initially began with MongoDB, it was deliberately migrated to PostgreSQL 16 to strictly enforce the complex relational integrity required by financial transactions and reservations. Furthermore, WebSockets were utilized to implement a live chat feature, Stripe API for secure payments, and OpenStreetMap for interactive geolocation analytics.
 
 The main deliverable of this project is a fully functioning web-based platform that efficiently fulfills the given user requirements, allowing photographers to manage their professional lives with ease while providing a superior, transparent booking experience for their customers.
 
@@ -54,21 +54,21 @@ The specific objectives are:
 - To manage reservations by properly displaying them to the photographer in a clear, interactive calendar dashboard.
 - To implement real-time chat functionality so clients and photographers can communicate securely within the system itself, eliminating the need for external messaging apps.
 - To manage the photographer’s public profile, showcasing their contact information, portfolio albums, and package details.
-- To fully automate the business process, from the initial customer inquiry to the final confirmation of an advance payment deposit.
+- To fully automate the business process, from the initial customer inquiry to the final confirmation of an advance payment deposit via the Stripe payment gateway.
 
 ## 1.4 Scope of the Project
 The scope defines the exact boundaries of the developed system. The system encompasses the following areas:
 
-1. The system showcases the photographer’s details (contact details, packages, portfolios, and map locations) to the customers online.
+1. The system showcases the photographer’s details (contact details, packages, portfolios, and OpenStreetMap locations) to the customers online without requiring an account. Customers access public landing pages via custom URLs (e.g., `/book/[slug]`).
 2. It collects customer, payment, and reservation details by allowing users to fill out secure online forms.
-3. The administrator is responsible for overseeing the system, capable of managing users, generating analytical reports, and viewing system-wide audit logs.
+3. The Super Administrator is responsible for overseeing the system, capable of managing users, updating booking slugs, generating analytical reports, and viewing system-wide audit logs.
 4. The system allows customers to select a base package and add additional extra services before requesting a reservation.
 5. The customers can pick an available date via an interactive calendar and input their specific event details to initiate a booking request.
 6. The chosen date is temporarily held (marked as pending) while the reservation request is being processed to prevent simultaneous double-booking.
 7. The photographer can review incoming requests, propose a custom estimated price, and specify the advance payment required.
-8. The system includes an integrated Payment Module allowing the customer to upload payment slips or process payments. If a customer fails to process the payment within a specified deadline, the system can automatically release the date.
-9. Real-Time Chat is fully implemented. Customers and photographers can exchange live messages regarding specific event details directly inside the application.
-10. The system handles automated email notifications (via an asynchronous message broker) to inform users of critical state changes (e.g., when a booking is confirmed).
+8. The system includes an integrated Payments Module utilizing the Stripe API, allowing the customer to securely process deposits via a unique tracking token at `/book/track/[token]`. If a customer fails to process the payment within a specified deadline, the system automatically releases the date.
+9. Real-Time Chat is fully implemented via Socket.io. Customers and photographers can exchange live messages regarding specific event details directly inside the application tracking page.
+10. The system handles automated email notifications (via a RabbitMQ message broker and Maildev SMTP) to inform users of critical state changes (e.g., when a booking is confirmed).
 11. The photographer has full control over their calendar, able to manually block out unavailable dates for personal holidays.
 
 # Chapter 2 – Analysis
@@ -100,22 +100,23 @@ The Sri Lanka Railways developed an online train seat reservation system to auto
 
 #### 2.1.3.1 Functional Requirements
 The core functional requirements for the Photographer Portal are:
-- **User Management**: The system must support role-based accounts for Super Admins, Photographers, and Customers.
-- **Profile & Package Management**: Photographers must be able to configure their bios, base locations (using geographical coordinates), and service packages.
+- **User Management**: The system must support role-based accounts for Super Admins, Admins, Photographers, and Public Customers.
+- **Profile & Package Management**: Photographers must be able to configure their bios, base locations (using OpenStreetMap coordinates), and service packages.
 - **Reservation Workflow**: Customers must be able to submit booking requests, which photographers can subsequently review, propose quotes for, and confirm or reject based on payments.
 - **Real-Time Messaging**: The system must facilitate live, bi-directional text communication between the photographer and the client regarding a specific reservation.
-- **Payment Processing**: The system must handle the tracking and verification of reservation deposits to update booking statuses.
+- **Payment Processing**: The system must handle the tracking and verification of reservation deposits using Stripe to update booking statuses.
 - **Notifications**: The system must send automated emails to customers for booking tracking and state changes.
+- **Analytical Reports**: The system must generate visual heatmaps based on booking locations and earnings charts for photographers and Super Admins.
 
 #### 2.1.3.2 Security as a Functional Requirement
 Because this system handles personal customer data and financial transaction records, security is a core functional requirement.
-- **Role-Based Access Control (RBAC)**: A customer must under no circumstances be able to view another customer's reservations. The photographer must only be able to view their own bookings.
+- **Role-Based Access Control (RBAC)**: A customer must under no circumstances be able to view another customer's reservations. The photographer must only be able to view their own bookings. Super Admins are the only users who can access the system-wide Audit Logs.
 - **Authentication**: Secure login mechanisms using encrypted JSON Web Tokens (JWT) are required.
 - **Input Validation**: All API endpoints must rigidly validate incoming payloads to prevent SQL injection and cross-site scripting (XSS) attacks.
 
 #### 2.1.3.3 Non-Functional Requirements
-- **Performance**: The system must load the public booking pages in under 2 seconds to ensure a smooth user experience.
-- **Scalability**: The backend architecture must be decoupled to allow independent scaling of the API, the database, and the message queues.
+- **Performance**: The system must load the public booking pages (`/book/[slug]`) in under 2 seconds to ensure a smooth user experience.
+- **Scalability**: The backend architecture must be decoupled to allow independent scaling of the API, the PostgreSQL database, and the RabbitMQ message queues.
 - **Usability**: The application must be fully responsive, ensuring photographers can manage their business on mobile devices as easily as on desktop computers.
 - **Reliability**: The system must process concurrent booking requests securely without data corruption.
 
@@ -129,7 +130,8 @@ This model was chosen and justified because the system's requirements were entir
 #### 2.1.4.2 Technology Stack Justification
 To build this robust system from scratch, a modern and powerful technology stack was carefully selected based on performance, relevance, and technical requirements.
 
-- **Backend Framework (NestJS)**: NestJS was chosen over basic Express.js because it enforces a highly structured, scalable, and object-oriented architecture out of the box using TypeScript. This ensures the backend code is strictly typed, heavily reducing runtime errors.
-- **Frontend Framework (Next.js & React)**: Next.js provides powerful routing and Server-Side Rendering (SSR). SSR is absolutely critical for the Photographer Portal because public pages (like the photographer's portfolio) must be easily indexable by search engines (SEO).
-- **The Database Transition (MongoDB to PostgreSQL)**: At the very beginning of the project, MongoDB (a NoSQL database) was initially considered for its ease of setup. However, during the deep analysis phase, it became explicitly clear that a reservation system inherently requires strict, complex relational data. A single reservation is directly tied to a specific customer, a specific photographer, a package, chat messages, and payment records. Using a NoSQL document store would lead to massive data duplication and potential data anomalies if a package price changed or a user was deleted. Therefore, I made the crucial engineering decision to migrate the architecture to **PostgreSQL**. PostgreSQL is an advanced, highly reliable relational database that guarantees ACID compliance and ensures transactional integrity through strict foreign key constraints, which is absolutely vital for a system handling financial bookings.
+- **Backend Framework (NestJS 11)**: NestJS was chosen over basic Express.js because it enforces a highly structured, scalable, and object-oriented architecture out of the box using TypeScript. This ensures the backend code is strictly typed, heavily reducing runtime errors.
+- **Frontend Framework (Next.js 16 & React 19)**: Next.js with its App Router provides powerful file-based routing and Server-Side Rendering (SSR). SSR is absolutely critical for the Photographer Portal because public pages (like the photographer's portfolio) must be easily indexable by search engines (SEO).
+- **The Database Transition (MongoDB to PostgreSQL 16)**: At the very beginning of the project, MongoDB (a NoSQL database) was initially considered for its ease of setup. However, during the deep analysis phase, it became explicitly clear that a reservation system inherently requires strict, complex relational data. A single reservation is directly tied to a specific customer, a specific photographer, a package, chat messages, and payment records. Using a NoSQL document store would lead to massive data duplication and potential data anomalies if a package price changed or a user was deleted. Therefore, I made the crucial engineering decision to migrate the architecture to **PostgreSQL**. PostgreSQL is an advanced, highly reliable relational database that guarantees ACID compliance and ensures transactional integrity through strict foreign key constraints, which is absolutely vital for a system handling financial bookings.
 - **Real-Time Communication (Socket.io)**: To fulfill the real-time chat requirement, WebSockets were chosen over HTTP polling because they maintain a persistent, low-latency bi-directional connection between the client and the server.
+- **Maps and Styling**: Tailwind CSS 4 was utilized for rapid UI development. For interactive geocoding and analytics mapping, OpenStreetMap and Leaflet were utilized rather than proprietary vendor APIs to reduce long-term operational costs.

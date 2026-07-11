@@ -9,9 +9,9 @@ Even though the proposed date reservation system could theoretically be implemen
 Architectural design exposes the system’s overall structure clearly to help stakeholders understand how different subsystems communicate. Because the proposed system is a modern web application, it was decided to use a combination of the Three-Tier Architecture and the Model-View-Controller (MVC) design pattern.
 
 The Three-Tier Architecture logically and physically separates the system into three distinct tiers:
-1. **Presentation Tier (Client-Side)**: This tier represents the front-end of the proposed system. It is implemented using Next.js and runs within the customer's or photographer's web browser. It is responsible for rendering the user interfaces, capturing user inputs, maintaining WebSocket connections for the live chat, and displaying data.
-2. **Application Tier (Server-Side)**: This tier represents the back-end business logic. It is implemented using NestJS and runs on a Node.js server environment. This tier receives requests from the presentation tier, processes the business rules (such as checking if a date is truly available), manages the real-time WebSocket server, and communicates with the database.
-3. **Database Tier (Storage)**: This tier represents the persistent data storage. It is implemented using a PostgreSQL database server. It securely stores all records regarding users, packages, chat messages, and reservations.
+1. **Presentation Tier (Client-Side)**: This tier represents the front-end of the proposed system. It is implemented using Next.js and runs within the customer's or photographer's web browser, served on **Port 4000**. It is responsible for rendering the user interfaces, capturing user inputs, maintaining WebSocket connections for the live chat, and displaying data using Redux RTK Store for global state.
+2. **Application Tier (Server-Side)**: This tier represents the back-end business logic. It is implemented using NestJS and runs on a Node.js server environment on **Port 4001**. This tier receives requests from the presentation tier, processes the business rules (such as checking if a date is truly available), manages the real-time WebSocket server, and communicates with the database.
+3. **Database Tier (Storage)**: This tier represents the persistent data storage. It is implemented using a PostgreSQL database server exposed on **Port 5433**. It securely stores all records regarding users, packages, chat messages, and reservations.
 
 Because each tier represents a distinct physical separation, the code in the Presentation Tier never directly accesses the Database Tier. It must communicate through the Application Tier via secured RESTful API endpoints and WebSocket channels.
 
@@ -19,6 +19,7 @@ Because each tier represents a distinct physical separation, the code in the Pre
 
 As depicted in the architecture diagram, the system also incorporates powerful external integrations to handle specific tasks efficiently:
 - A **RabbitMQ** message broker acts as an asynchronous queue within the Application Tier to process email notifications without slowing down the main server thread. 
+- A **Maildev** SMTP Server runs on Port 1080 to capture and display outbound emails.
 - A **Real-Time Messaging Engine** runs alongside the REST API, utilizing WebSockets to push live chat messages instantly between the customer and the photographer.
 - External APIs like **Stripe** and **OpenStreetMap** are integrated into the Application and Presentation tiers respectively to handle secure payments and geographical map rendering.
 
@@ -30,7 +31,7 @@ Entity-Relationship (ER) diagrams are utilized to visually design and represent 
 *[INSERT ER DIAGRAM HERE]*
 
 As depicted in the ER diagram, the database is highly normalized to prevent data redundancy and anomalies:
-- The **`users`** table acts as the central entity for authentication, storing shared properties like email, password hash, and role (Admin, Photographer, Customer).
+- The **`users`** table acts as the central entity for authentication, storing shared properties like email, password hash, and role (SUPER_ADMIN, ADMIN, PHOTOGRAPHER).
 - The **`photographer_profiles`** table shares a strict One-to-One relationship with the `users` table. It holds details specific only to photographers, such as their booking slug, bio, district, and universal deposit values.
 - The **`customers`** table holds the specific profile details for regular users who wish to place a booking.
 - The **`packages`** table holds a Many-to-One relationship with the `users` table (specifically the photographer). A single photographer can offer many different packages, but a package belongs to only one photographer.
@@ -45,9 +46,9 @@ Understanding how the system behaves over time and how users achieve their goals
 *[INSERT USE CASE DIAGRAM HERE]*
 
 As shown in the Use Case Diagram, there are three primary actors in the system:
-1. **Customer**: Can search for photographers, view packages, manage their own profile, and initiate the "Book a Session" workflow. The customer can also engage in "Real-Time Chat" with the photographer regarding their specific booking.
+1. **Customer**: Can search for photographers, view packages, manage their own profile, and initiate the "Book a Session" workflow. The customer can also engage in "Real-Time Chat" with the photographer regarding their specific booking, and process payments via Stripe.
 2. **Photographer**: Can manage their profile, portfolio, and service packages. They have the critical capability to manage incoming bookings—specifically approving or rejecting them based on the provided event details and payment validations. They also utilize the "Real-Time Chat" to negotiate details directly with the client.
-3. **Super Admin**: Has overarching control to manage all system users, view system-wide analytical reports, access the system audit logs, and resolve disputes.
+3. **Super Admin**: Has overarching control to manage all system users. This includes the ability to update photographer booking slugs (e.g., changing `alice-clicks` to `alice-photography`). They can also view system-wide analytical reports, access the system audit logs, and resolve disputes.
 
 ## 3.5 User Interface Design
 The User Interface (UI) is the bridge between the human users and the complex backend logic. If a UI is confusing or cluttered, the system will fail, regardless of how well the backend is coded. The proposed system’s presentation logic was designed using modern UI principles, focusing on mobile responsiveness, consistency, and clean typography.
