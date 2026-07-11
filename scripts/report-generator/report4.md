@@ -5,46 +5,45 @@ Software testing is an essential task in the software development lifecycle. It 
 ## 5.1 Common Types of Software Testing
 Different testing methodologies were employed to evaluate the system. 
 
-- **Unit Testing**: This is the testing approach that focuses on testing individual, isolated units of code. In this project, the Jest testing framework was utilized to test the backend services (such as verifying the algorithms that calculate the exact advance deposit prices for a reservation).
+- **Unit Testing**: This is the testing approach that focuses on testing individual, isolated units of code. In this project, the Jest testing framework was utilized to test the backend services (such as verifying the algorithms that calculate the exact advance deposit prices for a reservation based on package selections).
 - **Integration Testing**: This approach tests how different units of code interact with one another. For example, testing if the `ChatModule` correctly authenticates a WebSocket connection by verifying the JWT against the `UsersModule` before allowing a user to join a live chat room.
 - **System Testing**: In this testing approach, the software system is evaluated as a complete, integrated whole. This ensures the frontend and backend communicate correctly to satisfy end-to-end business requirements, like transitioning a reservation from `PENDING` to `CONFIRMED`.
 - **User Acceptance Testing (UAT)**: This final phase of testing is carried out with the help of actual end users to determine whether the software system truly meets the business needs in a real-world scenario.
 
 ## 5.2 Test Plan Used
-Every major API endpoint and React frontend component was thoroughly evaluated. The primary focus of the system testing was on critical user workflows: authentication, reservation creation, and real-time chat. The tests were designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
+Every major API endpoint and React frontend component was thoroughly evaluated. The primary focus of the system testing was on critical user workflows: authentication, reservation creation, real-time chat, and geolocation mapping. The tests were designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
 
-## 5.3 Test Cases
-Test cases are formalized scenarios used to evaluate that the system performs exactly as required. The tables below outline the critical test cases used to evaluate the implemented Photographer Portal, along with the expected and actual results.
+## 5.3 Real System Test Cases
+Test cases are formalized scenarios used to evaluate that the system performs exactly as required. The tables below outline the actual test cases used to evaluate the implemented Photographer Portal.
 
-### 5.3.1 User Login Operation Test Cases
-The login operation is the gateway to the system. It is critical that invalid attempts are rejected immediately while valid users are granted access.
+### 5.3.1 Booking & Concurrency Operation Test Cases
+These tests evaluate the core booking engine, specifically ensuring that race conditions (double-booking) and asynchronous queues function correctly.
 
-| Test Case | Tasks Performed | Expected Result | Real Result | Status |
+| Test ID | Scenario / Tasks Performed | Expected Result | Real Result | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **01** | Login with an unregistered email address and a random password. | Display an error message stating "Invalid credentials" while rejecting the login operation. | System displayed "Invalid credentials" and prevented access. | Pass |
-| **02** | Login with an existing valid email address but an incorrect password. | Display an error message to the user while rejecting the login operation. | System displayed "Invalid credentials" and prevented access. | Pass |
-| **03** | Login without entering any email address or password (empty fields). | Display front-end validation errors urging the user to fill in the required fields. | Form borders turned red and displayed "This field is required". | Pass |
-| **04** | Login with a valid email and correct password. | Successfully authenticate the user, issue a JWT, and redirect them to their specific dashboard based on their role. | User was logged in and immediately redirected to the authenticated dashboard. | Pass |
+| **TC-B01** | **Standard Booking**: Customer selects a package, picks an available date, fills in event details, and submits the form at `/book/[slug]`. | System creates a `PENDING` reservation in PostgreSQL. A `RabbitMQ` message is published, and `Maildev` captures the HTML confirmation email. | Reservation saved. RabbitMQ processed the event. Maildev received the HTML email successfully. | Pass |
+| **TC-B02** | **Concurrency Prevention**: Two different customers attempt to submit a booking for the exact same date and time simultaneously. | The database should process the first request and lock the date. The second request should be rejected by the backend with a `400 Bad Request` error. | First booking succeeded. Second booking was safely rejected, preventing a double-booking. | Pass |
+| **TC-B03** | **Deposit Payment via Stripe**: Customer opens the tracking link (`/book/track/[token]`), reviews the quote, and processes a deposit payment using a mock Stripe test card. | The Stripe webhook should trigger the `PaymentsModule`, save the transaction record, and flag the reservation for photographer review. | Stripe webhook received. Payment record created successfully in the database. | Pass |
+| **TC-B04** | **Booking Confirmation**: Photographer reviews the payment record and clicks "Confirm Reservation". | System updates the status to `CONFIRMED`. The date remains permanently blocked on the interactive calendar. | Status updated to `CONFIRMED`. Customer received final confirmation email via Maildev. | Pass |
 
-### 5.3.2 Reservation Management Operation Test Cases
-This is the core business logic of the system. It tests the complex State Machine interaction between the public customer and the photographer's backend logic.
+### 5.3.2 Real-Time Chat (WebSocket) Test Cases
+These tests evaluate the persistent, low-latency communication engine.
 
-| Test Case | Tasks Performed | Expected Result | Real Result | Status |
+| Test ID | Scenario / Tasks Performed | Expected Result | Real Result | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **01** | Customer selects a package, picks an available date (green) on the calendar, fills in event details, and clicks submit. | The system should create a `PENDING` reservation in PostgreSQL. The date on the calendar should instantly turn red (unavailable) for other users. | Reservation was successfully created. Calendar updated immediately to reflect the booked date. | Pass |
-| **02** | Photographer logs into their dashboard and clicks on the newly created `PENDING` reservation to propose a quote. | The system should allow the photographer to input an estimated price. The status should change to `PROPOSED`, and an email should be dispatched. | Status updated to `PROPOSED`. Customer received an automated email with a tracking link. | Pass |
-| **03** | Customer opens the tracking link (`/book/track/[token]`), reviews the quote, and processes a deposit payment via Stripe. | The system should save the payment details and notify the photographer that verification is required. | Payment was processed successfully. Photographer dashboard highlighted the reservation requiring review. | Pass |
-| **04** | Photographer reviews the payment record and clicks "Confirm Reservation". | The system should update the status to `CONFIRMED`. The date remains permanently blocked on the calendar. | Status updated to `CONFIRMED`. Customer received final confirmation email. | Pass |
+| **TC-C01** | **Bi-Directional Messaging**: Customer navigates to a reservation tracking page and types a message. Photographer has the dashboard open. | The message should be sent instantly over `Socket.io` and saved in the PostgreSQL `messages` table. Photographer UI updates instantly. | Message persisted in DB. Photographer UI updated immediately without a page refresh. | Pass |
+| **TC-C02** | **Unauthorized Room Access**: A malicious user attempts to connect their WebSocket client to a reservation room ID they do not own. | The backend WebSocket gateway must verify the JWT payload and reject the connection, emitting an unauthorized event. | Connection rejected immediately. Error emitted to the malicious client. | Pass |
+| **TC-C03** | **Offline Message Fallback**: Customer sends a message while the photographer is offline. | Message saves to DB. Next time photographer logs in, Redux state fetches the unread message history. | Message saved. History loaded successfully upon photographer login. | Pass |
 
-### 5.3.3 Real-Time Chat & Super Admin Operation Test Cases
-Testing the WebSocket integration to ensure reliable communication and Super Admin privileges.
+### 5.3.3 Geolocation & Super Admin Test Cases
+These tests ensure external map integrations and high-level administrative functions operate flawlessly.
 
-| Test Case | Tasks Performed | Expected Result | Real Result | Status |
+| Test ID | Scenario / Tasks Performed | Expected Result | Real Result | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **01** | Customer navigates to a reservation and types a message into the chat window. | The message should be sent instantly over the WebSocket connection and saved in the PostgreSQL `messages` table. | Message sent successfully and persisted in the database. | Pass |
-| **02** | Photographer has the reservation dashboard open while the customer sends a message. | The photographer's UI should update instantly with the new message without requiring a page refresh. | Message appeared instantly on the photographer's screen via Socket.io. | Pass |
-| **03** | Super Admin logs in and navigates to the Audit Logs page. | The Super Admin should see a comprehensive list of all system actions, including the recent reservation state changes. | Audit logs populated successfully, detailing the exact timestamps and user emails of the reservation changes. | Pass |
-| **04** | Super Admin modifies a photographer's booking slug from `john-doe` to `johndoe-photography`. | The old `/book/john-doe` URL should return a 404, and the new URL should serve the portfolio. | Profile successfully loaded on the new URL. Old URL returned a 404 Not Found error. | Pass |
+| **TC-A01** | **Geolocation Picker**: Photographer updates their profile, clicking a location on the `OSMMapPicker` component. | The Latitude and Longitude coordinates, along with City and District, should be extracted and saved to `photographer_profiles`. | Coordinates and district accurately extracted from OpenStreetMap and saved. | Pass |
+| **TC-A02** | **Map Analytics Cluster Rendering**: Photographer loads the `LocationAnalyticsSection` dashboard. | The backend `ReportsModule` should aggregate booking counts by district and render clustered color-coded markers on the Leaflet map. | Map rendered successfully with clustered markers reflecting true booking locations. | Pass |
+| **TC-A03** | **Slug Modification**: Super Admin navigates to the dashboard and modifies a photographer's booking slug from `alice-clicks` to `alice-photography`. | The old `/book/alice-clicks` URL should return a 404, and the new URL should properly serve the portfolio. | Profile successfully loaded on the new URL. Old URL returned a 404 Not Found error. | Pass |
+| **TC-A04** | **Audit Log Tracking**: Super Admin logs in and navigates to the Audit Logs page to review the slug change from TC-A03. | The Audit Logs table should display the exact timestamp, the Super Admin's email, and the specific action taken. | Audit log populated successfully with the exact action string and user email. | Pass |
 
 ## 5.4 User Acceptance Testing (UAT)
 User Acceptance Testing was carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
