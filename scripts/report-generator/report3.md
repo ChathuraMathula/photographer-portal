@@ -25,30 +25,26 @@ A robust software environment is critical for modern web development.
 ## 4.2 Module Interactions and Reservation Management
 The implemented system relies on the interaction between numerous distinct modules. In the NestJS backend, modules are used to organize the code into cohesive blocks of functionality.
 
-Because this project is fundamentally a **Date Reservation and Management System**, the **Reservations Module** sits at the absolute core of the backend architecture. The reservation management process is modeled as a complex State Machine. 
-
-When a user initiates a booking, the request is received by the **Bookings Module**. This module validates the selected packages and the requested date against the PostgreSQL database to ensure no overlap exists. It then communicates with the **Reservations Module** to create a new database record with a `PENDING` status. 
+Because this project is fundamentally a Date Reservation and Management System, the **Reservations Module** sits at the absolute core of the backend architecture. When a user initiates a booking, the request is received by the **Bookings Module**. It validates the requested date against the PostgreSQL database to ensure no overlap exists, then communicates with the **Reservations Module** to create a new record with a `PENDING` status. 
 
 Once the record is saved, the Reservations Module fires an event that interacts with multiple other subsystems:
-1. **RabbitMQ Module**: It places a notification message on the queue. The **Email Module** listens to this queue, picks up the message asynchronously, and dispatches an HTML confirmation email to the user via Maildev.
-2. **Chat Module (Socket.io)**: It initializes a secure WebSocket room for this specific reservation ID, allowing the customer and photographer to immediately begin real-time messaging regarding the event details.
-3. **Payments Module**: If the photographer approves the request, the state transitions to `PROPOSED`, and the Payments Module interfaces with the Stripe API to handle the tracking of the required advance deposit. Once the payment is verified, the reservation state is finally transitioned to `CONFIRMED`.
-4. **Audit Logs Module**: Every critical state change (e.g., creating the reservation, accepting payment) is asynchronously recorded in the Audit Logs Module to maintain a strict, system-wide history.
-
-This deeply interconnected, decoupled interaction ensures that the core reservation logic remains highly reliable while auxiliary features (like sending emails) do not slow down the main server thread.
+1. **RabbitMQ Module**: It places a notification message on the asynchronous queue, which the Email Module picks up to dispatch an HTML confirmation email to the user.
+2. **Chat Module (Socket.io)**: It initializes a secure WebSocket room for this specific reservation ID, allowing the customer and photographer to immediately begin real-time messaging.
+3. **Payments Module**: If the photographer approves the request, the Payments Module interfaces with the Stripe API to process the required advance deposit.
+4. **Reports & Analytics Module**: Every confirmed transaction is aggregated by this module. It performs complex SQL SUM and COUNT queries via TypeORM to feed live data into the photographer's financial dashboard.
 
 ## 4.3 Implementation Platforms and Frameworks Used
 A full-stack JavaScript approach was taken for this project. Utilizing JavaScript (specifically TypeScript) on both the front-end and back-end significantly increases developer productivity, as data models and interfaces can be shared across the entire stack.
 
 ### 4.3.1 Back-End Implementation Platforms
 - **Node.js**: The underlying runtime environment that allows JavaScript to be executed on the server.
-- **NestJS 11**: A progressive Node.js framework utilized for building efficient, reliable, and scalable server-side applications. Unlike raw Express.js, NestJS enforces an Angular-like architecture using decorators, dependency injection, and strict TypeScript typing.
+- **NestJS 11**: A progressive Node.js framework utilized for building efficient, reliable, and scalable server-side applications. Unlike raw Express.js, NestJS enforces strict TypeScript typing and dependency injection, which heavily reduces runtime errors.
 - **TypeORM**: An Object-Relational Mapper (ORM) that links the TypeScript entity classes directly to the PostgreSQL database tables. It abstracts away raw SQL queries, allowing the database to be manipulated using standard programming methods.
 
 ### 4.3.2 Front-End Implementation Platforms
 - **React 19**: A declarative JavaScript library used for building interactive user interfaces based on reusable components.
 - **Next.js 16**: A React framework utilizing the new App Router. It provides powerful file-based routing and Server-Side Rendering (SSR). It was used to ensure the public photographer profiles loaded instantly and were optimized for search engines.
-- **Redux Toolkit**: Used to manage the global state of the application on the client-side, such as keeping track of the currently logged-in user, their authentication tokens, and their real-time chat status.
+- **Redux Toolkit**: Used to manage the global state of the application on the client-side, heavily utilized to fetch and store the large datasets required for the analytics charts and transaction ledgers.
 - **Tailwind CSS 4**: A utility-first CSS framework that allows for rapid UI development without writing custom CSS files.
 
 ## 4.4 Folder Structures
@@ -57,8 +53,6 @@ Proper folder structure is vital for the maintainability of the codebase. The pr
 ### 4.4.1 Back-End Folder Structure
 The NestJS backend (`backend/src`) is highly modular:
 - **`/entities`**: Contains the TypeORM TypeScript classes that map directly to the PostgreSQL database tables.
-- **`/migrations`**: Contains the auto-generated scripts used to create and update the database schema.
-- **`/auth`**: Contains the controllers and services responsible for login, registration, and JWT validation.
 - **`/reservations`**: Contains the core business logic for handling the state machine of the booking process.
 - **`/chat`**: Contains the WebSocket gateways that handle real-time bi-directional messaging.
 - **`/reports`**: Contains the PDF generation and statistical aggregation logic for the analytics dashboard.
@@ -68,71 +62,35 @@ The Next.js frontend (`frontend/src/app`) uses the modern App Router architectur
 - **`/book/[slug]`**: Contains the public-facing pages where customers view photographer profiles and initiate bookings.
 - **`/book/track/[token]`**: The secure tracking page where customers pay deposits and chat with the photographer.
 - **`/dashboard`**: Contains the secured, authenticated pages for managing packages, viewing OpenStreetMap analytics, and approving reservations.
-- **`/components`**: Contains reusable UI elements like buttons, modal dialogs, and the interactive calendar.
-- **`/store`**: Contains the Redux slices for global state management.
+- **`/dashboard/reports`**: Contains the React components (`PhotographerAnalyticsCharts.tsx`, `LocationAnalyticsSection.tsx`) responsible for rendering the business management reports.
 
 ## 4.5 User Authentication
-User authentication is arguably the most critical security feature of the system. It proves the identity of the user before allowing them to access sensitive data, such as a customer's personal phone number or the photographer's financial earnings.
+User authentication proves the identity of the user before allowing them to access sensitive data, such as a customer's personal phone number or the photographer's financial earnings. Instead of traditional session cookies—which can be difficult to scale across distributed servers—this system implements authentication using **JSON Web Tokens (JWT)**. 
 
-Instead of traditional session cookies—which can be difficult to scale across distributed servers—this system implements authentication using **JSON Web Tokens (JWT)**. 
-
-### 4.5.1 JSON Web Token (JWT) Process
-A JWT is a compact, URL-safe string that contains three parts: a Header, a Payload, and a Signature.
-1. When a user submits their email and password, the backend verifies the credentials.
-2. The backend constructs a Payload containing the user's `id` and `role` (e.g., "PHOTOGRAPHER").
-3. This Payload is cryptographically signed using a secret key known only to the server.
-4. The resulting JWT string is sent back to the client and stored securely.
-5. On subsequent requests to protected routes (like viewing reservations), the client attaches this JWT in the HTTP Authorization header. The server verifies the signature. If the signature is valid, the server trusts the Payload and grants access. 
+A JWT is a compact, URL-safe string. When a user logs in, the backend verifies their credentials and cryptographically signs a payload containing the user's ID and role. On subsequent requests to protected routes (like viewing the transactions dashboard), the client attaches this JWT in the HTTP Authorization header. The server verifies the signature before granting access.
 
 ## 4.6 Acknowledgement of Reused Codes and Packages
-Modern software development relies heavily on open-source packages to avoid "reinventing the wheel" for solved problems. The following third-party dependencies were crucial to the implementation:
+Modern software development relies heavily on open-source packages to avoid "reinventing the wheel" for solved problems. 
 
 ### 4.6.1 Back-End Reused Code Modules
 - **`@nestjs/typeorm` & `pg`**: The official integrations to connect the application to the PostgreSQL database natively.
 - **`socket.io`**: The core library providing WebSockets to enable the real-time bi-directional chat communication.
-- **`bcrypt`**: A robust password-hashing function designed to protect user passwords against rainbow table attacks.
-- **`jsonwebtoken`**: An implementation of JSON Web Tokens used to securely sign and verify authentication payloads.
 - **`amqplib`**: The standard Node.js client for communicating with the RabbitMQ message broker.
-- **`nodemailer`**: A module used within the email service to format and dispatch HTML emails to Maildev.
 - **`stripe`**: The official SDK used to securely communicate with the Stripe API for handling payment intents and webhooks.
 
 ### 4.6.2 Front-End Reused Code Modules
-- **`react` & `react-dom`**: The core libraries for rendering the component-based UI.
 - **`socket.io-client`**: The front-end counterpart used to maintain the active WebSocket connection for the live chat interface.
 - **`@reduxjs/toolkit`**: The official toolset for efficient Redux development, used for managing client-side application state.
-- **`leaflet` & `react-leaflet`**: An open-source JavaScript library for interactive maps, utilized alongside OpenStreetMap tile engines to render geographical analytics and base locations of photographers.
-- **`date-fns`**: A modern library used to parse, validate, and manipulate dates, heavily utilized within the core Reservation Calendar component.
-- **`shadcn/ui`**: A collection of re-usable, accessible UI components.
+- **`leaflet` & `react-leaflet`**: An open-source JavaScript library for interactive maps, utilized alongside OpenStreetMap tile engines to render geographical analytics.
 
 ## 4.7 Routes and API Endpoints
-An API (Application Programming Interface) provides the endpoints through which the front-end client communicates with the back-end server. The backend exposes a strictly defined RESTful API, with a heavy emphasis on Reservation Management.
-
-### 4.7.1 GET API Endpoints (Data Retrieval)
-The following endpoints are used to retrieve information from the server without modifying the database.
-
-| Endpoint Path | Description | Allowed Roles |
-| :--- | :--- | :--- |
-| `/api/users/profile` | Fetches the current logged-in user's profile details. | All Authenticated |
-| `/api/photographers/:slug` | Fetches the public portfolio, bio, and packages of a specific photographer. | Public |
-| `/api/reservations/photographer` | Retrieves a paginated list of all reservations assigned to the currently logged-in photographer. | Photographer, Admin, Super Admin |
-| `/api/reservations/customer` | Retrieves a list of all reservations made by the currently logged-in customer. | Customer, Admin, Super Admin |
-| `/api/reservations/:id/messages` | Retrieves the real-time chat history associated with a specific reservation. | Assigned Users |
-| `/api/reports/analytics` | Fetches aggregated reservation statistics (total earnings, booking counts, location map markers) for the analytics dashboard. | Photographer, Admin, Super Admin |
-| `/api/audit-logs` | Retrieves the system-wide security audit logs, tracking all reservation state changes and admin actions. | Super Admin |
-
-### 4.7.2 POST/PATCH/DELETE API Endpoints (Data Modification)
-The following endpoints process core system actions.
+The backend exposes a strictly defined RESTful API. The following endpoints process core system actions related to reservations and analytics.
 
 | Endpoint Path | HTTP Method | Description |
 | :--- | :--- | :--- |
-| `/api/auth/register` | POST | Registers a new customer user and hashes their password. |
-| `/api/auth/login` | POST | Authenticates a user and returns a signed JWT. |
 | `/api/reservations/request` | POST | Submits a new booking reservation request. Sets the reservation status to `PENDING`. |
-| `/api/reservations/:id/propose` | PATCH | Photographer proposes a quote. Sets reservation status to `PROPOSED`. |
 | `/api/reservations/:id/confirm` | PATCH | Photographer manually confirms the payment. Sets reservation status to `CONFIRMED`. |
-| `/api/reservations/:id/reject` | PATCH | Photographer rejects the booking request, freeing up the calendar date. |
+| `/api/reports/analytics` | GET | Fetches aggregated reservation statistics (total earnings, transaction volumes, location map markers) for the management reports dashboard. |
 | `/api/payments/intent` | POST | Generates a Stripe payment intent to initiate the secure checkout flow. |
 | `/api/chat/message` | POST | Fallback REST endpoint for sending a message if the WebSocket connection drops. |
-| `/api/packages` | POST | Creates a new service package for a photographer. |
-| `/api/users/:id` | DELETE | Super Admin deletes a user account from the system entirely. |
-| `/api/photographers/:id/slug` | PATCH | Super Admin updates a photographer's booking slug URL. |
+| `/api/audit-logs` | GET | Retrieves the system-wide security audit logs for the Super Admin. |
