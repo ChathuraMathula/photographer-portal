@@ -168,3 +168,464 @@ graph TD
 2. **Geographical Geocoding**: The coordinates and user-selected City and District are saved to the `PhotographerProfile` entity in the Postgres database.
 3. **Analytics Cluster Aggregation**: When photographers or admins load the reports panel (`LocationAnalyticsSection`), Next.js pulls district aggregated counts from the backend `ReportsModule`.
 4. **Rendering**: The `EnhancedLocationMap` renders clustered markers representing reservation locations directly onto Leaflet widgets using OpenStreetMap tile sets.
+
+---
+
+## 6. Entity Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    users {
+        uuid id PK
+        string firstName
+        string lastName
+        string email UK
+        string passwordHash
+        string role
+        boolean isActive
+        string phone
+        string resetPasswordToken
+        datetime resetPasswordExpires
+        boolean emailNotificationsEnabled
+        boolean reminderEmailsEnabled
+        boolean inAppNotificationsEnabled
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    photographer_profiles {
+        uuid id PK
+        string bookingSlug UK
+        string bio
+        string specializations
+        string portfolioUrl
+        string profileImageUrl
+        string baseLocation
+        string locationMapLink
+        string city
+        string district
+        boolean showMapPreviewOnBookingPage
+        boolean isAvailableForBooking
+        string allowedEventTypes
+        boolean allowCustomEventTypes
+        string offlineMessage
+        uuid userId FK
+        string universalDepositType
+        integer universalDepositValue
+        string invoiceTitle
+        string invoiceColor
+        string invoiceNotes
+        string invoiceLogoText
+        string invoicePhone
+        float invoiceTaxRate
+        string invoiceInstructions
+        boolean showManualBookingInTopbar
+        boolean showAcceptBookingsInTopbar
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    customers {
+        uuid id PK
+        string firstName
+        string lastName
+        string email UK
+        string phone
+        string address
+        string notes
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    packages {
+        uuid id PK
+        uuid photographerId FK
+        string name
+        string description
+        integer priceInCents
+        integer durationHours
+        string includes
+        boolean isActive
+        string depositType
+        integer depositValue
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    reservations {
+        uuid id PK
+        uuid customerId FK
+        uuid photographerId FK
+        date date
+        string startTime
+        string endTime
+        string eventType
+        string location
+        string locationMapLink
+        string city
+        string district
+        string customerNotes
+        string adminNotes
+        integer totalAmountInCents
+        string status
+        string reservationToken UK
+        datetime paymentDeadline
+        integer advancePaymentPriceInCents
+        string quotationNotes
+        boolean usePackageWiseDeposit
+        string clientSelectedPackageId
+        jsonb selectedPackages
+        string rejectionReason
+        datetime createdAt
+        datetime updatedAt
+        boolean isRead
+    }
+
+    messages {
+        uuid id PK
+        uuid reservationId FK
+        string sender
+        string senderName
+        string content
+        datetime timestamp
+        boolean isRead
+    }
+
+    payments {
+        uuid id PK
+        uuid reservationId FK
+        integer amountInCents
+        string status
+        string transactionId
+        string cardBrand
+        string cardLast4
+        string errorMessage
+        datetime createdAt
+    }
+
+    audit_logs {
+        uuid id PK
+        string action
+        uuid userId
+        string userEmail
+        string details
+        datetime createdAt
+    }
+
+    users ||--|| photographer_profiles : "has profile"
+    users ||--o{ packages : "offers"
+    users ||--o{ reservations : "takes"
+    customers ||--o{ reservations : "requests"
+    reservations ||--o{ messages : "has chats"
+    reservations ||--o{ payments : "secures deposit via"
+```
+
+---
+
+## 7. SQL DDL for Exact Column Relationships
+
+To draw relationship lines pointing directly to specific columns in **diagrams.net (draw.io)**:
+1. Copy the SQL DDL script below.
+2. In Draw.io, go to **Arrange** $\rightarrow$ **Insert** $\rightarrow$ **Advanced** $\rightarrow$ **SQL...**
+3. Paste the SQL script and click **Insert**.
+4. Draw.io will automatically construct standard tables with foreign-key connectors linked **directly to the exact matching columns**.
+
+```sql
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    firstName VARCHAR(255),
+    lastName VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    passwordHash VARCHAR(255),
+    role VARCHAR(50),
+    isActive BOOLEAN,
+    phone VARCHAR(50),
+    resetPasswordToken VARCHAR(255),
+    resetPasswordExpires TIMESTAMP,
+    emailNotificationsEnabled BOOLEAN,
+    reminderEmailsEnabled BOOLEAN,
+    inAppNotificationsEnabled BOOLEAN,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP
+);
+
+CREATE TABLE photographer_profiles (
+    id UUID PRIMARY KEY,
+    bookingSlug VARCHAR(255) UNIQUE,
+    bio TEXT,
+    specializations TEXT,
+    portfolioUrl VARCHAR(255),
+    profileImageUrl VARCHAR(255),
+    baseLocation VARCHAR(255),
+    locationMapLink VARCHAR(255),
+    city VARCHAR(255),
+    district VARCHAR(255),
+    showMapPreviewOnBookingPage BOOLEAN,
+    isAvailableForBooking BOOLEAN,
+    allowedEventTypes TEXT,
+    allowCustomEventTypes BOOLEAN,
+    offlineMessage TEXT,
+    userId UUID UNIQUE,
+    universalDepositType VARCHAR(50),
+    universalDepositValue INTEGER,
+    invoiceTitle VARCHAR(255),
+    invoiceColor VARCHAR(50),
+    invoiceNotes TEXT,
+    invoiceLogoText VARCHAR(255),
+    invoicePhone VARCHAR(50),
+    invoiceTaxRate FLOAT,
+    invoiceInstructions TEXT,
+    showManualBookingInTopbar BOOLEAN,
+    showAcceptBookingsInTopbar BOOLEAN,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP
+);
+
+CREATE TABLE customers (
+    id UUID PRIMARY KEY,
+    firstName VARCHAR(255),
+    lastName VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    phone VARCHAR(50),
+    address TEXT,
+    notes TEXT,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP
+);
+
+CREATE TABLE packages (
+    id UUID PRIMARY KEY,
+    photographerId UUID,
+    name VARCHAR(255),
+    description TEXT,
+    priceInCents INTEGER,
+    durationHours INTEGER,
+    includes TEXT,
+    isActive BOOLEAN,
+    depositType VARCHAR(50),
+    depositValue INTEGER,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP
+);
+
+CREATE TABLE reservations (
+    id UUID PRIMARY KEY,
+    customerId UUID,
+    photographerId UUID,
+    date DATE,
+    startTime VARCHAR(50),
+    endTime VARCHAR(50),
+    eventType VARCHAR(100),
+    location VARCHAR(255),
+    locationMapLink VARCHAR(255),
+    city VARCHAR(255),
+    district VARCHAR(255),
+    customerNotes TEXT,
+    adminNotes TEXT,
+    totalAmountInCents INTEGER,
+    status VARCHAR(50),
+    reservationToken VARCHAR(255) UNIQUE,
+    paymentDeadline TIMESTAMP,
+    advancePaymentPriceInCents INTEGER,
+    quotationNotes TEXT,
+    usePackageWiseDeposit BOOLEAN,
+    clientSelectedPackageId UUID,
+    selectedPackages TEXT,
+    rejectionReason TEXT,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP,
+    isRead BOOLEAN
+);
+
+CREATE TABLE messages (
+    id UUID PRIMARY KEY,
+    reservationId UUID,
+    sender VARCHAR(50),
+    senderName VARCHAR(255),
+    content TEXT,
+    timestamp TIMESTAMP,
+    isRead BOOLEAN
+);
+
+CREATE TABLE payments (
+    id UUID PRIMARY KEY,
+    reservationId UUID,
+    amountInCents INTEGER,
+    status VARCHAR(50),
+    transactionId VARCHAR(255),
+    cardBrand VARCHAR(50),
+    cardLast4 VARCHAR(10),
+    errorMessage TEXT,
+    createdAt TIMESTAMP
+);
+
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY,
+    action VARCHAR(255),
+    userId UUID,
+    userEmail VARCHAR(255),
+    details TEXT,
+    createdAt TIMESTAMP
+);
+
+ALTER TABLE photographer_profiles ADD FOREIGN KEY (userId) REFERENCES users(id);
+ALTER TABLE packages ADD FOREIGN KEY (photographerId) REFERENCES users(id);
+ALTER TABLE reservations ADD FOREIGN KEY (customerId) REFERENCES customers(id);
+ALTER TABLE reservations ADD FOREIGN KEY (photographerId) REFERENCES users(id);
+ALTER TABLE messages ADD FOREIGN KEY (reservationId) REFERENCES reservations(id);
+ALTER TABLE payments ADD FOREIGN KEY (reservationId) REFERENCES reservations(id);
+```
+
+---
+
+## 8. DBML Script for dbdiagram.io (Exact Column Relationships)
+
+To create a visually precise ER diagram with exact column-to-column connecting arrows in **dbdiagram.io**, copy and paste the following DBML script into the left editor panel:
+
+```dbml
+Table users {
+  id uuid [primary key]
+  firstName varchar
+  lastName varchar
+  email varchar [unique]
+  passwordHash varchar
+  role varchar
+  isActive boolean
+  phone varchar
+  resetPasswordToken varchar
+  resetPasswordExpires timestamp
+  emailNotificationsEnabled boolean
+  reminderEmailsEnabled boolean
+  inAppNotificationsEnabled boolean
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table photographer_profiles {
+  id uuid [primary key]
+  bookingSlug varchar [unique]
+  bio text
+  specializations text
+  portfolioUrl varchar
+  profileImageUrl varchar
+  baseLocation varchar
+  locationMapLink varchar
+  city varchar
+  district varchar
+  showMapPreviewOnBookingPage boolean
+  isAvailableForBooking boolean
+  allowedEventTypes text
+  allowCustomEventTypes boolean
+  offlineMessage text
+  userId uuid [unique]
+  universalDepositType varchar
+  universalDepositValue integer
+  invoiceTitle varchar
+  invoiceColor varchar
+  invoiceNotes text
+  invoiceLogoText varchar
+  invoicePhone varchar
+  invoiceTaxRate float
+  invoiceInstructions text
+  showManualBookingInTopbar boolean
+  showAcceptBookingsInTopbar boolean
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table customers {
+  id uuid [primary key]
+  firstName varchar
+  lastName varchar
+  email varchar [unique]
+  phone varchar
+  address text
+  notes text
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table packages {
+  id uuid [primary key]
+  photographerId uuid
+  name varchar
+  description text
+  priceInCents integer
+  durationHours integer
+  includes text
+  isActive boolean
+  depositType varchar
+  depositValue integer
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table reservations {
+  id uuid [primary key]
+  customerId uuid
+  photographerId uuid
+  date date
+  startTime varchar
+  endTime varchar
+  eventType varchar
+  location varchar
+  locationMapLink varchar
+  city varchar
+  district varchar
+  customerNotes text
+  adminNotes text
+  totalAmountInCents integer
+  status varchar
+  reservationToken varchar [unique]
+  paymentDeadline timestamp
+  advancePaymentPriceInCents integer
+  quotationNotes text
+  usePackageWiseDeposit boolean
+  clientSelectedPackageId uuid
+  selectedPackages text
+  rejectionReason text
+  createdAt timestamp
+  updatedAt timestamp
+  isRead boolean
+}
+
+Table messages {
+  id uuid [primary key]
+  reservationId uuid
+  sender varchar
+  senderName varchar
+  content text
+  timestamp timestamp
+  isRead boolean
+}
+
+Table payments {
+  id uuid [primary key]
+  reservationId uuid
+  amountInCents integer
+  status varchar
+  transactionId varchar
+  cardBrand varchar
+  cardLast4 varchar
+  errorMessage text
+  createdAt timestamp
+}
+
+Table audit_logs {
+  id uuid [primary key]
+  action varchar
+  userId uuid
+  userEmail varchar
+  details text
+  createdAt timestamp
+}
+
+// Relationships
+Ref: photographer_profiles.userId - users.id
+Ref: packages.photographerId > users.id
+Ref: reservations.customerId > customers.id
+Ref: reservations.photographerId > users.id
+Ref: messages.reservationId > reservations.id
+Ref: payments.reservationId > reservations.id
+Ref: audit_logs.userId > users.id // Visual relation (no strict DB FK)
+```
