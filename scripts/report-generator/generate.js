@@ -19,8 +19,8 @@ async function generateReport() {
 
         console.log('Generating DOCX file using md-to-docx...');
         
-        // Outputting to V5
-        const outputPath = path.join(__dirname, '..', '..', 'Dissertation_Photographer_Portal_Final_V5.docx');
+        // Outputting to V6
+        const outputPath = path.join(__dirname, '..', '..', 'Dissertation_Photographer_Portal_Final_V6.docx');
         
         // Use npx md-to-docx to convert the combined markdown
         execSync(`npx md-to-docx combined_report.md "${outputPath}"`, { stdio: 'inherit' });

@@ -3,15 +3,15 @@
 Software testing is an essential task in the software development lifecycle. It ensures that the implemented Photographer Portal, particularly its core reservation management and analytics features, meets all functional and non-functional requirements by evaluating and verifying its behavior under various conditions. Rigorous software testing provides numerous advantages, including improving the overall quality of the software, significantly reducing operational risks, saving time and money, and most importantly, improving customer satisfaction by delivering a reliable product.
 
 ## 5.1 Common Types of Software Testing
-Different testing methodologies were employed to evaluate the system. 
+Different testing methodologies are employed to evaluate the system. 
 
-- **Unit Testing**: This approach focuses on testing individual, isolated units of code. In this project, the Jest testing framework was utilized to test the backend services (such as verifying the mathematical algorithms that aggregate the total revenue volume for the Management Reports).
+- **Unit Testing**: This approach focuses on testing individual, isolated units of code. In this project, the Jest testing framework is utilized to test the backend services (such as verifying the mathematical algorithms that aggregate the total revenue volume for the Management Reports).
 - **Integration Testing**: This approach tests how different units of code interact with one another. For example, testing if the `ChatModule` correctly authenticates a WebSocket connection by verifying the JWT against the `UsersModule` before allowing a user to join a live chat room.
 - **System Testing**: In this testing approach, the software system is evaluated as a complete, integrated whole. This ensures the frontend and backend communicate correctly to satisfy end-to-end business requirements, like transitioning a reservation from `PENDING` to `CONFIRMED`.
 - **User Acceptance Testing (UAT)**: This final phase of testing is carried out with the help of actual end users to determine whether the software system truly meets the business needs in a real-world scenario.
 
 ## 5.2 Test Plan Used
-Every major API endpoint and React frontend component was thoroughly evaluated. The primary focus of the system testing was on critical user workflows: authentication, reservation creation, real-time chat, and the generation of management analytics. The tests were designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
+Every major API endpoint and React frontend component is thoroughly evaluated. The primary focus of the system testing is on critical user workflows: authentication, reservation creation, real-time chat, and the generation of management analytics. The tests are designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
 
 ## 5.3 Test Cases
 Test cases are formalized scenarios used to evaluate that the system performs exactly as required. The tables below outline the comprehensive test cases designed to evaluate all critical areas of the implemented Photographer Portal.
@@ -46,31 +46,31 @@ These tests ensure external map integrations and high-level administrative repor
 | **TC-A04** | **Audit Log Tracking**: Super Admin modifies a photographer's booking slug, then navigates to the Audit Logs page. | The Audit Logs table must display the exact timestamp, the Super Admin's email, and the specific action taken (slug modification). |
 
 ## 5.4 User Acceptance Testing (UAT)
-User Acceptance Testing was carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
+User Acceptance Testing is carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
 
 **Feedback and Observations:**
-- **Photographer Feedback**: The photographer found the reservation management dashboard incredibly intuitive. They specifically praised the **Transactions and Invoices** management reports. They noted that having a live view of their total booking volume and the ability to instantly generate PDF ledger statements made them feel completely in control of their business finances. They also loved the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solved their problem of scattered social media messages.
-- **Customer Feedback**: The customer user found the step-by-step modal interfaces for making a booking very easy to use on their smartphone. They appreciated the immediate email notifications, the seamless Stripe payment integration, and the live chat, stating it provided a highly professional feel compared to traditional phone bookings.
+- **Photographer Feedback**: The photographer states that the reservation management dashboard is incredibly intuitive. They specifically praise the **Transactions and Invoices** management reports. They note that having a live view of their total booking volume and the ability to instantly generate PDF ledger statements makes them feel completely in control of their business finances. They also love the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solves their problem of scattered social media messages.
+- **Customer Feedback**: The customer user states that the step-by-step modal interfaces for making a booking are very easy to use on their smartphone. They appreciate the immediate email notifications, the seamless Stripe payment integration, and the live chat, stating it provides a highly professional feel compared to traditional phone bookings.
 
 # Chapter 6 - Conclusion
 
 ## 6.1 Critical Evaluation
-The primary objective of the implemented date reservation and management system was to simplify the process of making photography reservations and to provide powerful business analytics for the photographer. By critically evaluating the final deliverable against the initial requirements, it is clear that the project was a resounding success. 
+The primary objective of the implemented date reservation and management system is to simplify the process of making photography reservations and to provide powerful business analytics for the photographer. By critically evaluating the final deliverable against the initial requirements, it is clear that the project is a resounding success. 
 
 Typically, independent photographers rely on fragmented phone calls, social media messages, and handwritten diaries to manage their business. This manual process is slow, highly inaccurate, and leaves the photographer blind to their financial metrics. The newly developed web-based "Photographer Portal" successfully overcomes these difficulties. It provides a centralized, secure, and automated platform that handles everything from the initial customer inquiry, to real-time chat negotiations, to the final payment confirmation via Stripe. Furthermore, the robust PostgreSQL database feeds deeply insightful Management Reports, allowing the photographer to track transaction volumes and generate custom invoices effortlessly.
 
 ## 6.2 Lessons Learnt and Personal Reflection
-This project served as a profound learning experience, allowing me to apply theoretical software engineering concepts to a complex, real-world problem.
+This project serves as a profound learning experience, allowing theoretical software engineering concepts to be applied to a complex, real-world problem.
 
-- **The Database and Stack Migration**: The most critical lesson learned was recognizing the importance of choosing the right tool for the job. Initially, the project started with the MERN stack (MongoDB) because of its rapid setup time. However, as the reservation logic became more complex, it became clear that a document-based NoSQL database was the wrong choice for a system requiring strict financial integrity. I learned the immense value of pivoting the architecture and migrating the entire system to **NestJS and PostgreSQL**. The relational structure provided by PostgreSQL prevented data anomalies and ensured strict data integrity, which is absolutely vital for the analytics engine to generate accurate Management Reports.
-- **Real-Time WebSockets**: Implementing the live chat using Socket.io taught me the complexities of managing persistent, stateful connections between the client and the server, as opposed to traditional stateless REST APIs.
-- **System Architecture**: I learned the value of decoupling system components. Utilizing Docker to containerize the database and RabbitMQ message brokers taught me how enterprise-level applications are orchestrated and deployed.
+- **The Database and Stack Migration**: The most critical lesson learned is recognizing the importance of choosing the right tool for the job. Initially, the project starts with the MERN stack (MongoDB) because of its rapid setup time. However, as the reservation logic becomes more complex, it becomes clear that a document-based NoSQL database is the wrong choice for a system requiring strict financial integrity. The immense value of pivoting the architecture and migrating the entire system to **NestJS and PostgreSQL** is fully realized. The relational structure provided by PostgreSQL prevents data anomalies and ensures strict data integrity, which is absolutely vital for the analytics engine to generate accurate Management Reports.
+- **Real-Time WebSockets**: Implementing the live chat using Socket.io highlights the complexities of managing persistent, stateful connections between the client and the server, as opposed to traditional stateless REST APIs.
+- **System Architecture**: The value of decoupling system components is learned. Utilizing Docker to containerize the database and RabbitMQ message brokers demonstrates how enterprise-level applications are orchestrated and deployed.
 
 ## 6.3 Future Improvements
-While the current system robustly meets all its core objectives and already includes advanced features like automated PDF invoice generation and real-time chat, software is never truly "finished." Several enhancements could be explored in future iterations:
+While the current system robustly meets all its core objectives and already includes advanced features like automated PDF invoice generation and real-time chat, software is never truly "finished." Several enhancements can be explored in future iterations:
 
-1. **AI-Driven Pricing Suggestions**: The system currently tracks a massive amount of analytical data regarding which packages sell best in specific geographical districts. A future improvement could involve integrating a Machine Learning model that analyzes this historical data to suggest dynamic pricing adjustments to the photographer during peak wedding seasons.
-2. **Two-Way Calendar Syncing (Google Calendar)**: While the system has a powerful built-in interactive calendar, many photographers also use external tools for personal events. Integrating the Google Calendar API to automatically perform a two-way sync would ensure that if a photographer adds a personal holiday on their phone, the system instantly blocks that date on their public booking page.
+1. **AI-Driven Pricing Suggestions**: The system currently tracks a massive amount of analytical data regarding which packages sell best in specific geographical districts. A future improvement can involve integrating a Machine Learning model that analyzes this historical data to suggest dynamic pricing adjustments to the photographer during peak wedding seasons.
+2. **Two-Way Calendar Syncing (Google Calendar)**: While the system has a powerful built-in interactive calendar, many photographers also use external tools for personal events. Integrating the Google Calendar API to automatically perform a two-way sync ensures that if a photographer adds a personal holiday on their phone, the system instantly blocks that date on their public booking page.
 
 # References
 [1] Ian Sommerville, *Software Engineering*, 10th ed, Pearson Education Limited, 2016.
@@ -103,13 +103,13 @@ This section provides technical documentation to guide developers or administrat
    `npm install`
 5. Start the NestJS backend server:
    `npm run start:dev`
-   *(The backend API will now be running on `http://localhost:4001`)*
+   *(The backend API is now running on `http://localhost:4001`)*
 6. Open a third terminal window, navigate to the `frontend` directory, and install the front-end dependencies:
    `cd frontend`
    `npm install`
 7. Start the Next.js frontend development server:
    `npm run dev`
-   *(The frontend application will now be running on `http://localhost:4000`)*
+   *(The frontend application is now running on `http://localhost:4000`)*
 
 ## Appendix B - User Manual
 The system has distinct primary user roles: Super Admin, Photographer, and Customer.
@@ -118,14 +118,14 @@ The system has distinct primary user roles: Super Admin, Photographer, and Custo
 1. Navigate to the photographer's public booking URL (e.g., `http://localhost:4000/book/john-doe`).
 2. Click the **"Book a Session"** button to open the interactive calendar.
 3. Select any available date (marked in green) and fill out your event details.
-4. You will receive an automated email containing a secure tracking link (`/book/track/[token]`). Use this link to monitor your booking status, process your deposit payment via Stripe, and use the Real-Time Chat to talk directly to the photographer.
+4. You receive an automated email containing a secure tracking link (`/book/track/[token]`). Use this link to monitor your booking status, process your deposit payment via Stripe, and use the Real-Time Chat to talk directly to the photographer.
 
 **For Photographers (Managing Reservations):**
 1. Navigate to the system login page (`http://localhost:4000/login`) and log in.
-2. Your calendar will display all bookings. Click on any `PENDING` reservation (marked in yellow).
+2. Your calendar displays all bookings. Click on any `PENDING` reservation (marked in yellow).
 3. Review the customer's event details, input your estimated price, and click "Send Quote".
 4. Use the attached Chat Window to discuss any specific details live with the client.
-5. Once the customer processes the payment, verify the payment record and click "Confirm Reservation". The date will now be permanently secured (red on the calendar).
+5. Once the customer processes the payment, verify the payment record and click "Confirm Reservation". The date is now permanently secured (red on the calendar).
 
 ## Appendix C - Management Reports
 The Photographer Portal generates aggregated analytical reports to assist Photographers in making highly informed, strategic business decisions. These reports are a critical component of the system, transforming raw booking data into actionable business intelligence.

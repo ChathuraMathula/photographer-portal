@@ -15,24 +15,24 @@ Name(s) of Supervisor(s)/Advisor(s): ...........................................
 # Abstract
 Photography is a broad area that has become a widely respected profession since the invention of the camera. Most individual professional photographers who can be hired for events and functions face severe problems when managing their businesses. Reserving a date and time for a client efficiently, without making scheduling errors, and maintaining a friendly, continuous customer relationship is a complex task. Currently, many clients ask for packages and services via phone calls or fragmented social media messages before deciding to hire a photographer. They often request to reserve dates by calling the photographer directly, which leads to a highly time-consuming and error-prone process of manually recording each customer’s details.
 
-This project focuses on completely automating the business process of reserving dates online, generating powerful analytical reports, and managing financial transactions. The primary goal is to assist the photographer in reducing administrative time and costs, while significantly increasing the efficiency and accuracy of the reservation process. To solve these issues, a robust, web-based date reservation and management system—the "Photographer Portal"—was built entirely from scratch. The system showcases all necessary details customers need to select a package, offers a real-time messaging interface for direct communication, and beautifully aggregates booking data into management reports to help the photographer make strategic business decisions.
+This project focuses on completely automating the business process of reserving dates online, generating powerful analytical reports, and managing financial transactions. The primary goal is to assist the photographer in reducing administrative time and costs, while significantly increasing the efficiency and accuracy of the reservation process. To solve these issues, a robust, web-based date reservation and management system—the "Photographer Portal"—is built entirely from scratch. The system showcases all necessary details customers need to select a package, offers a real-time messaging interface for direct communication, and beautifully aggregates booking data into management reports to help the photographer make strategic business decisions.
 
-This project was executed using the traditional monolithic Waterfall software development life cycle, as the core system requirements were fixed and designed upfront. Initially, the project was planned to be developed using the MERN stack (MongoDB, Express, React, Node). However, due to the complex relational data required for reservations and financial transactions, the architecture was pivoted. The system was ultimately developed using a highly scalable, modern technology stack: React 19 and Next.js 16 for the frontend, and NestJS 11 for the backend API, powered by a strict PostgreSQL relational database.
+This project is executed using the traditional monolithic Waterfall software development life cycle, as the core system requirements are fixed and designed upfront. Initially, the project is planned to be developed using the MERN stack (MongoDB, Express, React, Node). However, due to the complex relational data required for reservations and financial transactions, the architecture is pivoted. The system is ultimately developed using a highly scalable, modern technology stack: React 19 and Next.js 16 for the frontend, and NestJS 11 for the backend API, powered by a strict PostgreSQL relational database.
 
 The main deliverable of this project is a fully functioning web-based platform that efficiently fulfills the given user requirements, allowing photographers to manage their professional lives with ease while providing a superior, transparent booking experience for their customers.
 
 # Acknowledgements
-This endeavour would not have been possible without my supervisor who guided and assisted me during the tough time I faced throughout the project.
+This endeavour would not be possible without my supervisor who guides and assists me during the tough time I face throughout the project.
 
-At the same time, all the teachers and lecturers who taught me since my childhood should be kindly appreciated and thanked.
+At the same time, all the teachers and lecturers who teach me since my childhood are kindly appreciated and thanked.
 
 I would like to express my deepest gratitude to the professional photographers who have been in the industry for years for helping me succeed in this project by giving me all the necessary details and their invaluable time to build this software system.
 
-I am also thankful to both of my university and school colleagues who supported me in completing this project by injecting me with their amazing ideas.
+I am also thankful to both of my university and school colleagues who support me in completing this project by injecting me with their amazing ideas.
 
-Similarly, I could not have undertaken this journey without my family who assisted me by proofreading this thesis as well as other reports I wrote.
+Similarly, I cannot undertake this journey without my family who assists me by proofreading this thesis as well as other reports I write.
 
-Last but not least, words cannot express my gratitude to my parents and family members who helped me to complete this project successfully.
+Last but not least, words cannot express my gratitude to my parents and family members who help me to complete this project successfully.
 
 # Chapter 1 Introduction
 
@@ -44,7 +44,7 @@ When a potential client wants to hire a photographer, the process usually starts
 ## 1.2 Motivation
 The motivation behind this project is to eliminate the inefficiencies, fragmented communications, and errors present in the manual booking process. Many customers ask for details about packages and services through lengthy phone calls even if they do not end up hiring the photographer, which wastes a significant amount of the photographer's valuable time. Taking down each event detail manually is very time-consuming and highly error-prone. 
 
-Furthermore, the lack of a centralized platform creates a disjointed customer experience and leaves the photographer completely blind to their own business metrics. Without a proper system, a photographer cannot easily track how much money they have made in a month, which geographical locations generate the most business, or which invoices remain unpaid. Therefore, it is highly advantageous to find a comprehensive solution to this problem by building a centralized, web-based date reservation and management system that automatically handles bookings and generates insightful business reports.
+Furthermore, the lack of a centralized platform creates a disjointed customer experience and leaves the photographer completely blind to their own business metrics. Without a proper system, a photographer cannot easily track how much money is made in a month, which geographical locations generate the most business, or which invoices remain unpaid. Therefore, it is highly advantageous to find a comprehensive solution to this problem by building a centralized, web-based date reservation and management system that automatically handles bookings and generates insightful business reports.
 
 ## 1.3 Aims, and Objectives of the Project
 The main objective of the Photographer Portal is to provide a unified platform to reserve an available date to get a photographer hired online and to efficiently manage the reservations, payments, and client communications.
@@ -63,7 +63,7 @@ The scope defines the exact boundaries of the developed system. The system encom
 2. It collects customer, payment, and reservation details by allowing users to fill out secure online forms.
 3. The Super Administrator is responsible for overseeing the system, capable of managing users, updating booking URLs, generating analytical reports, and viewing system-wide audit logs.
 4. The customers can pick an available date via an interactive calendar and input their specific event details to initiate a booking request.
-5. The chosen date is temporarily held (marked as pending) while the reservation request is being processed to prevent simultaneous double-booking.
+5. The chosen date is temporarily held (marked as pending) while the reservation request is processed to prevent simultaneous double-booking.
 6. The photographer can review incoming requests, propose a custom estimated price, and specify the advance payment required.
 7. The system includes an integrated Payments Module utilizing the Stripe API, allowing the customer to securely process deposits via a unique tracking token.
 8. Real-Time Chat is fully implemented via Socket.io, allowing clients and photographers to exchange live messages directly inside the application tracking page.
@@ -85,13 +85,13 @@ This manual process suffers from several severe limitations:
 *[INSERT MANUAL PROCESS FLOWCHART HERE]*
 
 ### 2.1.2 Review of Similar Systems
-To understand the landscape of reservation software, existing systems were reviewed. While they operate in different business domains, they share the same underlying scheduling logic.
+To understand the landscape of reservation software, existing systems are reviewed. While they operate in different business domains, they share the same underlying scheduling logic.
 
 **Online Hotel Room Reservation System (Colombo Hilton Hotel)**
 The Hilton Hotel utilizes an effective hotel room reservation system embedded in their official website. It offers customers the option to check room availability and rates without needing to log in. The system strictly validates user input and handles payments via credit cards. This system is an excellent example of how clean user interfaces and step-by-step booking flows simplify complex reservations.
 
 **Online Train Seats Reservation System (Sri Lanka Railways)**
-The Sri Lanka Railways developed an online train seat reservation system to automate their bookings. This system allows passengers to check the availability of trains based on routes and dates. Once a seat is selected, the system temporarily holds that seat while the user enters passenger information and completes the payment. This demonstrates the critical importance of a robust state machine that temporarily holds a resource to prevent race conditions (double-booking).
+The Sri Lanka Railways implements an online train seat reservation system to automate their bookings. This system allows passengers to check the availability of trains based on routes and dates. Once a seat is selected, the system temporarily holds that seat while the user enters passenger information and completes the payment. This demonstrates the critical importance of a robust state machine that temporarily holds a resource to prevent race conditions (double-booking).
 
 ### 2.1.3 System Requirements Analysis
 
@@ -117,29 +117,29 @@ Because this system handles personal customer data and financial transaction rec
 ### 2.1.4 Justification of Development Approach and Technologies
 
 #### 2.1.4.1 Chosen SDLC Model and Rationale
-The **Monolithic Waterfall model** was selected for this project. The Waterfall model is a plan-driven process where development is carried out in strict, sequential phases: requirements definition, system analysis and design, implementation, testing, and finally operation.
+The **Monolithic Waterfall model** is selected for this project. The Waterfall model is a plan-driven process where development is carried out in strict, sequential phases: requirements definition, system analysis and design, implementation, testing, and finally operation.
 
-This model was chosen and justified because the system's requirements were entirely fixed upfront. As a solo developer building this system from scratch, I needed a highly disciplined and predictable path. The Waterfall approach allowed me to deeply design the strict relational database schema first, implement the backend APIs second, and finally build the frontend interfaces without the chaotic overhead of iterative redesigns. 
+This model is chosen and justified because the system's requirements are entirely fixed upfront. As a solo developer building this system from scratch, a highly disciplined and predictable path is needed. The Waterfall approach allows the strict relational database schema to be deeply designed first, the backend APIs to be implemented second, and finally the frontend interfaces to be built without the chaotic overhead of iterative redesigns. 
 
 #### 2.1.4.2 Technology Stack Justification
-At the very beginning of the project, the intention was to build the Photographer Portal using the highly popular **MERN Stack** (MongoDB, Express, React, Node.js). However, as the deep analysis of the system's requirements unfolded, it became explicitly clear that the MERN stack would struggle to meet the strict engineering demands of a complex reservation and financial system. As a result, a massive architectural pivot was made to a much more robust stack.
+At the very beginning of the project, the intention is to build the Photographer Portal using the highly popular **MERN Stack** (MongoDB, Express, React, Node.js). However, as the deep analysis of the system's requirements unfolds, it becomes explicitly clear that the MERN stack is inadequate to meet the strict engineering demands of a complex reservation and financial system. As a result, a massive architectural pivot is made to a much more robust stack.
 
 The reasons for moving away from the MERN stack are as follows:
-- **Database Transition (MongoDB vs PostgreSQL)**: MongoDB is a NoSQL document database. It is excellent for storing unstructured data rapidly. However, a reservation system inherently requires strict, complex relational data. A single reservation is directly tied to a specific customer, a specific photographer, a package, chat messages, and payment records. Using MongoDB would have led to massive data duplication and potential data anomalies if a package price changed or a user was deleted. Therefore, the decision was made to migrate to **PostgreSQL**, an advanced relational database that guarantees ACID compliance and ensures transactional integrity through strict foreign key constraints.
-- **Backend Transition (Express vs NestJS)**: Express.js is highly unopinionated and lightweight, which often leads to messy, unstructured code in large projects. By switching to **NestJS**, the project benefited from a highly structured, object-oriented, Angular-like architecture. NestJS enforces strict TypeScript typing and Dependency Injection, which heavily reduced runtime errors and made the codebase much easier to maintain.
-- **Frontend Transition (React vs Next.js)**: While pure React is powerful, it renders entirely on the client-side, which is terrible for Search Engine Optimization (SEO). Since photographers need their public booking pages to be easily discoverable on Google, the frontend was upgraded to **Next.js**. Next.js provides powerful Server-Side Rendering (SSR), ensuring that the photographer's public portfolios load instantly and are perfectly indexed by search engines.
+- **Database Transition (MongoDB vs PostgreSQL)**: MongoDB is a NoSQL document database. It is excellent for storing unstructured data rapidly. However, a reservation system inherently requires strict, complex relational data. A single reservation is directly tied to a specific customer, a specific photographer, a package, chat messages, and payment records. Using MongoDB leads to massive data duplication and potential data anomalies if a package price changes or a user is deleted. Therefore, the decision is made to migrate to **PostgreSQL**, an advanced relational database that guarantees ACID compliance and ensures transactional integrity through strict foreign key constraints.
+- **Backend Transition (Express vs NestJS)**: Express.js is highly unopinionated and lightweight, which often leads to messy, unstructured code in large projects. By switching to **NestJS**, the project benefits from a highly structured, object-oriented, Angular-like architecture. NestJS enforces strict TypeScript typing and Dependency Injection, which heavily reduces runtime errors and makes the codebase much easier to maintain.
+- **Frontend Transition (React vs Next.js)**: While pure React is powerful, it renders entirely on the client-side, which is terrible for Search Engine Optimization (SEO). Since photographers need their public booking pages to be easily discoverable on Google, the frontend is upgraded to **Next.js**. Next.js provides powerful Server-Side Rendering (SSR), ensuring that the photographer's public portfolios load instantly and are perfectly indexed by search engines.
 
 
 # Chapter 3 - Design
 
 ## 3.1 Introduction to System Design
-The design phase of a software system is the most critical part of the SDLC. It translates the theoretical requirements gathered during the analysis phase into a structured, logical blueprint that developers can follow to implement the system. The primary goal of the Photographer Portal's design was to create a highly scalable, decoupled architecture that could securely manage complex reservations, real-time messaging, and comprehensive management reports without performance bottlenecks.
+The design phase of a software system is the most critical part of the SDLC. It translates the theoretical requirements gathered during the analysis phase into a structured, logical blueprint that developers can follow to implement the system. The primary goal of the Photographer Portal's design is to create a highly scalable, decoupled architecture that securely manages complex reservations, real-time messaging, and comprehensive management reports without performance bottlenecks.
 
 ## 3.2 Design Principles and Methodologies
-Even though the proposed date reservation system could theoretically be implemented entirely from scratch using only raw, low-level programming constructs, doing so is considered a bad practice in modern software engineering. Implementing standard protocols from scratch increases development time, costs, and the likelihood of introducing severe bugs and security vulnerabilities. Therefore, a major design strategy was to utilize reliable, free, and open-source software (FOSS) utility components to handle complex but standard logic. This includes using established libraries for database Object-Relational Mapping (TypeORM), real-time WebSockets (Socket.io), and cryptographic password hashing (Bcrypt). By doing so, the project maintains robustness, consistency, and security, allowing the primary development focus to remain firmly on the unique business logic of the reservation and analytics processes.
+Even though the proposed date reservation system can theoretically be implemented entirely from scratch using only raw, low-level programming constructs, doing so is considered a bad practice in modern software engineering. Implementing standard protocols from scratch increases development time, costs, and the likelihood of introducing severe bugs and security vulnerabilities. Therefore, a major design strategy is to utilize reliable, free, and open-source software (FOSS) utility components to handle complex but standard logic. This includes using established libraries for database Object-Relational Mapping (TypeORM), real-time WebSockets (Socket.io), and cryptographic password hashing (Bcrypt). By doing so, the project maintains robustness, consistency, and security, allowing the primary development focus to remain firmly on the unique business logic of the reservation and analytics processes.
 
 ## 3.3 System Architecture Overview
-Architectural design exposes the system’s overall structure clearly to help stakeholders understand how different subsystems communicate. Because the proposed system is a modern web application, it was decided to use a combination of the Three-Tier Architecture and the Model-View-Controller (MVC) design pattern.
+Architectural design exposes the system’s overall structure clearly to help stakeholders understand how different subsystems communicate. Because the proposed system is a modern web application, it is decided to use a combination of the Three-Tier Architecture and the Model-View-Controller (MVC) design pattern.
 
 The Three-Tier Architecture logically and physically separates the system into three distinct tiers:
 1. **Presentation Tier (Client-Side)**: This tier represents the front-end. It is implemented using Next.js and runs within the user's web browser on Port 4000. It is responsible for rendering the UI, maintaining WebSocket connections, and managing global state via Redux.
@@ -166,7 +166,7 @@ There are three primary actors in the system:
 3. **Super Admin**: Has overarching control to manage all system users and view the system-wide audit logs.
 
 ## 3.6 Data Modeling
-The database is the foundational bedrock of the system. As previously mentioned in the analysis chapter, migrating to **PostgreSQL** was a deliberate architectural decision because the system manages strict, interconnected financial data.
+The database is the foundational bedrock of the system. As previously mentioned in the analysis chapter, migrating to **PostgreSQL** is a deliberate architectural decision because the system manages strict, interconnected financial data.
 
 Entity-Relationship (ER) diagrams are utilized to visually design and represent the schema of the relational database.
 
@@ -179,18 +179,18 @@ The database is highly normalized to prevent data redundancy and anomalies:
 - The **`payments`** table holds a Many-to-One relationship with `reservations`, recording successful deposit transactions (e.g., Stripe payments or offline cash logs). This table is the critical foundation for the system's financial analytics and management reports.
 
 ## 3.7 User Interface Design
-The User Interface (UI) is the bridge between the human users and the complex backend logic. Because customers primarily access the booking portal via mobile devices, a "Mobile-First" design approach was utilized using React and Tailwind CSS.
+The User Interface (UI) is the bridge between the human users and the complex backend logic. Because customers primarily access the booking portal via mobile devices, a "Mobile-First" design approach is utilized using React and Tailwind CSS.
 
-For the photographer's dashboard, the UI focus shifted to heavy data visualization. The **Transactions and Invoices Dashboard** was designed to look like a professional, enterprise-grade accounting tool. It utilizes prominent KPI (Key Performance Indicator) cards to display "Total Volume" and "Payments Collected" in large, readable typography. The ledger tables were designed to cleanly separate invoice numbers, event details, and settled amounts, ensuring the photographer can monitor their business health instantly without feeling overwhelmed by raw data.
+For the photographer's dashboard, the UI focus is shifted to heavy data visualization. The **Transactions and Invoices Dashboard** is designed to look like a professional, enterprise-grade accounting tool. It utilizes prominent KPI (Key Performance Indicator) cards to display "Total Volume" and "Payments Collected" in large, readable typography. The ledger tables are designed to cleanly separate invoice numbers, event details, and settled amounts, ensuring the photographer can monitor their business health instantly without feeling overwhelmed by raw data.
 
 
 # Chapter 4 - Implementation
 
 ## 4.1 Implementation Device Specifications
-The implementation phase is where the theoretical design is translated into a working software system. To successfully write, compile, and run the code for the Photographer Portal, specific hardware and software environments were established. 
+The implementation phase is where the theoretical design is translated into a working software system. To successfully write, compile, and run the code for the Photographer Portal, specific hardware and software environments are established. 
 
 ### 4.1.1 Hardware Specifications
-The development was carried out on a standalone personal computer, which provided the necessary computing power to run the client, server, and database containers simultaneously without lag.
+The development is carried out on a standalone personal computer, which provides the necessary computing power to run the client, server, and database containers simultaneously without lag.
 - **Processor**: Intel(R) Core(TM) i7 or equivalent (2.0 GHz or higher)
 - **Installed RAM**: 16.0 GB
 - **Storage**: 512 GB SSD
@@ -220,7 +220,7 @@ Once the record is saved, the Reservations Module fires an event that interacts 
 4. **Reports & Analytics Module**: Every confirmed transaction is aggregated by this module. It performs complex SQL SUM and COUNT queries via TypeORM to feed live data into the photographer's financial dashboard.
 
 ## 4.3 Implementation Platforms and Frameworks Used
-A full-stack JavaScript approach was taken for this project. Utilizing JavaScript (specifically TypeScript) on both the front-end and back-end significantly increases developer productivity, as data models and interfaces can be shared across the entire stack.
+A full-stack JavaScript approach is taken for this project. Utilizing JavaScript (specifically TypeScript) on both the front-end and back-end significantly increases developer productivity, as data models and interfaces can be shared across the entire stack.
 
 ### 4.3.1 Back-End Implementation Platforms
 - **Node.js**: The underlying runtime environment that allows JavaScript to be executed on the server.
@@ -229,7 +229,7 @@ A full-stack JavaScript approach was taken for this project. Utilizing JavaScrip
 
 ### 4.3.2 Front-End Implementation Platforms
 - **React 19**: A declarative JavaScript library used for building interactive user interfaces based on reusable components.
-- **Next.js 16**: A React framework utilizing the new App Router. It provides powerful file-based routing and Server-Side Rendering (SSR). It was used to ensure the public photographer profiles loaded instantly and were optimized for search engines.
+- **Next.js 16**: A React framework utilizing the new App Router. It provides powerful file-based routing and Server-Side Rendering (SSR). It is used to ensure the public photographer profiles load instantly and are optimized for search engines.
 - **Redux Toolkit**: Used to manage the global state of the application on the client-side, heavily utilized to fetch and store the large datasets required for the analytics charts and transaction ledgers.
 - **Tailwind CSS 4**: A utility-first CSS framework that allows for rapid UI development without writing custom CSS files.
 
@@ -287,15 +287,15 @@ The backend exposes a strictly defined RESTful API. The following endpoints proc
 Software testing is an essential task in the software development lifecycle. It ensures that the implemented Photographer Portal, particularly its core reservation management and analytics features, meets all functional and non-functional requirements by evaluating and verifying its behavior under various conditions. Rigorous software testing provides numerous advantages, including improving the overall quality of the software, significantly reducing operational risks, saving time and money, and most importantly, improving customer satisfaction by delivering a reliable product.
 
 ## 5.1 Common Types of Software Testing
-Different testing methodologies were employed to evaluate the system. 
+Different testing methodologies are employed to evaluate the system. 
 
-- **Unit Testing**: This approach focuses on testing individual, isolated units of code. In this project, the Jest testing framework was utilized to test the backend services (such as verifying the mathematical algorithms that aggregate the total revenue volume for the Management Reports).
+- **Unit Testing**: This approach focuses on testing individual, isolated units of code. In this project, the Jest testing framework is utilized to test the backend services (such as verifying the mathematical algorithms that aggregate the total revenue volume for the Management Reports).
 - **Integration Testing**: This approach tests how different units of code interact with one another. For example, testing if the `ChatModule` correctly authenticates a WebSocket connection by verifying the JWT against the `UsersModule` before allowing a user to join a live chat room.
 - **System Testing**: In this testing approach, the software system is evaluated as a complete, integrated whole. This ensures the frontend and backend communicate correctly to satisfy end-to-end business requirements, like transitioning a reservation from `PENDING` to `CONFIRMED`.
 - **User Acceptance Testing (UAT)**: This final phase of testing is carried out with the help of actual end users to determine whether the software system truly meets the business needs in a real-world scenario.
 
 ## 5.2 Test Plan Used
-Every major API endpoint and React frontend component was thoroughly evaluated. The primary focus of the system testing was on critical user workflows: authentication, reservation creation, real-time chat, and the generation of management analytics. The tests were designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
+Every major API endpoint and React frontend component is thoroughly evaluated. The primary focus of the system testing is on critical user workflows: authentication, reservation creation, real-time chat, and the generation of management analytics. The tests are designed to cover both "happy paths" (where the user provides all correct data) and "edge cases" (where the user inputs invalid data or attempts unauthorized actions).
 
 ## 5.3 Test Cases
 Test cases are formalized scenarios used to evaluate that the system performs exactly as required. The tables below outline the comprehensive test cases designed to evaluate all critical areas of the implemented Photographer Portal.
@@ -330,31 +330,31 @@ These tests ensure external map integrations and high-level administrative repor
 | **TC-A04** | **Audit Log Tracking**: Super Admin modifies a photographer's booking slug, then navigates to the Audit Logs page. | The Audit Logs table must display the exact timestamp, the Super Admin's email, and the specific action taken (slug modification). |
 
 ## 5.4 User Acceptance Testing (UAT)
-User Acceptance Testing was carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
+User Acceptance Testing is carried out by providing access to the deployed system to a professional photographer and an ordinary individual representing a standard customer. 
 
 **Feedback and Observations:**
-- **Photographer Feedback**: The photographer found the reservation management dashboard incredibly intuitive. They specifically praised the **Transactions and Invoices** management reports. They noted that having a live view of their total booking volume and the ability to instantly generate PDF ledger statements made them feel completely in control of their business finances. They also loved the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solved their problem of scattered social media messages.
-- **Customer Feedback**: The customer user found the step-by-step modal interfaces for making a booking very easy to use on their smartphone. They appreciated the immediate email notifications, the seamless Stripe payment integration, and the live chat, stating it provided a highly professional feel compared to traditional phone bookings.
+- **Photographer Feedback**: The photographer states that the reservation management dashboard is incredibly intuitive. They specifically praise the **Transactions and Invoices** management reports. They note that having a live view of their total booking volume and the ability to instantly generate PDF ledger statements makes them feel completely in control of their business finances. They also love the Real-Time Chat functionality, stating that having all client conversations tied directly to the specific reservation completely solves their problem of scattered social media messages.
+- **Customer Feedback**: The customer user states that the step-by-step modal interfaces for making a booking are very easy to use on their smartphone. They appreciate the immediate email notifications, the seamless Stripe payment integration, and the live chat, stating it provides a highly professional feel compared to traditional phone bookings.
 
 # Chapter 6 - Conclusion
 
 ## 6.1 Critical Evaluation
-The primary objective of the implemented date reservation and management system was to simplify the process of making photography reservations and to provide powerful business analytics for the photographer. By critically evaluating the final deliverable against the initial requirements, it is clear that the project was a resounding success. 
+The primary objective of the implemented date reservation and management system is to simplify the process of making photography reservations and to provide powerful business analytics for the photographer. By critically evaluating the final deliverable against the initial requirements, it is clear that the project is a resounding success. 
 
 Typically, independent photographers rely on fragmented phone calls, social media messages, and handwritten diaries to manage their business. This manual process is slow, highly inaccurate, and leaves the photographer blind to their financial metrics. The newly developed web-based "Photographer Portal" successfully overcomes these difficulties. It provides a centralized, secure, and automated platform that handles everything from the initial customer inquiry, to real-time chat negotiations, to the final payment confirmation via Stripe. Furthermore, the robust PostgreSQL database feeds deeply insightful Management Reports, allowing the photographer to track transaction volumes and generate custom invoices effortlessly.
 
 ## 6.2 Lessons Learnt and Personal Reflection
-This project served as a profound learning experience, allowing me to apply theoretical software engineering concepts to a complex, real-world problem.
+This project serves as a profound learning experience, allowing theoretical software engineering concepts to be applied to a complex, real-world problem.
 
-- **The Database and Stack Migration**: The most critical lesson learned was recognizing the importance of choosing the right tool for the job. Initially, the project started with the MERN stack (MongoDB) because of its rapid setup time. However, as the reservation logic became more complex, it became clear that a document-based NoSQL database was the wrong choice for a system requiring strict financial integrity. I learned the immense value of pivoting the architecture and migrating the entire system to **NestJS and PostgreSQL**. The relational structure provided by PostgreSQL prevented data anomalies and ensured strict data integrity, which is absolutely vital for the analytics engine to generate accurate Management Reports.
-- **Real-Time WebSockets**: Implementing the live chat using Socket.io taught me the complexities of managing persistent, stateful connections between the client and the server, as opposed to traditional stateless REST APIs.
-- **System Architecture**: I learned the value of decoupling system components. Utilizing Docker to containerize the database and RabbitMQ message brokers taught me how enterprise-level applications are orchestrated and deployed.
+- **The Database and Stack Migration**: The most critical lesson learned is recognizing the importance of choosing the right tool for the job. Initially, the project starts with the MERN stack (MongoDB) because of its rapid setup time. However, as the reservation logic becomes more complex, it becomes clear that a document-based NoSQL database is the wrong choice for a system requiring strict financial integrity. The immense value of pivoting the architecture and migrating the entire system to **NestJS and PostgreSQL** is fully realized. The relational structure provided by PostgreSQL prevents data anomalies and ensures strict data integrity, which is absolutely vital for the analytics engine to generate accurate Management Reports.
+- **Real-Time WebSockets**: Implementing the live chat using Socket.io highlights the complexities of managing persistent, stateful connections between the client and the server, as opposed to traditional stateless REST APIs.
+- **System Architecture**: The value of decoupling system components is learned. Utilizing Docker to containerize the database and RabbitMQ message brokers demonstrates how enterprise-level applications are orchestrated and deployed.
 
 ## 6.3 Future Improvements
-While the current system robustly meets all its core objectives and already includes advanced features like automated PDF invoice generation and real-time chat, software is never truly "finished." Several enhancements could be explored in future iterations:
+While the current system robustly meets all its core objectives and already includes advanced features like automated PDF invoice generation and real-time chat, software is never truly "finished." Several enhancements can be explored in future iterations:
 
-1. **AI-Driven Pricing Suggestions**: The system currently tracks a massive amount of analytical data regarding which packages sell best in specific geographical districts. A future improvement could involve integrating a Machine Learning model that analyzes this historical data to suggest dynamic pricing adjustments to the photographer during peak wedding seasons.
-2. **Two-Way Calendar Syncing (Google Calendar)**: While the system has a powerful built-in interactive calendar, many photographers also use external tools for personal events. Integrating the Google Calendar API to automatically perform a two-way sync would ensure that if a photographer adds a personal holiday on their phone, the system instantly blocks that date on their public booking page.
+1. **AI-Driven Pricing Suggestions**: The system currently tracks a massive amount of analytical data regarding which packages sell best in specific geographical districts. A future improvement can involve integrating a Machine Learning model that analyzes this historical data to suggest dynamic pricing adjustments to the photographer during peak wedding seasons.
+2. **Two-Way Calendar Syncing (Google Calendar)**: While the system has a powerful built-in interactive calendar, many photographers also use external tools for personal events. Integrating the Google Calendar API to automatically perform a two-way sync ensures that if a photographer adds a personal holiday on their phone, the system instantly blocks that date on their public booking page.
 
 # References
 [1] Ian Sommerville, *Software Engineering*, 10th ed, Pearson Education Limited, 2016.
@@ -387,13 +387,13 @@ This section provides technical documentation to guide developers or administrat
    `npm install`
 5. Start the NestJS backend server:
    `npm run start:dev`
-   *(The backend API will now be running on `http://localhost:4001`)*
+   *(The backend API is now running on `http://localhost:4001`)*
 6. Open a third terminal window, navigate to the `frontend` directory, and install the front-end dependencies:
    `cd frontend`
    `npm install`
 7. Start the Next.js frontend development server:
    `npm run dev`
-   *(The frontend application will now be running on `http://localhost:4000`)*
+   *(The frontend application is now running on `http://localhost:4000`)*
 
 ## Appendix B - User Manual
 The system has distinct primary user roles: Super Admin, Photographer, and Customer.
@@ -402,14 +402,14 @@ The system has distinct primary user roles: Super Admin, Photographer, and Custo
 1. Navigate to the photographer's public booking URL (e.g., `http://localhost:4000/book/john-doe`).
 2. Click the **"Book a Session"** button to open the interactive calendar.
 3. Select any available date (marked in green) and fill out your event details.
-4. You will receive an automated email containing a secure tracking link (`/book/track/[token]`). Use this link to monitor your booking status, process your deposit payment via Stripe, and use the Real-Time Chat to talk directly to the photographer.
+4. You receive an automated email containing a secure tracking link (`/book/track/[token]`). Use this link to monitor your booking status, process your deposit payment via Stripe, and use the Real-Time Chat to talk directly to the photographer.
 
 **For Photographers (Managing Reservations):**
 1. Navigate to the system login page (`http://localhost:4000/login`) and log in.
-2. Your calendar will display all bookings. Click on any `PENDING` reservation (marked in yellow).
+2. Your calendar displays all bookings. Click on any `PENDING` reservation (marked in yellow).
 3. Review the customer's event details, input your estimated price, and click "Send Quote".
 4. Use the attached Chat Window to discuss any specific details live with the client.
-5. Once the customer processes the payment, verify the payment record and click "Confirm Reservation". The date will now be permanently secured (red on the calendar).
+5. Once the customer processes the payment, verify the payment record and click "Confirm Reservation". The date is now permanently secured (red on the calendar).
 
 ## Appendix C - Management Reports
 The Photographer Portal generates aggregated analytical reports to assist Photographers in making highly informed, strategic business decisions. These reports are a critical component of the system, transforming raw booking data into actionable business intelligence.

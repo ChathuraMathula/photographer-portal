@@ -1,13 +1,13 @@
 # Chapter 3 - Design
 
 ## 3.1 Introduction to System Design
-The design phase of a software system is the most critical part of the SDLC. It translates the theoretical requirements gathered during the analysis phase into a structured, logical blueprint that developers can follow to implement the system. The primary goal of the Photographer Portal's design was to create a highly scalable, decoupled architecture that could securely manage complex reservations, real-time messaging, and comprehensive management reports without performance bottlenecks.
+The design phase of a software system is the most critical part of the SDLC. It translates the theoretical requirements gathered during the analysis phase into a structured, logical blueprint that developers can follow to implement the system. The primary goal of the Photographer Portal's design is to create a highly scalable, decoupled architecture that securely manages complex reservations, real-time messaging, and comprehensive management reports without performance bottlenecks.
 
 ## 3.2 Design Principles and Methodologies
-Even though the proposed date reservation system could theoretically be implemented entirely from scratch using only raw, low-level programming constructs, doing so is considered a bad practice in modern software engineering. Implementing standard protocols from scratch increases development time, costs, and the likelihood of introducing severe bugs and security vulnerabilities. Therefore, a major design strategy was to utilize reliable, free, and open-source software (FOSS) utility components to handle complex but standard logic. This includes using established libraries for database Object-Relational Mapping (TypeORM), real-time WebSockets (Socket.io), and cryptographic password hashing (Bcrypt). By doing so, the project maintains robustness, consistency, and security, allowing the primary development focus to remain firmly on the unique business logic of the reservation and analytics processes.
+Even though the proposed date reservation system can theoretically be implemented entirely from scratch using only raw, low-level programming constructs, doing so is considered a bad practice in modern software engineering. Implementing standard protocols from scratch increases development time, costs, and the likelihood of introducing severe bugs and security vulnerabilities. Therefore, a major design strategy is to utilize reliable, free, and open-source software (FOSS) utility components to handle complex but standard logic. This includes using established libraries for database Object-Relational Mapping (TypeORM), real-time WebSockets (Socket.io), and cryptographic password hashing (Bcrypt). By doing so, the project maintains robustness, consistency, and security, allowing the primary development focus to remain firmly on the unique business logic of the reservation and analytics processes.
 
 ## 3.3 System Architecture Overview
-Architectural design exposes the system’s overall structure clearly to help stakeholders understand how different subsystems communicate. Because the proposed system is a modern web application, it was decided to use a combination of the Three-Tier Architecture and the Model-View-Controller (MVC) design pattern.
+Architectural design exposes the system’s overall structure clearly to help stakeholders understand how different subsystems communicate. Because the proposed system is a modern web application, it is decided to use a combination of the Three-Tier Architecture and the Model-View-Controller (MVC) design pattern.
 
 The Three-Tier Architecture logically and physically separates the system into three distinct tiers:
 1. **Presentation Tier (Client-Side)**: This tier represents the front-end. It is implemented using Next.js and runs within the user's web browser on Port 4000. It is responsible for rendering the UI, maintaining WebSocket connections, and managing global state via Redux.
@@ -34,7 +34,7 @@ There are three primary actors in the system:
 3. **Super Admin**: Has overarching control to manage all system users and view the system-wide audit logs.
 
 ## 3.6 Data Modeling
-The database is the foundational bedrock of the system. As previously mentioned in the analysis chapter, migrating to **PostgreSQL** was a deliberate architectural decision because the system manages strict, interconnected financial data.
+The database is the foundational bedrock of the system. As previously mentioned in the analysis chapter, migrating to **PostgreSQL** is a deliberate architectural decision because the system manages strict, interconnected financial data.
 
 Entity-Relationship (ER) diagrams are utilized to visually design and represent the schema of the relational database.
 
@@ -47,6 +47,6 @@ The database is highly normalized to prevent data redundancy and anomalies:
 - The **`payments`** table holds a Many-to-One relationship with `reservations`, recording successful deposit transactions (e.g., Stripe payments or offline cash logs). This table is the critical foundation for the system's financial analytics and management reports.
 
 ## 3.7 User Interface Design
-The User Interface (UI) is the bridge between the human users and the complex backend logic. Because customers primarily access the booking portal via mobile devices, a "Mobile-First" design approach was utilized using React and Tailwind CSS.
+The User Interface (UI) is the bridge between the human users and the complex backend logic. Because customers primarily access the booking portal via mobile devices, a "Mobile-First" design approach is utilized using React and Tailwind CSS.
 
-For the photographer's dashboard, the UI focus shifted to heavy data visualization. The **Transactions and Invoices Dashboard** was designed to look like a professional, enterprise-grade accounting tool. It utilizes prominent KPI (Key Performance Indicator) cards to display "Total Volume" and "Payments Collected" in large, readable typography. The ledger tables were designed to cleanly separate invoice numbers, event details, and settled amounts, ensuring the photographer can monitor their business health instantly without feeling overwhelmed by raw data.
+For the photographer's dashboard, the UI focus is shifted to heavy data visualization. The **Transactions and Invoices Dashboard** is designed to look like a professional, enterprise-grade accounting tool. It utilizes prominent KPI (Key Performance Indicator) cards to display "Total Volume" and "Payments Collected" in large, readable typography. The ledger tables are designed to cleanly separate invoice numbers, event details, and settled amounts, ensuring the photographer can monitor their business health instantly without feeling overwhelmed by raw data.

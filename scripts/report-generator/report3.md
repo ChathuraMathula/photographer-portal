@@ -1,10 +1,10 @@
 # Chapter 4 - Implementation
 
 ## 4.1 Implementation Device Specifications
-The implementation phase is where the theoretical design is translated into a working software system. To successfully write, compile, and run the code for the Photographer Portal, specific hardware and software environments were established. 
+The implementation phase is where the theoretical design is translated into a working software system. To successfully write, compile, and run the code for the Photographer Portal, specific hardware and software environments are established. 
 
 ### 4.1.1 Hardware Specifications
-The development was carried out on a standalone personal computer, which provided the necessary computing power to run the client, server, and database containers simultaneously without lag.
+The development is carried out on a standalone personal computer, which provides the necessary computing power to run the client, server, and database containers simultaneously without lag.
 - **Processor**: Intel(R) Core(TM) i7 or equivalent (2.0 GHz or higher)
 - **Installed RAM**: 16.0 GB
 - **Storage**: 512 GB SSD
@@ -34,7 +34,7 @@ Once the record is saved, the Reservations Module fires an event that interacts 
 4. **Reports & Analytics Module**: Every confirmed transaction is aggregated by this module. It performs complex SQL SUM and COUNT queries via TypeORM to feed live data into the photographer's financial dashboard.
 
 ## 4.3 Implementation Platforms and Frameworks Used
-A full-stack JavaScript approach was taken for this project. Utilizing JavaScript (specifically TypeScript) on both the front-end and back-end significantly increases developer productivity, as data models and interfaces can be shared across the entire stack.
+A full-stack JavaScript approach is taken for this project. Utilizing JavaScript (specifically TypeScript) on both the front-end and back-end significantly increases developer productivity, as data models and interfaces can be shared across the entire stack.
 
 ### 4.3.1 Back-End Implementation Platforms
 - **Node.js**: The underlying runtime environment that allows JavaScript to be executed on the server.
@@ -43,7 +43,7 @@ A full-stack JavaScript approach was taken for this project. Utilizing JavaScrip
 
 ### 4.3.2 Front-End Implementation Platforms
 - **React 19**: A declarative JavaScript library used for building interactive user interfaces based on reusable components.
-- **Next.js 16**: A React framework utilizing the new App Router. It provides powerful file-based routing and Server-Side Rendering (SSR). It was used to ensure the public photographer profiles loaded instantly and were optimized for search engines.
+- **Next.js 16**: A React framework utilizing the new App Router. It provides powerful file-based routing and Server-Side Rendering (SSR). It is used to ensure the public photographer profiles load instantly and are optimized for search engines.
 - **Redux Toolkit**: Used to manage the global state of the application on the client-side, heavily utilized to fetch and store the large datasets required for the analytics charts and transaction ledgers.
 - **Tailwind CSS 4**: A utility-first CSS framework that allows for rapid UI development without writing custom CSS files.
 
