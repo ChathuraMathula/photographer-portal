@@ -44,8 +44,12 @@ export function useLocationAnalyticsMap(bookings: any[]) {
         const query = queryParts.join(", ");
         if (query.trim()) {
           try {
+            const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+            const baseUrl = isOffline
+              ? "http://localhost:8081"
+              : "https://nominatim.openstreetmap.org";
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+              `${baseUrl}/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
               { headers: { "Accept-Language": "en" } },
             );
             if (res.ok) {

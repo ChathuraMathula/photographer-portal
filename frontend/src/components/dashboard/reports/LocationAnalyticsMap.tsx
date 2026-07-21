@@ -28,12 +28,25 @@ export function LocationAnalyticsMap({ bookings }: { bookings: any[] }) {
       </div>
     );
 
+  const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+  const tileUrl = isOffline
+    ? "http://localhost:8080/styles/basic-preview/{z}/{x}/{y}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+  const leafletCss = isOffline
+    ? "/leaflet/leaflet.css"
+    : "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+  const leafletJs = isOffline
+    ? "/leaflet/leaflet.js"
+    : "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+
   const mapHtml = `
     <!DOCTYPE html>
-    <html><head><meta charset="utf-8"/><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><style>body, html, #map { margin: 0; padding: 0; height: 100%; width: 100%; } .leaflet-container { font-family: system-ui, -apple-system, sans-serif; }</style></head>
+    <html><head><meta charset="utf-8"/><link rel="stylesheet" href="${leafletCss}" /><script src="${leafletJs}"></script><style>body, html, #map { margin: 0; padding: 0; height: 100%; width: 100%; } .leaflet-container { font-family: system-ui, -apple-system, sans-serif; }</style></head>
     <body><div id="map"></div><script>
+      ${isOffline ? `L.Icon.Default.imagePath = '/leaflet/images/';` : ''}
       var map = L.map('map').setView([7.8731, 80.7718], 8);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' }).addTo(map);
+      L.tileLayer('${tileUrl}', { maxZoom: 19, attribution: '&copy; <a href="https://openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' }).addTo(map);
       var points = ${JSON.stringify(points)}; var markers = [];
       points.forEach(function(pt) { markers.push(L.marker([pt.lat, pt.lon]).addTo(map).bindPopup("<b>" + pt.label + "</b>")); });
       if (markers.length > 0) map.fitBounds(new L.featureGroup(markers).getBounds().pad(0.1));

@@ -6,8 +6,12 @@ export function useBookingGeocoding() {
   const fetchCityDistrictFromCoords = async (lat: number, lon: number) => {
     setGeocodingStatus("Resolving nearest city & district from coordinates...");
     try {
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
       const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
+        `${baseUrl}/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
       );
       if (geoRes.ok) {
         const geoJson = await geoRes.json();
@@ -20,7 +24,7 @@ export function useBookingGeocoding() {
           addr.neighbourhood ||
           addr.hamlet ||
           "";
-        const resDistrict = addr.county || addr.state || "";
+        const resDistrict = addr.county || addr.state_district || addr.district || addr.state || "";
 
         if (resCity && resDistrict) {
           setGeocodingStatus(
@@ -46,8 +50,12 @@ export function useBookingGeocoding() {
   ) => {
     try {
       const query = [city, district, "Sri Lanka"].filter(Boolean).join(", ");
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        `${baseUrl}/search?q=${encodeURIComponent(
           query,
         )}&format=json&limit=1&accept-language=en`,
       );

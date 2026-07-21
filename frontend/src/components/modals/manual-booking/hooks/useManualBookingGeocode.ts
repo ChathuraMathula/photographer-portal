@@ -13,8 +13,12 @@ export function useManualBookingGeocode(
     if (formik.values.coordinates) return;
     try {
       const query = [city, district, "Sri Lanka"].filter(Boolean).join(", ");
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+        `${baseUrl}/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
       );
       if (res.ok) {
         const data = await res.json();
@@ -37,8 +41,12 @@ export function useManualBookingGeocode(
   const reverseGeocode = async (lat: number, lon: number, source: string) => {
     setGeocodingStatus(`Resolving nearest city & district from ${source}...`);
     try {
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+        `${baseUrl}/reverse?lat=${lat}&lon=${lon}&format=json`,
       );
       if (res.ok) {
         const geoJson = await res.json();
@@ -51,7 +59,7 @@ export function useManualBookingGeocode(
           addr.neighbourhood ||
           addr.hamlet ||
           "";
-        const resDistrict = addr.county || addr.state || "";
+        const resDistrict = addr.county || addr.state_district || addr.district || addr.state || "";
         if (resCity && resDistrict) {
           formik.setFieldValue("city", resCity);
           formik.setFieldValue("district", resDistrict);

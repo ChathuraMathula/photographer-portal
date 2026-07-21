@@ -19,6 +19,10 @@ export function useMapPreviewLocation(
       setLoading(true);
       setErrorMsg("");
       setCoords(null);
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
       try {
         let targetLink = locationMapLink;
         if (
@@ -62,7 +66,7 @@ export function useMapPreviewLocation(
               placeNameMatch[1].replace(/\+/g, " "),
             );
             const nominatimRes = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(placeName)}&format=json&limit=1`,
+              `${baseUrl}/search?q=${encodeURIComponent(placeName)}&format=json&limit=1`,
               { headers: { "Accept-Language": "en" } },
             );
             if (nominatimRes.ok) {
@@ -95,7 +99,7 @@ export function useMapPreviewLocation(
         }
 
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+          `${baseUrl}/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
           { headers: { "Accept-Language": "en" } },
         );
         if (!response.ok) throw new Error("Geocoding service unavailable.");
@@ -110,7 +114,7 @@ export function useMapPreviewLocation(
           if (district) fallbackParts.push(district);
           if (fallbackParts.length > 0) {
             const fallbackResponse = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fallbackParts.join(", "))}&format=json&limit=1`,
+              `${baseUrl}/search?q=${encodeURIComponent(fallbackParts.join(", "))}&format=json&limit=1`,
               { headers: { "Accept-Language": "en" } },
             );
             const fallbackData = await fallbackResponse.json();
@@ -124,7 +128,7 @@ export function useMapPreviewLocation(
           }
           if (district) {
             const distResponse = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(district)}&format=json&limit=1`,
+              `${baseUrl}/search?q=${encodeURIComponent(district)}&format=json&limit=1`,
               { headers: { "Accept-Language": "en" } },
             );
             const distData = await distResponse.json();
@@ -137,7 +141,7 @@ export function useMapPreviewLocation(
             }
           }
           const lkResponse = await fetch(
-            `https://nominatim.openstreetmap.org/search?q=Sri+Lanka&format=json&limit=1`,
+            `${baseUrl}/search?q=Sri+Lanka&format=json&limit=1`,
             { headers: { "Accept-Language": "en" } },
           );
           const lkData = await lkResponse.json();

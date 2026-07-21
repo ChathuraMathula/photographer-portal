@@ -3,13 +3,24 @@ export function getMapHtml(
   currentLon: number,
   readOnly: boolean,
 ) {
+  const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+  const leafletCss = isOffline
+    ? "/leaflet/leaflet.css"
+    : "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+  const leafletJs = isOffline
+    ? "/leaflet/leaflet.js"
+    : "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+  const tileUrl = isOffline
+    ? "http://localhost:8080/styles/basic-preview/{z}/{x}/{y}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
   return `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8" />
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <link rel="stylesheet" href="${leafletCss}" />
+      <script src="${leafletJs}"></script>
       <style>
         body, html, #map { margin: 0; padding: 0; height: 100%; width: 100%; }
         .leaflet-container { font-family: system-ui, -apple-system, sans-serif; }
@@ -21,7 +32,9 @@ export function getMapHtml(
       <div id="map"></div>
       <script>
         var map = L.map('map', { zoomControl: ${!readOnly}, dragging: ${!readOnly}, scrollWheelZoom: ${!readOnly}, doubleClickZoom: ${!readOnly}, boxZoom: ${!readOnly}, keyboard: ${!readOnly} }).setView([${currentLat}, ${currentLon}], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+        L.tileLayer('${tileUrl}', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+        
+        ${isOffline ? `L.Icon.Default.imagePath = '/leaflet/images/';` : ''}
         var marker = L.marker([${currentLat}, ${currentLon}], { draggable: ${!readOnly} }).addTo(map);
         ${
           !readOnly

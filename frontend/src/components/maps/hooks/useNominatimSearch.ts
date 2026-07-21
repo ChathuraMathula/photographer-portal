@@ -30,7 +30,11 @@ export function useNominatimSearch() {
     }
     setLoading(true);
     try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=lk&featuretype=settlement&format=json&addressdetails=1&limit=8`;
+      const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
+      const baseUrl = isOffline
+        ? "http://localhost:8081"
+        : "https://nominatim.openstreetmap.org";
+      const url = `${baseUrl}/search?q=${encodeURIComponent(query)}&countrycodes=lk&featuretype=settlement&format=json&addressdetails=1&limit=8`;
       const res = await fetch(url, { headers: { "Accept-Language": "en" } });
       if (res.ok) {
         const data = await res.json();
@@ -44,7 +48,7 @@ export function useNominatimSearch() {
               addr.village ||
               item.name ||
               "";
-            const district = addr.county || addr.state || "";
+            const district = addr.county || addr.state_district || addr.district || addr.state || "";
             const display = [city, district].filter(Boolean).join(", ");
             return { city, district, display };
           })
