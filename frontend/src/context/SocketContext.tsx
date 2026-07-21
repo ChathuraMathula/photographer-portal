@@ -66,7 +66,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     const handleUserDeactivated = async () => {
       console.log("🚫 Account deactivated — logging out...");
 
-      // Clear HTTP-only cookie on the backend
       try {
         await fetch(`${API}/auth/logout`, {
           method: "POST",
@@ -76,13 +75,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         console.error("Backend logout error:", err);
       }
 
-      // Clear Redux + localStorage
       dispatch(logout());
-
-      // Disconnect socket cleanly
       socketInstance.disconnect();
-
-      // Redirect to login with deactivation flag
       window.location.href = "/login?deactivated=true";
     };
 
