@@ -5,11 +5,11 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express'; // Import Express Request
+import { Request } from 'express';
 import { UserRole } from '../../entities/user.entity';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
-// 1. Define our custom Request type that includes the User payload
+// Define our custom Request type that includes the User payload
 export interface RequestWithUser extends Request {
   user: {
     userId: string;
@@ -20,7 +20,7 @@ export interface RequestWithUser extends Request {
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
@@ -32,11 +32,9 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    // 2. Cast the request to our strict interface instead of letting it be 'any'
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const user = request.user;
 
-    // 3. Safety check: If for some reason there is no user, deny access
     if (!user) {
       throw new ForbiddenException('No user found on request');
     }
