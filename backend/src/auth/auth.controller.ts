@@ -37,7 +37,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Res({ passthrough: true }) response: Response) {
+  logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

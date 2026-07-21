@@ -1,7 +1,6 @@
 import {
   Injectable,
   UnauthorizedException,
-  NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,20 +26,20 @@ export class AuthService {
     const { email, password } = loginDto;
     console.log(email, password);
 
-    // 1. Find user by email
+    // Find user by email
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 2. Compare hashed password
+    // Compare hashed password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 3. Generate JWT Payload
+    // Generate JWT Payload
     const payload = {
       sub: user.id,
       email: user.email,
@@ -68,7 +67,7 @@ export class AuthService {
   async forgotPassword(email: string) {
     const user = await this.userRepository.findOneBy({ email });
     if (!user || !user.isActive) {
-      // Return a success message even if email is not found to prevent user enumeration attacks
+      // Return a success message even if email is not found.
       return {
         message: 'If the email exists, a password reset link has been sent.',
       };
