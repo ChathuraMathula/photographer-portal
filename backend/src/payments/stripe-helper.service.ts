@@ -7,7 +7,7 @@ import { EmailService } from '../email/email.service';
 import {
   generateInvoicePdf,
   InvoiceData,
-} from '../reports/invoices-pdf-generator';
+} from '../reports/pdf/invoices-pdf-generator';
 import { Repository } from 'typeorm';
 
 @Injectable()

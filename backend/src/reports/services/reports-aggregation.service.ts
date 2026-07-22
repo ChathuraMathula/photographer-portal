@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Reservation } from '../entities/reservation.entity';
-import { Payment } from '../entities/payment.entity';
-import { User } from '../entities/user.entity';
-import { getDateRange } from './database/date-range.util';
-import { aggregateSummary } from './database/summary.aggregator';
-import { aggregateStatusDistribution } from './database/status.aggregator';
-import { aggregateEventTypes } from './database/event-type.aggregator';
-import { aggregatePackages } from './database/package.aggregator';
-import { aggregateTimeline } from './database/timeline.aggregator';
-import { aggregateSystemStats } from './database/system-stats.aggregator';
-import { aggregateLeaderboard } from './database/leaderboard.aggregator';
-import { aggregateRawBookings } from './database/bookings-raw.aggregator';
+import { Reservation } from '../../entities/reservation.entity';
+import { Payment } from '../../entities/payment.entity';
+import { User } from '../../entities/user.entity';
+import { getDateRange } from '../database/date-range.util';
+import { aggregateSummary } from '../database/summary.aggregator';
+import { aggregateStatusDistribution } from '../database/status.aggregator';
+import { aggregateEventTypes } from '../database/event-type.aggregator';
+import { aggregatePackages } from '../database/package.aggregator';
+import { aggregateTimeline } from '../database/timeline.aggregator';
+import { aggregateSystemStats } from '../database/system-stats.aggregator';
+import { aggregateLeaderboard } from '../database/leaderboard.aggregator';
+import { aggregateRawBookings } from '../database/bookings-raw.aggregator';
 
 @Injectable()
 export class ReportsAggregationService {

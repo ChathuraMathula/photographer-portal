@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InvoicesController } from './invoices.controller';
 import { InvoicesService } from './invoices.service';
-import { InvoiceGenerationService } from './invoice-generation.service';
+import { InvoiceGenerationService } from './services/invoice-generation.service';
 import { Reservation } from '../entities/reservation.entity';
 import { Payment } from '../entities/payment.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';

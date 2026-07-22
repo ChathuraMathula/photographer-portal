@@ -4,7 +4,7 @@ import { In, Repository } from 'typeorm';
 import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Payment, PaymentStatus } from '../entities/payment.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { InvoiceGenerationService } from './invoice-generation.service';
+import { InvoiceGenerationService } from './services/invoice-generation.service';
 
 @Injectable()
 export class InvoicesService {

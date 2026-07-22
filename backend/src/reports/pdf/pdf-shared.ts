@@ -1,4 +1,4 @@
-﻿import PDFDocument = require('pdfkit');
+import PDFDocument = require('pdfkit');
 
 // Theme Colors
 export const primaryColor = '#18181b'; // zinc-900

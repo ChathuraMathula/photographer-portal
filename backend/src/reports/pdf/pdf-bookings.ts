@@ -1,4 +1,4 @@
-﻿import PDFDocument = require('pdfkit');
+import PDFDocument = require('pdfkit');
 import {
   primaryColor,
   accentColor,

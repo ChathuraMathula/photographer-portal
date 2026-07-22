@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Reservation } from '../entities/reservation.entity';
-import { Payment, PaymentStatus } from '../entities/payment.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { generateInvoicePdf, InvoiceData } from './invoices-pdf-generator';
-import { EmailService } from '../email/email.service';
+import { Reservation } from '../../entities/reservation.entity';
+import { Payment, PaymentStatus } from '../../entities/payment.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { generateInvoicePdf, InvoiceData } from '../pdf/invoices-pdf-generator';
+import { EmailService } from '../../email/email.service';
 
 @Injectable()
 export class InvoiceGenerationService {
