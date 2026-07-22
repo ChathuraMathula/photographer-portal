@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices';
-import { EmailWorkerService } from './email-worker.service';
+import { EmailWorkerService } from './services/email-worker.service';
 
 @Controller()
 export class EmailController {

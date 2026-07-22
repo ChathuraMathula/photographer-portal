@@ -2,9 +2,9 @@ import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { EmailService } from './email.service';
-import { EmailWorkerService } from './email-worker.service';
+import { EmailWorkerService } from './services/email-worker.service';
 import { EmailController } from './email.controller';
-import { RemindersService } from './reminders.service';
+import { RemindersService } from './services/reminders.service';
 import { Reservation } from '../entities/reservation.entity';
 import { User } from '../entities/user.entity';
 
@@ -13,6 +13,6 @@ import { User } from '../entities/user.entity';
   imports: [TypeOrmModule.forFeature([Reservation, User]), RabbitMQModule],
   controllers: [EmailController],
   providers: [EmailService, EmailWorkerService, RemindersService],
-  exports: [EmailService],
+  exports: [EmailService, EmailWorkerService, RemindersService],
 })
 export class EmailModule {}

@@ -4,10 +4,10 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan } from 'typeorm';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { User } from '../entities/user.entity';
-import { EmailService } from './email.service';
+import { Repository, LessThan } from 'typeorm';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { User } from '../../entities/user.entity';
+import { EmailService } from '../email.service';
 
 @Injectable()
 export class RemindersService

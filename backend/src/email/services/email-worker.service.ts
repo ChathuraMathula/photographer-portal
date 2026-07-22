@@ -101,7 +101,7 @@ export class EmailWorkerService {
     await this.transporter.sendMail({
       from: '"Photographer Portal" <noreply@photoportal.com>',
       to: photographerEmail,
-      subject: 'Booking Confirmed - ' + customerName,
+      subject: `Booking Confirmed for ${eventDate}`,
       html,
     });
   }
@@ -113,20 +113,20 @@ export class EmailWorkerService {
     pdfBuffer: Buffer,
   ) {
     const html = `
-      <h2>Invoice Issued: ${invoiceNumber}</h2>
+      <h2>Invoice & Receipt</h2>
       <p>Dear ${customerName},</p>
-      <p>Your payment has been successfully received, and your booking is fully settled. Please find your system-generated invoice attached to this email.</p>
-      <p>Thank you for choosing our services!</p>
+      <p>Thank you for your payment! Please find attached the official PDF invoice for your reservation.</p>
+      <p>Invoice Number: <strong>${invoiceNumber}</strong></p>
     `;
 
     await this.transporter.sendMail({
       from: '"Photographer Portal" <noreply@photoportal.com>',
       to: customerEmail,
-      subject: `Invoice - ${invoiceNumber}`,
+      subject: `Invoice #${invoiceNumber} - Photographer Portal`,
       html,
       attachments: [
         {
-          filename: `invoice_${invoiceNumber}.pdf`,
+          filename: `${invoiceNumber}.pdf`,
           content: pdfBuffer,
         },
       ],
@@ -135,25 +135,16 @@ export class EmailWorkerService {
 
   async sendAccountDeactivated(userEmail: string, firstName: string) {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #dc2626;">Account Suspended</h2>
-        <p>Dear ${firstName},</p>
-        <p>We are writing to inform you that your account on the <strong>Photographer Portal</strong> has been <strong>suspended</strong> by a system administrator.</p>
-        <p>As a result of this action:</p>
-        <ul>
-          <li>Your portal access has been immediately revoked.</li>
-          <li>Any active sessions have been terminated.</li>
-          <li>Your booking page is no longer accessible to clients.</li>
-        </ul>
-        <p>If you believe this is a mistake or would like to appeal this decision, please contact your system administrator directly.</p>
-        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
-      </div>
+      <h2>Account Deactivated</h2>
+      <p>Dear ${firstName},</p>
+      <p>Your account on Photographer Portal has been deactivated by an administrator.</p>
+      <p>If you believe this is an error, please contact support.</p>
     `;
 
     await this.transporter.sendMail({
       from: '"Photographer Portal" <noreply@photoportal.com>',
       to: userEmail,
-      subject: 'Your Account Has Been Suspended',
+      subject: 'Account Status Notice',
       html,
     });
   }
@@ -164,18 +155,12 @@ export class EmailWorkerService {
     resetLink: string,
   ) {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Reset Your Password</h2>
-        <p>Dear ${firstName},</p>
-        <p>You requested to reset your password for the <strong>Photographer Portal</strong>.</p>
-        <p style="margin: 20px 0;">
-          <a href="${resetLink}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Reset Password
-          </a>
-        </p>
-        <p>If you did not request a password reset, please ignore this email. This link is valid for 1 hour.</p>
-        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
-      </div>
+      <h2>Password Reset Request</h2>
+      <p>Dear ${firstName},</p>
+      <p>You requested a password reset for your Photographer Portal account.</p>
+      <p>Click the link below to reset your password:</p>
+      <p><a href="${resetLink}">${resetLink}</a></p>
+      <p>If you did not request this, please ignore this email.</p>
     `;
 
     await this.transporter.sendMail({
@@ -194,26 +179,18 @@ export class EmailWorkerService {
     advancePaymentAmount: number,
   ) {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #d97706;">Action Required: Complete Your Booking Payment</h2>
-        <p>Dear ${customerName},</p>
-        <p>This is a friendly reminder to complete your reservation deposit payment for the package <strong>${packageName}</strong>.</p>
-        <p><strong>Advance Deposit Amount:</strong> LKR ${(advancePaymentAmount / 100).toLocaleString()}</p>
-        <p>Please use the link below to verify your details, complete the deposit, and lock in your reservation date:</p>
-        <p style="margin: 20px 0;">
-          <a href="${trackingLink}" style="display: inline-block; background-color: #d97706; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Complete Deposit & Confirm Booking
-          </a>
-        </p>
-        <p>If you have any questions, feel free to contact us.</p>
-        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
-      </div>
+      <h2>Payment Reminder</h2>
+      <p>Dear ${customerName},</p>
+      <p>This is a friendly reminder that your booking reservation for <strong>${packageName}</strong> requires a deposit payment to confirm.</p>
+      <p><strong>Advance Deposit:</strong> LKR ${(advancePaymentAmount / 100).toLocaleString()}</p>
+      <p>Please complete your payment here:</p>
+      <p><a href="${trackingLink}">${trackingLink}</a></p>
     `;
 
     await this.transporter.sendMail({
       from: '"Photographer Portal" <noreply@photoportal.com>',
       to: customerEmail,
-      subject: 'Reminder: Complete Deposit to Confirm Your Reservation',
+      subject: 'Payment Reminder for Reservation',
       html,
     });
   }
@@ -226,18 +203,9 @@ export class EmailWorkerService {
     eventDate: string,
   ) {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">Reminder: Upcoming Photography Event</h2>
-        <p>Dear ${name},</p>
-        <p>This is a reminder that you have an upcoming photography session scheduled on <strong>${eventDate}</strong>.</p>
-        <p>Details:</p>
-        <ul>
-          <li><strong>Date:</strong> ${eventDate}</li>
-          <li><strong>${recipientType === 'photographer' ? 'Customer' : 'Photographer'}:</strong> ${otherPartyName}</li>
-        </ul>
-        <p>We hope you have an amazing session!</p>
-        <p style="color: #6b7280; font-size: 0.85em; margin-top: 24px;">This is an automated message. Please do not reply to this email.</p>
-      </div>
+      <h2>Upcoming Booking Reminder</h2>
+      <p>Dear ${name},</p>
+      <p>This is a reminder for your upcoming photo session scheduled on <strong>${eventDate}</strong> with <strong>${otherPartyName}</strong>.</p>
     `;
 
     await this.transporter.sendMail({
