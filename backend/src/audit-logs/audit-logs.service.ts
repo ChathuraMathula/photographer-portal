@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
 import { AuditLog } from '../entities/audit-log.entity';
+import { AuditLogWriterService } from './services/audit-log-writer.service';
+import { AuditLogQueryService } from './services/audit-log-query.service';
 
 @Injectable()
 export class AuditLogsService {
   constructor(
-    @InjectRepository(AuditLog)
-    private auditLogRepository: Repository<AuditLog>,
+    private readonly writerService: AuditLogWriterService,
+    private readonly queryService: AuditLogQueryService,
   ) {}
 
   async logAction(
@@ -16,13 +16,7 @@ export class AuditLogsService {
     userId?: string,
     userEmail?: string,
   ): Promise<AuditLog> {
-    const log = this.auditLogRepository.create({
-      action,
-      details,
-      userId,
-      userEmail,
-    });
-    return this.auditLogRepository.save(log);
+    return this.writerService.logAction(action, details, userId, userEmail);
   }
 
   async getLogs(filters: {
@@ -33,44 +27,6 @@ export class AuditLogsService {
     startDate?: string;
     endDate?: string;
   }) {
-    const {
-      page = 1,
-      limit = 10,
-      action,
-      userEmail,
-      startDate,
-      endDate,
-    } = filters;
-    const skip = (page - 1) * limit;
-    const where: any = {};
-
-    if (action) {
-      where.action = action;
-    }
-
-    if (userEmail) {
-      where.userEmail = userEmail;
-    }
-
-    if (startDate || endDate) {
-      const start = startDate ? new Date(startDate) : new Date(0);
-      const end = endDate ? new Date(endDate) : new Date();
-      where.createdAt = Between(start, end);
-    }
-
-    const [data, total] = await this.auditLogRepository.findAndCount({
-      where,
-      order: { createdAt: 'DESC' },
-      skip,
-      take: limit,
-    });
-
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return this.queryService.getLogs(filters);
   }
 }
