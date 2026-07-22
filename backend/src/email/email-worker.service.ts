@@ -243,7 +243,49 @@ export class EmailWorkerService {
     await this.transporter.sendMail({
       from: '"Photographer Portal" <noreply@photoportal.com>',
       to: email,
-      subject: 'Reminder: Upcoming Photography Session',
+      subject: `Reminder: Upcoming Booking on ${eventDate}`,
+      html,
+    });
+  }
+
+  async sendUserCreated(
+    userEmail: string,
+    firstName: string,
+    role: string,
+    password?: string,
+  ) {
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000';
+    const html = `
+      <h2>Welcome to Photographer Portal</h2>
+      <p>Dear ${firstName},</p>
+      <p>An administrator has created an account for you on the Photographer Portal.</p>
+      <p><strong>Account Role:</strong> ${role}</p>
+      <p><strong>Login Email:</strong> ${userEmail}</p>
+      ${password ? `<p><strong>Temporary Password:</strong> <code>${password}</code></p>` : ''}
+      <p>You can access your portal here:</p>
+      <p><a href="${frontendUrl}/login">${frontendUrl}/login</a></p>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: userEmail,
+      subject: 'Account Created - Photographer Portal',
+      html,
+    });
+  }
+
+  async sendUserDetailsUpdated(userEmail: string, firstName: string) {
+    const html = `
+      <h2>Account Information Updated</h2>
+      <p>Dear ${firstName},</p>
+      <p>This is to inform you that your profile details (such as name or booking slug) have been updated by an administrator.</p>
+      <p>If you have any questions, please contact system administration.</p>
+    `;
+
+    await this.transporter.sendMail({
+      from: '"Photographer Portal" <noreply@photoportal.com>',
+      to: userEmail,
+      subject: 'Account Details Updated - Photographer Portal',
       html,
     });
   }

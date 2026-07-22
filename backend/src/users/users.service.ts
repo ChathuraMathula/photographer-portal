@@ -84,6 +84,18 @@ export class UsersService {
       user.email,
     );
 
+    // Send email notification to newly created user
+    try {
+      await this.emailService.sendUserCreated(
+        user.email,
+        user.firstName,
+        user.role,
+        dto.password,
+      );
+    } catch (err) {
+      console.error('Failed to send user creation email:', err);
+    }
+
     return {
       id: user.id,
       firstName: user.firstName,
@@ -280,6 +292,16 @@ export class UsersService {
       `User ${userId} details (name/slug) were updated by super admin`,
       userId,
     );
+
+    // Send email notification when user details are updated
+    try {
+      await this.emailService.sendUserDetailsUpdated(
+        user.email,
+        user.firstName,
+      );
+    } catch (err) {
+      console.error('Failed to send user details updated email:', err);
+    }
 
     return {
       firstName: user.firstName,

@@ -129,4 +129,25 @@ export class EmailService {
       eventDate,
     });
   }
+
+  async sendUserCreated(
+    userEmail: string,
+    firstName: string,
+    role: string,
+    password?: string,
+  ) {
+    this.client.emit('email.sendUserCreated', {
+      userEmail,
+      firstName,
+      role,
+      password,
+    });
+  }
+
+  async sendUserDetailsUpdated(userEmail: string, firstName: string) {
+    this.client.emit('email.sendUserDetailsUpdated', {
+      userEmail,
+      firstName,
+    });
+  }
 }

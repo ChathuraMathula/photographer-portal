@@ -156,4 +156,32 @@ export class EmailController {
       );
     });
   }
+
+  @EventPattern('email.sendUserCreated')
+  async handleSendUserCreated(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    await this.handleAck(context, async () => {
+      await this.emailWorkerService.sendUserCreated(
+        data.userEmail,
+        data.firstName,
+        data.role,
+        data.password,
+      );
+    });
+  }
+
+  @EventPattern('email.sendUserDetailsUpdated')
+  async handleSendUserDetailsUpdated(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    await this.handleAck(context, async () => {
+      await this.emailWorkerService.sendUserDetailsUpdated(
+        data.userEmail,
+        data.firstName,
+      );
+    });
+  }
 }
