@@ -7,21 +7,15 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import * as crypto from 'crypto';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { Customer } from '../entities/customer.entity';
-import { Package } from '../entities/package.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { Payment, PaymentStatus } from '../entities/payment.entity';
-import { CreateManualBookingDto } from './dto/create-manual-booking.dto';
-import { ChatGateway } from './chat.gateway';
-import { UserRole } from '../entities/user.entity';
-
-interface JwtUser {
-  userId: string;
-  role: UserRole;
-  firstName?: string;
-  lastName?: string;
-}
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { Customer } from '../../entities/customer.entity';
+import { Package } from '../../entities/package.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { Payment, PaymentStatus } from '../../entities/payment.entity';
+import { CreateManualBookingDto } from '../dto/create-manual-booking.dto';
+import { ChatGateway } from '../chat.gateway';
+import { UserRole } from '../../entities/user.entity';
+import { JwtUser } from '../interfaces/jwt-user.interface';
 
 @Injectable()
 export class ReservationsLifecycleService {

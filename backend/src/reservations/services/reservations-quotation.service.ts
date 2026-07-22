@@ -4,22 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, Brackets } from 'typeorm';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { Package } from '../entities/package.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { ProposeQuotationDto } from './dto/propose-quotation.dto';
-import { RejectReservationDto } from './dto/reject-reservation.dto';
-import { ChatGateway } from './chat.gateway';
-import { EmailService } from '../email/email.service';
-import { UserRole } from '../entities/user.entity';
-
-interface JwtUser {
-  userId: string;
-  role: UserRole;
-  firstName?: string;
-  lastName?: string;
-}
+import { Repository, In } from 'typeorm';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { Package } from '../../entities/package.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { ProposeQuotationDto } from '../dto/propose-quotation.dto';
+import { RejectReservationDto } from '../dto/reject-reservation.dto';
+import { ChatGateway } from '../chat.gateway';
+import { EmailService } from '../../email/email.service';
+import { JwtUser } from '../interfaces/jwt-user.interface';
 
 @Injectable()
 export class ReservationsQuotationService {
