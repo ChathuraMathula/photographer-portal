@@ -7,12 +7,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as crypto from 'crypto';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { Customer } from '../entities/customer.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { ChatGateway } from '../reservations/chat.gateway';
-import { EmailService } from '../email/email.service';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { Customer } from '../../entities/customer.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { CreateBookingDto } from '../dto/create-booking.dto';
+import { ChatGateway } from '../../reservations/chat.gateway';
+import { EmailService } from '../../email/email.service';
 import { BookingsValidationService } from './bookings-validation.service';
 
 @Injectable()
