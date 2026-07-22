@@ -165,8 +165,10 @@ export function useUserManagement() {
     onSubmit: async (values, { resetForm }) => {
       setSubmitError("");
       try {
+        // Exclude transient frontend form fields (e.g. coordinates) not accepted by backend CreateUserDto
+        const { coordinates, ...restValues } = values;
         const body = {
-          ...values,
+          ...restValues,
           specializations:
             values.role === UserRole.PHOTOGRAPHER ? specsList : undefined,
         };

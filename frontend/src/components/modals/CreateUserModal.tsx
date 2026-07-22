@@ -65,11 +65,7 @@ export function CreateUserModal({
           </Button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
-          {submitError && (
-            <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20 animate-in fade-in duration-100">
-              {submitError}
-            </div>
-          )}
+
           <CreateUserBasicFields formik={formik} loggedInRole={loggedInRole} />
           {formik.values.role === UserRole.PHOTOGRAPHER && (
             <CreateUserPhotographerFields
@@ -80,6 +76,12 @@ export function CreateUserModal({
               onAddSpec={onAddSpec}
               onRemoveSpec={onRemoveSpec}
             />
+          )}
+
+          {submitError && (
+            <div className="rounded-xl bg-red-50 p-4 text-body-small-s text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-250/20 animate-in fade-in duration-100">
+              {submitError}
+            </div>
           )}
         </div>
         <div className="border-t px-6 py-4 bg-zinc-50/50 dark:bg-zinc-950/20 dark:border-zinc-800 grid grid-cols-2 gap-3 shrink-0">
