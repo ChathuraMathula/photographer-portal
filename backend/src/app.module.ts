@@ -14,7 +14,7 @@ import { PhotographersModule } from './photographers/photographers.module';
 import { PackagesModule } from './packages/packages.module';
 import { EmailModule } from './email/email.module';
 import { ReportsModule } from './reports/reports.module';
-import { InvoicesModule } from './reports/invoices.module';
+import { InvoicesModule } from './invoices/invoices.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { User } from './entities/user.entity';
