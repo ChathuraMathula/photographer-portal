@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReportsService } from './reports.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Reservation } from '../entities/reservation.entity';
-import { ReportsAggregationService } from './reports-aggregation.service';
+import { ReportsAggregationService } from './services/reports-aggregation.service.js';
 
 describe('ReportsService', () => {
   let service: ReportsService;
