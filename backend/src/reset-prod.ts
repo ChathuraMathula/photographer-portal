@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DataSource } from 'typeorm';
 import { seedProdData } from './scripts/seed-prod-data';
+import { resetRabbitMQ } from './scripts/reset-rabbitmq';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -23,6 +24,9 @@ async function bootstrap() {
 
     console.log('🌱  Seeding Super Admin user...\n');
     await seedProdData(app);
+
+    console.log('\n  🐰  Resetting RabbitMQ message broker...');
+    await resetRabbitMQ();
 
     console.log('\n✅  Production database reset complete. Fresh Super Admin data ready.\n');
   } catch (err) {

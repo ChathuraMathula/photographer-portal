@@ -13,7 +13,8 @@
     "db:reset:prod": "cd backend && npm run db:reset:prod",
     "db:seed": "cd backend && npm run seed",
     "seed": "cd backend && npm run seed",
-    "seed:prod": "cd backend && npm run seed:prod"
+    "seed:prod": "cd backend && npm run seed:prod",
+    "rabbitmq:reset": "cd backend && npm run rabbitmq:reset"
   },
   "keywords": [],
   "author": "",
