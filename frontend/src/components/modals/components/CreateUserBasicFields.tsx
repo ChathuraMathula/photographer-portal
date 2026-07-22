@@ -1,8 +1,10 @@
+import React, { useState } from "react";
 import { type FormikProps } from "formik";
 import { UserRole } from "@/store/slices/authSlice";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/feedback/FieldError";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,6 +17,8 @@ import { CreateUserValues } from "../CreateUserModal";
 type Props = { formik: FormikProps<CreateUserValues>; loggedInRole: UserRole };
 
 export function CreateUserBasicFields({ formik, loggedInRole }: Props) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -76,12 +80,26 @@ export function CreateUserBasicFields({ formik, loggedInRole }: Props) {
           >
             Password
           </Label>
-          <Input
-            id="cu-password"
-            type="password"
-            {...formik.getFieldProps("password")}
-            className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.password && formik.errors.password ? "border-red-500" : ""}`}
-          />
+          <div className="relative">
+            <Input
+              id="cu-password"
+              type={showPassword ? "text" : "password"}
+              {...formik.getFieldProps("password")}
+              className={`h-[50px] pr-11 rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.password && formik.errors.password ? "border-red-500" : ""}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           <FieldError
             msg={formik.touched.password ? formik.errors.password : undefined}
           />
