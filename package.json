@@ -10,8 +10,10 @@
     "dev": "node scripts/start-dev.js",
     "stop": "docker-compose down",
     "db:reset": "cd backend && npm run db:reset",
+    "db:reset:prod": "cd backend && npm run db:reset:prod",
     "db:seed": "cd backend && npm run seed",
-    "seed": "cd backend && npm run seed"
+    "seed": "cd backend && npm run seed",
+    "seed:prod": "cd backend && npm run seed:prod"
   },
   "keywords": [],
   "author": "",
