@@ -1,7 +1,7 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '../entities/user.entity';
+import { User, UserRole } from '../../entities/user.entity';
 
 export async function seedProdData(
   app: INestApplicationContext,

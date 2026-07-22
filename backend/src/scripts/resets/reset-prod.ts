@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '../../app.module';
 import { DataSource } from 'typeorm';
-import { seedProdData } from './scripts/seed-prod-data';
-import { resetRabbitMQ } from './scripts/reset-rabbitmq';
-import { resetMailDev } from './scripts/reset-maildev';
+import { seedProdData } from '../seeds/seed-prod-data';
+import { resetRabbitMQ } from './reset-rabbitmq';
+import { resetMailDev } from './reset-maildev';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);

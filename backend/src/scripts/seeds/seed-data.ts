@@ -2,13 +2,13 @@ import { INestApplicationContext } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User, UserRole } from '../entities/user.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { Customer } from '../entities/customer.entity';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { Package } from '../entities/package.entity';
-import { Message } from '../entities/message.entity';
-import { Payment, PaymentStatus } from '../entities/payment.entity';
+import { User, UserRole } from '../../entities/user.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { Customer } from '../../entities/customer.entity';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { Package } from '../../entities/package.entity';
+import { Message } from '../../entities/message.entity';
+import { Payment, PaymentStatus } from '../../entities/payment.entity';
 
 const tok = () => crypto.randomBytes(32).toString('hex');
 

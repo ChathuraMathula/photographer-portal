@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { seedSarahData } from './scripts/seed-sarah-data';
+import { AppModule } from '../../app.module';
+import { seedSarahData } from './seed-sarah-data';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);

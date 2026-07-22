@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
-import { AppModule } from './app.module';
-import { seedDatabase } from './scripts/seed-data';
+import { AppModule } from '../../app.module';
+import { seedDatabase } from '../seeds/seed-data';
 
 async function bootstrap() {
-  const dbHost = process.env.DB_HOST ?? 'localhost';
-
   const app = await NestFactory.createApplicationContext(AppModule);
 
   console.log(
