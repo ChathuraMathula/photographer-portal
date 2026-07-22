@@ -24,6 +24,7 @@
     "db:reset": "ts-node -r tsconfig-paths/register src/reset.ts",
     "db:reset:prod": "ts-node -r tsconfig-paths/register src/reset-prod.ts",
     "rabbitmq:reset": "ts-node -r tsconfig-paths/register src/scripts/reset-rabbitmq.ts",
+    "maildev:reset": "ts-node -r tsconfig-paths/register src/scripts/reset-maildev.ts",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run typeorm -- migration:generate -d src/config/typeorm.config.ts",
     "migration:run": "npm run typeorm -- migration:run -d src/config/typeorm.config.ts",
