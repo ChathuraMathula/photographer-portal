@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { AuthLoginService } from './services/auth-login.service';
+import { AuthPasswordResetService } from './services/auth-password-reset.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { DatabaseModule } from '../database/database.module';
@@ -15,7 +17,13 @@ import { DatabaseModule } from '../database/database.module';
       signOptions: { expiresIn: '1d' }, // Token valid for 24 hours
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    AuthLoginService,
+    AuthPasswordResetService,
+    JwtStrategy,
+  ],
   controllers: [AuthController],
+  exports: [AuthService, AuthLoginService, AuthPasswordResetService],
 })
 export class AuthModule {}
