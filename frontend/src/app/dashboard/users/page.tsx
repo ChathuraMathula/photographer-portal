@@ -1,36 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { UserRole, logout } from "@/store/slices/authSlice";
+import { UserRole } from "@/store/slices/authSlice";
 import { useUserManagement } from "./hooks/useUserManagement";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { ADMIN_MENU } from "@/components/dashboard/AdminDashboard";
-import { Button } from "@/components/ui/button";
 import { UserTable } from "@/components/users/UserTable";
 import { CreateUserModal } from "@/components/modals/CreateUserModal";
-import { UserPlus, Search } from "lucide-react";
-import { Pagination } from "@/components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
+import { UserManagementHeader } from "./components/UserManagementHeader";
+import { UserFiltersBar } from "./components/UserFiltersBar";
+import { UserPaginationFooter } from "./components/UserPaginationFooter";
 
 export default function UserManagementPage() {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { start } = useTopLoadingBar();
-
-  const {
-    firstName,
-    role: authRole,
-    id: loggedInUserId,
-  } = useSelector((state: RootState) => state.auth);
+  const { id: loggedInUserId } = useSelector((state: RootState) => state.auth);
 
   const {
     loggedInRole,
@@ -60,34 +41,12 @@ export default function UserManagementPage() {
     setStatusFilter,
   } = useUserManagement();
 
-  const handleLogout = async () => {
-    try {
-      const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-      await fetch(`${API}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Backend logout error:", err);
-    }
-    dispatch(logout());
-    window.location.href = "/login";
-  };
-
-  const handleTabChange = (tab: string) => {
-    start();
-    if (tab === "overview") router.push("/dashboard");
-    else if (tab === "reports") router.push("/dashboard/reports");
-    else if (tab === "profile") router.push("/dashboard/profile");
-    else router.push("/dashboard/users");
-  };
-
   if (
     !isAuthenticated ||
     (loggedInRole !== UserRole.SUPER_ADMIN && loggedInRole !== UserRole.ADMIN)
   ) {
     return (
-      <div className="p-8 text-center text-red-500">
+      <div className="p-8 text-center text-red-500 font-medium">
         Access Denied. Authorized roles only.
       </div>
     );
@@ -96,66 +55,21 @@ export default function UserManagementPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-title-large text-primary-dark">
-            User Management
-          </h1>
-          <p className="text-body-small text-zinc-500 mt-1">
-            Logged in as{" "}
-            <span className="font-semibold text-zinc-800">{loggedInRole}</span>.{" "}
-            {loggedInRole === UserRole.SUPER_ADMIN
-              ? "Manage all system users, administrators, and photographers."
-              : "Manage and register new photographers."}
-          </p>
-        </div>
-        <Button
-          onClick={() => setShowModal(true)}
-          className="btn btn-primary h-11 gap-2 min-w-0 md:min-w-0 px-5 py-0 text-body-small-s shadow-sm"
-        >
-          <UserPlus className="h-4 w-4" />
-          Create User
-        </Button>
-      </div>
+      <UserManagementHeader
+        loggedInRole={loggedInRole}
+        onCreateUserClick={() => setShowModal(true)}
+      />
 
       {/* Filters Bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center bg-white dark:bg-zinc-900 p-4 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-          <input
-            type="text"
-            placeholder="Search by name, email or phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-3 bg-zinc-50 border border-zinc-250 rounded-lg text-body-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary dark:bg-zinc-800 dark:border-zinc-700 dark:text-white transition-all"
-          />
-        </div>
-        <div className="flex gap-3">
-          {loggedInRole === UserRole.SUPER_ADMIN && (
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-[160px] h-10 bg-zinc-50 border-zinc-250 dark:bg-zinc-800 dark:border-zinc-700">
-                <SelectValue placeholder="All Roles" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Roles</SelectItem>
-                <SelectItem value="SUPER_ADMIN">Super Admins</SelectItem>
-                <SelectItem value="ADMIN">Admins</SelectItem>
-                <SelectItem value="PHOTOGRAPHER">Photographers</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] h-10 bg-zinc-50 border-zinc-250 dark:bg-zinc-800 dark:border-zinc-700">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <UserFiltersBar
+        search={search}
+        onSearchChange={setSearch}
+        roleFilter={roleFilter}
+        onRoleFilterChange={setRoleFilter}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        loggedInRole={loggedInRole}
+      />
 
       {/* Users list */}
       {loading ? (
@@ -173,27 +87,13 @@ export default function UserManagementPage() {
             loggedInRole={loggedInRole as UserRole}
           />
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl shadow-sm gap-4">
-              <div className="text-body-caption text-zinc-500">
-                Showing page{" "}
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
-                  {page}
-                </span>{" "}
-                of{" "}
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
-                  {totalPages}
-                </span>{" "}
-                ({total} total users)
-              </div>
-              <Pagination
-                page={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+          {/* Pagination */}
+          <UserPaginationFooter
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={setPage}
+          />
         </div>
       )}
 
