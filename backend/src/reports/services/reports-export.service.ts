@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Reservation } from '../../entities/reservation.entity';
 import { buildFinancialReportPdf, buildBookingsReportPdf, buildLocationReportPdf } from '../pdf/reports-pdf-builder';
-import { getDateRange } from '../database/date-range.util';
+import { getDateRange } from '../aggregators/date-range.util';
 import { ReportsAggregationService } from './reports-aggregation.service';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class ReportsExportService {
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly aggregationService: ReportsAggregationService,
-  ) { }
+  ) {}
 
   async getReportBookings(
     photoId: string | undefined,
