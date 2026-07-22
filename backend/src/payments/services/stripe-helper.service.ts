@@ -1,14 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PaymentStatus } from '../entities/payment.entity';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
-import { Payment } from '../entities/payment.entity';
-import { EmailService } from '../email/email.service';
+import { Repository } from 'typeorm';
+import { PaymentStatus, Payment } from '../../entities/payment.entity';
+import { Reservation } from '../../entities/reservation.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { EmailService } from '../../email/email.service';
 import {
   generateInvoicePdf,
   InvoiceData,
-} from '../reports/pdf/invoices-pdf-generator';
-import { Repository } from 'typeorm';
+} from '../../invoices/pdf/invoices-pdf-generator';
 
 @Injectable()
 export class StripeHelperService {

@@ -3,13 +3,13 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { PaymentStatus, Payment } from '../entities/payment.entity';
-import { Reservation, ReservationStatus } from '../entities/reservation.entity';
 import { Repository } from 'typeorm';
-import { ChatGateway } from '../reservations/chat.gateway';
 import * as crypto from 'crypto';
+import { PaymentStatus, Payment } from '../../entities/payment.entity';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
+import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { ChatGateway } from '../../reservations/chat.gateway';
 import { StripeHelperService } from './stripe-helper.service';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
 
 @Injectable()
 export class OfflinePaymentService {
