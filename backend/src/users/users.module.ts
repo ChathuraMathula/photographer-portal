@@ -5,11 +5,29 @@ import { EmailModule } from '../email/email.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { UserProfileService } from './user-profile.service';
+import { UserSlugService } from './services/user-slug.service';
+import { UserSearchService } from './services/user-search.service';
+import { UserCreationService } from './services/user-creation.service';
+import { UserStatusService } from './services/user-status.service';
 
 @Module({
   imports: [DatabaseModule, ReservationsModule, EmailModule],
   controllers: [UsersController],
-  providers: [UsersService, UserProfileService],
-  exports: [UsersService, UserProfileService],
+  providers: [
+    UsersService,
+    UserProfileService,
+    UserSlugService,
+    UserSearchService,
+    UserCreationService,
+    UserStatusService,
+  ],
+  exports: [
+    UsersService,
+    UserProfileService,
+    UserSlugService,
+    UserSearchService,
+    UserCreationService,
+    UserStatusService,
+  ],
 })
 export class UsersModule {}

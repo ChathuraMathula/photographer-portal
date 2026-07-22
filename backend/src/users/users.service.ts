@@ -1,110 +1,22 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '../entities/user.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { Injectable } from '@nestjs/common';
+import { UserRole } from '../entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { EmailService } from '../email/email.service';
-import { AuditLogsService } from '../audit-logs/audit-logs.service';
-import { ChatGateway } from '../reservations/chat.gateway';
 import { UserProfileService } from './user-profile.service';
+import { UserCreationService } from './services/user-creation.service';
+import { UserSearchService } from './services/user-search.service';
+import { UserStatusService } from './services/user-status.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-    @InjectRepository(PhotographerProfile)
-    private profileRepository: Repository<PhotographerProfile>,
-    private readonly chatGateway: ChatGateway,
-    private readonly emailService: EmailService,
-    private readonly auditLogsService: AuditLogsService,
+    private readonly creationService: UserCreationService,
+    private readonly searchService: UserSearchService,
+    private readonly statusService: UserStatusService,
     private readonly profileService: UserProfileService,
   ) {}
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
-    // 1. RBAC constraints checking
-    if (callerRole === UserRole.ADMIN && dto.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Admins can only create Photographers');
-    }
-
-    // 2. Check if email already in use
-    const existing = await this.userRepository.findOneBy({ email: dto.email });
-    if (existing) {
-      throw new ConflictException('Email already in use');
-    }
-
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-
-    // 3. Create User
-    const user = this.userRepository.create({
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      email: dto.email,
-      passwordHash,
-      role: dto.role,
-      isActive: true,
-      phone: dto.phone,
-    });
-    await this.userRepository.save(user);
-
-    // 4. Create Profile if user is a PHOTOGRAPHER
-    let bookingLink: string | undefined = undefined;
-    if (dto.role === UserRole.PHOTOGRAPHER) {
-      const slug = await this.resolveSlug(
-        dto.bookingSlug ?? this.buildSlug(dto.firstName, dto.lastName),
-      );
-
-      const profile = this.profileRepository.create({
-        userId: user.id,
-        bookingSlug: slug,
-        bio: dto.bio,
-        baseLocation: dto.baseLocation,
-        city: dto.city,
-        district: dto.district,
-        locationMapLink: dto.locationMapLink,
-        specializations: dto.specializations ?? [],
-        isAvailableForBooking: true,
-      });
-      await this.profileRepository.save(profile);
-
-      bookingLink = `/book/${slug}`;
-    }
-
-    await this.auditLogsService.logAction(
-      'USER_CREATED',
-      `User ${user.email} of role ${user.role} was created by admin`,
-      user.id,
-      user.email,
-    );
-
-    // Send email notification to newly created user
-    try {
-      await this.emailService.sendUserCreated(
-        user.email,
-        user.firstName,
-        user.role,
-        dto.password,
-      );
-    } catch (err) {
-      console.error('Failed to send user creation email:', err);
-    }
-
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      bookingLink,
-    };
+    return this.creationService.create(dto, callerRole);
   }
 
   async getProfile(userId: string) {
@@ -125,128 +37,11 @@ export class UsersService {
       status?: string;
     } = {},
   ) {
-    if (callerRole !== UserRole.SUPER_ADMIN && callerRole !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    const page = query.page || 1;
-    const limit = query.limit || 10;
-    const skip = (page - 1) * limit;
-
-    const qb = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.profile', 'profile')
-      .orderBy('user.createdAt', 'DESC')
-      .skip(skip)
-      .take(limit);
-
-    // RBAC: Admins can only see Photographers
-    if (callerRole === UserRole.ADMIN) {
-      qb.andWhere('user.role = :role', { role: UserRole.PHOTOGRAPHER });
-    } else if (query.role && query.role !== 'ALL') {
-      qb.andWhere('user.role = :role', { role: query.role });
-    }
-
-    if (
-      query.status !== undefined &&
-      query.status !== '' &&
-      query.status !== 'ALL'
-    ) {
-      const isActive = query.status === 'active';
-      qb.andWhere('user.isActive = :isActive', { isActive });
-    }
-
-    if (query.search) {
-      const searchPattern = `%${query.search.toLowerCase()}%`;
-      qb.andWhere(
-        '(LOWER(user.firstName) LIKE :search OR LOWER(user.lastName) LIKE :search OR LOWER(user.email) LIKE :search OR LOWER(user.phone) LIKE :search)',
-        { search: searchPattern },
-      );
-    }
-
-    const [data, total] = await qb.getManyAndCount();
-
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return this.searchService.findAll(callerRole, query);
   }
 
   async toggleActive(id: string, callerRole: UserRole) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: { profile: true },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Admins can only manage photographers
-    if (callerRole === UserRole.ADMIN && user.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Admins can only manage Photographers');
-    }
-
-    const wasActive = user.isActive;
-    user.isActive = !user.isActive;
-    await this.userRepository.save(user);
-
-    // If user was just DEACTIVATED: emit real-time event + send email
-    if (wasActive && !user.isActive) {
-      // Emit WebSocket event to the user's personal room so they get logged out in real-time
-      try {
-        this.chatGateway.server.to(`user_${id}`).emit('userDeactivated', {
-          userId: id,
-          message: 'Your account has been suspended by an administrator.',
-        });
-      } catch (err) {
-        console.error('Failed to emit userDeactivated event:', err);
-      }
-
-      // Send deactivation email
-      try {
-        await this.emailService.sendAccountDeactivated(
-          user.email,
-          user.firstName,
-        );
-      } catch (err) {
-        console.error('Failed to send account deactivated email:', err);
-      }
-    }
-
-    await this.auditLogsService.logAction(
-      'USER_STATUS_TOGGLED',
-      `User ${user.email} active status toggled to ${user.isActive} by admin`,
-      user.id,
-      user.email,
-    );
-
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-    };
-  }
-
-  private buildSlug(firstName: string, lastName: string): string {
-    return `${firstName}-${lastName}`
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  private async resolveSlug(base: string): Promise<string> {
-    let slug = base;
-    let i = 1;
-    while (await this.profileRepository.findOneBy({ bookingSlug: slug })) {
-      slug = `${base}-${i++}`;
-    }
-    return slug;
+    return this.statusService.toggleActive(id, callerRole);
   }
 
   async getSettings(userId: string) {
@@ -261,52 +56,6 @@ export class UsersService {
     userId: string,
     updates: { firstName?: string; lastName?: string; bookingSlug?: string },
   ) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (updates.firstName) user.firstName = updates.firstName;
-    if (updates.lastName) user.lastName = updates.lastName;
-    await this.userRepository.save(user);
-
-    let finalSlug: string | null = null;
-    const profile = await this.profileRepository.findOneBy({ userId });
-
-    if (profile && updates.bookingSlug) {
-      if (profile.bookingSlug !== updates.bookingSlug) {
-        const existing = await this.profileRepository.findOneBy({
-          bookingSlug: updates.bookingSlug,
-        });
-        if (existing) {
-          throw new ConflictException('Booking slug is already in use');
-        }
-        profile.bookingSlug = updates.bookingSlug;
-        await this.profileRepository.save(profile);
-      }
-      finalSlug = profile.bookingSlug;
-    }
-
-    await this.auditLogsService.logAction(
-      'USER_DETAILS_UPDATED',
-      `User ${userId} details (name/slug) were updated by super admin`,
-      userId,
-    );
-
-    // Send email notification when user details are updated
-    try {
-      await this.emailService.sendUserDetailsUpdated(
-        user.email,
-        user.firstName,
-      );
-    } catch (err) {
-      console.error('Failed to send user details updated email:', err);
-    }
-
-    return {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      bookingSlug: finalSlug,
-    };
+    return this.statusService.updateUserDetails(userId, updates);
   }
 }
