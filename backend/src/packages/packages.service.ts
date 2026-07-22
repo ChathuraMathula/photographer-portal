@@ -1,57 +1,33 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Package } from '../entities/package.entity';
+import { Injectable } from '@nestjs/common';
 import { CreatePackageDto } from './dto/create-package.dto';
 import { UpdatePackageDto } from './dto/update-package.dto';
+import { PackageQueryService } from './services/package-query.service';
+import { PackageMutationsService } from './services/package-mutations.service';
 
 @Injectable()
 export class PackagesService {
   constructor(
-    @InjectRepository(Package)
-    private packageRepository: Repository<Package>,
+    private readonly queryService: PackageQueryService,
+    private readonly mutationsService: PackageMutationsService,
   ) {}
 
   async findAll(photographerId: string) {
-    return this.packageRepository.find({
-      where: { photographerId, isActive: true },
-      order: { createdAt: 'DESC' },
-    });
+    return this.queryService.findAll(photographerId);
   }
 
   async findOne(id: string, photographerId: string) {
-    const pkg = await this.packageRepository.findOneBy({ id });
-    if (!pkg) throw new NotFoundException('Package not found');
-    if (pkg.photographerId !== photographerId) {
-      throw new ForbiddenException('Access denied');
-    }
-    return pkg;
+    return this.queryService.findOne(id, photographerId);
   }
 
   async create(dto: CreatePackageDto, photographerId: string) {
-    const pkg = this.packageRepository.create({
-      ...dto,
-      photographerId,
-      isActive: true,
-    });
-    return this.packageRepository.save(pkg);
+    return this.mutationsService.create(dto, photographerId);
   }
 
   async update(id: string, dto: UpdatePackageDto, photographerId: string) {
-    const pkg = await this.findOne(id, photographerId);
-    Object.assign(pkg, dto);
-    return this.packageRepository.save(pkg);
+    return this.mutationsService.update(id, dto, photographerId);
   }
 
   async remove(id: string, photographerId: string) {
-    const pkg = await this.findOne(id, photographerId);
-    // Mark as inactive (soft delete) to preserve historical bookings
-    pkg.isActive = false;
-    await this.packageRepository.save(pkg);
-    return { success: true };
+    return this.mutationsService.remove(id, photographerId);
   }
 }
