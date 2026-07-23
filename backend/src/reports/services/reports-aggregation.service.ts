@@ -23,7 +23,7 @@ export class ReportsAggregationService {
     private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async generateReportData(
     photoId: string | undefined,

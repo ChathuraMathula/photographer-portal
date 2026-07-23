@@ -54,8 +54,6 @@ export type LocationInsightsSummary = {
   coveragePercent: number;
 };
 
-// ── Coordinate Extraction ──────────────────────────────────────────────────────
-
 /**
  * Extracts {lat, lon} from a Google Maps URL.
  * Handles:
@@ -86,7 +84,6 @@ export function extractCoordsFromMapLink(
   return null;
 }
 
-// ── Aggregation ────────────────────────────────────────────────────────────────
 
 /** Derives map points from bookings that have an extractable locationMapLink. */
 export function buildMapPoints(bookings: RawBooking[]): MapPoint[] {
