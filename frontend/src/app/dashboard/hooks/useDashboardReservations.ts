@@ -241,14 +241,14 @@ export function useDashboardReservations({
             customPackage:
               customPackage && isCustomPackageSelected
                 ? {
-                    name: customPackage.name,
-                    description: customPackage.description,
-                    priceInCents: customPackage.price * 100,
-                    durationHours: customPackage.durationHours,
-                    includes: customPackage.includes,
-                    depositType: customPackage.depositType,
-                    depositValue: customPackage.depositValue,
-                  }
+                  name: customPackage.name,
+                  description: customPackage.description,
+                  priceInCents: customPackage.price * 100,
+                  durationHours: customPackage.durationHours,
+                  includes: customPackage.includes,
+                  depositType: customPackage.depositType,
+                  depositValue: customPackage.depositValue,
+                }
                 : undefined,
           }),
           credentials: "include",
