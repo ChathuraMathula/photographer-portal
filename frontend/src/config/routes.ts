@@ -11,7 +11,7 @@ export const PUBLIC_ROUTES = [
 ];
 
 // Prefix-match public routes — /book/:slug and /book/track/:token are always public
-export const PUBLIC_PREFIXES = ["/book"];
+export const PUBLIC_PREFIXES = ["/book", "/leaflet", "/tiles", "/maps"];
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   [UserRole.SUPER_ADMIN]: [

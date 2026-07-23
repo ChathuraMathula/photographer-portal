@@ -70,7 +70,7 @@ export function OSMMapPreview({
         title="OpenStreetMap Location Preview"
         style={{ height, width: "100%", border: 0 }}
         srcDoc={getPreviewMapHtml(coords.lat, coords.lon, popupText)}
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
       />
     </div>
   );

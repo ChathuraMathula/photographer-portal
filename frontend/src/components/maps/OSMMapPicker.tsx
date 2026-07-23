@@ -54,7 +54,7 @@ export function OSMMapPicker({
         title="OpenStreetMap Pin Picker"
         style={{ height, width: "100%", border: 0 }}
         srcDoc={getMapHtml(currentLat, currentLon, readOnly)}
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
       />
     </div>
   );
