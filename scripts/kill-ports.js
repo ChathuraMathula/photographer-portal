@@ -1,6 +1,6 @@
 const { execSync } = require("child_process");
 
-const ports = [4000, 4001];
+const ports = [4000, 4001, 8080];
 
 console.log(`[Port Cleanup] Checking ports: ${ports.join(", ")}...`);
 

@@ -83,7 +83,8 @@ async function main() {
     log("SETUP", "kill-ports.js not found, skipping.");
   }
 
-  // 2. Start root docker DB (non-blocking)
+  // 2. Start root docker DB & containers (non-blocking)
+  log("DOCKER-ROOT", "Starting Docker containers (Database, TileServer, Nominatim)...");
   var dockerRootProc = spawnProc(
     "DOCKER-ROOT",
     "docker-compose",

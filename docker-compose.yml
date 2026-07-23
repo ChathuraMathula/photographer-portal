@@ -56,7 +56,7 @@ services:
       - "8080:8080"
     volumes:
       - ./map-data:/data
-    command: -p 8080
+    command: -c /data/config.json -p 8080
 
   nominatim:
     image: mediagis/nominatim:4.4
