@@ -5,7 +5,7 @@ import { ClientProxy } from '@nestjs/microservices';
 export class EmailService {
   constructor(
     @Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy,
-  ) {}
+  ) { }
 
   async sendBookingReceived(
     customerEmail: string,

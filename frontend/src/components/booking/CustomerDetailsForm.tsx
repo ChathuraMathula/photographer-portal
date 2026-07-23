@@ -69,14 +69,15 @@ export function CustomerDetailsForm({
         <CardFooter className="flex gap-3">
           <Button
             type="button"
-            className="btn btn-secondary flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
+            className="btn btn-secondary w-full flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
             onClick={onBack}
+            variant="outline"
           >
             Back
           </Button>
           <Button
             type="submit"
-            className="btn btn-primary flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
+            className="btn btn-primary w-full flex-1 min-w-0 md:min-w-0 h-11 py-0 shadow-sm"
             disabled={formik.isSubmitting}
           >
             {formik.isSubmitting ? "Submitting..." : "Submit Request"}

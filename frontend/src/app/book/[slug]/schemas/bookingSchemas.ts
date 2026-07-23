@@ -25,7 +25,7 @@ export const AvailabilitySchema = Yup.object({
         const { date } = this.parent;
         if (!date) return true;
         const today = new Date();
-        const todayStr = today.toLocaleDateString("en-CA");
+        const todayStr = today.toLocaleDateString("en-CA"); // YYYY-MM-DD
         if (date === todayStr) {
           const currentTime = today.toTimeString().slice(0, 5); // "HH:MM"
           return value >= currentTime;

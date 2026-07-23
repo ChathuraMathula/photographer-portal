@@ -29,7 +29,6 @@ export default function BookingPage() {
     today,
   } = useBooking();
 
-  // ── Render states ──────────────────────────────────────────────────────────
 
   if (pageState === "loading")
     return <LoadingSpinner text="Checking availability..." />;
