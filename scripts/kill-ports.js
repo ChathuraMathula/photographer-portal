@@ -40,10 +40,27 @@ if (process.platform === "win32") {
     }
 
     for (const pid of pidsToKill) {
-      console.log(
-        `[Port Cleanup] Killing process with PID ${pid} occupying dev port...`,
-      );
       try {
+        const procInfo = execSync(`tasklist /FI "PID eq ${pid}" /FO CSV /NH`, {
+          encoding: "utf8",
+        });
+        if (!procInfo || procInfo.includes("INFO:")) continue;
+        const procName = procInfo.split(",")[0].replace(/"/g, "").toLowerCase();
+
+        if (
+          procName.includes("docker") ||
+          procName.includes("vmenv") ||
+          procName.includes("wsl")
+        ) {
+          console.log(
+            `[Port Cleanup] Skipping Docker container process (${procName}) with PID ${pid}.`,
+          );
+          continue;
+        }
+
+        console.log(
+          `[Port Cleanup] Killing process (${procName}) with PID ${pid} occupying dev port...`,
+        );
         execSync(`taskkill /F /PID ${pid}`);
       } catch (err) {
         // ignore already killed or access denied errors
