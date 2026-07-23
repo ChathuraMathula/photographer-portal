@@ -59,9 +59,7 @@ export type PaginatedBookingsData = {
 
 export function useReports() {
   const context = usePhotographerDashboardContext();
-  const [period, setPeriod] = useState<
-    "weekly" | "monthly" | "yearly" | "custom"
-  >("monthly");
+  const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly" | "custom">("monthly");
 
   // Custom Date States
   const [startDate, setStartDate] = useState(() => {
