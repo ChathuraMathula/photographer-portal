@@ -60,18 +60,17 @@ export function ReportsHeader({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center lg:justify-end gap-3">
         {/* Period Selector Tabs */}
         <div className="flex bg-zinc-100 dark:bg-zinc-800 rounded-xl p-1 shadow-inner border border-zinc-200/50 dark:border-zinc-700/50">
           {(["weekly", "monthly", "yearly", "custom"] as const).map((p) => (
             <button
               key={p}
               onClick={() => onPeriodChange(p)}
-              className={`px-4 py-1.5 rounded-lg text-body-caption font-semibold transition-all cursor-pointer ${
-                period === p
-                  ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-              }`}
+              className={`px-4 py-1.5 rounded-lg text-body-caption font-semibold transition-all cursor-pointer ${period === p
+                ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                }`}
             >
               {p.charAt(0).toUpperCase() + p.slice(1)}
             </button>
@@ -177,7 +176,6 @@ export function ReportsHeader({
           </div>
         )}
 
-        {/* Custom Date Inputs with premium calendar pickers */}
         {period === "custom" && (
           <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800">
             <DatePickerInput
