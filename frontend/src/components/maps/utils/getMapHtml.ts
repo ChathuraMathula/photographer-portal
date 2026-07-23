@@ -36,14 +36,13 @@ export function getMapHtml(
         
         ${isOffline ? `L.Icon.Default.imagePath = '/leaflet/images/';` : ''}
         var marker = L.marker([${currentLat}, ${currentLon}], { draggable: ${!readOnly} }).addTo(map);
-        ${
-          !readOnly
-            ? `
+        ${!readOnly
+      ? `
         map.on('click', function(e) { window.parent.postMessage({ type: 'OSM_MAP_CLICK', lat: e.latlng.lat, lon: e.latlng.lng }, '*'); marker.setLatLng(e.latlng); });
         marker.on('dragend', function(e) { window.parent.postMessage({ type: 'OSM_MAP_CLICK', lat: marker.getLatLng().lat, lon: marker.getLatLng().lng }, '*'); });
         `
-            : ""
-        }
+      : ""
+    }
         window.addEventListener('message', function(event) {
           if (event.data && event.data.type === 'OSM_MAP_PAN') {
             map.setView([event.data.lat, event.data.lon], 14);
