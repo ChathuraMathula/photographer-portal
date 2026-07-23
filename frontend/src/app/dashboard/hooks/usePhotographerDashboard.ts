@@ -26,7 +26,7 @@ export function usePhotographerDashboard() {
   const resId = searchParams.get("id");
   const localSelectionRef = useRef(false);
 
-  // 1. Auth Hook
+  // Auth Hook
   const { firstName, role, userId, isAuthenticated, handleLogout, authFetch } =
     useDashboardAuth();
 
@@ -39,7 +39,7 @@ export function usePhotographerDashboard() {
     useState<Reservation | null>(null);
   const [showManualModal, setShowManualModal] = useState(false);
 
-  // 2. Notifications Hook
+  // Notifications Hook
   const {
     notifications,
     setNotifications,
@@ -48,10 +48,10 @@ export function usePhotographerDashboard() {
     handleClearAllNotifications,
   } = useDashboardNotifications({ authFetch, isAuthenticated, role });
 
-  // 3. Profile Hook
+  // Profile Hook
   const profile = useDashboardProfile({ userId, authFetch });
 
-  // 4. Packages Hook
+  // Packages Hook
   const packagesState = useDashboardPackages({
     authFetch,
     loadPhotographerData: async () => {
@@ -59,7 +59,7 @@ export function usePhotographerDashboard() {
     },
   });
 
-  // 5. Reservations Hook
+  // Reservations Hook
   const reservationsState = useDashboardReservations({
     authFetch,
     loadPhotographerData: async () => {
@@ -70,7 +70,7 @@ export function usePhotographerDashboard() {
     universalDepositValue: profile.universalDepositValue,
   });
 
-  // 6. Manual Booking Hook
+  // Manual Booking Hook
   const manualBooking = useDashboardManualBooking({
     authFetch,
     loadPhotographerData: async () => {
@@ -79,14 +79,14 @@ export function usePhotographerDashboard() {
     setShowManualModal,
   });
 
-  // 7. Chat Hook
+  // Chat Hook
   const chat = useDashboardChat({
     socket,
     selectedRes: reservationsState.selectedRes,
     authFetch,
   });
 
-  // 8. Data Loader Hook
+  // Data Loader Hook
   const {
     transactions,
     transactionsPage,
@@ -153,7 +153,7 @@ export function usePhotographerDashboard() {
       .then((data) => {
         if (data) reservationsState.setSelectedRes(data);
       })
-      .catch(() => {});
+      .catch(() => { });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resId, isAuthenticated, reservationsState.reservations]);
 

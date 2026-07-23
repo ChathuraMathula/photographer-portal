@@ -81,7 +81,6 @@ export class ReservationsQuotationService {
     }
 
     reservation.status = ReservationStatus.PROPOSED;
-    reservation.advancePaymentPriceInCents = dto.advancePaymentPriceInCents;
     reservation.quotationNotes = dto.quotationNotes;
     reservation.usePackageWiseDeposit = dto.usePackageWiseDeposit ?? false;
 
@@ -127,6 +126,39 @@ export class ReservationsQuotationService {
     }
 
     reservation.selectedPackages = selectedPkgsMapped;
+
+    if (reservation.clientSelectedPackageId) {
+      const exists = selectedPkgsMapped.some(
+        (p) => p.id === reservation.clientSelectedPackageId,
+      );
+      if (!exists) {
+        reservation.clientSelectedPackageId = null as any;
+      }
+    }
+
+    let computedAdvance = dto.advancePaymentPriceInCents || 0;
+    if (!computedAdvance && selectedPkgsMapped.length > 0) {
+      const targetPkg =
+        selectedPkgsMapped.find(
+          (p) => p.id === reservation.clientSelectedPackageId,
+        ) || selectedPkgsMapped[0];
+      if (targetPkg) {
+        if (
+          targetPkg.customDepositAmountInCents !== null &&
+          targetPkg.customDepositAmountInCents !== undefined
+        ) {
+          computedAdvance = targetPkg.customDepositAmountInCents;
+        } else if (targetPkg.depositType === 'fixed') {
+          computedAdvance = targetPkg.depositValue || 0;
+        } else if (targetPkg.depositType === 'percentage') {
+          computedAdvance = Math.round(
+            (targetPkg.priceInCents * (targetPkg.depositValue || 0)) / 100,
+          );
+        }
+      }
+    }
+    reservation.advancePaymentPriceInCents = computedAdvance;
+
     if (!reservation.paymentDeadline) {
       reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
     }

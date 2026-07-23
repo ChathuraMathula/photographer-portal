@@ -27,7 +27,14 @@ type Props = {
 
 export function ReservationList(props: Props) {
   const {
-    reservations, selectedId, onSelect, page, setPage, totalPages, total, loading
+    reservations,
+    selectedId,
+    onSelect,
+    page,
+    setPage,
+    totalPages,
+    total,
+    loading
   } = props;
 
   return (

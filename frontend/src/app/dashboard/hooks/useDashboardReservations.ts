@@ -228,6 +228,21 @@ export function useDashboardReservations({
         }
       }
 
+      let primaryAdvanceInCents = 0;
+      if (
+        selectedRes.clientSelectedPackageId &&
+        centsDeposits[selectedRes.clientSelectedPackageId] !== undefined
+      ) {
+        primaryAdvanceInCents = centsDeposits[selectedRes.clientSelectedPackageId];
+      } else if (
+        selectedPkgIds.length > 0 &&
+        centsDeposits[selectedPkgIds[0]] !== undefined
+      ) {
+        primaryAdvanceInCents = centsDeposits[selectedPkgIds[0]];
+      } else if (centsDeposits["custom"] !== undefined) {
+        primaryAdvanceInCents = centsDeposits["custom"];
+      }
+
       const res = await authFetch(
         `${API}/reservations/${selectedRes.id}/propose`,
         {
@@ -235,20 +250,20 @@ export function useDashboardReservations({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             packageIds: selectedPkgIds,
-            advancePaymentPriceInCents: 0,
+            advancePaymentPriceInCents: primaryAdvanceInCents,
             quotationNotes,
             packageDeposits: centsDeposits,
             customPackage:
               customPackage && isCustomPackageSelected
                 ? {
-                  name: customPackage.name,
-                  description: customPackage.description,
-                  priceInCents: customPackage.price * 100,
-                  durationHours: customPackage.durationHours,
-                  includes: customPackage.includes,
-                  depositType: customPackage.depositType,
-                  depositValue: customPackage.depositValue,
-                }
+                    name: customPackage.name,
+                    description: customPackage.description,
+                    priceInCents: customPackage.price * 100,
+                    durationHours: customPackage.durationHours,
+                    includes: customPackage.includes,
+                    depositType: customPackage.depositType,
+                    depositValue: customPackage.depositValue,
+                  }
                 : undefined,
           }),
           credentials: "include",
