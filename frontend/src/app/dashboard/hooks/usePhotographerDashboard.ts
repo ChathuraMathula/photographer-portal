@@ -209,6 +209,8 @@ export function usePhotographerDashboard() {
     setPackageIncludesText: packagesState.setPackageIncludesText,
     profileBio: profile.profileBio,
     setProfileBio: profile.setProfileBio,
+    specializations: profile.specializations,
+    setSpecializations: profile.setSpecializations,
     profileLocation: profile.profileLocation,
     setProfileLocation: profile.setProfileLocation,
     city: profile.city,

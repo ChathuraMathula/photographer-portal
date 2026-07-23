@@ -2,6 +2,8 @@ import React from "react";
 
 export type ProfileSettingsFormProps = {
   bio: string;
+  specializations?: string[];
+  onSpecializationsChange?: (v: string[]) => void;
   location: string;
   portfolio: string;
   bookingSlug?: string;

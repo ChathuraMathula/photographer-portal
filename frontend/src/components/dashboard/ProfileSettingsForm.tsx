@@ -8,6 +8,8 @@ import { type ProfileSettingsFormProps } from "./profile/types";
 
 export function ProfileSettingsForm({
   bio,
+  specializations,
+  onSpecializationsChange,
   location,
   portfolio,
   bookingSlug,
@@ -49,6 +51,8 @@ export function ProfileSettingsForm({
       <BiographyCard
         bio={bio}
         onBioChange={onBioChange}
+        specializations={specializations}
+        onSpecializationsChange={onSpecializationsChange}
         profileImageUrl={profileImageUrl}
         onProfileImageUrlChange={onProfileImageUrlChange}
         offlineMessage={offlineMessage}

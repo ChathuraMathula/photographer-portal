@@ -93,6 +93,9 @@ export function useDashboardDataLoader({
       if (profRes.ok) {
         const profData = await profRes.json();
         profile.setProfileBio(profData.bio || "");
+        if (typeof profile.setSpecializations === "function") {
+          profile.setSpecializations(profData.specializations || []);
+        }
         profile.setProfileLocation(profData.baseLocation || "");
         profile.setCity(profData.city || "");
         profile.setDistrict(profData.district || "");

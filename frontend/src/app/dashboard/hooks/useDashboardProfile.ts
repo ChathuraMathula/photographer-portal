@@ -33,6 +33,7 @@ export function useDashboardProfile({
   const [universalDepositType, setUniversalDepositType] = useState("fixed");
   const [universalDepositValue, setUniversalDepositValue] = useState(5000);
   const [offlineMessage, setOfflineMessage] = useState("");
+  const [specializations, setSpecializations] = useState<string[]>([]);
   const [showManualBookingInTopbar, setShowManualBookingInTopbar] =
     useState(true);
   const [showAcceptBookingsInTopbar, setShowAcceptBookingsInTopbar] =
@@ -47,6 +48,7 @@ export function useDashboardProfile({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bio: profileBio,
+          specializations,
           baseLocation: profileLocation,
           city,
           district,
@@ -101,6 +103,8 @@ export function useDashboardProfile({
   return {
     profileBio,
     setProfileBio,
+    specializations,
+    setSpecializations,
     profileLocation,
     setProfileLocation,
     city,

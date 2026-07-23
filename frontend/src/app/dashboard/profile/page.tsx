@@ -48,11 +48,15 @@ export default function ProfilePage() {
     setOfflineMessage,
     profileAvailability,
     handleToggleAvailability,
+    specializations,
+    setSpecializations
   } = context;
 
   return (
     <ProfileSettingsForm
       bio={profileBio}
+      specializations={specializations}
+      onSpecializationsChange={setSpecializations}
       location={profileLocation}
       portfolio={profilePortfolio}
       bookingSlug={bookingSlug}
