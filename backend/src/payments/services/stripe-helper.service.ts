@@ -4,14 +4,14 @@ import { PaymentStatus, Payment } from '../../entities/payment.entity';
 import { Reservation } from '../../entities/reservation.entity';
 import { PhotographerProfile } from '../../entities/photographer-profile.entity';
 import { EmailService } from '../../email/email.service';
-import {
-  generateInvoicePdf,
-  InvoiceData,
-} from '../../invoices/pdf/invoices-pdf-generator';
+import { InvoiceGenerationService } from '../../invoices/services/invoice-generation.service';
 
 @Injectable()
 export class StripeHelperService {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly invoiceGenerationService: InvoiceGenerationService,
+  ) {}
 
   async simulateStripeCharge(
     cardNumber: string,
@@ -73,96 +73,19 @@ export class StripeHelperService {
 
   async sendInvoiceAndNotify(
     reservation: Reservation,
-    allPayments: Payment[],
-    profileRepository: Repository<PhotographerProfile>,
+    allPayments?: Payment[],
+    profileRepository?: Repository<PhotographerProfile>,
   ) {
-    const profile = await profileRepository.findOne({
-      where: { userId: reservation.photographerId },
-    });
-
-    const settings = {
-      invoiceTitle: profile?.invoiceTitle || 'INVOICE',
-      invoiceColor: profile?.invoiceColor || '#2563eb',
-      invoiceNotes:
-        profile?.invoiceNotes ||
-        'Thank you for booking with us! We appreciate your trust.',
-      invoiceLogoText:
-        profile?.invoiceLogoText || reservation.photographer.firstName,
-      invoicePhone: profile?.invoicePhone || '',
-      invoiceInstructions: profile?.invoiceInstructions || '',
-    };
-
-    const packages = reservation.selectedPackages || [];
-    const selectedPkg = packages.find(
-      (p: any) => p.id === reservation.clientSelectedPackageId,
-    ) || {
-      name: 'Custom Booking Package',
-      priceInCents: reservation.totalAmountInCents || 0,
-    };
-
-    const taxRate = profile?.invoiceTaxRate || 0;
-    const packagePriceLkr =
-      (reservation.totalAmountInCents || selectedPkg.priceInCents || 0) / 100;
-    const taxAmountLkr = Math.round(packagePriceLkr * (taxRate / 100));
-    const grandTotalLkr = packagePriceLkr + taxAmountLkr;
-    const totalPaidLkr =
-      allPayments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
-    const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
-
-    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-
-    const mappedPayments = allPayments.map((p) => ({
-      date: new Date(p.createdAt).toLocaleDateString(),
-      method: `${p.cardBrand} (*${p.cardLast4})`,
-      amountLkr: p.amountInCents / 100,
-      transactionId: p.transactionId,
-    }));
-
-    const invoiceData: InvoiceData = {
-      invoiceNumber,
-      issueDate: new Date().toLocaleDateString(),
-      clientName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-      clientEmail: reservation.customer.email,
-      clientPhone: reservation.customer.phone || '',
-      photographerName: `${reservation.photographer.firstName} ${reservation.photographer.lastName}`,
-      photographerEmail: reservation.photographer.email,
-      photographerPhone: '',
-      eventDate: reservation.date
-        ? reservation.date.toString().split('T')[0]
-        : '',
-      eventTime: `${reservation.startTime || ''} - ${reservation.endTime || ''}`,
-      eventType: reservation.eventType || 'Event',
-      location: reservation.location || '',
-      packageName: selectedPkg.name,
-      packagePriceLkr,
-      payments: mappedPayments,
-      totalPaidLkr,
-      balanceDueLkr,
-      taxRate,
-      taxAmountLkr,
-      grandTotalLkr,
-      settings,
-    };
-
-    const pdfDoc = generateInvoicePdf(invoiceData);
-
-    const getPdfBuffer = async (doc: any): Promise<Buffer> => {
-      return new Promise<Buffer>((resolve, reject) => {
-        const chunks: Buffer[] = [];
-        doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-        doc.on('error', (err) => reject(err));
-        doc.end();
-      });
-    };
-
     try {
-      const pdfBuffer = await getPdfBuffer(pdfDoc);
+      const { pdfBuffer, invoiceUrl, invoiceNumber } =
+        await this.invoiceGenerationService.getOrCreateInvoicePdf(reservation.id);
+
       await this.emailService.sendInvoice(
         reservation.customer.email,
         `${reservation.customer.firstName} ${reservation.customer.lastName}`,
         invoiceNumber,
         pdfBuffer,
+        invoiceUrl,
       );
     } catch (err) {
       console.error('Failed to generate/email invoice PDF', err);

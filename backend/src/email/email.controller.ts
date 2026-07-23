@@ -94,6 +94,7 @@ export class EmailController {
         data.customerName,
         data.invoiceNumber,
         pdfBuffer,
+        data.invoiceUrl,
       );
     });
   }

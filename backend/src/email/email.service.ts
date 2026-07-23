@@ -68,12 +68,14 @@ export class EmailService {
     customerName: string,
     invoiceNumber: string,
     pdfBuffer: Buffer,
+    invoiceUrl?: string,
   ) {
     this.client.emit('email.sendInvoice', {
       customerEmail,
       customerName,
       invoiceNumber,
       pdfBuffer,
+      invoiceUrl,
     });
   }
 

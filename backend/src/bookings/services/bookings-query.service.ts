@@ -102,6 +102,8 @@ export class BookingsQueryService {
       selectedPackages: reservation.selectedPackages,
       paymentDeadline: reservation.paymentDeadline,
       rejectionReason: reservation.rejectionReason,
+      invoiceUrl: reservation.invoiceUrl,
+      invoiceGeneratedAt: reservation.invoiceGeneratedAt,
       photographer: {
         firstName: reservation.photographer.firstName,
         lastName: reservation.photographer.lastName,

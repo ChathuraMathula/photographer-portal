@@ -86,6 +86,12 @@ export class Reservation {
   @Column({ unique: true })
   reservationToken!: string;
 
+  @Column({ nullable: true })
+  invoiceUrl?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  invoiceGeneratedAt?: Date;
+
   @Column({ type: 'timestamp', nullable: true })
   paymentDeadline?: Date;
 

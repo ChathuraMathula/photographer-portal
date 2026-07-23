@@ -9,8 +9,11 @@ import {
   Req,
   Res,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import * as express from 'express';
+import { join } from 'path';
+import * as fs from 'fs';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -68,6 +71,20 @@ export class InvoicesController {
     return this.invoicesService.updateSettings(req.user.userId, body);
   }
 
+  @Get('pdf/:filename')
+  async getInvoicePdfFile(
+    @Param('filename') filename: string,
+    @Res() res: express.Response,
+  ) {
+    const filePath = join(process.cwd(), 'uploads', 'invoices', filename);
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException('Invoice file not found');
+    }
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    fs.createReadStream(filePath).pipe(res);
+  }
+
   @Get(':reservationId/download')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PHOTOGRAPHER)
@@ -76,19 +93,15 @@ export class InvoicesController {
     @Req() req: RequestWithUser,
     @Res() res: express.Response,
   ) {
-    const pdfDoc = await this.invoicesService.generateInvoicePdfDoc(
-      reservationId,
-      req.user.userId,
-    );
+    const { pdfBuffer, fileName } =
+      await this.invoicesService.getOrCreateInvoicePdf(
+        reservationId,
+        req.user.userId,
+      );
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=invoice_${reservationId.slice(0, 8)}.pdf`,
-    );
-
-    pdfDoc.pipe(res);
-    pdfDoc.end();
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(pdfBuffer);
   }
 
   @Get('public/:token/download')
@@ -96,17 +109,12 @@ export class InvoicesController {
     @Param('token') token: string,
     @Res() res: express.Response,
   ) {
-    const pdfDoc =
-      await this.invoicesService.generateInvoicePdfDocByToken(token);
+    const { pdfBuffer, fileName } =
+      await this.invoicesService.getOrCreateInvoicePdfByToken(token);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=invoice_${token.slice(0, 8)}.pdf`,
-    );
-
-    pdfDoc.pipe(res);
-    pdfDoc.end();
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(pdfBuffer);
   }
 
   @Post(':reservationId/resend')

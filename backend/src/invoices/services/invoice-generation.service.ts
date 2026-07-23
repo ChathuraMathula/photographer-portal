@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { join } from 'path';
+import * as fs from 'fs';
+import { Readable } from 'stream';
 import { Reservation } from '../../entities/reservation.entity';
 import { Payment, PaymentStatus } from '../../entities/payment.entity';
 import { PhotographerProfile } from '../../entities/photographer-profile.entity';
@@ -19,7 +22,22 @@ export class InvoiceGenerationService {
     private readonly emailService: EmailService,
   ) {}
 
-  async generateInvoicePdfDoc(reservationId: string, photographerId?: string) {
+  /**
+   * Generates or retrieves the invoice PDF from disk.
+   * If the file exists on disk, reads it from disk.
+   * If missing or not yet generated, generates a new PDF, stores it in backend/uploads/invoices,
+   * updates the reservation's invoiceUrl field in DB, and returns the buffer, url, filename, and reservation.
+   */
+  async getOrCreateInvoicePdf(
+    reservationId: string,
+    photographerId?: string,
+  ): Promise<{
+    pdfBuffer: Buffer;
+    invoiceUrl: string;
+    fileName: string;
+    invoiceNumber: string;
+    reservation: Reservation;
+  }> {
     const whereClause: any = { id: reservationId };
     if (photographerId) {
       whereClause.photographerId = photographerId;
@@ -34,6 +52,34 @@ export class InvoiceGenerationService {
       throw new NotFoundException('Reservation not found');
     }
 
+    const uploadDir = join(process.cwd(), 'uploads', 'invoices');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fileName = `invoice_${reservation.id}.pdf`;
+    const filePath = join(uploadDir, fileName);
+    const baseUrl =
+      process.env.API_URL ||
+      process.env.BACKEND_URL ||
+      'http://localhost:4001';
+    const invoiceUrl = `${baseUrl}/uploads/invoices/${fileName}`;
+    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
+
+    // Check if the file already exists on disk
+    if (fs.existsSync(filePath)) {
+      const pdfBuffer = fs.readFileSync(filePath);
+      if (reservation.invoiceUrl !== invoiceUrl || !reservation.invoiceGeneratedAt) {
+        reservation.invoiceUrl = invoiceUrl;
+        if (!reservation.invoiceGeneratedAt) {
+          reservation.invoiceGeneratedAt = new Date();
+        }
+        await this.reservationRepository.save(reservation);
+      }
+      return { pdfBuffer, invoiceUrl, fileName, invoiceNumber, reservation };
+    }
+
+    // PDF missing from disk — generate a new one
     const payments = await this.paymentRepository.find({
       where: { reservationId: reservation.id, status: PaymentStatus.SUCCESS },
       order: { createdAt: 'ASC' },
@@ -72,8 +118,6 @@ export class InvoiceGenerationService {
       payments.reduce((sum, p) => sum + p.amountInCents, 0) / 100;
     const balanceDueLkr = Math.max(0, grandTotalLkr - totalPaidLkr);
 
-    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
-
     const invoiceData: InvoiceData = {
       invoiceNumber,
       issueDate: new Date().toLocaleDateString(),
@@ -105,7 +149,40 @@ export class InvoiceGenerationService {
       settings,
     };
 
-    return generateInvoicePdf(invoiceData);
+    const pdfDoc = generateInvoicePdf(invoiceData);
+
+    const getPdfBuffer = async (doc: any): Promise<Buffer> => {
+      return new Promise<Buffer>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        doc.on('data', (chunk) => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', (err) => reject(err));
+        doc.end();
+      });
+    };
+
+    const pdfBuffer = await getPdfBuffer(pdfDoc);
+
+    // Save generated PDF to disk
+    fs.writeFileSync(filePath, pdfBuffer);
+
+    // Update reservation with invoiceUrl and invoiceGeneratedAt in database
+    reservation.invoiceUrl = invoiceUrl;
+    reservation.invoiceGeneratedAt = new Date();
+    await this.reservationRepository.save(reservation);
+
+    return { pdfBuffer, invoiceUrl, fileName, invoiceNumber, reservation };
+  }
+
+  async generateInvoicePdfDoc(reservationId: string, photographerId?: string) {
+    const { pdfBuffer } = await this.getOrCreateInvoicePdf(
+      reservationId,
+      photographerId,
+    );
+    const readable = new Readable();
+    readable.push(pdfBuffer);
+    readable.push(null);
+    return readable;
   }
 
   async generateInvoicePdfDocByToken(token: string) {
@@ -121,38 +198,15 @@ export class InvoiceGenerationService {
   }
 
   async resendInvoice(reservationId: string, photographerId: string) {
-    const reservation = await this.reservationRepository.findOne({
-      where: { id: reservationId, photographerId },
-      relations: { customer: true, photographer: true },
-    });
-
-    if (!reservation) {
-      throw new NotFoundException('Reservation not found');
-    }
-
-    const pdfDoc = await this.generateInvoicePdfDoc(
-      reservation.id,
-      photographerId,
-    );
-
-    const getPdfBuffer = async (doc: any): Promise<Buffer> => {
-      return new Promise<Buffer>((resolve, reject) => {
-        const chunks: Buffer[] = [];
-        doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-        doc.on('error', (err) => reject(err));
-        doc.end();
-      });
-    };
-
-    const pdfBuffer = await getPdfBuffer(pdfDoc);
-    const invoiceNumber = `INV-${reservation.id.slice(0, 8).toUpperCase()}-${new Date(reservation.createdAt).getTime().toString().slice(-4)}`;
+    const { pdfBuffer, invoiceUrl, invoiceNumber, reservation } =
+      await this.getOrCreateInvoicePdf(reservationId, photographerId);
 
     await this.emailService.sendInvoice(
       reservation.customer.email,
       `${reservation.customer.firstName} ${reservation.customer.lastName}`,
       invoiceNumber,
       pdfBuffer,
+      invoiceUrl,
     );
 
     return { message: 'Invoice email resent successfully.' };

@@ -86,3 +86,7 @@ Desktop.ini
 .vercel
 
 map-data/
+
+# ─── Uploaded Files ──────────────────────────────────────────────────────────
+uploads/
+backend/uploads/

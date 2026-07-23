@@ -197,6 +197,25 @@ export class InvoicesService {
     return this.getSettings(photographerId);
   }
 
+  async getOrCreateInvoicePdf(reservationId: string, photographerId?: string) {
+    return this.invoiceGenerationService.getOrCreateInvoicePdf(
+      reservationId,
+      photographerId,
+    );
+  }
+
+  async getOrCreateInvoicePdfByToken(token: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
+    }
+
+    return this.invoiceGenerationService.getOrCreateInvoicePdf(reservation.id);
+  }
+
   async generateInvoicePdfDoc(reservationId: string, photographerId?: string) {
     return this.invoiceGenerationService.generateInvoicePdfDoc(
       reservationId,

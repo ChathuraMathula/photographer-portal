@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
+import { InvoicesModule } from '../invoices/invoices.module';
 import { ReservationsModule } from '../reservations/reservations.module';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
@@ -19,6 +20,7 @@ import { PaymentQueryService } from './services/payment-query.service';
     TypeOrmModule.forFeature([Reservation, Payment, PhotographerProfile]),
     ReservationsModule,
     EmailModule,
+    InvoicesModule,
   ],
   controllers: [PaymentsController],
   providers: [

@@ -6,6 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import fs from 'fs';
 
+import * as express from 'express';
+
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
 if (
@@ -19,6 +21,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
   app.use(cookieParser());
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),

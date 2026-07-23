@@ -111,12 +111,19 @@ export class EmailWorkerService {
     customerName: string,
     invoiceNumber: string,
     pdfBuffer: Buffer,
+    invoiceUrl?: string,
   ) {
     const html = `
       <h2>Invoice & Receipt</h2>
       <p>Dear ${customerName},</p>
       <p>Thank you for your payment! Please find attached the official PDF invoice for your reservation.</p>
       <p>Invoice Number: <strong>${invoiceNumber}</strong></p>
+      ${
+        invoiceUrl
+          ? `<p>You can also view or download your invoice PDF online by clicking the link below:</p>
+             <p><a href="${invoiceUrl}" target="_blank" rel="noopener noreferrer">${invoiceUrl}</a></p>`
+          : ''
+      }
     `;
 
     await this.transporter.sendMail({
