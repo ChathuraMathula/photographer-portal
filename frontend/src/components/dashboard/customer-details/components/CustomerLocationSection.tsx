@@ -4,6 +4,7 @@ import React from "react";
 import { OSMMapPreview } from "@/components/maps/OSMMapPreview";
 
 interface CustomerLocationSectionProps {
+  date?: string | Date;
   startTime: string;
   endTime: string;
   eventType: string;
@@ -14,6 +15,7 @@ interface CustomerLocationSectionProps {
 }
 
 export function CustomerLocationSection({
+  date,
   startTime,
   endTime,
   eventType,
@@ -29,6 +31,22 @@ export function CustomerLocationSection({
     district
   );
 
+  const formattedDate = date
+    ? typeof date === "string" && !date.includes("T")
+      ? new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+      : new Date(date).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
   return (
     <>
       <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
@@ -36,16 +54,25 @@ export function CustomerLocationSection({
           <p className="text-body-caption font-semibold text-zinc-400">
             Date &amp; Location
           </p>
-          <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
+          {formattedDate && (
+            <p className="text-body-small-s font-semibold text-zinc-900 dark:text-zinc-100">
+              {formattedDate}
+            </p>
+          )}
+          <p className="text-body-small-s font-medium text-zinc-700 dark:text-zinc-300">
             {startTime} - {endTime}
           </p>
           <p className="text-body-caption text-zinc-500 mt-0.5 font-medium">
             {location || "Location not given"}
           </p>
-          {(city || district) && (
+          {(city) && (
             <p className="text-[10px] text-zinc-400 dark:text-zinc-550 font-bold mt-0.5 uppercase tracking-wider">
               {city && `City: ${city}`}
-              {district && ` | District: ${district}`}
+            </p>
+          )}
+          {(district) && (
+            <p className="text-[10px] text-zinc-400 dark:text-zinc-550 font-bold mt-0.5 uppercase tracking-wider">
+              {district && `District: ${district}`}
             </p>
           )}
           {locationMapLink && (

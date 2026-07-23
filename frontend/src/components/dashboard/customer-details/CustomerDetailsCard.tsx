@@ -9,13 +9,13 @@ import { CustomerTrackingBlock } from "./components/CustomerTrackingBlock";
 import { CustomerBioSection } from "./components/CustomerBioSection";
 import { CustomerLocationSection } from "./components/CustomerLocationSection";
 
-export function CustomerDetailsCard({
-  reservation,
-}: {
-  reservation: Reservation;
-}) {
-  const { copiedId, copiedLink, handleCopyId, handleCopyLink } =
-    useCustomerDetails(reservation.id, reservation.reservationToken || "");
+export function CustomerDetailsCard({ reservation, }: { reservation: Reservation }) {
+  const {
+    copiedId,
+    copiedLink,
+    handleCopyId,
+    handleCopyLink
+  } = useCustomerDetails(reservation.id, reservation.reservationToken || "");
 
   return (
     <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl">
@@ -37,6 +37,7 @@ export function CustomerDetailsCard({
         />
 
         <CustomerLocationSection
+          date={reservation.date}
           startTime={reservation.startTime}
           endTime={reservation.endTime}
           eventType={reservation.eventType}

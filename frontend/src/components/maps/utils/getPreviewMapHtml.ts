@@ -20,9 +20,7 @@ export function getPreviewMapHtml(lat: number, lon: number, popupText: string) {
     </head>
     <body>
       <div id="map"></div>
-      ${
-        isOffline
-          ? `
+      ${isOffline ? `
       <script>
         function initOfflinePreviewMap() {
           if (typeof maplibregl === 'undefined') {
@@ -73,7 +71,7 @@ export function getPreviewMapHtml(lat: number, lon: number, popupText: string) {
         }
       </script>
       `
-          : `
+      : `
       <script>
         function initOnlinePreviewMap() {
           if (typeof L === 'undefined') {
@@ -97,7 +95,7 @@ export function getPreviewMapHtml(lat: number, lon: number, popupText: string) {
         }
       </script>
       `
-      }
+    }
     </body>
     </html>
   `;
