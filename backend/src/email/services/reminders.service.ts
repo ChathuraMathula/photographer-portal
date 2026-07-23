@@ -11,8 +11,7 @@ import { EmailService } from '../email.service';
 
 @Injectable()
 export class RemindersService
-  implements OnApplicationBootstrap, OnApplicationShutdown
-{
+  implements OnApplicationBootstrap, OnApplicationShutdown {
   private timer: NodeJS.Timeout | null = null;
   private processedReminders = new Set<string>();
 
@@ -22,7 +21,7 @@ export class RemindersService
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private emailService: EmailService,
-  ) {}
+  ) { }
 
   onApplicationBootstrap() {
     // Run the reminder check every 60 seconds
@@ -41,7 +40,7 @@ export class RemindersService
     try {
       const now = new Date();
 
-      // 1. Find PROPOSED reservations approaching payment deadline (e.g. within 12 hours)
+      // Find PROPOSED reservations approaching payment deadline (e.g. within 12 hours)
       const twelveHoursFromNow = new Date(now.getTime() + 12 * 60 * 60 * 1000);
       const proposedReservations = await this.reservationRepository.find({
         where: {
@@ -74,7 +73,7 @@ export class RemindersService
         this.processedReminders.add(key);
       }
 
-      // 2. Find CONFIRMED reservations happening within the next 24 hours
+      // Find CONFIRMED reservations happening within the next 24 hours
       const twentyFourHoursFromNow = new Date(
         now.getTime() + 24 * 60 * 60 * 1000,
       );
