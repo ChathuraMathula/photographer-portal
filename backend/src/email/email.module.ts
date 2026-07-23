@@ -15,4 +15,4 @@ import { User } from '../entities/user.entity';
   providers: [EmailService, EmailWorkerService, RemindersService],
   exports: [EmailService, EmailWorkerService, RemindersService],
 })
-export class EmailModule {}
+export class EmailModule { }

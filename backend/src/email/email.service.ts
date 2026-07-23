@@ -69,8 +69,6 @@ export class EmailService {
     invoiceNumber: string,
     pdfBuffer: Buffer,
   ) {
-    // Note: Buffer serialization over RabbitMQ might need to be handled,
-    // usually JSON handles Buffer as { type: 'Buffer', data: [...] }
     this.client.emit('email.sendInvoice', {
       customerEmail,
       customerName,

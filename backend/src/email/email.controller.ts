@@ -4,7 +4,7 @@ import { EmailWorkerService } from './services/email-worker.service';
 
 @Controller()
 export class EmailController {
-  constructor(private readonly emailWorkerService: EmailWorkerService) {}
+  constructor(private readonly emailWorkerService: EmailWorkerService) { }
 
   private async handleAck(context: RmqContext, action: () => Promise<void>) {
     const channel = context.getChannelRef();
