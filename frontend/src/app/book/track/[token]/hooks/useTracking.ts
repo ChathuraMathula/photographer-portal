@@ -35,7 +35,7 @@ export function useTracking() {
   const [confirming, setConfirming] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
-  // 1. Check localStorage for pre-verified email
+  // Check localStorage for pre-verified email
   useEffect(() => {
     if (!token) return;
     const stored = localStorage.getItem(`verified_email_res_${token}`);
@@ -46,7 +46,7 @@ export function useTracking() {
     }
   }, [token]);
 
-  // 2. Fetch reservation once verified
+  // Fetch reservation once verified
   useEffect(() => {
     if (!token || !verifiedEmail) return;
     setLoading(true);
@@ -77,7 +77,7 @@ export function useTracking() {
     );
   };
 
-  // 3. Chat + Socket.io
+  // Chat + Socket.io
   useTrackingSocket(
     reservation,
     verifiedEmail,

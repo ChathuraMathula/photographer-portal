@@ -8,8 +8,6 @@ type ChartDataPoint = {
   revenueLkr: number;
 };
 
-// ── Revenue Area Chart ────────────────────────────────────────────────────────
-
 export function RevenueAreaChart({ data }: { data: ChartDataPoint[] }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -23,7 +21,7 @@ export function RevenueAreaChart({ data }: { data: ChartDataPoint[] }) {
     );
   }
 
-  const padding = 40;
+  const padding = 60;
   const width = 500;
   const height = 240;
   const chartWidth = width - padding * 2;
@@ -108,9 +106,8 @@ export function RevenueAreaChart({ data }: { data: ChartDataPoint[] }) {
               cx={p.x}
               cy={p.y}
               r={hoveredIdx === i ? 6 : 4}
-              className={`fill-white stroke-blue-600 transition-all duration-150 cursor-pointer ${
-                hoveredIdx === i ? "stroke-[3px]" : "stroke-2"
-              }`}
+              className={`fill-white stroke-blue-600 transition-all duration-150 cursor-pointer ${hoveredIdx === i ? "stroke-[3px]" : "stroke-2"
+                }`}
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
             />

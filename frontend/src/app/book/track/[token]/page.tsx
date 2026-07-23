@@ -52,7 +52,6 @@ export default function TrackingPage() {
   const [paymentConfirmDetails, setPaymentConfirmDetails] =
     useState<PaymentConfirmDetails | null>(null);
 
-  // ── Render gates ──────────────────────────────────────────────────────────
 
   if (loading && !verifiedEmail) {
     return <LoadingSpinner text="Checking verification..." />;

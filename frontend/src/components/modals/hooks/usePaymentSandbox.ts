@@ -138,7 +138,7 @@ export function usePaymentSandbox(
   const chargeLkr =
     (isBalancePayment
       ? (reservation.totalAmountInCents ?? 0) -
-        (reservation.totalPaidInCents ?? 0)
+      (reservation.totalPaidInCents ?? 0)
       : getDepositAmountInCents()) / 100;
 
   return {
