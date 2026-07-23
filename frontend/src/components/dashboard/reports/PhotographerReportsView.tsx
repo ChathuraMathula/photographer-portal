@@ -2,7 +2,6 @@
 import React from "react";
 import { ReportsHeader } from "@/app/dashboard/reports/components/ReportsHeader";
 import { KpiCardsGrid } from "@/app/dashboard/reports/components/KpiCardsGrid";
-import { BusinessAdvisoryCard } from "@/app/dashboard/reports/components/BusinessAdvisoryCard";
 import { PhotographerAnalyticsCharts } from "@/app/dashboard/reports/components/PhotographerAnalyticsCharts";
 import { PhotographerPerformanceBreakdown } from "@/app/dashboard/reports/components/PhotographerPerformanceBreakdown";
 import { Loader2 } from "lucide-react";
@@ -108,10 +107,6 @@ export function PhotographerReportsView({
           )}
           <div className="space-y-6">
             <KpiCardsGrid summary={reportData.summary} />
-            <BusinessAdvisoryCard
-              conversionRate={reportData.summary.conversionRate}
-              totalBookings={reportData.summary.totalBookings}
-            />
             <PhotographerAnalyticsCharts
               timeline={reportData.timeline}
               statusDistribution={reportData.statusDistribution}
