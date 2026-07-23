@@ -51,7 +51,7 @@ export function TopbarHeader({
         </button>
 
         <span className="h-5 w-[1px] bg-zinc-200 mr-4 hidden lg:inline" />
-        <h2 className="font-extrabold text-title-base tracking-tight text-zinc-900 title-font">
+        <h2 className="hidden md:block font-extrabold text-title-base tracking-tight text-zinc-900 title-font">
           {activeLabel}
         </h2>
       </div>

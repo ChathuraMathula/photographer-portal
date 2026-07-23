@@ -6,7 +6,7 @@ import { type ReservationsTabContentProps } from "./reservations-tab/types";
 
 export function ReservationsTabContent(props: ReservationsTabContentProps) {
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
       <ReservationsLeftPane
         reservations={props.reservations}
         selectedRes={props.selectedRes}
