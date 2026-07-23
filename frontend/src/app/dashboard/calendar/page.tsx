@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
+import { BookingCalendar } from "@/components/dashboard/booking-calendar/BookingCalendar";
 
 export default function CalendarPage() {
   const context = usePhotographerDashboardContext();

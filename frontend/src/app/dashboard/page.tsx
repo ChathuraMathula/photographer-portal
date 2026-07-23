@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 // Dashboard sub-components
-import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard/AdminDashboard";
 
 export default function DashboardPage() {
   const router = useRouter();

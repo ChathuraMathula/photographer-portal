@@ -1,7 +1,7 @@
 "use client";
 
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { PackageGrid } from "@/components/dashboard/PackageGrid";
+import { PackageGrid } from "@/components/dashboard/package-card/PackageGrid";
 
 export default function PackagesPage() {
   const context = usePhotographerDashboardContext();

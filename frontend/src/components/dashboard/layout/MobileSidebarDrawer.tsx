@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { MenuItem } from "../DashboardLayout";
+import { MenuItem } from "./constants";
 import { NavItem } from "./NavItem";
 import { useDrawerAnimation } from "./hooks/useDrawerAnimation";
 import { MobileSidebarHeader } from "./components/MobileSidebarHeader";

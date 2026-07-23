@@ -3,10 +3,10 @@
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { PhotographerTopbarActions } from "@/components/dashboard/PhotographerTopbarActions";
-import { FloatingChatWidget } from "@/components/dashboard/FloatingChatWidget";
-import { NotificationBell } from "@/components/dashboard/NotificationBell";
+import { DashboardLayout } from "@/components/dashboard/layout/DashboardLayout";
+import { PhotographerTopbarActions } from "@/components/dashboard/layout/PhotographerTopbarActions";
+import { FloatingChatWidget } from "@/components/dashboard/floating-chat/FloatingChatWidget";
+import { NotificationBell } from "@/components/dashboard/notification-bell/NotificationBell";
 import { BookingDetailsModal } from "@/components/modals/BookingDetailsModal";
 import { ManualBookingModal } from "@/components/modals/ManualBookingModal";
 import { PackageFormModal } from "@/components/modals/PackageFormModal";

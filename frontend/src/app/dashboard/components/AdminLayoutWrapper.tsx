@@ -4,7 +4,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import { logout, UserRole } from "@/store/slices/authSlice";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { DashboardLayout } from "@/components/dashboard/layout/DashboardLayout";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import {
   ClipboardList,

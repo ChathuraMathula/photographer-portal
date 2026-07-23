@@ -1,10 +1,10 @@
 import React from "react";
 import { type Reservation } from "@/types";
 import { Card } from "@/components/ui/card";
-import { ReservationListItem } from "./ReservationListItem";
 import { ReservationListHeader } from "./components/ReservationListHeader";
 import { ReservationListItemSkeleton } from "./components/ReservationListItemSkeleton";
 import { ReservationListPagination } from "./components/ReservationListPagination";
+import { ReservationListItem } from "./ReservationListItem";
 
 type Props = {
   reservations: Reservation[];
@@ -44,9 +44,8 @@ export function ReservationList(props: Props) {
         setSortOrder={props.setSortOrder}
       />
       <div
-        className={`flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden transition-opacity duration-200 ${
-          loading && reservations.length > 0 ? "opacity-50" : ""
-        }`}
+        className={`flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 scrollbar-hide overflow-hidden transition-opacity duration-200 ${loading && reservations.length > 0 ? "opacity-50" : ""
+          }`}
       >
         {loading && reservations.length === 0 ? (
           Array.from({ length: 5 }).map((_, idx) => (

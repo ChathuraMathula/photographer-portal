@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { MenuItem } from "../DashboardLayout";
+import { MenuItem } from "./constants";
 import { NavItem } from "./NavItem";
 import { DesktopSidebarHeader } from "./components/DesktopSidebarHeader";
 import { DesktopSidebarFooter } from "./components/DesktopSidebarFooter";

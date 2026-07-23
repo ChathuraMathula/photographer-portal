@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { type Reservation } from "@/types";
-import { ReservationList } from "../../ReservationList";
+import { ReservationList } from "../../reservation-list/ReservationList";
 
 interface ReservationsLeftPaneProps {
   reservations: Reservation[];

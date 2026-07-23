@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type MenuItem } from "@/components/dashboard/DashboardLayout";
+import { type MenuItem } from "@/components/dashboard/layout/DashboardLayout";
 import { LayoutDashboard, Users, BarChart3, UserCog } from "lucide-react";
 import { useTopLoadingBar } from "@/context/TopLoadingBarContext";
 import { AdminHeader } from "./components/AdminHeader";

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { ReservationsTabContent } from "@/components/dashboard/ReservationsTabContent";
+import { ReservationsTabContent } from "@/components/dashboard/reservations-tab/ReservationsTabContent";
 
 export default function ReservationsPage() {
   const searchParams = useSearchParams();

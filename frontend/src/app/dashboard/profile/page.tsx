@@ -5,7 +5,7 @@ import { RootState } from "@/store/store";
 import { UserRole } from "@/store/slices/authSlice";
 import { AdminProfilePage } from "@/components/dashboard/profile/AdminProfilePage";
 import { usePhotographerDashboardContext } from "../context/PhotographerDashboardContext";
-import { ProfileSettingsForm } from "@/components/dashboard/ProfileSettingsForm";
+import { ProfileSettingsForm } from "@/components/dashboard/profile/ProfileSettingsForm";
 
 export default function ProfilePage() {
   const { role } = useSelector((state: RootState) => state.auth);

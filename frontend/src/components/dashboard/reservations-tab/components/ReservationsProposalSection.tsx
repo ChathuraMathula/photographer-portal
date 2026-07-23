@@ -3,7 +3,7 @@
 import React from "react";
 import { type Reservation, type Package } from "@/types";
 import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
-import { ProposeQuotationCard } from "../../ProposeQuotationCard";
+import { ProposeQuotationCard } from "../../propose-quotation/ProposeQuotationCard";
 
 interface ReservationsProposalSectionProps {
   selectedRes: Reservation;

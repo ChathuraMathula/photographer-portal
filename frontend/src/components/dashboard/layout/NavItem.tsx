@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MenuItem } from "../DashboardLayout";
+import { MenuItem } from "./constants";
 
 type NavItemProps = {
   item: MenuItem;
