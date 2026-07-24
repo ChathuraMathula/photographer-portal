@@ -15,18 +15,18 @@ export async function seedProdData(
   );
 
   const adminEmail = process.env.SUPER_ADMIN_EMAIL || 'admin@photoportal.com';
-  const adminPassword = process.env.SUPER_ADMIN_PASSWORD || 'SuperSecret123!';
+  const adminPassword = process.env.SUPER_ADMIN_PASSWORD || 'Welcome@123';
   const passwordHash = await bcrypt.hash(adminPassword, 10);
 
   console.log('  👤 Creating Super Admin user...');
   const superAdmin = manager.create(User, {
-    firstName: 'Chathura',
-    lastName: 'Mathula',
+    firstName: 'Chamod',
+    lastName: 'Madhusanka',
     email: adminEmail,
     passwordHash,
     role: UserRole.SUPER_ADMIN,
     isActive: true,
-    phone: '+94112345678',
+    phone: '+94701234567',
   });
 
   await manager.save(User, superAdmin);
