@@ -68,6 +68,7 @@ export function usePhotographerDashboard() {
     packages: packagesState.packages,
     universalDepositType: profile.universalDepositType,
     universalDepositValue: profile.universalDepositValue,
+    isAuthenticated,
   });
 
   // Manual Booking Hook

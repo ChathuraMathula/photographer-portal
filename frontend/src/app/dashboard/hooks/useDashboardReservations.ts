@@ -17,6 +17,7 @@ interface UseDashboardReservationsProps {
   packages: Package[];
   universalDepositType: string;
   universalDepositValue: number;
+  isAuthenticated?: boolean;
 }
 
 export function useDashboardReservations({
@@ -25,6 +26,7 @@ export function useDashboardReservations({
   packages,
   universalDepositType,
   universalDepositValue,
+  isAuthenticated,
 }: UseDashboardReservationsProps) {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
@@ -65,6 +67,7 @@ export function useDashboardReservations({
   }, [search, debouncedSearch]);
 
   const fetchReservations = async () => {
+    if (isAuthenticated === false) return;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -95,6 +98,7 @@ export function useDashboardReservations({
     startStr: string,
     endStr: string,
   ) => {
+    if (isAuthenticated === false) return;
     setCalendarLoading(true);
     try {
       const params = new URLSearchParams();
@@ -115,8 +119,9 @@ export function useDashboardReservations({
   };
 
   useEffect(() => {
+    if (isAuthenticated === false) return;
     fetchReservations();
-  }, [page, debouncedSearch, statusFilter, sortBy, sortOrder]);
+  }, [isAuthenticated, page, debouncedSearch, statusFilter, sortBy, sortOrder]);
 
   // Proposal / rejection form states
   const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);

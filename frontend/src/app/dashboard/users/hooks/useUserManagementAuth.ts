@@ -26,10 +26,15 @@ export function useUserManagementAuth() {
   };
 
   const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (!isAuthenticated) {
+      return new Response(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const res = await fetch(input, init);
     if (res.status === 401) {
       handleLogout();
-      throw new Error("Unauthorized");
     }
     return res;
   };
