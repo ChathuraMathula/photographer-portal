@@ -68,9 +68,7 @@ export function useBooking() {
         setAvailabilityChecked(values);
         setStep("details");
       } else {
-        setAvailabilityError(
-          data.reason ?? "This time slot is not available. Please try another.",
-        );
+        setAvailabilityError("This time slot is not available. Please try another.");
       }
     },
   });
