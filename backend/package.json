@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/scripts/seeds/seed.ts",
     "seed:sarah": "ts-node -r tsconfig-paths/register src/scripts/seeds/seed-sarah.ts",
+    "seed:demo": "ts-node -r tsconfig-paths/register src/scripts/seeds/seed-demo.ts",
     "seed:prod": "ts-node -r tsconfig-paths/register src/scripts/seeds/seed-prod.ts",
     "db:reset": "ts-node -r tsconfig-paths/register src/scripts/resets/reset.ts",
     "db:reset:prod": "ts-node -r tsconfig-paths/register src/scripts/resets/reset-prod.ts",

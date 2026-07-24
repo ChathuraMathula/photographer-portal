@@ -13,6 +13,7 @@
     "db:reset:prod": "cd backend && npm run db:reset:prod",
     "db:seed": "cd backend && npm run seed",
     "seed": "cd backend && npm run seed",
+    "seed:demo": "cd backend && npm run db:reset:prod && npm run seed:demo",
     "seed:prod": "cd backend && npm run seed:prod",
     "rabbitmq:reset": "cd backend && npm run rabbitmq:reset",
     "maildev:reset": "cd backend && npm run maildev:reset",
