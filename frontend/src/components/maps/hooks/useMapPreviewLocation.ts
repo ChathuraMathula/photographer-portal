@@ -156,7 +156,7 @@ export function useMapPreviewLocation(
       } catch (err: any) {
         if (active) setErrorMsg(err.message || "Failed to load map.");
       } finally {
-        if (active) setLoading(false);
+        setLoading(false);
       }
     }
     resolveLocation();

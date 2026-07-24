@@ -18,15 +18,21 @@ export function useMapCenter(
 
   useEffect(() => {
     let active = true;
-    if (!city && !district) return;
 
     // If explicit lat & lon coordinates are already provided from a pin or map link, do not auto-geocode
     if (lat !== undefined && lon !== undefined && !isNaN(lat) && !isNaN(lon)) {
+      setLoading(false);
+      return;
+    }
+
+    if (!city && !district) {
+      setLoading(false);
       return;
     }
 
     const geoKey = `${city || ""}_${district || ""}`;
     if (lastGeocodedRef.current === geoKey) {
+      setLoading(false);
       return;
     }
 
@@ -60,7 +66,7 @@ export function useMapCenter(
       } catch (err) {
         console.error("Failed to center map picker on city change", err);
       } finally {
-        if (active) setLoading(false);
+        setLoading(false);
       }
     }
 
