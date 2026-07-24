@@ -38,6 +38,7 @@ export function useCustomPackageForm({
     const newErrors: Record<string, string> = {};
 
     if (!name.trim()) newErrors.name = "Package name is required";
+    if (!description.trim()) newErrors.description = "Description is required";
     if (price <= 0) newErrors.price = "Price must be positive";
     if (durationHours <= 0)
       newErrors.durationHours = "Duration must be positive";

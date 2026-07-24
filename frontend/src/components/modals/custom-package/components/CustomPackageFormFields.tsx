@@ -37,14 +37,14 @@ export function CustomPackageFormFields({
           htmlFor="cust-name"
           className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
         >
-          Package Name
+          Package Name <span className="text-red-500">*</span>
         </Label>
         <Input
           id="cust-name"
           placeholder="e.g. Special Customized Portrait Package"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+          className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${errors.name ? "border-red-500" : ""}`}
         />
         {errors.name && (
           <p className="text-red-500 text-xs mt-1">{errors.name}</p>
@@ -55,7 +55,7 @@ export function CustomPackageFormFields({
           htmlFor="cust-description"
           className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
         >
-          Description
+          Description <span className="text-red-500">*</span>
         </Label>
         <textarea
           id="cust-description"
@@ -63,8 +63,11 @@ export function CustomPackageFormFields({
           placeholder="Describe custom features tailored for this client..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
+          className={`w-full rounded-xl border bg-white p-2.5 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all ${errors.description ? "border-red-500" : "border-zinc-200"}`}
         />
+        {errors.description && (
+          <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
