@@ -47,12 +47,17 @@ export function ManualBookingModal({
   universalDepositType = "fixed",
   universalDepositValue = 5000,
 }: Props) {
+  const handleClose = () => {
+    formik.resetForm();
+    onClose();
+  };
+
   const footer = (
     <div className="flex gap-3 w-full">
       <Button
         type="button"
         variant="outline"
-        onClick={onClose}
+        onClick={handleClose}
         className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm flex-1 animate-in fade-in duration-100"
       >
         Cancel
@@ -69,7 +74,7 @@ export function ManualBookingModal({
   return (
     <ModalLayout
       title="Manual Booking"
-      onClose={onClose}
+      onClose={handleClose}
       onSubmit={formik.handleSubmit}
       footer={footer}
     >

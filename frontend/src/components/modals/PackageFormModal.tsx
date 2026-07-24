@@ -30,12 +30,17 @@ export function PackageFormModal({
   onIncludesChange,
   onClose,
 }: Props) {
+  const handleClose = () => {
+    formik.resetForm();
+    onClose();
+  };
+
   const footer = (
     <div className="flex gap-3 w-full">
       <Button
         type="button"
         variant="outline"
-        onClick={onClose}
+        onClick={handleClose}
         className="btn btn-secondary btn-modal h-11 py-0 px-6 shadow-sm flex-1 animate-in fade-in duration-100"
       >
         Cancel
@@ -52,7 +57,7 @@ export function PackageFormModal({
   return (
     <ModalLayout
       title={editingPkg ? "Edit Package Details" : "Create New Package"}
-      onClose={onClose}
+      onClose={handleClose}
       onSubmit={formik.handleSubmit}
       footer={footer}
       maxWidth="max-w-lg"
