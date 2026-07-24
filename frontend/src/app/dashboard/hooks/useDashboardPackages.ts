@@ -11,7 +11,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
 const PackageSchema = Yup.object().shape({
   name: Yup.string().required("Package name is required"),
-  description: Yup.string(),
+  description: Yup.string().required("Description is required"),
   price: Yup.number()
     .positive("Price must be positive")
     .required("Price is required"),

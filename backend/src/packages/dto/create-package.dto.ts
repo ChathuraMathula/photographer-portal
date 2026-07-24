@@ -13,8 +13,8 @@ export class CreatePackageDto {
   name!: string;
 
   @IsString()
-  @IsOptional()
-  description?: string;
+  @IsNotEmpty()
+  description!: string;
 
   @IsInt()
   @Min(0)

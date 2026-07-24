@@ -23,13 +23,13 @@ export function PackageFormBasicInfo({
           htmlFor="pkg-name"
           className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
         >
-          Package Name
+          Package Name <span className="text-red-500">*</span>
         </Label>
         <Input
           id="pkg-name"
           placeholder="e.g. Bronze Portrait Package"
           {...formik.getFieldProps("name")}
-          className="h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950"
+          className={`h-[50px] rounded-xl border-zinc-200 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-800 dark:bg-zinc-950 ${formik.touched.name && formik.errors.name ? "border-red-500" : ""}`}
         />
         <FieldError
           msg={formik.touched.name ? formik.errors.name : undefined}
@@ -41,14 +41,19 @@ export function PackageFormBasicInfo({
           htmlFor="pkg-description"
           className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
         >
-          Description
+          Description <span className="text-red-500">*</span>
         </Label>
         <textarea
           id="pkg-description"
           rows={2}
           placeholder="Describe details, deliverables..."
           {...formik.getFieldProps("description")}
-          className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all"
+          className={`w-full rounded-xl border bg-white p-2.5 text-body-small focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark dark:border-zinc-850 dark:bg-zinc-950 text-zinc-750 dark:text-zinc-305 transition-all ${formik.touched.description && formik.errors.description ? "border-red-500" : "border-zinc-200"}`}
+        />
+        <FieldError
+          msg={
+            formik.touched.description ? formik.errors.description : undefined
+          }
         />
       </div>
 

@@ -2,6 +2,7 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Min,
@@ -13,6 +14,7 @@ export class UpdatePackageDto {
   name?: string;
 
   @IsString()
+  @IsNotEmpty()
   @IsOptional()
   description?: string;
 
