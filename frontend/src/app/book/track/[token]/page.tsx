@@ -158,8 +158,8 @@ export default function TrackingPage() {
             />
           </div>
 
-          {/* Chat column */}
-          <div>
+
+          <div className="md:sticky md:top-6 md:self-start">
             <ChatBox
               messages={messages}
               messageText={messageText}

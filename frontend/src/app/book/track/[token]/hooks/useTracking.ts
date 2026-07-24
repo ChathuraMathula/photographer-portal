@@ -71,10 +71,7 @@ export function useTracking() {
   }, [token, verifiedEmail]);
 
   const scrollToBottom = () => {
-    setTimeout(
-      () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }),
-      100,
-    );
+    // Container scrolling is handled internally by ChatBox component
   };
 
   // Chat + Socket.io
