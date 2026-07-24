@@ -61,8 +61,6 @@ export function getPreviewMapHtml(lat: number, lon: number, popupText: string) {
             .setLngLat([${lon}, ${lat}])
             .setPopup(popup)
             .addTo(map);
-
-          popup.addTo(map);
         }
         if (document.readyState === 'complete') {
           initOfflinePreviewMap();
@@ -85,8 +83,7 @@ export function getPreviewMapHtml(lat: number, lon: number, popupText: string) {
           }).addTo(map);
           
           L.marker([${lat}, ${lon}]).addTo(map)
-            .bindPopup("<b>Event Location</b><br/>${popupText.replace(/"/g, '\\"')}")
-            .openPopup();
+            .bindPopup("<b>Event Location</b><br/>${popupText.replace(/"/g, '\\"')}");
         }
         if (document.readyState === 'complete') {
           initOnlinePreviewMap();

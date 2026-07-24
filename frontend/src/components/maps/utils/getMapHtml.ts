@@ -103,7 +103,7 @@ export function getMapHtml(
             setTimeout(initOnlineMap, 50);
             return;
           }
-          var map = L.map('map', { zoomControl: ${!readOnly}, dragging: ${!readOnly}, scrollWheelZoom: ${!readOnly}, doubleClickZoom: ${!readOnly}, boxZoom: ${!readOnly}, keyboard: ${!readOnly} }).setView([${currentLat}, ${currentLon}], 13);
+          var map = L.map('map', { zoomControl: ${!readOnly}, dragging: ${!readOnly}, scrollWheelZoom: false, doubleClickZoom: ${!readOnly}, boxZoom: ${!readOnly}, keyboard: false }).setView([${currentLat}, ${currentLon}], 13);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
           var marker = L.marker([${currentLat}, ${currentLon}], { draggable: ${!readOnly} }).addTo(map);
           ${

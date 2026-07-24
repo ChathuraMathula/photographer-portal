@@ -49,13 +49,21 @@ export function ReservationsLeftPane({
   const handleSelectReservation = (res: Reservation) => {
     setSelectedRes(res);
     setShowRejectForm(false);
-    router.replace(`/dashboard/reservations?id=${res.id}&page=${page}`, { scroll: false });
+    window.history.replaceState(
+      null,
+      "",
+      `/dashboard/reservations?id=${res.id}&page=${page}`,
+    );
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     const idParam = selectedRes ? `&id=${selectedRes.id}` : "";
-    router.replace(`/dashboard/reservations?page=${newPage}${idParam}`, { scroll: false });
+    window.history.replaceState(
+      null,
+      "",
+      `/dashboard/reservations?page=${newPage}${idParam}`,
+    );
   };
 
   return (
