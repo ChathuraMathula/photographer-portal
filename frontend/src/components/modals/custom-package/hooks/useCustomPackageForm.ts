@@ -33,6 +33,72 @@ export function useCustomPackageForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleNameChange = (val: string) => {
+    setName(val);
+    if (errors.name && val.trim()) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.name;
+        return next;
+      });
+    }
+  };
+
+  const handleDescriptionChange = (val: string) => {
+    setDescription(val);
+    if (errors.description && val.trim()) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.description;
+        return next;
+      });
+    }
+  };
+
+  const handlePriceChange = (val: number) => {
+    setPrice(val);
+    if (errors.price && val > 0) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.price;
+        return next;
+      });
+    }
+  };
+
+  const handleDurationHoursChange = (val: number) => {
+    setDurationHours(val);
+    if (errors.durationHours && val > 0) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.durationHours;
+        return next;
+      });
+    }
+  };
+
+  const handleDepositValueChange = (val: number) => {
+    setDepositValue(val);
+    if (errors.depositValue) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.depositValue;
+        return next;
+      });
+    }
+  };
+
+  const handleDepositTypeChange = (val: "universal" | "fixed" | "percentage") => {
+    setDepositType(val);
+    if (errors.depositValue) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.depositValue;
+        return next;
+      });
+    }
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
@@ -77,17 +143,17 @@ export function useCustomPackageForm({
 
   return {
     name,
-    setName,
+    setName: handleNameChange,
     description,
-    setDescription,
+    setDescription: handleDescriptionChange,
     price,
-    setPrice,
+    setPrice: handlePriceChange,
     durationHours,
-    setDurationHours,
+    setDurationHours: handleDurationHoursChange,
     depositType,
-    setDepositType,
+    setDepositType: handleDepositTypeChange,
     depositValue,
-    setDepositValue,
+    setDepositValue: handleDepositValueChange,
     includesText,
     setIncludesText,
     errors,
