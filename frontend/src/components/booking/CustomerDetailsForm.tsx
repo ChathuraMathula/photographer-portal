@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { type FormikProps } from "formik";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,8 +38,16 @@ export function CustomerDetailsForm({
   availabilityChecked,
   onBack,
 }: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (formik.submitCount > 0 && !formik.isValid) {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [formik.submitCount, formik.isValid]);
+
   return (
-    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+    <Card ref={cardRef} className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm scroll-mt-6">
       <CardHeader>
         <CardTitle className="text-title-medium text-primary-dark dark:text-white">
           Your Details
