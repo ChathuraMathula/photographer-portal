@@ -10,7 +10,13 @@ export async function aggregateTimeline(
   startDate: Date,
   endDate: Date,
   photographerId?: string,
-): Promise<{ label: string; bookings: number; revenueLkr: number }[]> {
+): Promise<
+  {
+    label: string;
+    bookings: number;
+    revenueLkr: number
+  }[]
+> {
   const diffDays = Math.ceil((endDate.getTime() - startDate.getTime()) / 86400000);
   const type = diffDays <= 8 ? 'daily' : diffDays <= 45 ? 'monthly' : 'yearly';
 
