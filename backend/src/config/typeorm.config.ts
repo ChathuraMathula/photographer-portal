@@ -34,6 +34,10 @@ export default new DataSource({
     Message,
     Payment,
   ],
-  migrations: ['src/migrations/*.ts', 'dist/migrations/*.js'],
+  migrations: [
+    process.env.NODE_ENV === 'production'
+      ? 'dist/migrations/*.js'
+      : 'src/migrations/*.ts',
+  ],
   synchronize: false,
 });

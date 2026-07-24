@@ -33,6 +33,9 @@ export class Reservation {
   @JoinColumn({ name: 'customerId' })
   customer!: Customer;
 
+  // @Column({nullable: true})
+  // testField!: string;
+
   @Column()
   customerId!: string;
 
