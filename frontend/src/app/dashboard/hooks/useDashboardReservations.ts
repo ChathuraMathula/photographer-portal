@@ -349,6 +349,7 @@ export function useDashboardReservations({
     setSortOrder,
     loading,
     calendarReservations,
+    setCalendarReservations,
     fetchCalendarReservations,
     calendarLoading,
     paymentsUpdatedTrigger,

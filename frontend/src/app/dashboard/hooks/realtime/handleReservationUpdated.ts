@@ -15,6 +15,12 @@ export function handleReservationUpdated(
     prev.map((r) => (r.id === updatedRes.id ? updatedRes : r)),
   );
 
+  if (typeof ctx.reservationsState.setCalendarReservations === "function") {
+    ctx.reservationsState.setCalendarReservations((prev: Reservation[]) =>
+      prev.map((r) => (r.id === updatedRes.id ? updatedRes : r)),
+    );
+  }
+
   ctx.reservationsState.setSelectedRes((prev: Reservation | null) =>
     prev && prev.id === updatedRes.id ? updatedRes : prev,
   );

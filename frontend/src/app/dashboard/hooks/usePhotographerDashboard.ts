@@ -75,8 +75,21 @@ export function usePhotographerDashboard() {
     authFetch,
     loadPhotographerData: async () => {
       await loadPhotographerData();
+      await reservationsState.fetchReservations();
     },
     setShowManualModal,
+    onBookingCreated: (newRes) => {
+      reservationsState.setReservations((prev: Reservation[]) => {
+        if (prev.some((r) => r.id === newRes.id)) return prev;
+        return [newRes, ...prev];
+      });
+      if (typeof reservationsState.setCalendarReservations === "function") {
+        reservationsState.setCalendarReservations((prev: Reservation[]) => {
+          if (prev.some((r) => r.id === newRes.id)) return prev;
+          return [...prev, newRes];
+        });
+      }
+    },
   });
 
   // Chat Hook

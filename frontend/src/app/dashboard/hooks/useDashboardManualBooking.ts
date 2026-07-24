@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { toast } from "sonner";
 import * as Yup from "yup";
 import { type ManualBookingValues } from "@/components/modals/ManualBookingModal";
+import { type Reservation } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -90,12 +91,14 @@ interface UseDashboardManualBookingProps {
   ) => Promise<Response>;
   loadPhotographerData: () => Promise<void>;
   setShowManualModal: (show: boolean) => void;
+  onBookingCreated?: (newRes: Reservation) => void;
 }
 
 export function useDashboardManualBooking({
   authFetch,
   loadPhotographerData,
   setShowManualModal,
+  onBookingCreated,
 }: UseDashboardManualBookingProps) {
   const manualFormik = useFormik<ManualBookingValues>({
     initialValues: {
@@ -154,6 +157,9 @@ export function useDashboardManualBooking({
           throw new Error(data.message || "Failed to book manual reservation");
         setShowManualModal(false);
         resetForm();
+        if (onBookingCreated) {
+          onBookingCreated(data);
+        }
         await loadPhotographerData();
         toast.success("Manual offline booking registered successfully!");
       } catch (err: any) {

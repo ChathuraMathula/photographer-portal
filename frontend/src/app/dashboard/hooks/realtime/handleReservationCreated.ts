@@ -19,6 +19,13 @@ export function handleReservationCreated(
     return [newRes, ...prev];
   });
 
+  if (typeof ctx.reservationsState.setCalendarReservations === "function") {
+    ctx.reservationsState.setCalendarReservations((prev: Reservation[]) => {
+      if (prev.some((r) => r.id === newRes.id)) return prev;
+      return [...prev, newRes];
+    });
+  }
+
   ctx.setNotifications((prev) => [
     {
       id: `booking_${newRes.id}_${Date.now()}`,
