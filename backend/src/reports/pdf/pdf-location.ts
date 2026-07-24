@@ -49,7 +49,7 @@ export function buildLocationReportPdf(
   const topCity =
     Object.entries(cityCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
   const coveragePercent =
-    totalBookings > 0 ? Math.round((withLocation / totalBookings) * 100) : 0;
+    totalBookings > 0 ? Math.round((withCoords / totalBookings) * 100) : 0;
 
   // Render Stats Grid
   doc
@@ -103,7 +103,7 @@ export function buildLocationReportPdf(
     .fillColor(textColor)
     .fontSize(7)
     .font('Helvetica-Bold')
-    .text('LOCATION COVERAGE', 430, 123);
+    .text('GPS PIN COVERAGE', 430, 123);
   doc
     .fillColor('#6366f1')
     .fontSize(14)

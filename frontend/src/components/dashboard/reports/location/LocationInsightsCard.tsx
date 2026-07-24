@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { MapPin, Building2, Crosshair, TrendingUp } from "lucide-react";
@@ -72,9 +72,9 @@ export function LocationInsightsCard({ insights }: Props) {
       />
       <StatTile
         icon={<TrendingUp className="h-4 w-4" />}
-        label="Location Coverage"
+        label="GPS Pin Coverage"
         value={`${coveragePercent}%`}
-        sub={`${totalWithLocation} of ${totalBookings} have location`}
+        sub={`${totalWithCoords} of ${totalBookings} pinned on map`}
         accent={
           coveragePercent >= 75
             ? "text-emerald-700 dark:text-emerald-400"

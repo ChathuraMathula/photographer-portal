@@ -154,7 +154,7 @@ export function buildLocationInsights(
   const totalWithCoords = mapPoints.length;
   const coveragePercent =
     totalBookings > 0
-      ? Math.round((totalWithLocation / totalBookings) * 100)
+      ? Math.round((totalWithCoords / totalBookings) * 100)
       : 0;
   return {
     topDistrict: districtStats[0]?.district ?? null,
