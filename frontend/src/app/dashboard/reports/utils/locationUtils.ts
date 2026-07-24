@@ -1,4 +1,4 @@
-﻿/**
+/**
  * locationUtils.ts
  * Pure utility functions for location analytics — no side-effects, no React.
  */
@@ -89,6 +89,7 @@ export function extractCoordsFromMapLink(
 export function buildMapPoints(bookings: RawBooking[]): MapPoint[] {
   const points: MapPoint[] = [];
   for (const b of bookings) {
+    if (b.status === "REJECTED" || b.status === "CANCELLED") continue;
     const coords = extractCoordsFromMapLink(b.locationMapLink);
     if (!coords) continue;
     const clientName = b.customer
@@ -111,6 +112,7 @@ export function buildMapPoints(bookings: RawBooking[]): MapPoint[] {
 export function buildDistrictStats(bookings: RawBooking[]): DistrictStat[] {
   const map: Record<string, DistrictStat> = {};
   for (const b of bookings) {
+    if (b.status === "REJECTED" || b.status === "CANCELLED") continue;
     const district = b.district?.trim() || null;
     if (!district) continue;
     if (!map[district]) map[district] = { district, count: 0, eventTypes: {} };
@@ -125,6 +127,7 @@ export function buildDistrictStats(bookings: RawBooking[]): DistrictStat[] {
 export function buildCityStats(bookings: RawBooking[]): CityStat[] {
   const map: Record<string, number> = {};
   for (const b of bookings) {
+    if (b.status === "REJECTED" || b.status === "CANCELLED") continue;
     const city = b.city?.trim() || null;
     if (!city) continue;
     map[city] = (map[city] || 0) + 1;
@@ -141,8 +144,11 @@ export function buildLocationInsights(
   cityStats: CityStat[],
   mapPoints: MapPoint[],
 ): LocationInsightsSummary {
-  const totalBookings = bookings.length;
-  const totalWithLocation = bookings.filter(
+  const validBookings = bookings.filter(
+    (b) => b.status !== "REJECTED" && b.status !== "CANCELLED",
+  );
+  const totalBookings = validBookings.length;
+  const totalWithLocation = validBookings.filter(
     (b) => b.district || b.city || b.location || b.locationMapLink,
   ).length;
   const totalWithCoords = mapPoints.length;
@@ -164,6 +170,7 @@ export function buildLocationInsights(
 export function getUniqueEventTypes(bookings: RawBooking[]): string[] {
   const set = new Set<string>();
   for (const b of bookings) {
+    if (b.status === "REJECTED" || b.status === "CANCELLED") continue;
     if (b.eventType) set.add(b.eventType);
   }
   return Array.from(set).sort();

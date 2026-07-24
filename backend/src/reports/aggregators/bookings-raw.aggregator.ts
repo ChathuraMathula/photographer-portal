@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Reservation } from '../../entities/reservation.entity';
+import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
 
 export async function aggregateRawBookings(
   reservationRepository: Repository<Reservation>,
@@ -18,7 +18,13 @@ export async function aggregateRawBookings(
     .addSelect('res.location', 'location')
     .addSelect('res.status', 'status')
     .addSelect("CONCAT(cust.firstName, ' ', cust.lastName)", 'clientName')
-    .where('res.date BETWEEN :startDate AND :endDate', { startDate, endDate });
+    .where('res.date BETWEEN :startDate AND :endDate', { startDate, endDate })
+    .andWhere('res.status NOT IN (:...excludedStatuses)', {
+      excludedStatuses: [
+        ReservationStatus.REJECTED,
+        ReservationStatus.CANCELLED,
+      ],
+    });
 
   if (photographerId) {
     qb.andWhere('res.photographerId = :photographerId', { photographerId });
