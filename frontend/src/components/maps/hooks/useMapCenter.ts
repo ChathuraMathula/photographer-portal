@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState, useRef, type RefObject } from "react";
 
 export function useMapCenter(
   city: string | undefined,
@@ -9,11 +9,26 @@ export function useMapCenter(
   onChange: (lat: number, lon: number) => void,
 ) {
   const [loading, setLoading] = useState(false);
+  const lastGeocodedRef = useRef<string>("");
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     let active = true;
     if (!city && !district) return;
-    if (lat !== undefined && lon !== undefined) return;
+
+    // If explicit lat & lon coordinates are already provided from a pin or map link, do not auto-geocode
+    if (lat !== undefined && lon !== undefined && !isNaN(lat) && !isNaN(lon)) {
+      return;
+    }
+
+    const geoKey = `${city || ""}_${district || ""}`;
+    if (lastGeocodedRef.current === geoKey) {
+      return;
+    }
 
     async function centerOnCity() {
       setLoading(true);
@@ -33,7 +48,8 @@ export function useMapCenter(
             const newLat = parseFloat(data[0].lat);
             const newLon = parseFloat(data[0].lon);
             if (!isNaN(newLat) && !isNaN(newLon)) {
-              onChange(newLat, newLon);
+              lastGeocodedRef.current = geoKey;
+              onChangeRef.current(newLat, newLon);
               iframeRef.current?.contentWindow?.postMessage(
                 { type: "OSM_MAP_PAN", lat: newLat, lon: newLon },
                 "*",
@@ -52,7 +68,7 @@ export function useMapCenter(
     return () => {
       active = false;
     };
-  }, [city, district, lat, lon, iframeRef, onChange]);
+  }, [city, district, lat, lon, iframeRef]);
 
   return { loading };
 }

@@ -18,7 +18,6 @@ export function useMapPreviewLocation(
     async function resolveLocation() {
       setLoading(true);
       setErrorMsg("");
-      setCoords(null);
       const isOffline = process.env.NEXT_PUBLIC_OFFLINE_MAPS === "true";
       const baseUrl = isOffline
         ? "http://localhost:8081"
