@@ -46,7 +46,6 @@ export class EmailWorkerService {
       <h2>Quotation and Packages Proposed</h2>
       <p>Dear ${customerName},</p>
       <p>The photographer has reviewed your booking request and sent over recommended package options and price details.</p>
-      <p><strong>Advance Deposit Required:</strong> LKR ${(advancePaymentAmount / 100).toLocaleString()}</p>
       ${notes ? `<p><strong>Photographer's Note:</strong> ${notes}</p>` : ''}
       <p>Please visit the tracking page below to select your package, view instructions, and confirm the reservation:</p>
       <p><a href="${trackingLink}">${trackingLink}</a></p>
@@ -118,11 +117,10 @@ export class EmailWorkerService {
       <p>Dear ${customerName},</p>
       <p>Thank you for your payment! Please find attached the official PDF invoice for your reservation.</p>
       <p>Invoice Number: <strong>${invoiceNumber}</strong></p>
-      ${
-        invoiceUrl
-          ? `<p>You can also view or download your invoice PDF online by clicking the link below:</p>
+      ${invoiceUrl
+        ? `<p>You can also view or download your invoice PDF online by clicking the link below:</p>
              <p><a href="${invoiceUrl}" target="_blank" rel="noopener noreferrer">${invoiceUrl}</a></p>`
-          : ''
+        : ''
       }
     `;
 

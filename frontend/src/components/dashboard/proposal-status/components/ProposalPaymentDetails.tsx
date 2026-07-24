@@ -26,8 +26,7 @@ export function ProposalPaymentDetails({
 }: ProposalPaymentDetailsProps) {
   if (
     reservation.status !== "CONFIRMED" &&
-    reservation.status !== "COMPLETED" &&
-    reservation.status !== "PROPOSED"
+    reservation.status !== "COMPLETED"
   ) {
     return null;
   }
@@ -47,9 +46,7 @@ export function ProposalPaymentDetails({
         <div className="bg-zinc-50/80 dark:bg-zinc-900/60 p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 space-y-2.5 my-2 text-left shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-              {reservation.status === "CONFIRMED" || reservation.status === "COMPLETED"
-                ? "Selected Package"
-                : "Proposed Package Details"}
+              Selected Package
             </span>
             {(selectedPkg.isCustom || selectedPkg.id?.startsWith("custom_")) && (
               <span className="px-2 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 rounded-md">
