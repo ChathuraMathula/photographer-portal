@@ -70,12 +70,8 @@ Desktop.ini
 *.sln
 *.sw?
 
-# VSCode — keep shared config, ignore personal workspace state
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# VSCode
+.vscode/
 
 # ─── SSL / Certificates ──────────────────────────────────────────────────────
 *.pem
