@@ -124,7 +124,7 @@ export async function seedDemoData(app: INestApplicationContext) {
   await manager.save(User, superAdmin);
 
   // 2. Create Photographer Supun Kanishka
-  const supunEmail = 'supunkanishka@photoportal.com';
+  const supunEmail = 'supun@photoportal.com';
   const supunPassword = 'Welcome@123';
   const supunHash = await bcrypt.hash(supunPassword, 10);
 
@@ -157,6 +157,41 @@ export async function seedDemoData(app: INestApplicationContext) {
     offlineMessage: '',
   });
   await manager.save(PhotographerProfile, profile);
+
+  // 2b. Create Photographer Nuwan Thushara
+  const nuwanEmail = 'nuwan@photoportal.com';
+  const nuwanPassword = 'Welcome@123';
+  const nuwanHash = await bcrypt.hash(nuwanPassword, 10);
+
+  const nuwanUser = manager.create(User, {
+    firstName: 'Nuwan',
+    lastName: 'Thushara',
+    email: nuwanEmail,
+    passwordHash: nuwanHash,
+    role: UserRole.PHOTOGRAPHER,
+    isActive: true,
+    phone: '+94779876543',
+  });
+  await manager.save(User, nuwanUser);
+
+  // 3b. Create Photographer Profile for Nuwan Thushara
+  const nuwanProfile = manager.create(PhotographerProfile, {
+    userId: nuwanUser.id,
+    bookingSlug: 'nuwan-thushara',
+    bio: 'Experienced Destination Wedding & Cultural Event Photographer based in Kandy. Capturing timeless moments and heritage celebrations.',
+    baseLocation: 'Kandy, Central Province',
+    city: 'Kandy',
+    district: 'Kandy District',
+    locationMapLink: 'https://www.google.com/maps?q=7.2914,80.6654',
+    allowedEventTypes: ['Wedding', 'Engagement', 'Portrait', 'Cultural Event', 'Pre-Wedding'],
+    isAvailableForBooking: true,
+    showManualBookingInTopbar: true,
+    showAcceptBookingsInTopbar: true,
+    universalDepositType: 'fixed',
+    universalDepositValue: 1500000, // LKR 15,000 default deposit
+    offlineMessage: '',
+  });
+  await manager.save(PhotographerProfile, nuwanProfile);
 
   // 4. Create Realistic Packages for Supun
   const pkgData = [
@@ -221,6 +256,59 @@ export async function seedDemoData(app: INestApplicationContext) {
     packages.push(await manager.save(Package, pkg));
   }
 
+  // 4b. Create Packages for Nuwan Thushara
+  const nuwanPkgData = [
+    {
+      name: 'Kandy Royal Wedding Package',
+      description: 'Traditional & modern wedding photography coverage including homecoming & Poruwa ceremony with drone and photobook.',
+      priceInCents: 22000000, // LKR 220,000
+      durationHours: 12,
+      depositType: 'fixed',
+      depositValue: 4000000, // LKR 40,000
+      includes: ['2 Main Photographers', 'Drone Coverage', 'Poruwa & Reception', '350 Retouched Photos'],
+      isActive: true,
+    },
+    {
+      name: 'Pre-Wedding Scenic Shoot',
+      description: 'Cinematic pre-wedding portrait session at scenic Hill Country locations (Nuwara Eliya, Ella, Kandy).',
+      priceInCents: 8500000, // LKR 85,000
+      durationHours: 6,
+      depositType: 'fixed',
+      depositValue: 1500000, // LKR 15,000
+      includes: ['Full Day Hill Country Locations', '150 Digital Photos', '3 Outfit Changes', 'Short Teaser Reel'],
+      isActive: true,
+    },
+    {
+      name: 'Heritage & Cultural Event Package',
+      description: 'Specialized coverage for cultural functions, engagement ceremonies, and family gatherings.',
+      priceInCents: 6000000, // LKR 60,000
+      durationHours: 4,
+      depositType: 'fixed',
+      depositValue: 1000000, // LKR 10,000
+      includes: ['4 Hours Coverage', '120 Edited Photos', 'Online Digital Gallery'],
+      isActive: true,
+    },
+    {
+      name: 'Express Portrait Shoot',
+      description: 'Quick professional personal portrait session.',
+      priceInCents: 2500000, // LKR 25,000
+      durationHours: 2,
+      depositType: 'fixed',
+      depositValue: 500000, // LKR 5,000
+      includes: ['2 Hours Shoot', '25 Retouched Images'],
+      isActive: true,
+    },
+  ];
+
+  const nuwanPackages: Package[] = [];
+  for (const p of nuwanPkgData) {
+    const pkg = manager.create(Package, {
+      ...p,
+      photographerId: nuwanUser.id,
+    });
+    nuwanPackages.push(await manager.save(Package, pkg));
+  }
+
   // 5. Create Customers
   const customers: Customer[] = [];
   for (const c of sriLankanCustomers) {
@@ -233,7 +321,7 @@ export async function seedDemoData(app: INestApplicationContext) {
     customers.push(await manager.save(Customer, cust));
   }
 
-  // 6. Generate Past & Future Reservations
+  // 6. Generate Past & Future Reservations for Supun
   let totalCompleted = 0;
   let totalConfirmed = 0;
   let totalProposed = 0;
@@ -381,34 +469,142 @@ export async function seedDemoData(app: INestApplicationContext) {
     }
   }
 
+  // 6b. Generate 15 Past & 15 Future Reservations for Nuwan Thushara
+  let nuwanCompleted = 0;
+  let nuwanConfirmed = 0;
+  let nuwanProposed = 0;
+  let nuwanPending = 0;
+  let nuwanRejected = 0;
+  let nuwanCancelled = 0;
+  let nuwanRevenueCents = 0;
+
+  // Nuwan: 15 Past Reservations (Completed, Cancelled, Rejected)
+  const nuwanPastSpecs: ReservationSpec[] = [
+    { date: '2024-02-10', status: ReservationStatus.COMPLETED, pkgIndex: 0, locIndex: 1, eventType: 'Wedding' },
+    { date: '2024-04-15', status: ReservationStatus.COMPLETED, pkgIndex: 1, locIndex: 6, eventType: 'Pre-Wedding' },
+    { date: '2024-06-20', status: ReservationStatus.CANCELLED, pkgIndex: 2, locIndex: 1, eventType: 'Cultural Event' },
+    { date: '2024-08-05', status: ReservationStatus.COMPLETED, pkgIndex: 0, locIndex: 6, eventType: 'Wedding' },
+    { date: '2024-10-12', status: ReservationStatus.REJECTED, pkgIndex: 1, locIndex: 1, eventType: 'Pre-Wedding', rejectionReason: 'Schedule conflict' },
+    { date: '2024-12-01', status: ReservationStatus.COMPLETED, pkgIndex: 3, locIndex: 6, eventType: 'Portrait' },
+    { date: '2025-01-25', status: ReservationStatus.COMPLETED, pkgIndex: 0, locIndex: 1, eventType: 'Wedding' },
+    { date: '2025-03-14', status: ReservationStatus.COMPLETED, pkgIndex: 2, locIndex: 6, eventType: 'Engagement' },
+    { date: '2025-05-18', status: ReservationStatus.REJECTED, pkgIndex: 0, locIndex: 1, eventType: 'Wedding', rejectionReason: 'Fully booked' },
+    { date: '2025-07-22', status: ReservationStatus.COMPLETED, pkgIndex: 1, locIndex: 6, eventType: 'Pre-Wedding' },
+    { date: '2025-09-30', status: ReservationStatus.CANCELLED, pkgIndex: 3, locIndex: 1, eventType: 'Portrait' },
+    { date: '2025-11-15', status: ReservationStatus.COMPLETED, pkgIndex: 0, locIndex: 6, eventType: 'Wedding' },
+    { date: '2026-02-14', status: ReservationStatus.COMPLETED, pkgIndex: 1, locIndex: 1, eventType: 'Pre-Wedding' },
+    { date: '2026-04-20', status: ReservationStatus.REJECTED, pkgIndex: 2, locIndex: 6, eventType: 'Cultural Event', rejectionReason: 'Client requested unreachable date' },
+    { date: '2026-06-10', status: ReservationStatus.COMPLETED, pkgIndex: 0, locIndex: 1, eventType: 'Wedding' },
+  ];
+
+  // Nuwan: 15 Future Reservations (Pending, Proposed, Confirmed)
+  const nuwanFutureSpecs: ReservationSpec[] = [
+    { date: '2026-07-27', status: ReservationStatus.CONFIRMED, pkgIndex: 0, locIndex: 1, eventType: 'Wedding' },
+    { date: '2026-07-30', status: ReservationStatus.PROPOSED, pkgIndex: 1, locIndex: 6, eventType: 'Pre-Wedding' },
+    { date: '2026-08-04', status: ReservationStatus.PENDING, pkgIndex: 2, locIndex: 1, eventType: 'Cultural Event' },
+    { date: '2026-08-10', status: ReservationStatus.CONFIRMED, pkgIndex: 0, locIndex: 6, eventType: 'Wedding' },
+    { date: '2026-08-16', status: ReservationStatus.PROPOSED, pkgIndex: 3, locIndex: 1, eventType: 'Portrait' },
+    { date: '2026-08-22', status: ReservationStatus.PENDING, pkgIndex: 1, locIndex: 6, eventType: 'Pre-Wedding' },
+    { date: '2026-08-29', status: ReservationStatus.CONFIRMED, pkgIndex: 2, locIndex: 1, eventType: 'Engagement' },
+    { date: '2026-09-05', status: ReservationStatus.PROPOSED, pkgIndex: 0, locIndex: 6, eventType: 'Wedding' },
+    { date: '2026-09-11', status: ReservationStatus.PENDING, pkgIndex: 3, locIndex: 1, eventType: 'Portrait' },
+    { date: '2026-09-16', status: ReservationStatus.CONFIRMED, pkgIndex: 1, locIndex: 6, eventType: 'Pre-Wedding' },
+    { date: '2026-09-22', status: ReservationStatus.PROPOSED, pkgIndex: 2, locIndex: 1, eventType: 'Cultural Event' },
+    { date: '2026-09-28', status: ReservationStatus.PENDING, pkgIndex: 0, locIndex: 6, eventType: 'Wedding' },
+    { date: '2026-10-05', status: ReservationStatus.CONFIRMED, pkgIndex: 1, locIndex: 1, eventType: 'Pre-Wedding' },
+    { date: '2026-10-12', status: ReservationStatus.PROPOSED, pkgIndex: 3, locIndex: 6, eventType: 'Portrait' },
+    { date: '2026-10-20', status: ReservationStatus.PENDING, pkgIndex: 2, locIndex: 1, eventType: 'Engagement' },
+  ];
+
+  const allNuwanSpecs = [...nuwanPastSpecs, ...nuwanFutureSpecs];
+
+  for (let i = 0; i < allNuwanSpecs.length; i++) {
+    const spec = allNuwanSpecs[i];
+    const customer = customers[(i + 5) % customers.length];
+    const pkg = nuwanPackages[spec.pkgIndex];
+    const loc = locationsList[spec.locIndex];
+
+    const res = manager.create(Reservation, {
+      customerId: customer.id,
+      photographerId: nuwanUser.id,
+      date: new Date(spec.date),
+      startTime: '09:00',
+      endTime: '17:00',
+      eventType: spec.eventType,
+      location: loc.location,
+      locationMapLink: loc.locationMapLink,
+      city: loc.city,
+      district: loc.district,
+      customerNotes: `Demo reservation request for Nuwan Thushara (${spec.eventType}) at ${loc.location}.`,
+      status: spec.status,
+      reservationToken: randomToken(),
+      totalAmountInCents: pkg.priceInCents,
+      advancePaymentPriceInCents: pkg.depositValue,
+      clientSelectedPackageId: pkg.id,
+      selectedPackages: [
+        {
+          id: pkg.id,
+          name: pkg.name,
+          description: pkg.description,
+          priceInCents: pkg.priceInCents,
+          durationHours: pkg.durationHours,
+          includes: pkg.includes,
+          depositType: pkg.depositType,
+          depositValue: pkg.depositValue,
+        },
+      ],
+      rejectionReason: spec.rejectionReason || undefined,
+    });
+
+    const savedRes = await manager.save(Reservation, res);
+
+    if (spec.status === ReservationStatus.COMPLETED) {
+      nuwanCompleted++;
+      nuwanRevenueCents += pkg.priceInCents;
+      
+      const payment = manager.create(Payment, {
+        reservationId: savedRes.id,
+        amountInCents: pkg.priceInCents,
+        status: PaymentStatus.SUCCESS,
+        transactionId: randomTxId(),
+        cardBrand: 'MasterCard',
+        cardLast4: '8888',
+        createdAt: new Date(spec.date),
+      });
+      await manager.save(Payment, payment);
+    } else if (spec.status === ReservationStatus.CONFIRMED) {
+      nuwanConfirmed++;
+    } else if (spec.status === ReservationStatus.PROPOSED) {
+      nuwanProposed++;
+    } else if (spec.status === ReservationStatus.PENDING) {
+      nuwanPending++;
+    } else if (spec.status === ReservationStatus.REJECTED) {
+      nuwanRejected++;
+    } else if (spec.status === ReservationStatus.CANCELLED) {
+      nuwanCancelled++;
+    }
+  }
+
   // 7. Print Comprehensive Verification Report in Console
   const totalReservations = allSpecs.length;
   const totalRevenueLkr = (totalRevenueCents / 100).toLocaleString();
+  const nuwanRevenueLkr = (nuwanRevenueCents / 100).toLocaleString();
 
   console.log('\n========================================================================');
-  console.log('🎉 DEMO SEED COMPLETED SUCCESSFULLY FOR SUPUN KANISHKA');
+  console.log('🎉 DEMO SEED COMPLETED SUCCESSFULLY FOR SUPUN KANISHKA & NUWAN THUSHARA');
   console.log('========================================================================');
-  console.log(`📧 Login Email:       ${supunEmail}`);
-  console.log(`🔑 Login Password:    ${supunPassword}`);
-  console.log(`🔗 Photographer Slug: ${profile.bookingSlug}`);
-  console.log(`👤 Super Admin:       ${adminEmail} / ${adminPassword}`);
+  console.log(`👤 Super Admin:          ${adminEmail} / ${adminPassword}`);
   console.log('------------------------------------------------------------------------');
-  console.log('📊 SEEDED DATA SUMMARY VERIFICATION:');
+  console.log(`📸 Photographer 1:       Supun Kanishka`);
+  console.log(`📧 Email / Pass:         ${supunEmail} / ${supunPassword}`);
+  console.log(`🔗 Booking Slug:         ${profile.bookingSlug}`);
+  console.log(`• Total Reservations:    ${totalReservations} (Completed: ${totalCompleted}, Confirmed: ${totalConfirmed}, Pending: ${totalPending}, Rejected: ${totalRejected}, Cancelled: ${totalCancelled})`);
+  console.log(`• Settled Revenue:       LKR ${totalRevenueLkr}`);
   console.log('------------------------------------------------------------------------');
-  console.log(`• Packages Created:      ${packages.length}`);
-  console.log(`• Customers Created:     ${customers.length}`);
-  console.log(`• Total Reservations:    ${totalReservations}`);
-  console.log(`   - COMPLETED:          ${totalCompleted}`);
-  console.log(`   - CONFIRMED:          ${totalConfirmed}`);
-  console.log(`   - PROPOSED:           ${totalProposed}`);
-  console.log(`   - PENDING:            ${totalPending}`);
-  console.log(`   - REJECTED:           ${totalRejected}`);
-  console.log(`   - CANCELLED:          ${totalCancelled}`);
-  console.log(`• Successful Payments:   ${totalPaymentsCount}`);
-  console.log(`• Total Settled Revenue: LKR ${totalRevenueLkr}`);
-  console.log(`• Past Date Range:       2024-01-15 to 2026-07-22`);
-  console.log(`• Future Date Range:     2026-07-26 to 2026-09-25 (Next ~2 Months)`);
-  console.log(`• Locations Covered:     Colombo, Kandy, Galle, Kurunegala, Jaffna,`);
-  console.log(`                         Negombo, Nuwara Eliya, Trincomalee, Matara, Bentota`);
+  console.log(`📸 Photographer 2:       Nuwan Thushara`);
+  console.log(`📧 Email / Pass:         ${nuwanEmail} / ${nuwanPassword}`);
+  console.log(`🔗 Booking Slug:         ${nuwanProfile.bookingSlug}`);
+  console.log(`• Total Reservations:    ${allNuwanSpecs.length} (Completed: ${nuwanCompleted}, Confirmed: ${nuwanConfirmed}, Pending: ${nuwanPending}, Rejected: ${nuwanRejected}, Cancelled: ${nuwanCancelled})`);
+  console.log(`• Settled Revenue:       LKR ${nuwanRevenueLkr}`);
   console.log('========================================================================\n');
 }
