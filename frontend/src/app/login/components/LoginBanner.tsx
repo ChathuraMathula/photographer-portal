@@ -1,5 +1,5 @@
 import React from "react";
-import loginBanner from "../../../../public/login-banner.png";
+import loginBanner from "../../../../public/login-banner.jpg";
 
 export function LoginBanner() {
   return (
@@ -9,8 +9,7 @@ export function LoginBanner() {
         alt="Photographer Portal Professional Studio"
         className="w-full h-full object-cover opacity-90 transition-transform duration-[10000ms] ease-in-out hover:scale-105"
       />
-      {/* Subtle decorative gradient overlay to add depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+      {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" /> */}
     </div>
   );
 }

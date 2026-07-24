@@ -61,11 +61,10 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
             type="email"
             placeholder="you@example.com"
             {...formik.getFieldProps("email")}
-            className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-              formik.touched.email && formik.errors.email
+            className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${formik.touched.email && formik.errors.email
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                 : ""
-            }`}
+              }`}
           />
           {formik.touched.email && formik.errors.email && (
             <p className="text-body-caption text-red-500 mt-1">
@@ -87,11 +86,10 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               {...formik.getFieldProps("password")}
-              className={`h-11 md:h-12 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
-                formik.touched.password && formik.errors.password
+              className={`h-11 md:h-12 pr-11 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${formik.touched.password && formik.errors.password
                   ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                   : ""
-              }`}
+                }`}
             />
             <button
               type="button"
@@ -129,14 +127,14 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
           {formik.isSubmitting ? "Signing in..." : "Login"}
         </Button>
 
-        <div className="pt-4 text-center">
+        {/* <div className="pt-4 text-center">
           <Link
             href="/test-accounts"
             className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:underline transition-colors"
           >
             Looking for sandbox credentials? View Test Accounts
           </Link>
-        </div>
+        </div> */}
       </form>
     </div>
   );
