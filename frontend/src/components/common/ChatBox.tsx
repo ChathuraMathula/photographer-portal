@@ -29,7 +29,7 @@ export function ChatBox({
   reservationId,
   photographerFirstName,
 }: Props) {
-  const { chatEndRef, firstUnreadIndex, unreadCount } = useChatState(
+  const { chatEndRef, containerRef, firstUnreadIndex, unreadCount } = useChatState(
     messages,
     reservationId,
     myRole,
@@ -49,6 +49,7 @@ export function ChatBox({
         photographerFirstName={photographerFirstName}
         firstUnreadIndex={firstUnreadIndex}
         chatEndRef={chatEndRef}
+        containerRef={containerRef}
       />
 
       <ChatBoxInput

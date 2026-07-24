@@ -7,6 +7,7 @@ type Props = {
   photographerFirstName?: string;
   firstUnreadIndex: number;
   chatEndRef: RefObject<HTMLDivElement | null>;
+  containerRef?: RefObject<HTMLDivElement | null>;
 };
 
 export function ChatBoxMessageList({
@@ -15,9 +16,13 @@ export function ChatBoxMessageList({
   photographerFirstName,
   firstUnreadIndex,
   chatEndRef,
+  containerRef,
 }: Props) {
   return (
-    <div className="flex-1 p-3 overflow-y-auto space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20">
+    <div
+      ref={containerRef as any}
+      className="flex-1 p-3 overflow-y-auto space-y-2 bg-zinc-50/50 dark:bg-zinc-950/20"
+    >
       {messages.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-body-caption text-zinc-400 italic">

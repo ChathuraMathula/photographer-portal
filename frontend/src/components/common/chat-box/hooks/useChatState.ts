@@ -7,15 +7,16 @@ export function useChatState(
   myRole?: string,
 ) {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const lastResIdRef = useRef<string | null>(null);
   const [initialLastViewed, setInitialLastViewed] = useState<string | null>(
     null,
   );
 
   useEffect(() => {
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -53,5 +54,5 @@ export function useChatState(
   const unreadCount =
     firstUnreadIndex !== -1 ? messages.length - firstUnreadIndex : 0;
 
-  return { chatEndRef, firstUnreadIndex, unreadCount };
+  return { chatEndRef, containerRef, firstUnreadIndex, unreadCount };
 }
