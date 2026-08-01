@@ -40,11 +40,46 @@ export class LockedDatesService {
     photographerId: string,
     dto: CreateLockedDateDto,
   ): Promise<LockedDate> {
+    const sTime = dto.startTime || '00:00';
+    const eTime = dto.endTime || '23:59';
+    const isNewFullDay = sTime === '00:00' && eTime === '23:59';
+
+    // Find any existing locks for this photographer on the given date
+    const existingLocks = await this.lockedDateRepository.find({
+      where: {
+        photographerId,
+        date: dto.date,
+      },
+    });
+
+    if (existingLocks.length > 0) {
+      // 1. If any existing lock is already a full day lock, return it (no duplicates)
+      const existingFullDay = existingLocks.find(
+        (ld) => ld.startTime === '00:00' && ld.endTime === '23:59',
+      );
+      if (existingFullDay) {
+        return existingFullDay;
+      }
+
+      // 2. If the new lock is a full day lock, remove all existing partial locks for this date
+      if (isNewFullDay) {
+        await this.lockedDateRepository.remove(existingLocks);
+      } else {
+        // 3. If new lock overlaps with an existing partial lock, return the existing lock
+        const overlapping = existingLocks.find(
+          (ld) => ld.startTime < eTime && ld.endTime > sTime,
+        );
+        if (overlapping) {
+          return overlapping;
+        }
+      }
+    }
+
     const lockedDate = this.lockedDateRepository.create({
       photographerId,
       date: dto.date,
-      startTime: dto.startTime || '00:00',
-      endTime: dto.endTime || '23:59',
+      startTime: sTime,
+      endTime: eTime,
       reason: dto.reason,
     });
     return this.lockedDateRepository.save(lockedDate);

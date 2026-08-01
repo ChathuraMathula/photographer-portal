@@ -151,7 +151,15 @@ export function useDashboardReservations({
       const resData = await res.json();
       if (!res.ok) throw new Error(resData.message || "Failed to lock date");
       toast.success("Date/time slot locked successfully!");
-      setLockedDates((prev) => [...prev, resData]);
+      setLockedDates((prev) => {
+        const exists = prev.some((item) => item.id === resData.id);
+        if (exists) return prev;
+        // Filter out any partial locks replaced by full day lock
+        if (resData.startTime === "00:00" && resData.endTime === "23:59") {
+          return [...prev.filter((item) => item.date !== resData.date), resData];
+        }
+        return [...prev, resData];
+      });
       return resData;
     } catch (err: any) {
       toast.error(err.message || "Error locking date");
