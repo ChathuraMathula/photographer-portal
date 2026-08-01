@@ -28,11 +28,19 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL ?? 'http://localhost:4000',
-      'http://127.0.0.1:4000',
-      'http://localhost:4000',
-    ],
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin === process.env.FRONTEND_URL ||
+        /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+):4000$/.test(
+          origin,
+        )
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   });
 
