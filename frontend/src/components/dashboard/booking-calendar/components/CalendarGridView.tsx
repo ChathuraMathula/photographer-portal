@@ -63,9 +63,9 @@ export function CalendarGridView({
         onClick={() => {
           onDayClick(day);
         }}
-        className={`group/tile border p-2 rounded-xl min-h-[85px] text-left relative flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
+        className={`group/tile border p-1.5 sm:p-2 rounded-xl min-h-[65px] sm:min-h-[85px] text-left relative flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
           isSelected
-            ? "border-zinc-900 bg-zinc-50/50 dark:border-white dark:bg-zinc-900/50 shadow-sm"
+            ? "border-zinc-900 bg-zinc-50/50 dark:border-white dark:bg-zinc-900/50 shadow-sm ring-1 ring-zinc-900 dark:ring-white"
             : isToday
               ? "border-[#0e2d5c]/60 bg-[#0e2d5c]/5 dark:border-zinc-700/60 dark:bg-zinc-900/10"
               : isLocked
@@ -108,7 +108,7 @@ export function CalendarGridView({
           )}
         </div>
 
-        <div className="space-y-1 mt-2 flex-1 flex flex-col justify-end">
+        <div className="space-y-1 mt-1 sm:mt-2 flex-1 flex flex-col justify-end">
           {dayLocks.map((lock) => (
             <div
               key={lock.id}
@@ -119,10 +119,13 @@ export function CalendarGridView({
               className="flex items-center gap-1 p-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 transition-all duration-150 cursor-pointer shadow-sm relative overflow-hidden"
             >
               <Lock className="h-2.5 w-2.5 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span className="text-[8px] font-bold truncate leading-none">
+              <span className="text-[8px] font-bold truncate leading-none hidden sm:inline">
                 {lock.startTime === "00:00" && lock.endTime === "23:59"
                   ? "Locked"
                   : `${lock.startTime}-${lock.endTime}`}
+              </span>
+              <span className="text-[8px] font-bold truncate leading-none sm:hidden">
+                Locked
               </span>
             </div>
           ))}
@@ -134,24 +137,24 @@ export function CalendarGridView({
                 e.stopPropagation();
                 onDayReservationClick(r);
               }}
-              className="group/item flex flex-col p-1 rounded-lg bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/80 transition-all duration-150 cursor-pointer shadow-sm relative overflow-hidden"
+              className="group/item flex flex-col p-0.5 sm:p-1 rounded-lg bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/80 transition-all duration-150 cursor-pointer shadow-sm relative overflow-hidden"
             >
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[9px] font-bold text-zinc-700 dark:text-zinc-300 truncate leading-none">
+                <span className="text-[8px] sm:text-[9px] font-bold text-zinc-700 dark:text-zinc-300 truncate leading-none">
                   {r.startTime}
                 </span>
                 <div
                   className={`h-1.5 w-1.5 rounded-full shrink-0 ${r.status === "CONFIRMED" ? "bg-emerald-500" : r.status === "PENDING" ? "bg-amber-500" : r.status === "PROPOSED" ? "bg-blue-500" : r.status === "REJECTED" ? "bg-red-500" : r.status === "CANCELLED" ? "bg-zinc-400" : "bg-zinc-300"}`}
                 />
               </div>
-              <span className="text-[8px] text-zinc-500 truncate block font-medium leading-none mt-1">
+              <span className="text-[8px] text-zinc-500 truncate hidden sm:block font-medium leading-none mt-1">
                 {r.customer?.firstName ?? "Client"}
               </span>
             </div>
           ))}
           {dayRes.length > 3 && (
-            <div className="text-[8px] text-[#0e2d5c] dark:text-zinc-400 font-bold bg-[#0e2d5c]/10 dark:bg-zinc-800/50 py-0.5 px-1.5 rounded text-center">
-              +{dayRes.length - 3} more
+            <div className="text-[8px] text-[#0e2d5c] dark:text-zinc-400 font-bold bg-[#0e2d5c]/10 dark:bg-zinc-800/50 py-0.5 px-1 rounded text-center">
+              +{dayRes.length - 3}
             </div>
           )}
         </div>
@@ -160,25 +163,25 @@ export function CalendarGridView({
   };
 
   return (
-    <CardContent className="pt-6 hidden sm:block">
-      <div className="grid grid-cols-7 gap-1 text-center font-bold text-body-caption text-zinc-500 mb-3 uppercase tracking-wider">
+    <CardContent className="pt-4 sm:pt-6">
+      <div className="grid grid-cols-7 gap-1 text-center font-bold text-body-caption text-zinc-500 mb-2 sm:mb-3 uppercase tracking-wider">
         {DAYS.map((d) => (
           <span
             key={d}
-            className="title-font text-[11px] font-bold text-zinc-455"
+            className="title-font text-[10px] sm:text-[11px] font-bold text-zinc-455"
           >
             {d}
           </span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-2 min-h-[350px]">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 min-h-[300px] sm:min-h-[350px]">
         {days.map((day, idx) =>
           day ? (
             renderDayContent(day)
           ) : (
             <div
               key={`empty-${idx}`}
-              className="bg-zinc-50/20 dark:bg-zinc-950/10 rounded-xl min-h-[85px] border border-dashed border-zinc-150 dark:border-zinc-850 opacity-40"
+              className="bg-zinc-50/20 dark:bg-zinc-950/10 rounded-xl min-h-[65px] sm:min-h-[85px] border border-dashed border-zinc-150 dark:border-zinc-850 opacity-40"
             />
           ),
         )}
