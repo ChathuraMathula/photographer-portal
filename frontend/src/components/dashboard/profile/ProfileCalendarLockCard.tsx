@@ -20,7 +20,7 @@ import { toast } from "sonner";
 export function ProfileCalendarLockCard() {
   const context = usePhotographerDashboardContext();
 
-  const [mode, setMode] = useState<"single" | "range">("range");
+  const [mode, setMode] = useState<"single" | "range">("single");
   const [selectedSingleDate, setSelectedSingleDate] = useState<Date | null>(new Date());
   const [selectedRange, setSelectedRange] = useState<DateRange>({
     from: new Date(),
@@ -130,17 +130,6 @@ export function ProfileCalendarLockCard() {
           <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg self-start sm:self-auto">
             <button
               type="button"
-              onClick={() => setMode("range")}
-              className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
-                mode === "range"
-                  ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs"
-                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-              }`}
-            >
-              Date Range
-            </button>
-            <button
-              type="button"
               onClick={() => setMode("single")}
               className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
                 mode === "single"
@@ -149,6 +138,17 @@ export function ProfileCalendarLockCard() {
               }`}
             >
               Single Date
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("range")}
+              className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
+                mode === "range"
+                  ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+              }`}
+            >
+              Date Range
             </button>
           </div>
         </div>
