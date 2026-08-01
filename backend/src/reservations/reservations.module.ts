@@ -10,6 +10,7 @@ import { ReservationsChatService } from './services/reservations-chat.service';
 import { ReservationsNotificationService } from './services/reservations-notification.service';
 import { ChatWorkerGateway } from './chat-worker.gateway';
 import { ChatController } from './chat.controller';
+import { LockedDatesService } from './locked-dates.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -23,6 +24,7 @@ import { ChatController } from './chat.controller';
     ReservationsQueryService,
     ReservationsChatService,
     ReservationsNotificationService,
+    LockedDatesService,
   ],
   exports: [
     ReservationsService,
@@ -32,6 +34,7 @@ import { ChatController } from './chat.controller';
     ReservationsQueryService,
     ReservationsChatService,
     ReservationsNotificationService,
+    LockedDatesService,
   ],
 })
 export class ReservationsModule {}

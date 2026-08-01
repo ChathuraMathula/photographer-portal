@@ -312,5 +312,9 @@ export function usePhotographerDashboard() {
     setShowAcceptBookingsInTopbar: profile.setShowAcceptBookingsInTopbar,
     paymentsUpdatedTrigger: reservationsState.paymentsUpdatedTrigger,
     setPaymentsUpdatedTrigger: reservationsState.setPaymentsUpdatedTrigger,
+    lockedDates: reservationsState.lockedDates,
+    fetchLockedDates: reservationsState.fetchLockedDates,
+    lockDate: reservationsState.lockDate,
+    unlockDate: reservationsState.unlockDate,
   };
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { type Reservation, type Package } from "@/types";
+import { type Reservation, type Package, type LockedDate } from "@/types";
 
 import { type CustomPackageValues } from "@/components/modals/CustomPackageModal";
 
@@ -48,6 +48,9 @@ export function useDashboardReservations({
   const [calendarReservations, setCalendarReservations] = useState<
     Reservation[]
   >([]);
+
+  // Locked dates state
+  const [lockedDates, setLockedDates] = useState<LockedDate[]>([]);
 
   useEffect(() => {
     if (search === debouncedSearch) return;
@@ -111,6 +114,65 @@ export function useDashboardReservations({
       console.error("Error loading calendar reservations:", err);
     } finally {
       setCalendarLoading(false);
+    }
+  };
+
+  const fetchLockedDates = async (startStr?: string, endStr?: string) => {
+    try {
+      const params = new URLSearchParams();
+      if (startStr) params.append("startDate", startStr);
+      if (endStr) params.append("endDate", endStr);
+      const res = await authFetch(
+        `${API}/reservations/locked-dates?${params.toString()}`,
+        { credentials: "include" },
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setLockedDates(data || []);
+      }
+    } catch (err) {
+      console.error("Error loading locked dates:", err);
+    }
+  };
+
+  const lockDate = async (data: {
+    date: string;
+    startTime?: string;
+    endTime?: string;
+    reason?: string;
+  }) => {
+    try {
+      const res = await authFetch(`${API}/reservations/locked-dates`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.message || "Failed to lock date");
+      toast.success("Date/time slot locked successfully!");
+      setLockedDates((prev) => [...prev, resData]);
+      return resData;
+    } catch (err: any) {
+      toast.error(err.message || "Error locking date");
+      throw err;
+    }
+  };
+
+  const unlockDate = async (id: string) => {
+    try {
+      const res = await authFetch(`${API}/reservations/locked-dates/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.message || "Failed to unlock date");
+      toast.success("Date/time slot unlocked successfully!");
+      setLockedDates((prev) => prev.filter((item) => item.id !== id));
+      return resData;
+    } catch (err: any) {
+      toast.error(err.message || "Error unlocking date");
+      throw err;
     }
   };
 
@@ -354,5 +416,9 @@ export function useDashboardReservations({
     calendarLoading,
     paymentsUpdatedTrigger,
     setPaymentsUpdatedTrigger,
+    lockedDates,
+    fetchLockedDates,
+    lockDate,
+    unlockDate,
   };
 }

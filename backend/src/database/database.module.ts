@@ -8,6 +8,7 @@ import { Reservation } from '../entities/reservation.entity';
 import { Message } from '../entities/message.entity';
 import { Payment } from '../entities/payment.entity';
 import { AuditLog } from '../entities/audit-log.entity';
+import { LockedDate } from '../entities/locked-date.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuditLog } from '../entities/audit-log.entity';
       Message,
       Payment,
       AuditLog,
+      LockedDate,
     ]),
   ],
   exports: [TypeOrmModule],

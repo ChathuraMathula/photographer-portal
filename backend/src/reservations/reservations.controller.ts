@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -15,10 +16,12 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { ReservationStatus } from '../entities/reservation.entity';
 import { ReservationsService } from './reservations.service';
+import { LockedDatesService } from './locked-dates.service';
 import type { Request } from 'express';
 import { CreateManualBookingDto } from './dto/create-manual-booking.dto';
 import { ProposeQuotationDto } from './dto/propose-quotation.dto';
 import { RejectReservationDto } from './dto/reject-reservation.dto';
+import { CreateLockedDateDto } from './dto/create-locked-date.dto';
 
 interface RequestWithUser extends Request {
   user: {
@@ -33,7 +36,39 @@ interface RequestWithUser extends Request {
 @Controller('reservations')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ReservationsController {
-  constructor(private readonly reservationsService: ReservationsService) {}
+  constructor(
+    private readonly reservationsService: ReservationsService,
+    private readonly lockedDatesService: LockedDatesService,
+  ) {}
+
+  @Get('locked-dates')
+  @Roles(UserRole.PHOTOGRAPHER)
+  getLockedDates(
+    @Req() req: RequestWithUser,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.lockedDatesService.getLockedDates(
+      req.user.userId,
+      startDate,
+      endDate,
+    );
+  }
+
+  @Post('locked-dates')
+  @Roles(UserRole.PHOTOGRAPHER)
+  createLockedDate(
+    @Req() req: RequestWithUser,
+    @Body() dto: CreateLockedDateDto,
+  ) {
+    return this.lockedDatesService.createLockedDate(req.user.userId, dto);
+  }
+
+  @Delete('locked-dates/:id')
+  @Roles(UserRole.PHOTOGRAPHER)
+  deleteLockedDate(@Req() req: RequestWithUser, @Param('id') id: string) {
+    return this.lockedDatesService.deleteLockedDate(req.user.userId, id);
+  }
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)

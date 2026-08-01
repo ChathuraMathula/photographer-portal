@@ -131,3 +131,14 @@ export type NotificationItem = {
   type: "booking" | "chat";
   referenceId: string;
 };
+
+export type LockedDate = {
+  id: string;
+  photographerId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+  createdAt?: string;
+};
+

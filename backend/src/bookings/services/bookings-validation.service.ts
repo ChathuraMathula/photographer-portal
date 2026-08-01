@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Customer } from '../../entities/customer.entity';
 import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
 import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { LockedDate } from '../../entities/locked-date.entity';
 
 @Injectable()
 export class BookingsValidationService {
@@ -14,6 +15,8 @@ export class BookingsValidationService {
     private readonly reservationRepository: Repository<Reservation>,
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
+    @InjectRepository(LockedDate)
+    private readonly lockedDateRepository: Repository<LockedDate>,
   ) {}
 
   async checkAvailability(
@@ -39,6 +42,29 @@ export class BookingsValidationService {
         reason:
           profile.offlineMessage ||
           'Photographer is not taking new bookings at this time.',
+        profile,
+      };
+    }
+
+    // Check locked dates set by photographer
+    const lockedSlot = await this.lockedDateRepository
+      .createQueryBuilder('ld')
+      .where('ld.photographerId = :photographerId', {
+        photographerId: profile.userId,
+      })
+      .andWhere('ld.date = :date', { date })
+      .andWhere('ld.startTime < :endTime AND ld.endTime > :startTime', {
+        startTime,
+        endTime,
+      })
+      .getOne();
+
+    if (lockedSlot) {
+      return {
+        available: false,
+        reason:
+          lockedSlot.reason ||
+          'The requested time slot has been locked by the photographer.',
         profile,
       };
     }

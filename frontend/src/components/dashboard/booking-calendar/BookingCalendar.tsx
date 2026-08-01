@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { type Reservation } from "@/types";
+import { type Reservation, type LockedDate } from "@/types";
 import { Card } from "@/components/ui/card";
 import { useBookingCalendarState } from "./hooks/useBookingCalendarState";
 import { CalendarHeader } from "./components/CalendarHeader";
@@ -11,12 +11,14 @@ import { CalendarSelectedDayList } from "./components/CalendarSelectedDayList";
 
 type Props = {
   reservations: Reservation[];
+  lockedDates?: LockedDate[];
   currentDate: Date;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onDateChange?: (date: Date) => void;
   onDayReservationClick: (res: Reservation) => void;
   onDayClick: (date: Date) => void;
+  onLockDayClick?: (day: Date, lockedSlots: LockedDate[]) => void;
   loading?: boolean;
 };
 
@@ -63,12 +65,14 @@ export function BookingCalendar(props: Props) {
         days={state.days}
         selectedDay={state.selectedDay}
         loading={props.loading || false}
+        lockedDates={props.lockedDates}
         getReservationsForDay={state.getReservationsForDay}
         onDayClick={(day) => {
           state.setSelectedDay(day);
           props.onDayClick(day);
         }}
         onDayReservationClick={props.onDayReservationClick}
+        onLockDayClick={props.onLockDayClick}
       />
 
       <div className="pt-4 block sm:hidden px-4 space-y-4 pb-4">

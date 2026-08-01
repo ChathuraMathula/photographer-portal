@@ -1,31 +1,44 @@
 "use client";
 
 import React from "react";
-import { type Reservation } from "@/types";
+import { type Reservation, type LockedDate } from "@/types";
 import { CardContent } from "@/components/ui/card";
 import { DAYS } from "../constants/calendarConstants";
+import { Lock, LockOpen } from "lucide-react";
 
 interface Props {
   days: (Date | null)[];
   selectedDay: Date;
   loading: boolean;
+  lockedDates?: LockedDate[];
   getReservationsForDay: (day: Date) => Reservation[];
   onDayClick: (day: Date) => void;
   onDayReservationClick: (res: Reservation) => void;
+  onLockDayClick?: (day: Date, lockedSlots: LockedDate[]) => void;
 }
 
 export function CalendarGridView({
   days,
   selectedDay,
   loading,
+  lockedDates = [],
   getReservationsForDay,
   onDayClick,
   onDayReservationClick,
+  onLockDayClick,
 }: Props) {
   const renderDayContent = (day: Date) => {
     const dayRes = getReservationsForDay(day);
     const isToday = day.toDateString() === new Date().toDateString();
     const isSelected = day.toDateString() === selectedDay.toDateString();
+
+    const year = day.getFullYear();
+    const month = String(day.getMonth() + 1).padStart(2, "0");
+    const dayStr = String(day.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${dayStr}`;
+
+    const dayLocks = lockedDates.filter((ld) => ld.date === formattedDate);
+    const isLocked = dayLocks.length > 0;
 
     if (loading) {
       return (
@@ -50,20 +63,70 @@ export function CalendarGridView({
         onClick={() => {
           onDayClick(day);
         }}
-        className={`border p-2 rounded-xl min-h-[85px] text-left relative flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
+        className={`group/tile border p-2 rounded-xl min-h-[85px] text-left relative flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
           isSelected
             ? "border-zinc-900 bg-zinc-50/50 dark:border-white dark:bg-zinc-900/50 shadow-sm"
             : isToday
               ? "border-[#0e2d5c]/60 bg-[#0e2d5c]/5 dark:border-zinc-700/60 dark:bg-zinc-900/10"
-              : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700 hover:bg-zinc-50/30"
+              : isLocked
+                ? "border-amber-300/80 bg-amber-50/20 dark:border-amber-900/40 dark:bg-amber-950/10"
+                : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-350 dark:hover:border-zinc-700 hover:bg-zinc-50/30"
         }`}
       >
-        <span
-          className={`text-body-caption font-bold inline-flex items-center justify-center rounded-full h-5 w-5 ${isToday ? "bg-[#0e2d5c] text-white dark:bg-white dark:text-zinc-900" : "text-zinc-500"}`}
-        >
-          {day.getDate()}
-        </span>
+        <div className="flex items-center justify-between">
+          <span
+            className={`text-body-caption font-bold inline-flex items-center justify-center rounded-full h-5 w-5 ${
+              isToday
+                ? "bg-[#0e2d5c] text-white dark:bg-white dark:text-zinc-900"
+                : "text-zinc-500"
+            }`}
+          >
+            {day.getDate()}
+          </span>
+          {onLockDayClick && (
+            <button
+              type="button"
+              title={
+                isLocked ? "Unlock date / time slot" : "Lock date / time slot"
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                onLockDayClick(day, dayLocks);
+              }}
+              className={`p-1 rounded-md transition-all cursor-pointer ${
+                isLocked
+                  ? "bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 hover:scale-110"
+                  : "text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              }`}
+            >
+              {isLocked ? (
+                <Lock className="h-3 w-3 fill-amber-500/20 text-amber-600 dark:text-amber-400" />
+              ) : (
+                <LockOpen className="h-3 w-3 opacity-60 hover:opacity-100" />
+              )}
+            </button>
+          )}
+        </div>
+
         <div className="space-y-1 mt-2 flex-1 flex flex-col justify-end">
+          {dayLocks.map((lock) => (
+            <div
+              key={lock.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onLockDayClick) onLockDayClick(day, dayLocks);
+              }}
+              className="flex items-center gap-1 p-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 transition-all duration-150 cursor-pointer shadow-sm relative overflow-hidden"
+            >
+              <Lock className="h-2.5 w-2.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <span className="text-[8px] font-bold truncate leading-none">
+                {lock.startTime === "00:00" && lock.endTime === "23:59"
+                  ? "Locked"
+                  : `${lock.startTime}-${lock.endTime}`}
+              </span>
+            </div>
+          ))}
+
           {dayRes.slice(0, 3).map((r) => (
             <div
               key={r.id}
@@ -123,3 +186,4 @@ export function CalendarGridView({
     </CardContent>
   );
 }
+
