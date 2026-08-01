@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { useBookingCalendarState } from "./hooks/useBookingCalendarState";
 import { CalendarHeader } from "./components/CalendarHeader";
 import { CalendarGridView } from "./components/CalendarGridView";
-import { CalendarMobileStrip } from "./components/CalendarMobileStrip";
 import { CalendarSelectedDayList } from "./components/CalendarSelectedDayList";
 
 type Props = {
@@ -67,6 +66,9 @@ export function BookingCalendar(props: Props) {
         loading={props.loading || false}
         lockedDates={props.lockedDates}
         getReservationsForDay={state.getReservationsForDay}
+        onSelectDayOnly={(day) => {
+          state.setSelectedDay(day);
+        }}
         onDayClick={(day) => {
           state.setSelectedDay(day);
           props.onDayClick(day);
@@ -76,13 +78,6 @@ export function BookingCalendar(props: Props) {
       />
 
       <div className="pt-4 block sm:hidden px-4 space-y-4 pb-4">
-        <CalendarMobileStrip
-          activeMonthDays={state.activeMonthDays}
-          selectedDay={state.selectedDay}
-          setSelectedDay={state.setSelectedDay}
-          getReservationsForDay={state.getReservationsForDay}
-          mobileSliderRef={mobileSliderRef}
-        />
         <CalendarSelectedDayList
           selectedDay={state.selectedDay}
           loading={props.loading || false}
