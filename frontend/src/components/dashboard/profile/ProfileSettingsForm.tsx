@@ -4,6 +4,7 @@ import { BiographyCard } from "./BiographyCard";
 import { LocationPortfolioCard } from "./LocationPortfolioCard";
 import { EventTypesCard } from "./EventTypesCard";
 import { AcceptBookingsToggle } from "./AcceptBookingsToggle";
+import { ProfileCalendarLockCard } from "./ProfileCalendarLockCard";
 import { type ProfileSettingsFormProps } from "./types";
 
 export function ProfileSettingsForm({
@@ -75,6 +76,8 @@ export function ProfileSettingsForm({
           onShowMapPreviewOnBookingPageChange
         }
       />
+
+      <ProfileCalendarLockCard />
 
       <EventTypesCard
         allowedEventTypes={allowedEventTypes}

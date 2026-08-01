@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { ModalLayout } from "./ModalLayout";
 import { Button } from "@/components/ui/button";
-import { Lock, Clock, Calendar as CalendarIcon, Info } from "lucide-react";
+import { Lock, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { TimePicker } from "@/components/ui/time-picker";
 
 type LockDateModalProps = {
   isOpen: boolean;
@@ -142,30 +143,16 @@ export function LockDateModal({
         {/* Custom Start/End Inputs */}
         {!isFullDay && (
           <div className="grid grid-cols-2 gap-3 pt-1 animate-in fade-in duration-150">
-            <div>
-              <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
-                Start Time
-              </label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#0e2d5c]"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
-                End Time
-              </label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#0e2d5c]"
-                required
-              />
-            </div>
+            <TimePicker
+              label="Start Time"
+              value={startTime}
+              onChange={setStartTime}
+            />
+            <TimePicker
+              label="End Time"
+              value={endTime}
+              onChange={setEndTime}
+            />
           </div>
         )}
 
