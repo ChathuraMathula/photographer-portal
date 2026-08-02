@@ -107,14 +107,10 @@ export function PhotographerLayoutWrapper({
           onClearAll={handleClearAllNotifications}
           inAppNotificationsEnabled={inAppNotificationsEnabled}
           onSelectReservation={(resId, type) => {
-            const res = reservations.find((r) => r.id === resId);
-            if (res) {
-              setSelectedRes(res);
-            }
             if (type === "chat") {
               setForceOpenChat((prev) => prev + 1);
             }
-            router.push(`/dashboard/reservations?id=${resId}&fromNotification=true`);
+            router.push(`/dashboard/reservations/${resId}`);
           }}
         />
       }
@@ -135,7 +131,6 @@ export function PhotographerLayoutWrapper({
           reservation={calendarSelectedRes}
           onClose={() => setCalendarSelectedRes(null)}
           onNavigateToReservation={(res) => {
-            setSelectedRes(res);
             setCalendarSelectedRes(null);
             router.push(`/dashboard/reservations/${res.id}`);
           }}
@@ -162,7 +157,7 @@ export function PhotographerLayoutWrapper({
         />
       )}
 
-      {selectedRes && !pathname.includes("/dashboard/reservations") && (
+      {selectedRes && forceOpenChat > 0 && !pathname.includes("/dashboard/reservations") && (
         <FloatingChatWidget
           selectedRes={selectedRes}
           messages={messages}
