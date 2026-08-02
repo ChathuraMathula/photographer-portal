@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,6 +27,16 @@ export default function CustomerLayout({
   const auth = useSelector((state: RootState) => state.auth);
 
   const activeTab = pathname.split("/").pop() || "dashboard";
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const userName = mounted
+    ? (auth.firstName || auth.email?.split("@")[0] || "Customer")
+    : "Customer";
 
   const handleTabChange = (tab: string) => {
     if (tab === "dashboard") router.push("/customer/dashboard");
@@ -55,7 +65,7 @@ export default function CustomerLayout({
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onLogout={handleLogout}
-        userName={auth.firstName || auth.email?.split("@")[0] || "Customer"}
+        userName={userName}
         userRole="CUSTOMER"
         menuItems={CUSTOMER_MENU}
       >
