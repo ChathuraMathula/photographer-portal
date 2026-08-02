@@ -8,10 +8,11 @@ export const PUBLIC_ROUTES = [
   "/test-accounts",
   "/forgot-password",
   "/reset-password",
+  "/auth/customer-verify",
 ];
 
 // Prefix-match public routes — /book/:slug and /book/track/:token are always public
-export const PUBLIC_PREFIXES = ["/book", "/leaflet", "/tiles", "/maps"];
+export const PUBLIC_PREFIXES = ["/book", "/leaflet", "/tiles", "/maps", "/auth", "/customer"];
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   [UserRole.SUPER_ADMIN]: [
@@ -36,6 +37,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/profile",
     "/dashboard/settings",
     "/dashboard/invoices",
+  ],
+  [UserRole.CUSTOMER]: [
+    "/customer/dashboard",
+    "/customer/complete-profile",
   ],
 };
 

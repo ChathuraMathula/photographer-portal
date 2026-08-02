@@ -26,6 +26,7 @@ import { Message } from './entities/message.entity';
 import { Payment } from './entities/payment.entity';
 import { AuditLog } from './entities/audit-log.entity';
 import { LockedDate } from './entities/locked-date.entity';
+import { SubscriptionPlan } from './entities/subscription-plan.entity';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
@@ -55,6 +56,7 @@ if (
         Payment,
         AuditLog,
         LockedDate,
+        SubscriptionPlan,
       ],
       synchronize: true, // Automatically synchronize schema in development
     }),

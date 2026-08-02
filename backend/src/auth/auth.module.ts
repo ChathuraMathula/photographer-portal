@@ -8,9 +8,14 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { DatabaseModule } from '../database/database.module';
 
+import { CustomerAuthService } from './services/customer-auth.service';
+import { CustomerAuthController } from './customer-auth.controller';
+import { EmailModule } from '../email/email.module';
+
 @Module({
   imports: [
-    DatabaseModule, // Gives us access to the User model
+    DatabaseModule, // Gives us access to User and Customer repositories
+    EmailModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? 'SUPER_SECRET_KEY_CHANGE_ME',
@@ -21,9 +26,15 @@ import { DatabaseModule } from '../database/database.module';
     AuthService,
     AuthLoginService,
     AuthPasswordResetService,
+    CustomerAuthService,
     JwtStrategy,
   ],
-  controllers: [AuthController],
-  exports: [AuthService, AuthLoginService, AuthPasswordResetService],
+  controllers: [AuthController, CustomerAuthController],
+  exports: [
+    AuthService,
+    AuthLoginService,
+    AuthPasswordResetService,
+    CustomerAuthService,
+  ],
 })
 export class AuthModule {}

@@ -4,6 +4,7 @@ export enum UserRole {
   SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   PHOTOGRAPHER = "PHOTOGRAPHER",
+  CUSTOMER = "CUSTOMER",
 }
 
 // Define how our User looks based on the backend response
@@ -12,6 +13,7 @@ interface UserState {
   email: string | null;
   role: UserRole | null;
   firstName: string | null;
+  isProfileCompleted?: boolean;
   isAuthenticated: boolean;
 }
 
@@ -67,6 +69,7 @@ const authSlice = createSlice({
       state.email = action.payload.email;
       state.role = action.payload.role;
       state.firstName = action.payload.firstName;
+      state.isProfileCompleted = action.payload.isProfileCompleted;
       state.isAuthenticated = true;
       if (typeof window !== "undefined") {
         try {
@@ -77,6 +80,7 @@ const authSlice = createSlice({
               email: state.email,
               role: state.role,
               firstName: state.firstName,
+              isProfileCompleted: state.isProfileCompleted,
               isAuthenticated: true,
             }),
           );

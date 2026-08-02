@@ -13,23 +13,26 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
-  firstName!: string;
+  @Column({ nullable: true })
+  firstName?: string;
 
-  @Column()
-  lastName!: string;
+  @Column({ nullable: true })
+  lastName?: string;
 
   @Column({ unique: true })
   email!: string;
 
-  @Column()
-  phone!: string;
+  @Column({ nullable: true })
+  phone?: string;
 
   @Column({ type: 'text', nullable: true })
   address?: string;
 
   @Column({ type: 'text', nullable: true })
   notes?: string;
+
+  @Column({ default: false })
+  isProfileCompleted!: boolean;
 
   @OneToMany(() => Reservation, (reservation) => reservation.customer)
   reservations?: Reservation[];
