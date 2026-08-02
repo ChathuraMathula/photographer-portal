@@ -29,7 +29,28 @@ export default function CustomerCompleteProfilePage() {
     }
     if (auth.isProfileCompleted) {
       router.push("/customer/dashboard");
+      return;
     }
+
+    const fetchCustomerProfile = async () => {
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+        const res = await fetch(`${API}/auth/customer/me`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.firstName) setFirstName(data.firstName);
+          if (data.lastName) setLastName(data.lastName);
+          if (data.phone) setPhone(data.phone);
+          if (data.address) setAddress(data.address);
+        }
+      } catch (err) {
+        console.error("Error fetching customer profile:", err);
+      }
+    };
+
+    fetchCustomerProfile();
   }, [auth, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
