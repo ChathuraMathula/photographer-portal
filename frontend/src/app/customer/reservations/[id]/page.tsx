@@ -25,8 +25,12 @@ import {
   AlertCircle,
   FileText,
   DollarSign,
+  MessageSquare,
+  Sparkles,
+  Check,
 } from "lucide-react";
 import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 interface CustomerReservation {
   id: string;
@@ -42,6 +46,7 @@ interface CustomerReservation {
   totalAmountInCents?: number;
   selectedPackages?: any[];
   clientSelectedPackageId?: string;
+  quotationNotes?: string;
   photographer?: {
     id: string;
     firstName: string;
@@ -62,6 +67,9 @@ export default function CustomerReservationDetailPage() {
   const [messageText, setMessageText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mobileTab, setMobileTab] = useState<"details" | "chat">("details");
+  const [selectedPkgId, setSelectedPkgId] = useState<string>("");
+  const [confirmingPkg, setConfirmingPkg] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
@@ -84,8 +92,11 @@ export default function CustomerReservationDetailPage() {
           const target = list.find((r) => r.id === reservationId);
           if (target) {
             setReservation(target);
+            if (target.selectedPackages && target.selectedPackages.length > 0) {
+              setSelectedPkgId(target.clientSelectedPackageId || target.selectedPackages[0].id);
+            }
 
-            // Fetch chat messages using tracking token endpoint
+            // Fetch chat messages
             const chatRes = await fetch(
               `${API}/bookings/track/${target.reservationToken}/messages?email=${encodeURIComponent(target.photographer?.email || "")}`,
             );
@@ -117,7 +128,7 @@ export default function CustomerReservationDetailPage() {
     fetchDetails();
   }, [reservationId, auth, router, API]);
 
-  // Connect Socket.IO for real-time chat updates
+  // Connect Socket.IO for real-time chat & status updates
   useEffect(() => {
     if (!reservation) return;
 
@@ -171,6 +182,35 @@ export default function CustomerReservationDetailPage() {
     }
   };
 
+  const handleConfirmPackage = async () => {
+    if (!reservation || !selectedPkgId) return;
+
+    try {
+      setConfirmingPkg(true);
+      const res = await fetch(
+        `${API}/bookings/track/${reservation.reservationToken}/confirm`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: reservation.photographer?.email || "",
+            packageId: selectedPkgId,
+          }),
+        },
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to confirm package");
+
+      toast.success("Package selected and booking confirmed successfully!");
+      setReservation((prev) => prev ? { ...prev, status: "CONFIRMED" } : null);
+    } catch (err: any) {
+      toast.error(err.message || "Error confirming package");
+    } finally {
+      setConfirmingPkg(false);
+    }
+  };
+
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case "CONFIRMED":
@@ -188,7 +228,7 @@ export default function CustomerReservationDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header bar with Back button */}
+      {/* Header Bar */}
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-xs">
         <div className="flex items-center gap-3">
           <Link href="/customer/dashboard">
@@ -199,7 +239,7 @@ export default function CustomerReservationDetailPage() {
               className="h-9 px-3 text-xs font-bold gap-1.5 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to My Bookings
+              Back to Bookings
             </Button>
           </Link>
           {reservation && (
@@ -220,6 +260,36 @@ export default function CustomerReservationDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Mobile Tab Switcher */}
+        {reservation && (
+          <div className="flex lg:hidden grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl max-w-xs w-full">
+            <button
+              type="button"
+              onClick={() => setMobileTab("details")}
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                mobileTab === "details"
+                  ? "bg-white dark:bg-zinc-900 text-[#0e2d5c] dark:text-white shadow-xs"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+              }`}
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Details & Proposal
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab("chat")}
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                mobileTab === "chat"
+                  ? "bg-white dark:bg-zinc-900 text-[#0e2d5c] dark:text-white shadow-xs"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+              }`}
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              Live Chat ({messages.length})
+            </button>
+          </div>
+        )}
       </header>
 
       {loading ? (
@@ -231,95 +301,289 @@ export default function CustomerReservationDetailPage() {
           {error || "Reservation not found"}
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Session Details */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card className="border-zinc-200/60 dark:border-zinc-800/80 shadow-xs bg-white dark:bg-zinc-900">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-[#0e2d5c] dark:text-blue-400" />
-                  Booking Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-xs">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                    <span className="font-semibold flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-zinc-400" />
-                      Date:
-                    </span>
-                    <span className="font-bold text-zinc-900 dark:text-white">
-                      {new Date(reservation.date).toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
+        <>
+          {/* Desktop Layout: Side-by-Side Grid */}
+          <div className="hidden lg:grid grid-cols-12 gap-6 items-start">
+            {/* Left Column (7 Cols): Session Overview & Proposal Options */}
+            <div className="col-span-7 space-y-6">
+              <Card className="border-zinc-200/60 dark:border-zinc-800/80 shadow-xs bg-white dark:bg-zinc-900">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-[#0e2d5c] dark:text-blue-400" />
+                    Session Details & Tracking
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-xs">
+                  <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80">
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 font-medium flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                        Event Date
+                      </span>
+                      <span className="font-bold text-zinc-900 dark:text-white block">
+                        {new Date(reservation.date).toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                    <span className="font-semibold flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-zinc-400" />
-                      Time Slot:
-                    </span>
-                    <span className="font-bold text-zinc-900 dark:text-white">
-                      {reservation.startTime} - {reservation.endTime}
-                    </span>
-                  </div>
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 font-medium flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-zinc-400" />
+                        Time Slot
+                      </span>
+                      <span className="font-bold text-zinc-900 dark:text-white block">
+                        {reservation.startTime} - {reservation.endTime}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                    <span className="font-semibold flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-zinc-400" />
-                      Location:
-                    </span>
-                    <span className="font-bold text-zinc-900 dark:text-white truncate max-w-[150px]">
-                      {reservation.city || reservation.location || "On Location"}
-                    </span>
-                  </div>
-                </div>
-
-                {reservation.photographer && (
-                  <div className="pt-3 border-t border-zinc-150 dark:border-zinc-800 space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">
-                      Photographer
-                    </span>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                      <User className="h-3.5 w-3.5 text-[#0e2d5c] dark:text-blue-400" />
-                      {reservation.photographer.firstName} {reservation.photographer.lastName}
+                    <div className="space-y-1 col-span-2">
+                      <span className="text-zinc-500 font-medium flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+                        Location / City
+                      </span>
+                      <span className="font-bold text-zinc-900 dark:text-white block">
+                        {reservation.city || reservation.location || "On Location"}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {reservation.totalAmountInCents && (
-                  <div className="pt-3 border-t border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
-                    <span className="font-semibold text-zinc-600 dark:text-zinc-400">
-                      Total Package Price:
-                    </span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
-                      ${(reservation.totalAmountInCents / 100).toFixed(2)}
-                    </span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  {reservation.photographer && (
+                    <div className="pt-2 border-t border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
+                      <span className="text-zinc-500 font-medium">Assigned Photographer:</span>
+                      <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5 text-[#0e2d5c] dark:text-blue-400" />
+                        {reservation.photographer.firstName} {reservation.photographer.lastName}
+                      </span>
+                    </div>
+                  )}
+
+                  {reservation.totalAmountInCents && (
+                    <div className="pt-2 border-t border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
+                      <span className="font-semibold text-zinc-600 dark:text-zinc-400">
+                        Total Amount:
+                      </span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                        ${(reservation.totalAmountInCents / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Quotation / Proposal Section if status is PROPOSED */}
+              {reservation.status === "PROPOSED" && reservation.selectedPackages && reservation.selectedPackages.length > 0 && (
+                <Card className="border-blue-200 dark:border-blue-900/40 shadow-xs bg-blue-50/30 dark:bg-blue-950/10">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      Photographer Quote & Proposed Packages
+                    </CardTitle>
+                    <CardDescription className="text-xs text-zinc-500">
+                      Select your preferred package below to confirm your booking.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-xs">
+                    {reservation.quotationNotes && (
+                      <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 italic">
+                        &quot;{reservation.quotationNotes}&quot;
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      {reservation.selectedPackages.map((pkg: any) => (
+                        <div
+                          key={pkg.id}
+                          onClick={() => setSelectedPkgId(pkg.id)}
+                          className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                            selectedPkgId === pkg.id
+                              ? "bg-white dark:bg-zinc-900 border-[#0e2d5c] dark:border-blue-400 shadow-xs ring-1 ring-[#0e2d5c]"
+                              : "bg-white/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300"
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name="package"
+                                checked={selectedPkgId === pkg.id}
+                                onChange={() => setSelectedPkgId(pkg.id)}
+                                className="accent-[#0e2d5c]"
+                              />
+                              <span className="font-bold text-zinc-900 dark:text-white">
+                                {pkg.name}
+                              </span>
+                            </div>
+                            {pkg.description && (
+                              <p className="text-zinc-500 text-[11px] pl-5">
+                                {pkg.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <span className="font-bold text-[#0e2d5c] dark:text-blue-400 text-sm">
+                              ${((pkg.priceInCents || 0) / 100).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={handleConfirmPackage}
+                      disabled={confirmingPkg || !selectedPkgId}
+                      className="w-full h-11 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Check className="h-4 w-4" />
+                      {confirmingPkg ? "Confirming Booking..." : "Confirm Selected Package"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Right Column (5 Cols): Real-time Chat Room */}
+            <div className="col-span-5 sticky top-20">
+              <ChatBox
+                messages={messages}
+                messageText={messageText}
+                onMessageChange={setMessageText}
+                onSend={handleSendMessage}
+                myRole="CUSTOMER"
+                title={`Chat with ${reservation.photographer?.firstName || "Photographer"}`}
+                description="Real-time messaging with your photographer"
+                reservationId={reservation.id}
+                photographerFirstName={reservation.photographer?.firstName}
+              />
+            </div>
           </div>
 
-          {/* Right Column: Real-Time Chat Room */}
-          <div className="lg:col-span-2">
-            <ChatBox
-              messages={messages}
-              messageText={messageText}
-              onMessageChange={setMessageText}
-              onSend={handleSendMessage}
-              myRole="CUSTOMER"
-              title={`Chat with ${reservation.photographer?.firstName || "Photographer"}`}
-              description="Real-time messaging with your photographer"
-              reservationId={reservation.id}
-              photographerFirstName={reservation.photographer?.firstName}
-            />
+          {/* Mobile Layout: Tab Switcher View */}
+          <div className="block lg:hidden">
+            {mobileTab === "details" ? (
+              <div className="space-y-6">
+                <Card className="border-zinc-200/60 dark:border-zinc-800/80 shadow-xs bg-white dark:bg-zinc-900">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-[#0e2d5c] dark:text-blue-400" />
+                      Session Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-xs">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                          Date:
+                        </span>
+                        <span className="font-bold text-zinc-900 dark:text-white">
+                          {new Date(reservation.date).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-zinc-400" />
+                          Time Slot:
+                        </span>
+                        <span className="font-bold text-zinc-900 dark:text-white">
+                          {reservation.startTime} - {reservation.endTime}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+                          Location:
+                        </span>
+                        <span className="font-bold text-zinc-900 dark:text-white truncate max-w-[150px]">
+                          {reservation.city || reservation.location || "On Location"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {reservation.photographer && (
+                      <div className="pt-3 border-t border-zinc-150 dark:border-zinc-800 space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">
+                          Photographer
+                        </span>
+                        <div className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                          <User className="h-3.5 w-3.5 text-[#0e2d5c] dark:text-blue-400" />
+                          {reservation.photographer.firstName} {reservation.photographer.lastName}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Proposal Section on Mobile */}
+                {reservation.status === "PROPOSED" && reservation.selectedPackages && (
+                  <Card className="border-blue-200 dark:border-blue-900/40 shadow-xs bg-blue-50/30 dark:bg-blue-950/10">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        Photographer Quote
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-xs">
+                      {reservation.selectedPackages.map((pkg: any) => (
+                        <div
+                          key={pkg.id}
+                          onClick={() => setSelectedPkgId(pkg.id)}
+                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                            selectedPkgId === pkg.id
+                              ? "bg-white dark:bg-zinc-900 border-[#0e2d5c] ring-1 ring-[#0e2d5c]"
+                              : "bg-white/60 dark:bg-zinc-900/60 border-zinc-200"
+                          }`}
+                        >
+                          <span className="font-bold text-zinc-900 dark:text-white">
+                            {pkg.name}
+                          </span>
+                          <span className="font-bold text-[#0e2d5c] dark:text-blue-400">
+                            ${((pkg.priceInCents || 0) / 100).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+
+                      <Button
+                        type="button"
+                        onClick={handleConfirmPackage}
+                        disabled={confirmingPkg || !selectedPkgId}
+                        className="w-full h-10 bg-[#0e2d5c] text-white font-bold rounded-xl text-xs"
+                      >
+                        {confirmingPkg ? "Confirming..." : "Confirm Selected Package"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            ) : (
+              <div className="w-full">
+                <ChatBox
+                  messages={messages}
+                  messageText={messageText}
+                  onMessageChange={setMessageText}
+                  onSend={handleSendMessage}
+                  myRole="CUSTOMER"
+                  title={`Chat with ${reservation.photographer?.firstName || "Photographer"}`}
+                  description="Real-time messaging with your photographer"
+                  reservationId={reservation.id}
+                  photographerFirstName={reservation.photographer?.firstName}
+                />
+              </div>
+            )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );
