@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { type ChatMessage, type TrackingReservation } from "@/types";
 
@@ -15,8 +15,14 @@ export function useTrackingSocket(
     React.SetStateAction<TrackingReservation | null>
   >,
   socketRef: React.MutableRefObject<Socket | null>,
-  scrollToBottom: () => void,
+  scrollToBottom?: () => void,
 ) {
+  const scrollToBottomRef = useRef(scrollToBottom);
+
+  useEffect(() => {
+    scrollToBottomRef.current = scrollToBottom;
+  }, [scrollToBottom]);
+
   useEffect(() => {
     if (!reservation?.id || !verifiedEmail || !token) return;
 
@@ -25,18 +31,21 @@ export function useTrackingSocket(
     )
       .then((r) => r.json())
       .then((data) => {
-        setMessages(data);
-        scrollToBottom();
+        setMessages(data || []);
+        scrollToBottomRef.current?.();
       })
       .catch(console.error);
 
-    const socket = io(API);
+    const socket = io(API, { withCredentials: true });
     socketRef.current = socket;
     socket.emit("joinReservation", { reservationId: reservation.id });
 
     socket.on("message", (msg: ChatMessage) => {
-      setMessages((prev) => [...prev, msg]);
-      scrollToBottom();
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+      scrollToBottomRef.current?.();
     });
 
     socket.on("reservationUpdated", (updatedRes: any) => {
@@ -75,13 +84,5 @@ export function useTrackingSocket(
       socket.emit("leaveReservation", { reservationId: reservation.id });
       socket.disconnect();
     };
-  }, [
-    reservation?.id,
-    verifiedEmail,
-    token,
-    setMessages,
-    setReservation,
-    socketRef,
-    scrollToBottom,
-  ]);
+  }, [reservation?.id, verifiedEmail, token]);
 }

@@ -28,6 +28,6 @@ export const PHOTOGRAPHER_MENU: MenuItem[] = [
 
 export const CUSTOMER_MENU: MenuItem[] = [
   { id: "dashboard", label: "My Bookings & Chats", icon: CalendarCheck },
+  { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "profile", label: "My Profile", icon: User },
-  { id: "settings", label: "Settings", icon: Settings },
 ];

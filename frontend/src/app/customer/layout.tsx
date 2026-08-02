@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/dashboard/layout/DashboardLayout";
 import { CUSTOMER_MENU } from "@/components/dashboard/layout/constants";
 import {
   CalendarCheck,
+  CalendarDays,
   User,
   Settings,
   Plus,
@@ -40,6 +41,7 @@ export default function CustomerLayout({
 
   const handleTabChange = (tab: string) => {
     if (tab === "dashboard") router.push("/customer/dashboard");
+    else if (tab === "calendar") router.push("/customer/calendar");
     else if (tab === "profile") router.push("/customer/profile");
     else if (tab === "settings") router.push("/customer/settings");
     else router.push(`/customer/${tab}`);
@@ -73,7 +75,7 @@ export default function CustomerLayout({
       </DashboardLayout>
 
       {/* Sticky Bottom Menu (Mobile Only) */}
-      <nav className="block sm:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 px-6 py-2">
+      <nav className="block sm:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 px-4 py-2">
         <div className="flex items-center justify-between relative max-w-md mx-auto">
           {/* Bookings Link */}
           <Link
@@ -86,6 +88,19 @@ export default function CustomerLayout({
           >
             <CalendarCheck className="h-5 w-5" />
             <span>Bookings</span>
+          </Link>
+
+          {/* Calendar Link */}
+          <Link
+            href="/customer/calendar"
+            className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
+              pathname.includes("/customer/calendar")
+                ? "text-[#0e2d5c] dark:text-blue-400"
+                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            }`}
+          >
+            <CalendarDays className="h-5 w-5" />
+            <span>Calendar</span>
           </Link>
 
           {/* Central Floating Rounded Plus Button */}
@@ -111,19 +126,6 @@ export default function CustomerLayout({
           >
             <User className="h-5 w-5" />
             <span>Profile</span>
-          </Link>
-
-          {/* Settings Link */}
-          <Link
-            href="/customer/settings"
-            className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
-              pathname.includes("/customer/settings")
-                ? "text-[#0e2d5c] dark:text-blue-400"
-                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-            }`}
-          >
-            <Settings className="h-5 w-5" />
-            <span>Settings</span>
           </Link>
         </div>
       </nav>
