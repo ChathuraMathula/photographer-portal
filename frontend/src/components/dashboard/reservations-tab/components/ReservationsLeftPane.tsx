@@ -47,7 +47,6 @@ export function ReservationsLeftPane({
   const router = useRouter();
 
   const handleSelectReservation = (res: Reservation) => {
-    setSelectedRes(res);
     setShowRejectForm(false);
     router.push(`/dashboard/reservations/${res.id}`);
   };

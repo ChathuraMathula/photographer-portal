@@ -162,7 +162,7 @@ export function PhotographerLayoutWrapper({
         />
       )}
 
-      {selectedRes && !pathname.includes("/dashboard/reservations/") && (
+      {selectedRes && !pathname.includes("/dashboard/reservations") && (
         <FloatingChatWidget
           selectedRes={selectedRes}
           messages={messages}

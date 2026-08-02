@@ -31,7 +31,11 @@ export function useDashboardChat({
   };
 
   useEffect(() => {
-    if (!socket || !selectedRes?.id) {
+    const isIndividualPage =
+      typeof window !== "undefined" &&
+      window.location.pathname.includes("/dashboard/reservations/");
+
+    if (!socket || !selectedRes?.id || !isIndividualPage) {
       setMessages([]);
       return;
     }
