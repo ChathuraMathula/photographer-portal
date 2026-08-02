@@ -5,12 +5,15 @@ import { useParams } from "next/navigation";
 import { usePhotographerDashboardContext } from "../../context/PhotographerDashboardContext";
 import { ReservationsRightPane } from "@/components/dashboard/reservations-tab/components/ReservationsRightPane";
 import { ChatBox } from "@/components/common/ChatBox";
-import { FileText, MessageSquare, Calendar, User, MapPin } from "lucide-react";
+import { FileText, MessageSquare, Calendar, User } from "lucide-react";
+import { type Reservation } from "@/types";
 
 export default function ReservationDetailPage() {
   const params = useParams();
   const context = usePhotographerDashboardContext();
   const [mobileTab, setMobileTab] = useState<"details" | "chat">("details");
+  const [fetchedRes, setFetchedRes] = useState<Reservation | null>(null);
+  const [loadingRes, setLoadingRes] = useState(false);
 
   const reservationId = params?.id as string;
 
@@ -18,6 +21,7 @@ export default function ReservationDetailPage() {
 
   const {
     reservations,
+    calendarReservations,
     selectedRes,
     setSelectedRes,
     packages,
@@ -44,21 +48,71 @@ export default function ReservationDetailPage() {
     setMessageText,
     handleSendChatMessage,
     chatDisabled,
+    authFetch,
   } = context;
 
+  // Resolve target reservation from selectedRes, reservations list, calendarReservations, or API fetch fallback
   useEffect(() => {
-    if (reservationId && reservations.length > 0) {
-      const found = reservations.find((r) => r.id === reservationId);
-      if (found && selectedRes?.id !== found.id) {
-        setSelectedRes(found);
-      }
+    if (!reservationId) return;
+
+    // 1. Check selectedRes
+    if (selectedRes?.id === reservationId) {
+      setFetchedRes(selectedRes);
+      return;
     }
-  }, [reservationId, reservations, selectedRes, setSelectedRes]);
+
+    // 2. Check main reservations list
+    const foundInList = reservations.find((r) => r.id === reservationId);
+    if (foundInList) {
+      setSelectedRes(foundInList);
+      setFetchedRes(foundInList);
+      return;
+    }
+
+    // 3. Check calendar reservations list
+    const foundInCalendar = calendarReservations?.find((r) => r.id === reservationId);
+    if (foundInCalendar) {
+      setSelectedRes(foundInCalendar);
+      setFetchedRes(foundInCalendar);
+      return;
+    }
+
+    // 4. API Fetch Fallback for direct links or calendar items not in state
+    let isMounted = true;
+    setLoadingRes(true);
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+    authFetch(`${API}/reservations/${reservationId}`, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data) {
+          setSelectedRes(data);
+          setFetchedRes(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching single reservation details:", err))
+      .finally(() => {
+        if (isMounted) setLoadingRes(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [reservationId, reservations, calendarReservations, selectedRes, setSelectedRes, authFetch]);
+
+  // Mark unread customer messages as read when opening detail page
+  useEffect(() => {
+    if (reservationId) {
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      authFetch(`${API}/reservations/${reservationId}/messages/read`, {
+        method: "PATCH",
+        credentials: "include",
+      }).catch((err) => console.error("Error marking messages as read:", err));
+    }
+  }, [reservationId, authFetch]);
 
   const targetRes =
-    selectedRes?.id === reservationId
-      ? selectedRes
-      : reservations.find((r) => r.id === reservationId) || selectedRes;
+    fetchedRes ||
+    (selectedRes?.id === reservationId ? selectedRes : reservations.find((r) => r.id === reservationId) || selectedRes);
 
   const getStatusBadge = (status?: string) => {
     switch (status) {
@@ -143,9 +197,13 @@ export default function ReservationDetailPage() {
       )}
 
       {/* Main Content Area */}
-      {!targetRes ? (
+      {loadingRes && !targetRes ? (
         <div className="p-12 text-center bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-500 text-xs font-medium">
           Loading reservation details...
+        </div>
+      ) : !targetRes ? (
+        <div className="p-12 text-center bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-500 text-xs font-medium">
+          Reservation not found.
         </div>
       ) : (
         <>

@@ -85,13 +85,23 @@ export default function CustomerReservationDetailPage() {
           if (target) {
             setReservation(target);
 
-            // Fetch chat messages using tracking token endpoint (no password required for authenticated customer)
+            // Fetch chat messages using tracking token endpoint
             const chatRes = await fetch(
               `${API}/bookings/track/${target.reservationToken}/messages?email=${encodeURIComponent(target.photographer?.email || "")}`,
             );
             if (chatRes.ok) {
               const chatData = await chatRes.json();
               setMessages(chatData || []);
+
+              // Mark messages as read for customer
+              fetch(
+                `${API}/bookings/track/${target.reservationToken}/messages/read`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email: target.photographer?.email || "" }),
+                },
+              ).catch(() => {});
             }
           } else {
             setError("Reservation not found.");

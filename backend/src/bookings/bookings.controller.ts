@@ -73,6 +73,14 @@ export class BookingsController {
     return this.bookingsService.sendMessage(token, email, content);
   }
 
+  @Post('track/:token/messages/read')
+  markCustomerMessagesAsRead(
+    @Param('token') token: string,
+    @Body('email') email: string,
+  ) {
+    return this.bookingsService.markCustomerMessagesAsRead(token, email);
+  }
+
   @Post('track/:token/confirm')
   confirm(
     @Param('token') token: string,

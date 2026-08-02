@@ -63,4 +63,22 @@ export class BookingsChatService {
 
     return message;
   }
+
+  async markCustomerMessagesAsRead(token: string, email: string) {
+    const reservation = await this.reservationRepository.findOne({
+      where: { reservationToken: token },
+      relations: { customer: true },
+    });
+    if (!reservation) throw new NotFoundException('Reservation not found');
+    if (reservation.customer.email.toLowerCase() !== email.toLowerCase()) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    await this.messageRepository.update(
+      { reservationId: reservation.id, sender: 'PHOTOGRAPHER', isRead: false },
+      { isRead: true },
+    );
+
+    return { success: true };
+  }
 }

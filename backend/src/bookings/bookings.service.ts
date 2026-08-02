@@ -57,6 +57,10 @@ export class BookingsService {
     return this.chatService.sendMessage(token, email, content);
   }
 
+  async markCustomerMessagesAsRead(token: string, email: string) {
+    return this.chatService.markCustomerMessagesAsRead(token, email);
+  }
+
   async confirmBooking(token: string, email: string, packageId: string) {
     return this.lifecycleService.confirmBooking(token, email, packageId);
   }

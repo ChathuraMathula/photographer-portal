@@ -234,7 +234,7 @@ export default function CustomerDashboardPage() {
                     </div>
                   )}
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex items-center gap-2">
                     <Link
                       href={`/customer/reservations/${res.id}`}
                       className="w-full inline-flex items-center justify-center gap-1.5 h-9 rounded-lg bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
