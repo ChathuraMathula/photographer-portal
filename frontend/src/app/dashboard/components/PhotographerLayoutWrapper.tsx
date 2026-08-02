@@ -66,7 +66,9 @@ export function PhotographerLayoutWrapper({
     showAcceptBookingsInTopbar,
   } = context;
 
-  const activeTab = pathname.split("/").pop() as any;
+  const activeTab = pathname.includes("/dashboard/reservations")
+    ? "reservations"
+    : (pathname.split("/").pop() as any);
 
   const prevPathnameRef = React.useRef(pathname);
   React.useEffect(() => {
@@ -160,7 +162,7 @@ export function PhotographerLayoutWrapper({
         />
       )}
 
-      {selectedRes && (
+      {selectedRes && !pathname.includes("/dashboard/reservations/") && (
         <FloatingChatWidget
           selectedRes={selectedRes}
           messages={messages}
