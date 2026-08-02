@@ -39,8 +39,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/invoices",
   ],
   [UserRole.CUSTOMER]: [
-    "/customer/dashboard",
-    "/customer/complete-profile",
+    "/customer",
   ],
 };
 

@@ -49,25 +49,15 @@ export function ReservationsLeftPane({
   const handleSelectReservation = (res: Reservation) => {
     setSelectedRes(res);
     setShowRejectForm(false);
-    window.history.replaceState(
-      null,
-      "",
-      `/dashboard/reservations?id=${res.id}&page=${page}`,
-    );
+    router.push(`/dashboard/reservations/${res.id}`);
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    const idParam = selectedRes ? `&id=${selectedRes.id}` : "";
-    window.history.replaceState(
-      null,
-      "",
-      `/dashboard/reservations?page=${newPage}${idParam}`,
-    );
   };
 
   return (
-    <div className="lg:col-span-1">
+    <div className="w-full">
       <ReservationList
         reservations={reservations}
         selectedId={selectedRes?.id}

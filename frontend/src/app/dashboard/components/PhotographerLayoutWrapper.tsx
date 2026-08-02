@@ -135,7 +135,7 @@ export function PhotographerLayoutWrapper({
           onNavigateToReservation={(res) => {
             setSelectedRes(res);
             setCalendarSelectedRes(null);
-            router.push(`/dashboard/reservations?id=${res.id}&fromCalendar=true`);
+            router.push(`/dashboard/reservations/${res.id}`);
           }}
         />
       )}
