@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import { Endpoint, SeedAccount, SessionInfo, QueryParam } from "../types";
 import { API } from "../constants";
 
@@ -55,10 +56,12 @@ export function useApiTester() {
     checkHealth();
   }, []);
 
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(id);
-    setTimeout(() => setCopiedText(null), 1500);
+  const handleCopy = async (text: string, id: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      setCopiedText(id);
+      setTimeout(() => setCopiedText(null), 1500);
+    }
   };
 
   // Perform custom login

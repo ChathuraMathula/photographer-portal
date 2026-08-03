@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,11 +20,13 @@ type BookingPageLinkCardProps = {
 export function BookingPageLinkCard({ bookingSlug }: BookingPageLinkCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const url = `${window.location.origin}/book/${bookingSlug}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(url);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (

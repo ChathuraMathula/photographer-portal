@@ -10,19 +10,18 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import { AccountRow } from "./components/AccountRow";
 import { testAccounts } from "./data/accountsData";
 
 export default function TestAccountsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const copyToClipboard = async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
+  const handleCopy = async (text: string, id: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 1500);
-    } catch (err) {
-      console.error("Failed to copy text", err);
     }
   };
 
@@ -60,7 +59,7 @@ export default function TestAccountsPage() {
                 account={acc}
                 index={index}
                 copiedId={copiedId}
-                onCopy={copyToClipboard}
+                onCopy={handleCopy}
               />
             ))}
           </CardContent>

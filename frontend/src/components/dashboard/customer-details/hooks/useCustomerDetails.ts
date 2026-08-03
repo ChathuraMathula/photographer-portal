@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 
 export function useCustomerDetails(
   reservationId: string,
@@ -10,28 +11,24 @@ export function useCustomerDetails(
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleCopyId = async () => {
-    try {
-      await navigator.clipboard.writeText(reservationId);
+    const success = await copyToClipboard(reservationId);
+    if (success) {
       setCopiedId(true);
       setTimeout(() => setCopiedId(false), 2000);
-    } catch (err) {
-      console.error(err);
     }
   };
 
   const handleCopyLink = async () => {
-    try {
-      const originUrl =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : "http://localhost:4000";
-      await navigator.clipboard.writeText(
-        `${originUrl}/book/track/${reservationToken}`,
-      );
+    const originUrl =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost:4000";
+    const success = await copyToClipboard(
+      `${originUrl}/book/track/${reservationToken}`,
+    );
+    if (success) {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
-    } catch (err) {
-      console.error(err);
     }
   };
 

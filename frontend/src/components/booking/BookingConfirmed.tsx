@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import {
   Card,
   CardContent,
@@ -24,13 +25,11 @@ export function BookingConfirmed({
   const [copied, setCopied] = useState(false);
   const trackUrl = `${origin}/book/track/${trackingToken}`;
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(trackUrl);
+  const handleCopy = async () => {
+    const success = await copyToClipboard(trackUrl);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
     }
   };
 
@@ -61,7 +60,7 @@ export function BookingConfirmed({
               {trackUrl}
             </code>
             <button
-              onClick={copyToClipboard}
+              onClick={handleCopy}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:text-primary-dark dark:hover:text-white hover:border-zinc-350 dark:hover:border-zinc-750 transition-all cursor-pointer"
               title="Copy link"
             >
