@@ -56,6 +56,7 @@ services:
       - portal_network
 
   backend:
+    image: Chathuramathula97/photographer-portal-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -84,6 +85,7 @@ services:
       - portal_network
 
   frontend:
+    image: Chathuramathula97/photographer-portal-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
