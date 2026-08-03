@@ -22,9 +22,11 @@ export class AuthController {
   ) {
     const { access_token, user } = await this.authService.login(loginDto);
 
+    const isHttps = process.env.FRONTEND_URL?.startsWith('https://') ?? false;
+
     response.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });

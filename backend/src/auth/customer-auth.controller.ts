@@ -31,9 +31,11 @@ export class CustomerAuthController {
   ) {
     const result = await this.customerAuthService.verifyMagicLink(token);
 
+    const isHttps = process.env.FRONTEND_URL?.startsWith('https://') ?? false;
+
     response.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
