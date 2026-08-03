@@ -1,0 +1,6 @@
+dist
+node_modules
+uploads
+.git
+.gitignore
+README.md

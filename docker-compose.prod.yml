@@ -1,0 +1,95 @@
+# docker-compose.prod.yml
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: portal_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-securepassword123}
+      POSTGRES_DB: ${POSTGRES_DB:-portal}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - portal_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-portal}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: portal_rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - portal_network
+
+  maildev:
+    image: maildev/maildev
+    container_name: portal_maildev
+    restart: always
+    ports:
+      - "1080:1080"
+    networks:
+      - portal_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: portal_backend
+    restart: always
+    environment:
+      PORT: 4001
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${POSTGRES_USER:-admin}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-securepassword123}
+      DB_DATABASE: ${POSTGRES_DB:-portal}
+      JWT_SECRET: ${JWT_SECRET:-SUPER_SECRET_KEY_CHANGE_ME}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "4001:4001"
+    networks:
+      - portal_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4001}
+        NEXT_PUBLIC_OFFLINE_MAPS: "false"
+    container_name: portal_frontend
+    restart: always
+    ports:
+      - "4000:4000"
+    depends_on:
+      - backend
+    networks:
+      - portal_network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  backend_uploads:
+
+networks:
+  portal_network:
+    driver: bridge
