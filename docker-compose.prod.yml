@@ -29,7 +29,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@photoportal.com
       PGADMIN_DEFAULT_PASSWORD: pgadminsecure123
-      SCRIPT_NAME: /pgadmin
     depends_on:
       - postgres
     networks:
