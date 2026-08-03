@@ -24,15 +24,13 @@ export function useDashboardAuth() {
     }
   }, [isAuthenticated, router]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Backend logout error:", err);
-    }
+  const handleLogout = () => {
+    // Fire backend cookie cleanup in background without blocking UI
+    fetch(`${API}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).catch((err) => console.error("Backend logout error:", err));
+
     dispatch(logout());
     if (typeof window !== "undefined") {
       window.location.href = "/login";
