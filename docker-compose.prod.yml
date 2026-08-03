@@ -57,9 +57,6 @@ services:
 
   backend:
     image: chathuramathula97/photographer-portal-backend:latest
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
     container_name: portal_backend
     restart: always
     environment:
@@ -71,7 +68,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-securepassword123}
       DB_DATABASE: ${POSTGRES_DB:-portal}
       JWT_SECRET: ${JWT_SECRET:-SUPER_SECRET_KEY_CHANGE_ME}
-      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_URL:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672
     volumes:
       - backend_uploads:/app/uploads
     depends_on:
@@ -86,12 +83,6 @@ services:
 
   frontend:
     image: chathuramathula97/photographer-portal-frontend:latest
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4001}
-        NEXT_PUBLIC_OFFLINE_MAPS: "false"
     container_name: portal_frontend
     restart: always
     ports:
