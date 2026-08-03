@@ -61,7 +61,7 @@ services:
     restart: always
     environment:
       PORT: 4001
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      FRONTEND_URL: ${FRONTEND_URL:-https://photo-portal.duckdns.org}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: ${POSTGRES_USER:-admin}
