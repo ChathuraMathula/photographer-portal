@@ -82,20 +82,20 @@ export function InvoiceCustomizerCard({
   };
 
   return (
-    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900">
-      <CardHeader>
+    <Card className="border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm rounded-xl bg-white dark:bg-zinc-900 w-full min-w-0 max-w-full overflow-hidden">
+      <CardHeader className="p-4 sm:p-6">
         <CardTitle className="text-body-base-bold font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <Palette className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-          Invoice Customizer
+          <Palette className="h-5 w-5 text-blue-600 dark:text-blue-500 shrink-0" />
+          <span className="truncate">Invoice Customizer</span>
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-xs leading-relaxed">
           Personalize the design and terms of your system-generated PDFs.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
+      <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+        <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs w-full min-w-0">
           {/* Invoice Header Title */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Header Document Title
             </label>
@@ -103,14 +103,14 @@ export function InvoiceCustomizerCard({
               type="text"
               value={invoiceTitle}
               onChange={(e) => setInvoiceTitle(e.target.value)}
-              className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full min-w-0 max-w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"
               placeholder="e.g. INVOICE, BILLING STATEMENT"
               required
             />
           </div>
 
           {/* Branding Studio Name */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Branding Logo Text (Studio Name)
             </label>
@@ -118,13 +118,13 @@ export function InvoiceCustomizerCard({
               type="text"
               value={invoiceLogoText}
               onChange={(e) => setInvoiceLogoText(e.target.value)}
-              className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full min-w-0 max-w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"
               placeholder="e.g. Elite Photography Studio"
             />
           </div>
 
           {/* Studio Phone Number */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Business Contact Phone
             </label>
@@ -132,13 +132,13 @@ export function InvoiceCustomizerCard({
               type="text"
               value={invoicePhone}
               onChange={(e) => setInvoicePhone(e.target.value)}
-              className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full min-w-0 max-w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"
               placeholder="e.g. +94 77 123 4567"
             />
           </div>
 
           {/* Tax / VAT Percentage */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               VAT / Tax Percentage Rate (%)
             </label>
@@ -149,13 +149,13 @@ export function InvoiceCustomizerCard({
               step="0.01"
               value={invoiceTaxRate}
               onChange={(e) => setInvoiceTaxRate(Number(e.target.value))}
-              className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full min-w-0 max-w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"
               placeholder="e.g. 5 for 5% tax"
             />
           </div>
 
           {/* Theme Accent Color */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Invoice Accent Theme Color
             </label>
@@ -164,7 +164,7 @@ export function InvoiceCustomizerCard({
                 type="color"
                 value={invoiceColor}
                 onChange={(e) => setInvoiceColor(e.target.value)}
-                className="h-10 w-16 p-0 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent cursor-pointer overflow-hidden"
+                className="h-10 w-16 p-0 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent cursor-pointer overflow-hidden shrink-0"
               />
               <span className="font-mono text-[11px] text-zinc-500">
                 {invoiceColor.toUpperCase()}
@@ -173,7 +173,7 @@ export function InvoiceCustomizerCard({
           </div>
 
           {/* Fulfillment Instructions & Next Steps */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Fulfillment Instructions (Next Steps)
             </label>
@@ -181,13 +181,13 @@ export function InvoiceCustomizerCard({
               value={invoiceInstructions}
               onChange={(e) => setInvoiceInstructions(e.target.value)}
               rows={3}
-              className="w-full p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              className="w-full min-w-0 max-w-full p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               placeholder="e.g. To proceed, please coordinate shoot times. Bank account info: Sampath Bank..."
             />
           </div>
 
           {/* Custom Footer Notes */}
-          <div className="space-y-1.5 text-left">
+          <div className="space-y-1.5 text-left w-full min-w-0">
             <label className="font-bold text-zinc-550 block">
               Custom Footer Notes & Terms
             </label>
@@ -195,7 +195,7 @@ export function InvoiceCustomizerCard({
               value={invoiceNotes}
               onChange={(e) => setInvoiceNotes(e.target.value)}
               rows={3}
-              className="w-full p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              className="w-full min-w-0 max-w-full p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               placeholder="e.g. Thank you for your business!"
             />
           </div>

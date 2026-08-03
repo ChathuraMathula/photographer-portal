@@ -42,9 +42,9 @@ export function InvoicesListTable({
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl overflow-hidden shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-body-small border-collapse">
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl overflow-hidden shadow-sm w-full min-w-0 max-w-full">
+      <div className="overflow-x-auto w-full min-w-0 max-w-full">
+        <table className="w-full text-left text-body-small border-collapse min-w-[550px]">
           <thead>
             <tr className="bg-zinc-50/50 dark:bg-zinc-950/40 text-zinc-550 border-b border-zinc-100 dark:border-zinc-850">
               <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wider">

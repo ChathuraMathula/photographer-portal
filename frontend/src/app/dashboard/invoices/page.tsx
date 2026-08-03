@@ -71,9 +71,9 @@ function InvoicesPageInner({
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300 w-full min-w-0 max-w-full overflow-x-hidden">
       {/* Page Header with inline filters */}
-      <div className="border-b border-zinc-100 dark:border-zinc-800/80 pb-4 space-y-3">
+      <div className="border-b border-zinc-100 dark:border-zinc-800/80 pb-4 space-y-3 w-full min-w-0">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h2 className="text-title-medium font-extrabold text-zinc-900 dark:text-white leading-none">
@@ -87,9 +87,9 @@ function InvoicesPageInner({
         </div>
 
         {/* Filter / Sort Bar */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full min-w-0">
           {/* Search */}
-          <div className="relative w-[220px] shrink-0">
+          <div className="relative w-full sm:w-[220px] shrink-0 min-w-0">
             <input
               type="text"
               value={searchTerm}
@@ -101,7 +101,7 @@ function InvoicesPageInner({
           </div>
 
           {/* Date Filter */}
-          <div className="shrink-0">
+          <div className="w-full sm:w-auto shrink-0 min-w-0">
             <DatePickerInput
               label="Date:"
               value={filterDate}
@@ -110,7 +110,7 @@ function InvoicesPageInner({
           </div>
 
           {/* Sort By */}
-          <div className="w-[120px] shrink-0">
+          <div className="flex-1 sm:flex-initial sm:w-[120px] min-w-[110px]">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full h-8 px-2 text-xs bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400">
                 <SelectValue placeholder="Sort by" />
@@ -123,7 +123,7 @@ function InvoicesPageInner({
           </div>
 
           {/* Sort Order */}
-          <div className="w-[100px] shrink-0">
+          <div className="flex-1 sm:flex-initial sm:w-[100px] min-w-[90px]">
             <Select value={sortOrder} onValueChange={setSortOrder}>
               <SelectTrigger className="w-full h-8 px-2 text-xs bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 font-semibold focus:ring-1 focus:ring-zinc-400">
                 <SelectValue placeholder="Order" />
@@ -202,9 +202,9 @@ function InvoicesPageInner({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 w-full min-w-0 max-w-full">
         {/* Customizer sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 w-full min-w-0 max-w-full">
           <InvoiceCustomizerCard
             settings={settings}
             onSave={handleSaveSettings}
@@ -212,13 +212,13 @@ function InvoicesPageInner({
         </div>
 
         {/* Invoices List Table */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 w-full min-w-0 max-w-full">
           <h3 className="text-body-base-bold font-bold text-zinc-850 dark:text-zinc-200">
             Generated Ledger Statements
           </h3>
 
           {/* Table — stays mounted; dims smoothly during search refresh */}
-          <div className={`transition-opacity duration-200 ${refreshing ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+          <div className={`transition-opacity duration-200 w-full min-w-0 max-w-full ${refreshing ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
             <InvoicesListTable
               invoices={invoices}
               onDownload={handleDownload}
