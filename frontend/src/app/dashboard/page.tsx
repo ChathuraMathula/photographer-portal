@@ -14,7 +14,11 @@ export default function DashboardPage() {
     usePhotographerDashboard();
 
   useEffect(() => {
-    if (isAuthenticated && role === UserRole.PHOTOGRAPHER) {
+    if (!isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+    if (role === UserRole.PHOTOGRAPHER) {
       router.replace("/dashboard/reservations");
     }
   }, [isAuthenticated, role, router]);
