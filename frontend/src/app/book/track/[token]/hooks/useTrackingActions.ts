@@ -37,14 +37,26 @@ export function useTrackingActions(
     }
   };
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (
+    text: string,
+    setMessages?: React.Dispatch<React.SetStateAction<import("@/types").ChatMessage[]>>,
+  ) => {
     if (!text.trim() || !verifiedEmail || !token) return;
     try {
-      await fetch(`${API}/bookings/track/${token}/messages`, {
+      const res = await fetch(`${API}/bookings/track/${token}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: verifiedEmail, content: text }),
       });
+      if (res.ok) {
+        const newMessage = await res.json();
+        if (newMessage && setMessages) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
+        }
+      }
     } catch (err) {
       console.error(err);
     }

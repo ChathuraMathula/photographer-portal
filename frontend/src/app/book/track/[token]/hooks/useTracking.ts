@@ -139,7 +139,7 @@ export function useTracking() {
     },
     handleSendMessage: (e: React.FormEvent) => {
       e.preventDefault();
-      actions.handleSendMessage(messageText);
+      actions.handleSendMessage(messageText, setMessages);
       setMessageText("");
     },
     handleConfirmReservation: () =>

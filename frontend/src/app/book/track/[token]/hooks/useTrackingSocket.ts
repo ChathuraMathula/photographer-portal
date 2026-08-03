@@ -36,9 +36,21 @@ export function useTrackingSocket(
       })
       .catch(console.error);
 
-    const socket = io(API, { withCredentials: true });
+    const socket = io(API, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 10,
+    });
     socketRef.current = socket;
-    socket.emit("joinReservation", { reservationId: reservation.id });
+
+    socket.on("connect", () => {
+      socket.emit("joinReservation", { reservationId: reservation.id });
+    });
+
+    if (socket.connected) {
+      socket.emit("joinReservation", { reservationId: reservation.id });
+    }
 
     socket.on("message", (msg: ChatMessage) => {
       setMessages((prev) => {

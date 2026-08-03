@@ -89,7 +89,8 @@ export class BookingsLifecycleService {
       .to(`photographer_${profile.userId}`)
       .emit('reservationCreated', reservation);
 
-    const trackingLink = `http://localhost:4000/book/track/${token}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000';
+    const trackingLink = `${frontendUrl}/book/track/${token}`;
     await this.emailService.sendBookingReceived(
       customer.email,
       `${customer.firstName} ${customer.lastName}`,

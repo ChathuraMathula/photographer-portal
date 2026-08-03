@@ -73,12 +73,22 @@ export function useDashboardChat({
     try {
       const text = messageText;
       setMessageText("");
-      await authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
+      const res = await authFetch(`${API}/reservations/${selectedRes.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: text }),
         credentials: "include",
       });
+      if (res.ok) {
+        const newMsg = await res.json();
+        if (newMsg && newMsg.id) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+          scrollToBottom();
+        }
+      }
     } catch (err) {
       console.error(err);
     }
