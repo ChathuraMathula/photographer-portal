@@ -24,16 +24,23 @@ export function useDashboardAuth() {
     }
   }, [isAuthenticated, router]);
 
-  const handleLogout = () => {
-    // Fire backend cookie cleanup in background without blocking UI
-    fetch(`${API}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    }).catch((err) => console.error("Backend logout error:", err));
+  const handleLogout = async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 800);
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+    } catch (err) {
+      console.error("Backend logout error or timeout:", err);
+    }
 
     dispatch(logout());
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.replace("/login");
     }
   };
 

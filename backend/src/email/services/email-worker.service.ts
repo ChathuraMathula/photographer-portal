@@ -6,9 +6,12 @@ export class EmailWorkerService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
+    const host = process.env.SMTP_HOST || process.env.MAIL_HOST || 'maildev';
+    const port = parseInt(process.env.SMTP_PORT || process.env.MAIL_PORT || '1025', 10);
+
     this.transporter = nodemailer.createTransport({
-      host: '127.0.0.1',
-      port: 1025,
+      host,
+      port,
       ignoreTLS: true,
     });
   }

@@ -213,17 +213,6 @@ export function LoginForm({ formik, apiError, isDeactivated }: Props) {
               <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
                 We sent a passwordless sign-in link to <strong>{customerEmail}</strong>. Check your email inbox to access your portal.
               </p>
-
-              {generatedLink && (
-                <div className="pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40">
-                  <a
-                    href={generatedLink}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#0e2d5c] dark:text-blue-400 underline hover:opacity-80"
-                  >
-                    Click here to verify & sign in directly
-                  </a>
-                </div>
-              )}
             </div>
           ) : (
             <>

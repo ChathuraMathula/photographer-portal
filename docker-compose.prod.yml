@@ -68,13 +68,17 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-securepassword123}
       DB_DATABASE: ${POSTGRES_DB:-portal}
       JWT_SECRET: ${JWT_SECRET:-SUPER_SECRET_KEY_CHANGE_ME}
-      RABBITMQ_URL: amqp://${RABBITMQ_URL:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672
+      SMTP_HOST: maildev
+      SMTP_PORT: 1025
     volumes:
       - backend_uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_started
+      maildev:
         condition: service_started
     ports:
       - "4001:4001"
