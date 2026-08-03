@@ -25,10 +25,11 @@ services:
     container_name: portal_pgadmin
     restart: always
     ports:
-      - "127.0.0.1:5050:80"
+      - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@photoportal.com
       PGADMIN_DEFAULT_PASSWORD: pgadminsecure123
+      SCRIPT_NAME: /pgadmin
     depends_on:
       - postgres
     networks:
@@ -50,8 +51,9 @@ services:
     image: maildev/maildev
     container_name: portal_maildev
     restart: always
+    command: ["bin/maildev", "--web-ip-header", "x-forwarded-for", "--base-pathname", "/maildev"]
     ports:
-      - "127.0.0.1:1080:1080"
+      - "1080:1080"
     networks:
       - portal_network
 
