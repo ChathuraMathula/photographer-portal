@@ -7,7 +7,8 @@ import { RootState } from "@/store/store";
 import { logout } from "@/store/slices/authSlice";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
-const SOCKET_URL = API.replace(/\/api\/?$/, "");
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || API.replace(/\/api\/?$/, "");
 
 interface SocketContextType {
   socket: Socket | null;
