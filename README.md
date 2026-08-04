@@ -117,6 +117,59 @@ This starts:
 - **RabbitMQ Management UI** on `http://localhost:15672`
   - **Login**: `guest` / `guest`
 
+---
+
+## Production Deployment & Docker Build Arguments
+
+When deploying to production (e.g. Oracle Cloud VPS / AWS), Next.js requires `ARG` values at **build time** so it can embed the production URLs into the compiled JavaScript bundle.
+
+### 1. Frontend Build Arguments (`frontend/Dockerfile`)
+
+| Argument | Purpose | Production Example Value | Local Fallback Value |
+|---|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Base URL for NestJS REST API endpoints | `https://photo-portal.duckdns.org/api` | `http://localhost:4001` |
+| `NEXT_PUBLIC_SOCKET_URL` | Base URL for Socket.IO WebSockets | `https://photo-portal.duckdns.org` | `http://localhost:4001` |
+| `NEXT_PUBLIC_OFFLINE_MAPS` | Enable/disable offline map tiles | `false` | `false` |
+
+---
+
+### 2. How to Build & Deploy
+
+#### **Option A: Building locally & pushing to Docker Hub**
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_API_URL=https://photo-portal.duckdns.org/api \
+  --build-arg NEXT_PUBLIC_SOCKET_URL=https://photo-portal.duckdns.org \
+  --build-arg NEXT_PUBLIC_OFFLINE_MAPS=false \
+  -t chathuramathula97/photographer-portal-frontend:latest ./frontend
+
+docker push chathuramathula97/photographer-portal-frontend:latest
+```
+
+#### **Option B: Building directly on VPS via Docker Compose**
+Update the `frontend` service in `docker-compose.prod.yml`:
+
+```yaml
+frontend:
+  image: chathuramathula97/photographer-portal-frontend:latest
+  build:
+    context: ./frontend
+    args:
+      NEXT_PUBLIC_API_URL: https://photo-portal.duckdns.org/api
+      NEXT_PUBLIC_SOCKET_URL: https://photo-portal.duckdns.org
+      NEXT_PUBLIC_OFFLINE_MAPS: "false"
+  container_name: portal_frontend
+  restart: always
+  ports:
+    - "4000:4000"
+```
+
+Then run on VPS:
+```bash
+docker compose -f docker-compose.prod.yml build frontend
+docker compose -f docker-compose.prod.yml up -d frontend
+```
+
 ### pgAdmin Login & Database Connection
 
 To access and manage the database via the pgAdmin web UI:
