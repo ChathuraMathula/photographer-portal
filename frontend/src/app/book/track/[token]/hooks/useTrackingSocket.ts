@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { type ChatMessage, type TrackingReservation } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+const SOCKET_URL = API.replace(/\/api\/?$/, "");
 
 export function useTrackingSocket(
   reservation: TrackingReservation | null,
@@ -36,7 +37,7 @@ export function useTrackingSocket(
       })
       .catch(console.error);
 
-    const socket = io(API, {
+    const socket = io(SOCKET_URL, {
       withCredentials: true,
       transports: ["websocket", "polling"],
       reconnection: true,

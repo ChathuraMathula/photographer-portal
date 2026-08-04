@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 import { type PhotographerProfile } from "@/types";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+const SOCKET_URL = API.replace(/\/api\/?$/, "");
 
 export function useBookingSocket(
   slug: string,
@@ -12,7 +13,7 @@ export function useBookingSocket(
 ) {
   useEffect(() => {
     if (!slug) return;
-    const socket = io(API);
+    const socket = io(SOCKET_URL);
     socket.emit("joinBooking", { bookingSlug: slug });
 
     socket.on("profileUpdated", (updatedProfile: PhotographerProfile) => {

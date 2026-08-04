@@ -7,6 +7,7 @@ import { RootState } from "@/store/store";
 import { logout } from "@/store/slices/authSlice";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
+const SOCKET_URL = API.replace(/\/api\/?$/, "");
 
 interface SocketContextType {
   socket: Socket | null;
@@ -38,7 +39,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const socketInstance = io(API, {
+    const socketInstance = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
     });
