@@ -11,7 +11,10 @@ export async function seedProdData(
 
   console.log('  🗑  Clearing existing database tables...');
   await dataSource.query(
-    'TRUNCATE TABLE messages, payments, reservations, packages, photographer_profiles, customers, users, audit_logs CASCADE;',
+    'DROP TABLE IF EXISTS photographer_profiles CASCADE;',
+  );
+  await dataSource.query(
+    'TRUNCATE TABLE messages, payments, reservations, packages, service_profiles, customers, users, audit_logs CASCADE;',
   );
 
   const adminEmail = process.env.SUPER_ADMIN_EMAIL || 'admin@photoportal.com';
