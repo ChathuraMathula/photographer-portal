@@ -29,6 +29,11 @@ export default function CustomerDashboardPage() {
   const [reservations, setReservations] = useState<CustomerReservationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -81,7 +86,7 @@ export default function CustomerDashboardPage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
-                  Welcome back, {profile?.firstName || auth.firstName || "Customer"}!
+                  Welcome back, {mounted ? (profile?.firstName || auth.firstName || "Customer") : "Customer"}!
                 </h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/60 flex items-center gap-1">
                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
