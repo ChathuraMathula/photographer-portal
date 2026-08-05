@@ -46,4 +46,12 @@ export class RegisterPhotographerDto {
   @IsArray()
   @IsString({ each: true })
   specializations?: string[];
+
+  @IsOptional()
+  @IsString()
+  locationMapLink?: string;
+
+  @IsOptional()
+  @IsString()
+  coordinates?: string;
 }

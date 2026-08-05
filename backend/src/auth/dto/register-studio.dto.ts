@@ -44,4 +44,16 @@ export class RegisterStudioDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
+  locationMapLink?: string;
+
+  @IsOptional()
+  @IsString()
+  coordinates?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 }
