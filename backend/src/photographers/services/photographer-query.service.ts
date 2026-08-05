@@ -42,7 +42,7 @@ export class PhotographerQueryService {
     const query = this.profileRepository
       .createQueryBuilder('profile')
       .leftJoinAndSelect('profile.user', 'user')
-      .where('user.isDeactivated = :deactivated', { deactivated: false });
+      .where('(user.isActive = :active OR user.isActive IS NULL)', { active: true });
 
     if (search && search.trim()) {
       const q = `%${search.trim().toLowerCase()}%`;

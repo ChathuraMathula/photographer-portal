@@ -9,6 +9,8 @@ import {
 import { decodeJwtPayload } from "@/lib/jwt";
 import { UserRole } from "@/store/slices/authSlice";
 
+const AUTH_PAGES = ["/login", "/photographer/login", "/admin/login"];
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("access_token")?.value;
@@ -18,7 +20,7 @@ export function proxy(request: NextRequest) {
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
   if (isPublic) {
-    if (token && pathname === "/login") {
+    if (token && AUTH_PAGES.includes(pathname)) {
       const decodedToken = decodeJwtPayload(token);
       const isExpired = decodedToken
         ? decodedToken.exp * 1000 < Date.now()
@@ -28,7 +30,11 @@ export function proxy(request: NextRequest) {
         response.cookies.delete("access_token");
         return response;
       }
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+
+      const userRole = decodedToken.role as UserRole;
+      const targetDashboard =
+        userRole === UserRole.CUSTOMER ? "/customer/dashboard" : "/dashboard";
+      return NextResponse.redirect(new URL(targetDashboard, request.url));
     }
     return NextResponse.next();
   }
@@ -51,7 +57,6 @@ export function proxy(request: NextRequest) {
   }
 
   const userRole = decodedToken.role as UserRole;
-
   const allowedPaths = ROLE_PERMISSIONS[userRole] || [];
 
   const isAuthorized = allowedPaths.some((allowedPath) =>
@@ -62,7 +67,9 @@ export function proxy(request: NextRequest) {
     console.warn(
       `Unauthorized: Role ${userRole} attempted to access ${pathname}`,
     );
-    return NextResponse.redirect(new URL(REDIRECTS.unauthorized, request.url));
+    const targetRedirect =
+      userRole === UserRole.CUSTOMER ? "/customer/dashboard" : REDIRECTS.unauthorized;
+    return NextResponse.redirect(new URL(targetRedirect, request.url));
   }
 
   return NextResponse.next();

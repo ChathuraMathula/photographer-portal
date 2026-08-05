@@ -4,6 +4,9 @@ import { UserRole } from "@/store/slices/authSlice";
 export const PUBLIC_ROUTES = [
   "/",
   "/login",
+  "/photographer/login",
+  "/admin/login",
+  "/photographers",
   "/about",
   "/test-accounts",
   "/forgot-password",
@@ -11,8 +14,18 @@ export const PUBLIC_ROUTES = [
   "/auth/customer-verify",
 ];
 
-// Prefix-match public routes — /book/:slug and /book/track/:token are always public
-export const PUBLIC_PREFIXES = ["/book", "/leaflet", "/tiles", "/maps", "/auth", "/customer"];
+// Prefix-match public routes — /book/:slug, /photographers, etc. are public
+export const PUBLIC_PREFIXES = [
+  "/book",
+  "/photographers",
+  "/photographer",
+  "/admin",
+  "/leaflet",
+  "/tiles",
+  "/maps",
+  "/auth",
+  "/customer",
+];
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   [UserRole.SUPER_ADMIN]: [
@@ -22,12 +35,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/settings",
     "/dashboard/audit-logs",
     "/dashboard/reports",
+    "/photographers",
   ],
   [UserRole.ADMIN]: [
     "/dashboard",
     "/dashboard/users",
     "/dashboard/reports",
     "/dashboard/profile",
+    "/photographers",
   ],
   [UserRole.PHOTOGRAPHER]: [
     "/dashboard",
@@ -37,9 +52,11 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/profile",
     "/dashboard/settings",
     "/dashboard/invoices",
+    "/photographers",
   ],
   [UserRole.CUSTOMER]: [
     "/customer",
+    "/photographers",
   ],
 };
 
