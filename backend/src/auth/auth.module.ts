@@ -14,6 +14,9 @@ import { CustomerAuthService } from './services/customer-auth.service';
 import { CustomerAuthController } from './customer-auth.controller';
 import { EmailModule } from '../email/email.module';
 
+import { SmsDevService } from './services/sms-dev.service';
+import { OtpService } from './services/otp.service';
+
 @Module({
   imports: [
     DatabaseModule,
@@ -31,6 +34,8 @@ import { EmailModule } from '../email/email.module';
     AuthPasswordResetService,
     AuthRegisterService,
     CustomerAuthService,
+    SmsDevService,
+    OtpService,
     JwtStrategy,
   ],
   controllers: [AuthController, CustomerAuthController],
@@ -40,6 +45,8 @@ import { EmailModule } from '../email/email.module';
     AuthPasswordResetService,
     AuthRegisterService,
     CustomerAuthService,
+    SmsDevService,
+    OtpService,
   ],
 })
 export class AuthModule {}

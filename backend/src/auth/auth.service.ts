@@ -6,12 +6,17 @@ import { AuthLoginService } from './services/auth-login.service';
 import { AuthPasswordResetService } from './services/auth-password-reset.service';
 import { AuthRegisterService } from './services/auth-register.service';
 
+import { OtpService } from './services/otp.service';
+import { SmsDevService } from './services/sms-dev.service';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly loginService: AuthLoginService,
     private readonly passwordResetService: AuthPasswordResetService,
     private readonly registerService: AuthRegisterService,
+    private readonly otpService: OtpService,
+    private readonly smsDevService: SmsDevService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -36,5 +41,22 @@ export class AuthService {
 
   async checkAvailability(query: { email?: string; username?: string; bookingSlug?: string }) {
     return this.registerService.checkAvailability(query);
+  }
+
+  async sendOtp(target: string, type: 'EMAIL' | 'SMS') {
+    return this.otpService.sendOtp(target, type);
+  }
+
+  verifyOtp(target: string, otp: string, type: 'EMAIL' | 'SMS') {
+    return this.otpService.verifyOtp(target, otp, type);
+  }
+
+  getSmsDevInbox() {
+    return this.smsDevService.getInbox();
+  }
+
+  clearSmsDevInbox() {
+    this.smsDevService.clearInbox();
+    return { message: 'SMS Dev inbox cleared' };
   }
 }

@@ -89,4 +89,34 @@ export class AuthController {
   ) {
     return this.authService.checkAvailability({ email, username, bookingSlug });
   }
+
+  @Post('send-otp')
+  @HttpCode(HttpStatus.OK)
+  async sendOtp(
+    @Body('target') target: string,
+    @Body('type') type: 'EMAIL' | 'SMS',
+  ) {
+    return this.authService.sendOtp(target, type);
+  }
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  async verifyOtp(
+    @Body('target') target: string,
+    @Body('otp') otp: string,
+    @Body('type') type: 'EMAIL' | 'SMS',
+  ) {
+    return this.authService.verifyOtp(target, otp, type);
+  }
+
+  @Get('sms-inbox')
+  async getSmsDevInbox() {
+    return this.authService.getSmsDevInbox();
+  }
+
+  @Post('sms-inbox/clear')
+  @HttpCode(HttpStatus.OK)
+  async clearSmsDevInbox() {
+    return this.authService.clearSmsDevInbox();
+  }
 }

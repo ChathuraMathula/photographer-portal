@@ -12,6 +12,7 @@ export const PUBLIC_ROUTES = [
   "/register/studio",
   "/about",
   "/test-accounts",
+  "/sms-tester",
   "/forgot-password",
   "/reset-password",
   "/auth/customer-verify",

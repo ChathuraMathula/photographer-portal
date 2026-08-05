@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -31,9 +31,11 @@ import {
   Globe,
   Mail,
   Phone,
-  Lock,
+  KeyRound,
   Loader2,
   AlertCircle,
+  ExternalLink,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,7 +51,7 @@ const SPECIALIZATION_OPTIONS = [
 
 const STEPS = [
   { step: 1, label: "Email Verification", icon: Mail },
-  { step: 2, label: "Contact Phone", icon: Phone },
+  { step: 2, label: "Phone Verification", icon: Phone },
   { step: 3, label: "Personal Credentials", icon: User },
   { step: 4, label: "Username & Handle", icon: AtSign },
   { step: 5, label: "Profile & Specialties", icon: Sparkles },
@@ -75,9 +77,21 @@ export default function RegisterPhotographerWizardPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Availability checking state
-  const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [emailStatus, setEmailStatus] = useState<{ available?: boolean; message?: string }>({});
+  // OTP Verification state
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [sendingEmailOtp, setSendingEmailOtp] = useState(false);
+  const [verifyingEmailOtp, setVerifyingEmailOtp] = useState(false);
+
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [sendingPhoneOtp, setSendingPhoneOtp] = useState(false);
+  const [verifyingPhoneOtp, setVerifyingPhoneOtp] = useState(false);
+
+  // Availability checking state for Step 4
+  const [checkingHandle, setCheckingHandle] = useState(false);
   const [handleStatus, setHandleStatus] = useState<{
     usernameAvailable?: boolean;
     slugAvailable?: boolean;
@@ -93,8 +107,8 @@ export default function RegisterPhotographerWizardPage() {
       .toLowerCase()
       .trim()
       .replace(/^@/, "")
-      .replace(/[^\w]/g, "_") // Replace spaces & non-alphanumeric with underscore (_)
-      .replace(/_+/g, "_"); // Remove duplicate underscores
+      .replace(/[^\w]/g, "_")
+      .replace(/_+/g, "_");
   };
 
   const formatSlug = (val: string) => {
@@ -102,7 +116,7 @@ export default function RegisterPhotographerWizardPage() {
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-") // Replace spaces & underscores with hyphen (-)
+      .replace(/[\s_-]+/g, "-")
       .replace(/^-+|-+$/g, "");
   };
 
@@ -115,42 +129,133 @@ export default function RegisterPhotographerWizardPage() {
     }));
   };
 
-  // Step transition validation & availability checks
+  // OTP Dispatch & Verification Handlers
+  const handleSendEmailOtp = async () => {
+    if (!formData.email || !formData.email.includes("@")) {
+      toast.error("Please enter a valid email address first.");
+      return;
+    }
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+    try {
+      setSendingEmailOtp(true);
+      // First check if email is already taken
+      const availRes = await fetch(`${API}/auth/check-availability?email=${encodeURIComponent(formData.email)}`);
+      const availData = await availRes.json();
+      if (!availData.emailAvailable) {
+        toast.error("An account with this email address already exists.");
+        return;
+      }
+
+      const res = await fetch(`${API}/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: formData.email, type: "EMAIL" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+
+      setEmailOtpSent(true);
+      toast.success(`Verification OTP code sent to ${formData.email}! Check Maildev (http://localhost:1080)`);
+    } catch (err: any) {
+      toast.error(err.message || "Error sending email OTP");
+    } finally {
+      setSendingEmailOtp(false);
+    }
+  };
+
+  const handleVerifyEmailOtp = async () => {
+    if (!emailOtp || emailOtp.length < 6) {
+      toast.error("Please enter the 6-digit verification OTP code.");
+      return;
+    }
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+    try {
+      setVerifyingEmailOtp(true);
+      const res = await fetch(`${API}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: formData.email, otp: emailOtp, type: "EMAIL" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Verification failed");
+
+      setEmailVerified(true);
+      toast.success("Email address verified successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid or expired OTP code.");
+    } finally {
+      setVerifyingEmailOtp(false);
+    }
+  };
+
+  const handleSendPhoneOtp = async () => {
+    if (!formData.phone || formData.phone.trim().length < 8) {
+      toast.error("Please enter a valid phone number first.");
+      return;
+    }
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+    try {
+      setSendingPhoneOtp(true);
+      const res = await fetch(`${API}/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: formData.phone, type: "SMS" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to send SMS OTP");
+
+      setPhoneOtpSent(true);
+      toast.success(`SMS verification OTP sent to ${formData.phone}! View in SMS Tester (/sms-tester).`);
+    } catch (err: any) {
+      toast.error(err.message || "Error sending SMS OTP");
+    } finally {
+      setSendingPhoneOtp(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async () => {
+    if (!phoneOtp || phoneOtp.length < 6) {
+      toast.error("Please enter the 6-digit SMS verification OTP code.");
+      return;
+    }
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+    try {
+      setVerifyingPhoneOtp(true);
+      const res = await fetch(`${API}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: formData.phone, otp: phoneOtp, type: "SMS" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Verification failed");
+
+      setPhoneVerified(true);
+      toast.success("Phone number verified successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid or expired SMS OTP code.");
+    } finally {
+      setVerifyingPhoneOtp(false);
+    }
+  };
+
+  // Step Transition Guards
   const handleNextStep = async () => {
     const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
 
-    // STEP 1: Email Validation
     if (currentStep === 1) {
-      if (!formData.email || !formData.email.includes("@")) {
-        toast.error("Please enter a valid email address.");
+      if (!emailVerified) {
+        toast.error("Please verify your email address via OTP before proceeding.");
         return;
-      }
-      try {
-        setCheckingAvailability(true);
-        const res = await fetch(`${API}/auth/check-availability?email=${encodeURIComponent(formData.email)}`);
-        const data = await res.json();
-        if (!data.emailAvailable) {
-          setEmailStatus({ available: false, message: data.messages?.[0] || "Email is already registered." });
-          toast.error("An account with this email address already exists.");
-          return;
-        }
-        setEmailStatus({ available: true });
-      } catch (err) {
-        console.error("Email availability check failed", err);
-      } finally {
-        setCheckingAvailability(false);
       }
     }
 
-    // STEP 2: Phone Validation
     if (currentStep === 2) {
-      if (!formData.phone || formData.phone.trim().length < 8) {
-        toast.error("Please enter a valid contact phone number.");
+      if (!phoneVerified) {
+        toast.error("Please verify your phone number via SMS OTP before proceeding.");
         return;
       }
     }
 
-    // STEP 3: Personal Info & Password Validation
     if (currentStep === 3) {
       if (!formData.firstName.trim() || !formData.lastName.trim()) {
         toast.error("Please enter both first and last name.");
@@ -166,7 +271,6 @@ export default function RegisterPhotographerWizardPage() {
       }
     }
 
-    // STEP 4: Username & Booking Slug Availability Validation
     if (currentStep === 4) {
       if (!formData.username || !formData.bookingSlug) {
         toast.error("Please enter both unique username and custom booking slug.");
@@ -174,7 +278,7 @@ export default function RegisterPhotographerWizardPage() {
       }
 
       try {
-        setCheckingAvailability(true);
+        setCheckingHandle(true);
         const res = await fetch(
           `${API}/auth/check-availability?username=${encodeURIComponent(formData.username)}&bookingSlug=${encodeURIComponent(formData.bookingSlug)}`
         );
@@ -195,9 +299,9 @@ export default function RegisterPhotographerWizardPage() {
           return;
         }
       } catch (err) {
-        console.error("Handle availability check error", err);
+        console.error("Handle availability error", err);
       } finally {
-        setCheckingAvailability(false);
+        setCheckingHandle(false);
       }
     }
 
@@ -210,11 +314,6 @@ export default function RegisterPhotographerWizardPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
 
     try {
       setLoading(true);
@@ -251,7 +350,6 @@ export default function RegisterPhotographerWizardPage() {
     }
   };
 
-  // Calculate percentage fill for progress bar
   const progressPercentage = (currentStep / 5) * 100;
 
   return (
@@ -268,13 +366,24 @@ export default function RegisterPhotographerWizardPage() {
             </span>
           </Link>
 
-          <Link
-            href="/photography"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Directory
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/sms-tester"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 text-[11px] font-bold hover:bg-emerald-100 transition-colors"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              <span>SMS Dev Inbox</span>
+            </Link>
+
+            <Link
+              href="/photography"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Directory
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -287,31 +396,31 @@ export default function RegisterPhotographerWizardPage() {
             </div>
             <div className="space-y-2">
               <h2 className="text-xl font-extrabold text-zinc-900 dark:text-white">
-                Application Under Review
+                Application Submitted & Verified
               </h2>
               <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-md mx-auto">
-                Thank you for applying to join SeyaRoo as an independent photographer!
-                Your profile has been submitted and is currently undergoing verification by our administration team.
+                Your email and phone number have been successfully verified via OTP!
+                Your profile application is now undergoing final review by our administrative team.
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 text-left text-xs space-y-2">
               <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
                 <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>Submitted Registration Details</span>
+                <span>Verified Account Details</span>
               </div>
               <ul className="list-disc list-inside text-zinc-500 space-y-1 text-[11px]">
-                <li>Super admins will review your application details.</li>
-                <li>Your username: <strong>@{formData.username}</strong></li>
-                <li>Your booking link: <strong>seyaroo.com/book/{formData.bookingSlug}</strong></li>
-                <li>Email: <strong>{formData.email}</strong></li>
+                <li>Email (Verified): <strong>{formData.email}</strong></li>
+                <li>Phone (Verified): <strong>{formData.phone}</strong></li>
+                <li>Username: <strong>@{formData.username}</strong></li>
+                <li>Booking Slug: <strong>seyaroo.com/book/{formData.bookingSlug}</strong></li>
               </ul>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/photography">
                 <Button className="w-full sm:w-auto h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer">
-                  Return to Showcase
+                  Return to Directory
                 </Button>
               </Link>
               <Link href="/portal/login">
@@ -381,17 +490,17 @@ export default function RegisterPhotographerWizardPage() {
 
             <CardHeader className="border-b border-zinc-150 dark:border-zinc-800 pb-4">
               <CardTitle className="text-xl font-black text-zinc-900 dark:text-white">
-                {currentStep === 1 && "Step 1: Account Email Verification"}
-                {currentStep === 2 && "Step 2: Contact Phone Number"}
+                {currentStep === 1 && "Step 1: Email OTP Verification"}
+                {currentStep === 2 && "Step 2: Phone SMS OTP Verification"}
                 {currentStep === 3 && "Step 3: Personal Credentials"}
-                {currentStep === 4 && "Step 4: Username & Custom Booking Slug"}
+                {currentStep === 4 && "Step 4: Unique Username & Custom Slug"}
                 {currentStep === 5 && "Step 5: Profile Info & Specializations"}
               </CardTitle>
               <CardDescription className="text-xs text-zinc-500">
-                {currentStep === 1 && "Enter your primary email address for portal sign-in and notifications."}
-                {currentStep === 2 && "Provide your contact number for booking updates and verification."}
+                {currentStep === 1 && "Send and enter a 6-digit OTP code sent to your email."}
+                {currentStep === 2 && "Send and enter a 6-digit SMS OTP code sent to your phone."}
                 {currentStep === 3 && "Enter your full name and create a secure login password."}
-                {currentStep === 4 && "Choose your unique handle (@username) and custom booking link (slug)."}
+                {currentStep === 4 && "Choose your unique handle (@username) and custom booking link."}
                 {currentStep === 5 && "Select your operating city, bio description, and photography styles."}
               </CardDescription>
             </CardHeader>
@@ -399,63 +508,172 @@ export default function RegisterPhotographerWizardPage() {
             <form onSubmit={handleSubmit}>
               <CardContent className="p-6 space-y-4">
 
-                {/* STEP 1: Email Address */}
+                {/* STEP 1: Email OTP Verification */}
                 {currentStep === 1 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
                         <span>Email Address *</span>
-                        {emailStatus.available === true && (
-                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3" /> Available
+                        {emailVerified && (
+                          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Email Verified
                           </span>
                         )}
                       </Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                        <Input
-                          type="email"
-                          required
-                          placeholder="kasun@example.com"
-                          value={formData.email}
-                          onChange={(e) => {
-                            setFormData({ ...formData, email: e.target.value });
-                            setEmailStatus({});
-                          }}
-                          className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            type="email"
+                            required
+                            disabled={emailVerified}
+                            placeholder="kasun@example.com"
+                            value={formData.email}
+                            onChange={(e) => {
+                              setFormData({ ...formData, email: e.target.value });
+                              setEmailVerified(false);
+                              setEmailOtpSent(false);
+                            }}
+                            className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          />
+                        </div>
+                        {!emailVerified && (
+                          <Button
+                            type="button"
+                            onClick={handleSendEmailOtp}
+                            disabled={sendingEmailOtp || !formData.email}
+                            className="h-11 px-4 bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold rounded-xl cursor-pointer shrink-0"
+                          >
+                            {sendingEmailOtp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Code"}
+                          </Button>
+                        )}
                       </div>
-                      {emailStatus.message && (
-                        <p className="text-[11px] text-red-500 font-medium">{emailStatus.message}</p>
-                      )}
                     </div>
+
+                    {emailOtpSent && !emailVerified && (
+                      <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 space-y-3 animate-in fade-in duration-150">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
+                            <KeyRound className="h-4 w-4 text-blue-600" />
+                            Enter 6-Digit Email OTP
+                          </Label>
+                          <span className="text-[10px] text-zinc-500">Check Maildev (http://localhost:1080)</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            maxLength={6}
+                            placeholder="e.g. 123456"
+                            value={emailOtp}
+                            onChange={(e) => setEmailOtp(e.target.value)}
+                            className="h-11 text-center text-sm font-mono font-bold tracking-widest rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                          />
+                          <Button
+                            type="button"
+                            onClick={handleVerifyEmailOtp}
+                            disabled={verifyingEmailOtp || emailOtp.length < 6}
+                            className="h-11 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer shrink-0"
+                          >
+                            {verifyingEmailOtp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify Code"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {emailVerified && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Email address verified successfully. Click Next Step to proceed.</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* STEP 2: Contact Phone Number */}
+                {/* STEP 2: Phone SMS OTP Verification */}
                 {currentStep === 2 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                        Contact Phone Number *
+                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                        <span>Contact Phone Number *</span>
+                        {phoneVerified && (
+                          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Phone Verified
+                          </span>
+                        )}
                       </Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                        <Input
-                          type="tel"
-                          required
-                          placeholder="077 123 4567"
-                          value={formData.phone}
-                          onChange={(e) =>
-                            setFormData({ ...formData, phone: e.target.value })
-                          }
-                          className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            type="tel"
+                            required
+                            disabled={phoneVerified}
+                            placeholder="077 123 4567"
+                            value={formData.phone}
+                            onChange={(e) => {
+                              setFormData({ ...formData, phone: e.target.value });
+                              setPhoneVerified(false);
+                              setPhoneOtpSent(false);
+                            }}
+                            className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          />
+                        </div>
+                        {!phoneVerified && (
+                          <Button
+                            type="button"
+                            onClick={handleSendPhoneOtp}
+                            disabled={sendingPhoneOtp || !formData.phone}
+                            className="h-11 px-4 bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold rounded-xl cursor-pointer shrink-0"
+                          >
+                            {sendingPhoneOtp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send SMS OTP"}
+                          </Button>
+                        )}
                       </div>
-                      <p className="text-[11px] text-zinc-400">
-                        We use this number to send client booking confirmations and SMS updates.
-                      </p>
                     </div>
+
+                    {phoneOtpSent && !phoneVerified && (
+                      <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-900/40 space-y-3 animate-in fade-in duration-150">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
+                            <KeyRound className="h-4 w-4 text-indigo-600" />
+                            Enter 6-Digit SMS OTP
+                          </Label>
+                          <Link
+                            href="/sms-tester"
+                            target="_blank"
+                            className="text-[11px] text-indigo-600 hover:underline font-bold inline-flex items-center gap-1"
+                          >
+                            <span>Open SMS Dev Inbox</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            maxLength={6}
+                            placeholder="e.g. 123456"
+                            value={phoneOtp}
+                            onChange={(e) => setPhoneOtp(e.target.value)}
+                            className="h-11 text-center text-sm font-mono font-bold tracking-widest rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                          />
+                          <Button
+                            type="button"
+                            onClick={handleVerifyPhoneOtp}
+                            disabled={verifyingPhoneOtp || phoneOtp.length < 6}
+                            className="h-11 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer shrink-0"
+                          >
+                            {verifyingPhoneOtp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify SMS"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {phoneVerified && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Contact phone number verified successfully via SMS. Click Next Step to proceed.</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -494,7 +712,7 @@ export default function RegisterPhotographerWizardPage() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {/* Create Password */}
+                      {/* Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                           Create Password *
@@ -568,7 +786,6 @@ export default function RegisterPhotographerWizardPage() {
                 {currentStep === 4 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
                       {/* Username (using _) */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
@@ -702,10 +919,10 @@ export default function RegisterPhotographerWizardPage() {
                         <strong>Name:</strong> {formData.firstName} {formData.lastName}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Email:</strong> {formData.email}
+                        <strong>Email (Verified):</strong> {formData.email}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Phone:</strong> {formData.phone}
+                        <strong>Phone (Verified):</strong> {formData.phone}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         <strong>Username Handle:</strong> @{formData.username}
@@ -724,7 +941,7 @@ export default function RegisterPhotographerWizardPage() {
                     type="button"
                     variant="outline"
                     onClick={handlePrevStep}
-                    disabled={checkingAvailability}
+                    disabled={checkingHandle}
                     className="h-10 px-4 font-bold text-xs rounded-xl cursor-pointer"
                   >
                     <ArrowLeft className="h-3.5 w-3.5 mr-1" />
@@ -737,11 +954,15 @@ export default function RegisterPhotographerWizardPage() {
                 {currentStep < 5 ? (
                   <Button
                     type="button"
-                    disabled={checkingAvailability}
+                    disabled={
+                      checkingHandle ||
+                      (currentStep === 1 && !emailVerified) ||
+                      (currentStep === 2 && !phoneVerified)
+                    }
                     onClick={handleNextStep}
-                    className="h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer shadow-md"
+                    className="h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {checkingAvailability ? (
+                    {checkingHandle ? (
                       <span className="flex items-center gap-1.5">
                         <Loader2 className="h-3.5 w-3.5 animate-spin" /> Verifying...
                       </span>
