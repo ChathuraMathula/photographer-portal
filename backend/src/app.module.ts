@@ -19,7 +19,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { StudiosModule } from './studios/studios.module';
 import { User } from './entities/user.entity';
-import { PhotographerProfile } from './entities/photographer-profile.entity';
+import { ServiceProfile } from './entities/service-profile.entity';
 import { Package } from './entities/package.entity';
 import { Customer } from './entities/customer.entity';
 import { Reservation } from './entities/reservation.entity';
@@ -48,7 +48,7 @@ if (
       database: process.env.DB_DATABASE ?? 'portal',
       entities: [
         User,
-        PhotographerProfile,
+        ServiceProfile,
         Package,
         Customer,
         Reservation,

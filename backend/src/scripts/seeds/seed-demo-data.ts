@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User, UserRole } from '../../entities/user.entity';
-import { PhotographerProfile } from '../../entities/photographer-profile.entity';
+import { ServiceProfile, PhotographerProfile } from '../../entities/service-profile.entity';
 import { Customer } from '../../entities/customer.entity';
 import { Reservation, ReservationStatus } from '../../entities/reservation.entity';
 import { Package } from '../../entities/package.entity';
@@ -104,7 +104,7 @@ export async function seedDemoData(app: INestApplicationContext) {
 
   console.log('\n🧹 Clearing existing database tables...');
   await dataSource.query(
-    'TRUNCATE TABLE messages, payments, reservations, packages, photographer_profiles, customers, users, audit_logs CASCADE;',
+    'TRUNCATE TABLE messages, payments, reservations, packages, service_profiles, customers, users, audit_logs CASCADE;',
   );
 
   // 1. Create Super Admin

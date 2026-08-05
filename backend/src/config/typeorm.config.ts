@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { join } from 'path';
 import fs from 'fs';
 import { User } from '../entities/user.entity';
-import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { ServiceProfile } from '../entities/service-profile.entity';
 import { Package } from '../entities/package.entity';
 import { Customer } from '../entities/customer.entity';
 import { Reservation } from '../entities/reservation.entity';
@@ -27,7 +27,7 @@ export default new DataSource({
   database: process.env.DB_DATABASE ?? 'portal',
   entities: [
     User,
-    PhotographerProfile,
+    ServiceProfile,
     Package,
     Customer,
     Reservation,

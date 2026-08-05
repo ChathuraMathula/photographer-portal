@@ -7,7 +7,7 @@ import {
   OneToOne,
   OneToMany,
 } from 'typeorm';
-import { PhotographerProfile } from './photographer-profile.entity';
+import { ServiceProfile, PhotographerProfile } from './service-profile.entity';
 import { Package } from './package.entity';
 import { Reservation } from './reservation.entity';
 
