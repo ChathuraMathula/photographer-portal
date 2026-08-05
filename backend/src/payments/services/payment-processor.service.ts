@@ -156,6 +156,52 @@ export class PaymentProcessorService {
       reservation.totalAmountInCents = selectedPkg.priceInCents;
       reservation.advancePaymentPriceInCents = chargeAmountInCents;
       reservation.paymentDeadline = undefined;
+
+      // Auto-reject any colliding PENDING or PROPOSED reservations for the same photographer/studio
+      const collidingReservations = await this.reservationRepository
+        .createQueryBuilder('res')
+        .leftJoinAndSelect('res.customer', 'customer')
+        .where('res.photographerId = :photographerId', {
+          photographerId: reservation.photographerId,
+        })
+        .andWhere('res.id != :resId', { resId: reservation.id })
+        .andWhere('res.date = :date', { date: reservation.date })
+        .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+        })
+        .andWhere('res.status IN (:...collidingStatuses)', {
+          collidingStatuses: [ReservationStatus.PENDING, ReservationStatus.PROPOSED],
+        })
+        .getMany();
+
+      const formalRejectionMsg =
+        'Thank you for your interest! Unfortunately, this time slot has just been confirmed and reserved by another client. We invite you to select an alternative date or time slot.';
+
+      for (const colliding of collidingReservations) {
+        colliding.status = ReservationStatus.REJECTED;
+        colliding.rejectionReason = formalRejectionMsg;
+        await this.reservationRepository.save(colliding);
+
+        this.chatGateway.server
+          .to(`reservation_${colliding.id}`)
+          .emit('reservationUpdated', colliding);
+        this.chatGateway.server
+          .to(`photographer_${reservation.photographerId}`)
+          .emit('reservationUpdated', colliding);
+
+        if (colliding.customer?.email) {
+          try {
+            await this.emailService.sendReservationRejected(
+              colliding.customer.email,
+              `${colliding.customer.firstName || ''} ${colliding.customer.lastName || ''}`.trim() || 'Valued Client',
+              formalRejectionMsg,
+            );
+          } catch (err) {
+            console.error('Failed to send auto-rejection email:', err);
+          }
+        }
+      }
     }
 
     await this.reservationRepository.save(reservation);

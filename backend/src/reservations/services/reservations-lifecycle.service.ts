@@ -147,6 +147,36 @@ export class ReservationsLifecycleService {
 
     reservation.customer = customer;
 
+    // Auto-reject colliding PENDING / PROPOSED requests
+    const colliding = await this.reservationRepository
+      .createQueryBuilder('res')
+      .where('res.photographerId = :photographerId', { photographerId: user.userId })
+      .andWhere('res.id != :resId', { resId: reservation.id })
+      .andWhere('res.date = :date', { date: dto.date })
+      .andWhere('res.startTime < :endTime AND res.endTime > :startTime', {
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+      })
+      .andWhere('res.status IN (:...collidingStatuses)', {
+        collidingStatuses: [ReservationStatus.PENDING, ReservationStatus.PROPOSED],
+      })
+      .getMany();
+
+    const formalRejectionMsg =
+      'Thank you for your interest! Unfortunately, this time slot has just been confirmed and reserved by another client. We invite you to select an alternative date or time slot.';
+
+    for (const c of colliding) {
+      c.status = ReservationStatus.REJECTED;
+      c.rejectionReason = formalRejectionMsg;
+      await this.reservationRepository.save(c);
+      this.chatGateway.server
+        .to(`reservation_${c.id}`)
+        .emit('reservationUpdated', c);
+      this.chatGateway.server
+        .to(`photographer_${user.userId}`)
+        .emit('reservationUpdated', c);
+    }
+
     this.chatGateway.server
       .to(`photographer_${user.userId}`)
       .emit('reservationCreated', reservation);

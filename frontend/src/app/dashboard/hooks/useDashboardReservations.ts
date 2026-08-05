@@ -380,6 +380,26 @@ export function useDashboardReservations({
     }
   };
 
+  const assignStaffMember = async (reservationId: string, assignedPhotographerId: string | null) => {
+    try {
+      const res = await authFetch(`${API}/studios/my/reservations/${reservationId}/assign`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignedPhotographerId }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update staff assignment");
+      toast.success("Team photographer assigned successfully!");
+      fetchReservations();
+      if (selectedRes?.id === reservationId) {
+        setSelectedRes(data.reservation);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error assigning staff member");
+    }
+  };
+
   return {
     reservations,
     setReservations,
@@ -428,5 +448,6 @@ export function useDashboardReservations({
     fetchLockedDates,
     lockDate,
     unlockDate,
+    assignStaffMember,
   };
 }

@@ -38,6 +38,7 @@ export function useDashboardProfile({
     useState(true);
   const [showAcceptBookingsInTopbar, setShowAcceptBookingsInTopbar] =
     useState(true);
+  const [proposalExpirationHours, setProposalExpirationHours] = useState(24);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +67,7 @@ export function useDashboardProfile({
           offlineMessage,
           showManualBookingInTopbar,
           showAcceptBookingsInTopbar,
+          proposalExpirationHours,
         }),
         credentials: "include",
       });
@@ -137,6 +139,8 @@ export function useDashboardProfile({
     setShowManualBookingInTopbar,
     showAcceptBookingsInTopbar,
     setShowAcceptBookingsInTopbar,
+    proposalExpirationHours,
+    setProposalExpirationHours,
     handleSaveProfile,
     handleToggleAvailability,
   };

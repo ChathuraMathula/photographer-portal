@@ -1,12 +1,5 @@
-"use client";
-
-import { LoginLayout } from "../../login/components/LoginLayout";
-import { PhotographerLoginForm } from "../../login/components/PhotographerLoginForm";
+import { redirect } from "next/navigation";
 
 export default function PhotographerLoginPage() {
-  return (
-    <LoginLayout>
-      <PhotographerLoginForm />
-    </LoginLayout>
-  );
+  redirect("/portal/login");
 }

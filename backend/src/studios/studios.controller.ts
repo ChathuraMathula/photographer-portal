@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -61,5 +62,20 @@ export class StudiosController {
     @Body() dto: CreateStudioPhotographerDto,
   ) {
     return this.studiosService.createStudioPhotographer(req.user.userId, dto);
+  }
+
+  @Patch('my/reservations/:id/assign')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.STUDIO)
+  async assignReservationToStaff(
+    @Req() req: RequestWithUser,
+    @Param('id') reservationId: string,
+    @Body('assignedPhotographerId') assignedPhotographerId: string | null,
+  ) {
+    return this.studiosService.assignReservationToStaff(
+      req.user.userId,
+      reservationId,
+      assignedPhotographerId,
+    );
   }
 }

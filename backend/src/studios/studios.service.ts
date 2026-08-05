@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../entities/user.entity';
 import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { Reservation } from '../entities/reservation.entity';
 import { CreateStudioPhotographerDto } from './dto/create-studio-photographer.dto';
 import { UserSlugService } from '../users/services/user-slug.service';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
@@ -166,13 +167,18 @@ export class StudiosService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
+    const assignedRole =
+      dto.role === UserRole.STUDIO_STAFF
+        ? UserRole.STUDIO_STAFF
+        : UserRole.STUDIO_PHOTOGRAPHER;
+
     const user = this.userRepository.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
       username: cleanUsername,
       passwordHash,
-      role: UserRole.PHOTOGRAPHER,
+      role: assignedRole,
       studioId: studioUserId,
       studioName: studio.studioName,
       studioLogoUrl: studio.studioLogoUrl,
@@ -237,11 +243,53 @@ export class StudiosService {
         username: p.username ? `@${p.username}` : undefined,
         phone: p.phone,
         isActive: p.isActive,
+        role: p.role,
         bookingSlug: p.profile?.bookingSlug,
         bio: p.profile?.bio,
         specializations: p.profile?.specializations || [],
         isPublishedToGlobalShowcase: p.isPublishedToGlobalShowcase,
       })),
+    };
+  }
+
+  async assignReservationToStaff(
+    studioUserId: string,
+    reservationId: string,
+    assignedPhotographerId: string | null,
+  ) {
+    const reservation = await this.userRepository.manager.getRepository(Reservation).findOne({
+      where: { id: reservationId, photographerId: studioUserId },
+      relations: { customer: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found for this studio');
+    }
+
+    if (assignedPhotographerId) {
+      const staffUser = await this.userRepository.findOne({
+        where: { id: assignedPhotographerId, studioId: studioUserId },
+      });
+      if (!staffUser) {
+        throw new NotFoundException('Photographer is not registered under your studio');
+      }
+      reservation.assignedPhotographerId = staffUser.id;
+    } else {
+      reservation.assignedPhotographerId = undefined;
+    }
+
+    await this.userRepository.manager.getRepository(Reservation).save(reservation);
+
+    await this.auditLogsService.logAction(
+      'STUDIO_RESERVATION_ASSIGNED',
+      `Assigned reservation ${reservationId} to photographer ${assignedPhotographerId || 'Unassigned'}`,
+      studioUserId,
+      '',
+    );
+
+    return {
+      message: 'Reservation staff assignment updated successfully',
+      reservation,
     };
   }
 }

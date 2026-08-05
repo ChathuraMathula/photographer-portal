@@ -46,6 +46,13 @@ export class Reservation {
   @Column()
   photographerId!: string;
 
+  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'assignedPhotographerId' })
+  assignedPhotographer?: User;
+
+  @Column({ nullable: true })
+  assignedPhotographerId?: string;
+
   @Column({ type: 'date' })
   date!: Date;
 

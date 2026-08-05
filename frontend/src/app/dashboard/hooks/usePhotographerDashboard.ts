@@ -310,6 +310,8 @@ export function usePhotographerDashboard() {
     setShowManualBookingInTopbar: profile.setShowManualBookingInTopbar,
     showAcceptBookingsInTopbar: profile.showAcceptBookingsInTopbar,
     setShowAcceptBookingsInTopbar: profile.setShowAcceptBookingsInTopbar,
+    proposalExpirationHours: profile.proposalExpirationHours,
+    setProposalExpirationHours: profile.setProposalExpirationHours,
     paymentsUpdatedTrigger: reservationsState.paymentsUpdatedTrigger,
     setPaymentsUpdatedTrigger: reservationsState.setPaymentsUpdatedTrigger,
     lockedDates: reservationsState.lockedDates,

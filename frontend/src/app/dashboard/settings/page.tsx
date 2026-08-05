@@ -203,6 +203,33 @@ export default function UserSettingsPage() {
                   onCheckedChange={setInAppNotifications}
                 />
               </div>
+
+              {/* Option 4: Quotation Proposal Expiration Window */}
+              <div className="p-4 rounded-xl border border-zinc-150/40 bg-zinc-50/20 dark:bg-zinc-950/20 dark:border-zinc-850/60 space-y-3">
+                <div>
+                  <Label className="text-body-small-bold font-bold text-zinc-850 dark:text-zinc-200">
+                    Quotation Proposal Expiration Window
+                  </Label>
+                  <p className="text-body-caption text-zinc-500 leading-normal">
+                    Specify how many hours a customer is given to pay the advance deposit before a sent proposal expires.
+                  </p>
+                </div>
+                <select
+                  value={context?.proposalExpirationHours || 24}
+                  onChange={(e) => {
+                    const hours = parseInt(e.target.value, 10);
+                    if (context && context.setProposalExpirationHours) {
+                      context.setProposalExpirationHours(hours);
+                    }
+                  }}
+                  className="h-10 px-3 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value={12}>12 Hours</option>
+                  <option value={24}>24 Hours (Standard Default)</option>
+                  <option value={48}>48 Hours</option>
+                  <option value={72}>72 Hours</option>
+                </select>
+              </div>
             </CardContent>
           </Card>
 

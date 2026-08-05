@@ -42,7 +42,7 @@ export class ReservationsController {
   ) {}
 
   @Get('locked-dates')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   getLockedDates(
     @Req() req: RequestWithUser,
     @Query('startDate') startDate?: string,
@@ -56,7 +56,7 @@ export class ReservationsController {
   }
 
   @Post('locked-dates')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   createLockedDate(
     @Req() req: RequestWithUser,
     @Body() dto: CreateLockedDateDto,
@@ -65,13 +65,20 @@ export class ReservationsController {
   }
 
   @Delete('locked-dates/:id')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   deleteLockedDate(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.lockedDatesService.deleteLockedDate(req.user.userId, id);
   }
 
   @Get()
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PHOTOGRAPHER,
+    UserRole.STUDIO,
+    UserRole.STUDIO_PHOTOGRAPHER,
+    UserRole.STUDIO_STAFF,
+  )
   findAll(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -96,7 +103,7 @@ export class ReservationsController {
   }
 
   @Post()
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   createManual(
     @Body() dto: CreateManualBookingDto,
     @Req() req: RequestWithUser,
@@ -105,19 +112,26 @@ export class ReservationsController {
   }
 
   @Get('notifications/unread')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   getUnreadNotifications(@Req() req: RequestWithUser) {
     return this.reservationsService.getUnreadNotifications(req.user);
   }
 
   @Get(':id')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PHOTOGRAPHER,
+    UserRole.STUDIO,
+    UserRole.STUDIO_PHOTOGRAPHER,
+    UserRole.STUDIO_STAFF,
+  )
   findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.reservationsService.findOne(id, req.user);
   }
 
   @Post(':id/propose')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   proposeQuotation(
     @Param('id') id: string,
     @Body() dto: ProposeQuotationDto,
@@ -127,7 +141,7 @@ export class ReservationsController {
   }
 
   @Post(':id/reject')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   reject(
     @Param('id') id: string,
     @Body() dto: RejectReservationDto,
@@ -137,13 +151,20 @@ export class ReservationsController {
   }
 
   @Get(':id/messages')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PHOTOGRAPHER)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PHOTOGRAPHER,
+    UserRole.STUDIO,
+    UserRole.STUDIO_PHOTOGRAPHER,
+    UserRole.STUDIO_STAFF,
+  )
   getMessages(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.reservationsService.getMessages(id, req.user);
   }
 
   @Post(':id/messages')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   sendMessage(
     @Param('id') id: string,
     @Body('content') content: string,
@@ -153,13 +174,13 @@ export class ReservationsController {
   }
 
   @Patch(':id/read')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   markReservationAsRead(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.reservationsService.markReservationAsRead(id, req.user);
   }
 
   @Patch(':id/messages/read')
-  @Roles(UserRole.PHOTOGRAPHER)
+  @Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO, UserRole.STUDIO_PHOTOGRAPHER, UserRole.STUDIO_STAFF)
   markMessagesAsRead(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.reservationsService.markMessagesAsRead(id, req.user);
   }

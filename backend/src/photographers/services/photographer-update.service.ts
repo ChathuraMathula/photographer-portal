@@ -31,6 +31,7 @@ export class PhotographerUpdateService {
       'district',
       'locationMapLink',
       'showMapPreviewOnBookingPage',
+      'proposalExpirationHours',
     ];
     const safe = Object.fromEntries(
       Object.entries(updates).filter(([k]) => allowed.includes(k)),

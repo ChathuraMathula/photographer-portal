@@ -42,4 +42,8 @@ export class CreateStudioPhotographerDto {
   @IsArray()
   @IsString({ each: true })
   specializations?: string[];
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 }

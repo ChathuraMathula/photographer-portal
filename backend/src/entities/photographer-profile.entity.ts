@@ -105,6 +105,9 @@ export class PhotographerProfile {
   @Column({ default: true })
   showAcceptBookingsInTopbar!: boolean;
 
+  @Column({ type: 'integer', default: 24 })
+  proposalExpirationHours!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

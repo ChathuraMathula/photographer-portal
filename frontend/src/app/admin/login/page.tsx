@@ -1,12 +1,5 @@
-"use client";
-
-import { LoginLayout } from "../../login/components/LoginLayout";
-import { AdminLoginForm } from "../../login/components/AdminLoginForm";
+import { redirect } from "next/navigation";
 
 export default function AdminLoginPage() {
-  return (
-    <LoginLayout>
-      <AdminLoginForm />
-    </LoginLayout>
-  );
+  redirect("/portal/login");
 }

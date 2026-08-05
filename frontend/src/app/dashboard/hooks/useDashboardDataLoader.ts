@@ -123,6 +123,9 @@ export function useDashboardDataLoader({
         profile.setShowAcceptBookingsInTopbar(
           profData.showAcceptBookingsInTopbar !== false,
         );
+        if (typeof profile.setProposalExpirationHours === "function") {
+          profile.setProposalExpirationHours(profData.proposalExpirationHours ?? 24);
+        }
         if (typeof profile.setShowMapPreviewOnBookingPage === "function") {
           profile.setShowMapPreviewOnBookingPage(
             profData.showMapPreviewOnBookingPage !== false,

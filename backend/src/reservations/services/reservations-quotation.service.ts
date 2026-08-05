@@ -160,7 +160,11 @@ export class ReservationsQuotationService {
     reservation.advancePaymentPriceInCents = computedAdvance;
 
     if (!reservation.paymentDeadline) {
-      reservation.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const profile = await this.profileRepository.findOneBy({
+        userId: user.userId,
+      });
+      const hours = profile?.proposalExpirationHours || 24;
+      reservation.paymentDeadline = new Date(Date.now() + hours * 60 * 60 * 1000);
     }
 
     await this.reservationRepository.save(reservation);
