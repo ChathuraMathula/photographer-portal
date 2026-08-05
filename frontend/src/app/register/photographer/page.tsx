@@ -157,7 +157,10 @@ export default function RegisterPhotographerWizardPage() {
       setEmailOtpSent(true);
       toast.success(`Verification OTP code sent to ${formData.email}! Check Maildev (http://localhost:1080)`);
     } catch (err: any) {
-      toast.error(err.message || "Error sending email OTP");
+      const msg = err?.message === "Failed to fetch"
+        ? "Unable to connect to backend server. Please verify backend service on port 4001."
+        : err?.message || "Error sending email OTP";
+      toast.error(msg);
     } finally {
       setSendingEmailOtp(false);
     }
@@ -182,7 +185,10 @@ export default function RegisterPhotographerWizardPage() {
       setEmailVerified(true);
       toast.success("Email address verified successfully!");
     } catch (err: any) {
-      toast.error(err.message || "Invalid or expired OTP code.");
+      const msg = err?.message === "Failed to fetch"
+        ? "Unable to connect to backend server."
+        : err?.message || "Invalid or expired OTP code.";
+      toast.error(msg);
     } finally {
       setVerifyingEmailOtp(false);
     }
@@ -207,7 +213,10 @@ export default function RegisterPhotographerWizardPage() {
       setPhoneOtpSent(true);
       toast.success(`SMS verification OTP sent to ${formData.phone}! View in SMS Tester (/sms-tester).`);
     } catch (err: any) {
-      toast.error(err.message || "Error sending SMS OTP");
+      const msg = err?.message === "Failed to fetch"
+        ? "Unable to connect to backend server."
+        : err?.message || "Error sending SMS OTP";
+      toast.error(msg);
     } finally {
       setSendingPhoneOtp(false);
     }

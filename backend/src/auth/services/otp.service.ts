@@ -40,12 +40,17 @@ export class OtpService {
     this.otpStore.set(key, record);
 
     if (type === 'EMAIL') {
-      await this.emailService.sendUserCreated(
-        cleanTarget,
-        'Valued User',
-        'VERIFICATION',
-        code,
-      );
+      try {
+        await this.emailService.sendUserCreated(
+          cleanTarget,
+          'Valued User',
+          'VERIFICATION',
+          code,
+        );
+      } catch (emailErr) {
+        // Log RabbitMQ dispatch error safely without failing HTTP response
+        console.error('RabbitMQ Email OTP dispatch log:', emailErr);
+      }
     } else {
       await this.smsDevService.sendSms(
         cleanTarget,
