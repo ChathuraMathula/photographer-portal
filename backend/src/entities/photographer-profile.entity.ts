@@ -56,6 +56,12 @@ export class PhotographerProfile {
   @Column({ type: 'text', nullable: true })
   offlineMessage?: string;
 
+  @Column({ type: 'float', default: 4.8 })
+  rating!: number;
+
+  @Column({ type: 'integer', default: 12 })
+  ratingCount!: number;
+
   @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;

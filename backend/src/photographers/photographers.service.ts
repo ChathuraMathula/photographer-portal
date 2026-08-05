@@ -29,4 +29,12 @@ export class PhotographersService {
   async toggleAvailability(userId: string) {
     return this.updateService.toggleAvailability(userId);
   }
+
+  async findPublicPaginated(page: number, limit: number, search?: string) {
+    return this.queryService.findPublicPaginated(page, limit, search);
+  }
+
+  async submitRating(profileId: string, rating: number) {
+    return this.updateService.submitRating(profileId, rating);
+  }
 }

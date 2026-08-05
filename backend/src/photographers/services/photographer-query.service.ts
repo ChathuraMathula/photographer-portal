@@ -36,6 +36,48 @@ export class PhotographerQueryService {
     return profile;
   }
 
+  async findPublicPaginated(page = 1, limit = 6, search?: string) {
+    const skip = (page - 1) * limit;
+
+    const query = this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .where('user.isDeactivated = :deactivated', { deactivated: false });
+
+    if (search && search.trim()) {
+      const q = `%${search.trim().toLowerCase()}%`;
+      query.andWhere(
+        '(LOWER(user.firstName) LIKE :q OR LOWER(user.lastName) LIKE :q OR LOWER(profile.bio) LIKE :q OR LOWER(profile.city) LIKE :q OR LOWER(profile.district) LIKE :q)',
+        { q },
+      );
+    }
+
+    const [profiles, total] = await query
+      .orderBy('profile.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    const items = profiles.map((p) => {
+      if (p.user) {
+        delete (p.user as any).passwordHash;
+      }
+      return p;
+    });
+
+    const hasMore = skip + items.length < total;
+
+    return {
+      data: items,
+      meta: {
+        page,
+        limit,
+        total,
+        hasMore,
+      },
+    };
+  }
+
   async getBookingLink(userId: string, baseUrl: string) {
     const profile = await this.profileRepository.findOneBy({ userId });
     if (!profile) throw new NotFoundException('Profile not found');

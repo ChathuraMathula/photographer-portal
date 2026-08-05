@@ -41,6 +41,7 @@ export default function CustomerLayout({
 
   const handleTabChange = (tab: string) => {
     if (tab === "dashboard") router.push("/customer/dashboard");
+    else if (tab === "photographers") router.push("/photographers");
     else if (tab === "calendar") router.push("/customer/calendar");
     else if (tab === "profile") router.push("/customer/profile");
     else if (tab === "settings") router.push("/customer/settings");
@@ -53,7 +54,7 @@ export default function CustomerLayout({
   };
 
   const handlePlusClick = () => {
-    toast.info("Book a Photographer: Photographer selection page coming soon!");
+    router.push("/photographers");
   };
 
   // If on complete-profile page, render cleanly without full dashboard layout

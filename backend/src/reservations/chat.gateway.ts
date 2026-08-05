@@ -45,6 +45,13 @@ export class ChatGateway {
       this.chatWorker.server
         .to(`booking_${bookingSlug}`)
         .emit('profileUpdated', profileData);
+      this.chatWorker.server.emit('photographerUpdated', profileData);
+    }
+  }
+
+  broadcastPhotographerUpdate(profileData: any) {
+    if (this.chatWorker?.server) {
+      this.chatWorker.server.emit('photographerUpdated', profileData);
     }
   }
 }

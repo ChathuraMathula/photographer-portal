@@ -23,6 +23,7 @@ import {
   Mail,
   Phone,
   MessageSquare,
+  Camera,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -144,17 +145,27 @@ export default function CustomerDashboardPage() {
             </div>
 
             {profile && (
-              <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/80">
-                <div className="flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-zinc-400" />
-                  <span>{profile.email}</span>
-                </div>
-                {profile.phone && (
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/photographers"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                >
+                  <Camera className="h-4 w-4" />
+                  Select Photographer
+                </Link>
+
+                <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/80">
                   <div className="flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-zinc-400" />
-                    <span>{profile.phone}</span>
+                    <Mail className="h-3.5 w-3.5 text-zinc-400" />
+                    <span>{profile.email}</span>
                   </div>
-                )}
+                  {profile.phone && (
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="h-3.5 w-3.5 text-zinc-400" />
+                      <span>{profile.phone}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -168,6 +179,14 @@ export default function CustomerDashboardPage() {
             <Calendar className="h-5 w-5 text-[#0e2d5c] dark:text-blue-400" />
             My Bookings & Sessions ({reservations.length})
           </h2>
+
+          <Link
+            href="/photographers"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0e2d5c] dark:text-blue-400 hover:underline"
+          >
+            <Camera className="h-3.5 w-3.5" />
+            Browse Photographers
+          </Link>
         </div>
 
         {loading ? (
@@ -180,7 +199,7 @@ export default function CustomerDashboardPage() {
           </div>
         ) : reservations.length === 0 ? (
           <Card className="border-dashed border-zinc-250 dark:border-zinc-800 p-8 text-center bg-white dark:bg-zinc-900">
-            <div className="max-w-sm mx-auto space-y-3">
+            <div className="max-w-sm mx-auto space-y-4">
               <FileText className="h-10 w-10 text-zinc-400 mx-auto" />
               <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
                 No Reservations Yet
@@ -188,6 +207,13 @@ export default function CustomerDashboardPage() {
               <p className="text-xs text-zinc-500">
                 You haven't placed any photography booking requests using this email address yet.
               </p>
+              <Link
+                href="/photographers"
+                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <Camera className="h-4 w-4" />
+                Select & Book a Photographer
+              </Link>
             </div>
           </Card>
         ) : (

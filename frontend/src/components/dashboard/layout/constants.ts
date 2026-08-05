@@ -6,7 +6,7 @@ import {
   CreditCard,
   BarChart3,
   Receipt,
-  Settings,
+  Camera,
 } from "lucide-react";
 import React from "react";
 
@@ -28,6 +28,7 @@ export const PHOTOGRAPHER_MENU: MenuItem[] = [
 
 export const CUSTOMER_MENU: MenuItem[] = [
   { id: "dashboard", label: "My Bookings & Chats", icon: CalendarCheck },
+  { id: "photographers", label: "Find Photographers", icon: Camera },
   { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "profile", label: "My Profile", icon: User },
 ];

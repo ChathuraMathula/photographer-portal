@@ -97,4 +97,28 @@ export class PhotographerUpdateService {
 
     return saved;
   }
+
+  async submitRating(profileId: string, ratingValue: number) {
+    const profile = await this.profileRepository.findOneBy({ id: profileId });
+    if (!profile) throw new NotFoundException('Photographer profile not found');
+
+    const currentRating = profile.rating || 5.0;
+    const currentCount = profile.ratingCount || 0;
+
+    const newCount = currentCount + 1;
+    const newRating = Number((((currentRating * currentCount) + ratingValue) / newCount).toFixed(1));
+
+    profile.rating = newRating;
+    profile.ratingCount = newCount;
+
+    const saved = await this.profileRepository.save(profile);
+    this.chatGateway.broadcastPhotographerUpdate({
+      id: saved.id,
+      userId: saved.userId,
+      rating: saved.rating,
+      ratingCount: saved.ratingCount,
+    });
+
+    return saved;
+  }
 }
