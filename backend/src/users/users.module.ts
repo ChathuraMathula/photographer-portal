@@ -10,6 +10,8 @@ import { UserSearchService } from './services/user-search.service';
 import { UserCreationService } from './services/user-creation.service';
 import { UserStatusService } from './services/user-status.service';
 
+import { UserDeletionService } from './services/user-deletion.service';
+
 @Module({
   imports: [DatabaseModule, ReservationsModule, EmailModule],
   controllers: [UsersController],
@@ -20,6 +22,7 @@ import { UserStatusService } from './services/user-status.service';
     UserSearchService,
     UserCreationService,
     UserStatusService,
+    UserDeletionService,
   ],
   exports: [
     UsersService,
@@ -28,6 +31,7 @@ import { UserStatusService } from './services/user-status.service';
     UserSearchService,
     UserCreationService,
     UserStatusService,
+    UserDeletionService,
   ],
 })
 export class UsersModule {}

@@ -23,6 +23,9 @@ export interface PhotographerProfileItem {
   rating: number;
   ratingCount: number;
   user: PhotographerUser;
+  studioName?: string;
+  studioLogoUrl?: string;
+  studioSlug?: string;
   createdAt?: string;
 }
 

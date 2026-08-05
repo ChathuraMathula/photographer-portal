@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Delete,
   Req,
   UseGuards,
   Query,
@@ -96,5 +97,12 @@ export class UsersController {
     @Body() body: UpdateUserDetailsDto,
   ) {
     return this.usersService.updateUserDetails(id, body);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.SUPER_ADMIN)
+  deleteUser(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const callerRole = req.user.role;
+    return this.usersService.deleteUser(id, callerRole);
   }
 }

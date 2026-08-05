@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Sparkles,
   Camera,
+  Building2,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -63,9 +64,9 @@ export function PhotographerCard({
   return (
     <div className="group relative bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/70 dark:border-zinc-800/80 shadow-sm hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-700/60 transition-all duration-300 overflow-hidden flex flex-col justify-between">
       {/* Header Banner Background */}
-      <div className="h-28 w-full bg-gradient-to-r from-[#0e2d5c] via-blue-900 to-slate-900 relative p-4 flex items-start justify-between">
-        {/* Availability Badge */}
-        <div className="flex items-center gap-1.5">
+      <div className="h-28 w-full bg-gradient-to-r from-[#0e2d5c] via-blue-900 to-slate-900 relative p-4 flex items-start justify-between gap-2">
+        {/* Availability Badge & Studio Badge */}
+        <div className="flex flex-wrap items-center gap-1.5">
           <span
             className={`px-2.5 py-1 rounded-full text-[10px] font-bold backdrop-blur-md flex items-center gap-1.5 ${
               photographer.isAvailableForBooking
@@ -81,9 +82,27 @@ export function PhotographerCard({
               }`}
             />
             {photographer.isAvailableForBooking
-              ? "Available for Booking"
-              : "Currently Unavailable"}
+              ? "Available"
+              : "Unavailable"}
           </span>
+
+          {photographer.studioName && (
+            <Link
+              href={`/studios/${photographer.studioSlug || photographer.studioName.toLowerCase().replace(/\s+/g, '-')}`}
+              className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 backdrop-blur-md flex items-center gap-1 hover:bg-indigo-500/50 transition-colors"
+            >
+              {photographer.studioLogoUrl ? (
+                <img
+                  src={photographer.studioLogoUrl}
+                  alt={photographer.studioName}
+                  className="h-3 w-3 rounded-full object-cover shrink-0"
+                />
+              ) : (
+                <Building2 className="h-3 w-3 text-indigo-300 shrink-0" />
+              )}
+              <span className="truncate max-w-[100px]">{photographer.studioName}</span>
+            </Link>
+          )}
         </div>
 
         {/* Super Admin Placeholder / Badge */}

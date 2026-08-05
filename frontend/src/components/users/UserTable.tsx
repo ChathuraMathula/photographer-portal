@@ -5,6 +5,7 @@ import { UserTableRow } from "./UserTableRow";
 type Props = {
   users: UserAccount[];
   onToggleActive: (id: string) => Promise<void> | void;
+  onDeleteUser?: (id: string) => Promise<void> | void;
   loggedInUserId: string;
   loggedInRole: string;
 };
@@ -12,6 +13,7 @@ type Props = {
 export function UserTable({
   users,
   onToggleActive,
+  onDeleteUser,
   loggedInUserId,
   loggedInRole,
 }: Props) {
@@ -41,6 +43,7 @@ export function UserTable({
                   key={user.id}
                   user={user}
                   onToggleActive={onToggleActive}
+                  onDeleteUser={onDeleteUser}
                   loggedInUserId={loggedInUserId}
                   loggedInRole={loggedInRole}
                 />

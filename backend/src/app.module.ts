@@ -17,6 +17,7 @@ import { ReportsModule } from './reports/reports.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
+import { StudiosModule } from './studios/studios.module';
 import { User } from './entities/user.entity';
 import { PhotographerProfile } from './entities/photographer-profile.entity';
 import { Package } from './entities/package.entity';
@@ -36,7 +37,6 @@ if (
 ) {
   (process as any).loadEnvFile(envPath);
 }
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -73,6 +73,7 @@ if (
     InvoicesModule,
     AuditLogsModule,
     RabbitMQModule,
+    StudiosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

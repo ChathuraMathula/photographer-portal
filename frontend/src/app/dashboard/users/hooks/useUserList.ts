@@ -95,6 +95,21 @@ export function useUserList({
     }
   };
 
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const res = await authFetch(`${API}/users/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to delete user");
+      toast.success(data.message || "User deleted successfully");
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+    } catch (err: any) {
+      toast.error(err.message || "Error deleting user");
+    }
+  };
+
   return {
     users,
     loading,
@@ -111,5 +126,6 @@ export function useUserList({
     setStatusFilter,
     fetchUsers,
     handleToggleActive,
+    handleDeleteUser,
   };
 }

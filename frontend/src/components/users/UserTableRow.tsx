@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { type UserAccount } from "@/types";
 import { UserRole } from "@/store/slices/authSlice";
-import { Edit2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import { EditUserDetailsModal } from "@/components/modals/EditUserDetailsModal";
 import { RoleBadge } from "./components/RoleBadge";
 import { ToggleStatusButton } from "./components/ToggleStatusButton";
@@ -10,6 +10,7 @@ import { SuspendConfirmModal } from "./components/SuspendConfirmModal";
 type Props = {
   user: UserAccount;
   onToggleActive: (id: string) => void;
+  onDeleteUser?: (id: string) => void;
   loggedInUserId: string;
   loggedInRole: string;
 };
@@ -17,11 +18,14 @@ type Props = {
 export function UserTableRow({
   user,
   onToggleActive,
+  onDeleteUser,
   loggedInUserId,
   loggedInRole,
 }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentFirstName, setCurrentFirstName] = useState(user.firstName);
   const [currentLastName, setCurrentLastName] = useState(user.lastName);
@@ -40,6 +44,17 @@ export function UserTableRow({
     } finally {
       setToggling(false);
       setShowConfirm(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDeleteUser) return;
+    setDeleting(true);
+    try {
+      await onDeleteUser(user.id);
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -87,11 +102,24 @@ export function UserTableRow({
           </div>
         </td>
         <td className="p-4 text-right">
-          <ToggleStatusButton
-            isActive={user.isActive}
-            isSelf={isSelf}
-            onClick={() => !isSelf && setShowConfirm(true)}
-          />
+          <div className="flex items-center justify-end gap-2">
+            <ToggleStatusButton
+              isActive={user.isActive}
+              isSelf={isSelf}
+              onClick={() => !isSelf && setShowConfirm(true)}
+            />
+
+            {loggedInRole === UserRole.SUPER_ADMIN && !isSelf && onDeleteUser && (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                title="Delete User (Super Admin Privilege)"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </td>
       </tr>
 
@@ -103,6 +131,38 @@ export function UserTableRow({
         onConfirm={handleConfirm}
         onCancel={() => setShowConfirm(false)}
       />
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-zinc-200 dark:border-zinc-800">
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-red-600 dark:text-red-400">
+                Confirm User Deletion
+              </h3>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                Are you sure you want to delete <strong>{fullName}</strong> ({user.email})? This action is permanent and cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-3 py-1.5 text-xs font-bold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDelete}
+                className="px-4 py-1.5 text-xs font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs"
+              >
+                {deleting ? "Deleting..." : "Delete Permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showEditModal && (
         <EditUserDetailsModal

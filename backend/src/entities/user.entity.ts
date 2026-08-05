@@ -50,6 +50,18 @@ export class User {
   @Column({ nullable: true })
   studioName?: string;
 
+  @Column({ nullable: true })
+  studioId?: string;
+
+  @Column({ nullable: true })
+  studioLogoUrl?: string;
+
+  @Column({ nullable: true })
+  studioSlug?: string;
+
+  @Column({ default: true })
+  isPublishedToGlobalShowcase!: boolean;
+
   @Column({ default: 'FREE' })
   subscriptionPlan!: string;
 

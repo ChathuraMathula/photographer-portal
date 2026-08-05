@@ -26,6 +26,7 @@ export default function UserManagementPage() {
     setSpecsInput,
     specsList,
     handleToggleActive,
+    handleDeleteUser,
     formik,
     handleAddSpec,
     handleRemoveSpec,
@@ -83,6 +84,7 @@ export default function UserManagementPage() {
           <UserTable
             users={users}
             onToggleActive={handleToggleActive}
+            onDeleteUser={handleDeleteUser}
             loggedInUserId={loggedInUserId ?? ""}
             loggedInRole={loggedInRole as UserRole}
           />

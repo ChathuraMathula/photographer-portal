@@ -7,6 +7,7 @@ export const PUBLIC_ROUTES = [
   "/photographer/login",
   "/admin/login",
   "/photographers",
+  "/studios",
   "/register/photographer",
   "/register/studio",
   "/about",
@@ -16,11 +17,12 @@ export const PUBLIC_ROUTES = [
   "/auth/customer-verify",
 ];
 
-// Prefix-match public routes — /book/:slug, /photographers, /register, etc. are public
+// Prefix-match public routes — /book/:slug, /photographers, /studios, /register, etc. are public
 export const PUBLIC_PREFIXES = [
   "/book",
   "/photographers",
   "/photographer",
+  "/studios",
   "/admin",
   "/register",
   "/leaflet",

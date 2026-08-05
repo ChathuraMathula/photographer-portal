@@ -26,9 +26,14 @@ export class UserCreationService {
   ) { }
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
-    // RBAC constraints checking
-    if (callerRole === UserRole.ADMIN && dto.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Admins can only create Photographers');
+    if (dto.role === UserRole.PHOTOGRAPHER || dto.role === UserRole.STUDIO) {
+      throw new ForbiddenException(
+        'Photographers and Studios self-register via the portal and are approved by administrators.',
+      );
+    }
+
+    if (callerRole === UserRole.ADMIN && dto.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Admins can only create Admin accounts.');
     }
 
     // Check if email already in use
@@ -51,28 +56,7 @@ export class UserCreationService {
     });
     await this.userRepository.save(user);
 
-    // Create Profile if user is a PHOTOGRAPHER
-    let bookingLink: string | undefined = undefined;
-    if (dto.role === UserRole.PHOTOGRAPHER) {
-      const slug = await this.slugService.resolveSlug(
-        dto.bookingSlug ?? this.slugService.buildSlug(dto.firstName, dto.lastName),
-      );
 
-      const profile = this.profileRepository.create({
-        userId: user.id,
-        bookingSlug: slug,
-        bio: dto.bio,
-        baseLocation: dto.baseLocation,
-        city: dto.city,
-        district: dto.district,
-        locationMapLink: dto.locationMapLink,
-        specializations: dto.specializations ?? [],
-        isAvailableForBooking: true,
-      });
-      await this.profileRepository.save(profile);
-
-      bookingLink = `/book/${slug}`;
-    }
 
     await this.auditLogsService.logAction(
       'USER_CREATED',
@@ -100,7 +84,6 @@ export class UserCreationService {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
-      bookingLink,
     };
   }
 }

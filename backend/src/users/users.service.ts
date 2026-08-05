@@ -5,6 +5,7 @@ import { UserProfileService } from './user-profile.service';
 import { UserCreationService } from './services/user-creation.service';
 import { UserSearchService } from './services/user-search.service';
 import { UserStatusService } from './services/user-status.service';
+import { UserDeletionService } from './services/user-deletion.service';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,7 @@ export class UsersService {
     private readonly searchService: UserSearchService,
     private readonly statusService: UserStatusService,
     private readonly profileService: UserProfileService,
+    private readonly deletionService: UserDeletionService,
   ) {}
 
   async create(dto: CreateUserDto, callerRole: UserRole) {
@@ -42,6 +44,10 @@ export class UsersService {
 
   async toggleActive(id: string, callerRole: UserRole) {
     return this.statusService.toggleActive(id, callerRole);
+  }
+
+  async deleteUser(id: string, callerRole: UserRole) {
+    return this.deletionService.deleteUser(id, callerRole);
   }
 
   async getSettings(userId: string) {

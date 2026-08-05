@@ -23,6 +23,7 @@ export function useUserManagement() {
     setStatusFilter,
     fetchUsers,
     handleToggleActive,
+    handleDeleteUser,
   } = useUserList({
     isAuthenticated,
     loggedInRole,
@@ -57,6 +58,7 @@ export function useUserManagement() {
     setSpecsInput,
     specsList,
     handleToggleActive,
+    handleDeleteUser,
     formik,
     handleAddSpec,
     handleRemoveSpec,

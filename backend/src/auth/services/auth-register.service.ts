@@ -81,10 +81,15 @@ export class AuthRegisterService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
+    const studioSlug = await this.slugService.resolveSlug(
+      this.slugService.buildSlug(dto.studioName, ''),
+    );
+
     const user = this.userRepository.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
       studioName: dto.studioName,
+      studioSlug: studioSlug,
       email: dto.email,
       passwordHash,
       role: UserRole.STUDIO,
