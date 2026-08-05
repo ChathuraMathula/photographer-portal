@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import React from "react";
+import { CheckCircle2, Ban } from "lucide-react";
 
 type Props = {
   isActive: boolean;
@@ -8,29 +8,30 @@ type Props = {
 };
 
 export function ToggleStatusButton({ isActive, isSelf, onClick }: Props) {
+  if (isSelf) return null;
+
   return (
-    <Button
-      variant="outline"
-      size="sm"
+    <button
+      type="button"
       onClick={onClick}
-      disabled={isSelf}
-      className={`btn btn-secondary h-8 px-3 py-0 min-w-0 md:min-w-0 text-body-caption shadow-none gap-1 border ${
-        isSelf
-          ? "opacity-50 cursor-not-allowed text-zinc-400 bg-zinc-50 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800"
-          : isActive
-            ? "text-emerald-700 border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-950/30 dark:bg-emerald-950/10"
-            : "text-zinc-555 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-700"
+      className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+        isActive
+          ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40"
+          : "bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:hover:bg-amber-950/80 dark:text-amber-300 border-amber-200/60 dark:border-amber-900/40"
       }`}
+      title={isActive ? "Click to Suspend Account" : "Click to Reactivate Account"}
     >
       {isActive ? (
         <>
-          <CheckCircle className="h-3.5 w-3.5 shrink-0" /> Active
+          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+          <span>Active</span>
         </>
       ) : (
         <>
-          <XCircle className="h-3.5 w-3.5 shrink-0" /> Suspended
+          <Ban className="h-3.5 w-3.5 shrink-0" />
+          <span>Suspended</span>
         </>
       )}
-    </Button>
+    </button>
   );
 }
