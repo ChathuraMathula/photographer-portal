@@ -122,24 +122,16 @@ export function CreateUserBasicFields({ formik, loggedInRole }: Props) {
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-in duration-100">
-              <SelectItem
-                value={UserRole.PHOTOGRAPHER}
-                className="cursor-pointer"
-              >
-                Photographer
+              <SelectItem value={UserRole.ADMIN} className="cursor-pointer">
+                Admin
               </SelectItem>
               {loggedInRole === UserRole.SUPER_ADMIN && (
-                <>
-                  <SelectItem value={UserRole.ADMIN} className="cursor-pointer">
-                    Admin
-                  </SelectItem>
-                  <SelectItem
-                    value={UserRole.SUPER_ADMIN}
-                    className="cursor-pointer"
-                  >
-                    Super Admin
-                  </SelectItem>
-                </>
+                <SelectItem
+                  value={UserRole.SUPER_ADMIN}
+                  className="cursor-pointer"
+                >
+                  Super Admin
+                </SelectItem>
               )}
             </SelectContent>
           </Select>

@@ -9,37 +9,47 @@ import { UserRole } from "@/store/slices/authSlice";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   CheckCircle2,
-  Clock,
-  ShieldCheck,
   Building2,
   Camera,
   User as UserIcon,
   Mail,
   Phone,
   MapPin,
-  Sparkles,
   ExternalLink,
   Ban,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { type UserAccount } from "@/types";
+
+interface StudioStaffMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username?: string;
+  phone?: string;
+  role?: string;
+  isActive: boolean;
+  bookingSlug?: string;
+}
 
 export default function UserRequestReviewPage() {
   const params = useParams();
   const router = useRouter();
   const userId = (params?.id as string) || "";
 
-  const { role: loggedInRole } = useSelector((state: RootState) => state.auth);
+  const { role: loggedInRole, id: loggedInUserId } = useSelector((state: RootState) => state.auth);
 
   const [user, setUser] = useState<UserAccount | null>(null);
+  const [studioStaff, setStudioStaff] = useState<StudioStaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
@@ -61,6 +71,21 @@ export default function UserRequestReviewPage() {
         }
 
         setUser(data);
+
+        // If user is a Studio, fetch their registered team staff members
+        if (data.role === UserRole.STUDIO) {
+          try {
+            const studioRes = await fetch(`${API}/studios/${data.studioSlug || data.id}`, {
+              credentials: "include",
+            });
+            if (studioRes.ok) {
+              const studioData = await studioRes.json();
+              setStudioStaff(studioData.photographers || []);
+            }
+          } catch (staffErr) {
+            console.error("Failed to load studio staff members:", staffErr);
+          }
+        }
       } catch (err: any) {
         setError(err.message || "Something went wrong loading request details.");
       } finally {
@@ -73,6 +98,11 @@ export default function UserRequestReviewPage() {
 
   const handleToggleActive = async () => {
     if (!user) return;
+    if (user.id === loggedInUserId) {
+      toast.error("You cannot suspend or deactivate your own account.");
+      return;
+    }
+
     try {
       setActionLoading(true);
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
@@ -111,8 +141,10 @@ export default function UserRequestReviewPage() {
     );
   }
 
+  const isSelf = user?.id === loggedInUserId;
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
       {/* Top Header Navigation */}
       <div className="flex items-center justify-between">
         <Link
@@ -154,9 +186,14 @@ export default function UserRequestReviewPage() {
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 uppercase tracking-wider">
                         {user.role}
                       </span>
+                      {isSelf && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200">
+                          YOU (ACTIVE SESSION)
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {user.email} • Requested on {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                      {user.email} • Registered on {new Date(user.createdAt || Date.now()).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -186,12 +223,12 @@ export default function UserRequestReviewPage() {
                 {/* Account & Contact Info */}
                 <div className="space-y-4 p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/50 border border-zinc-200/60 dark:border-zinc-800">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Contact & Manager Information
+                    Contact & Account Information
                   </h3>
                   <div className="space-y-2.5 text-xs">
                     <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
                       <UserIcon className="h-4 w-4 text-zinc-400" />
-                      <span><strong>Manager Name:</strong> {user.firstName} {user.lastName}</span>
+                      <span><strong>Full Name:</strong> {user.firstName} {user.lastName}</span>
                     </div>
                     <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
                       <Mail className="h-4 w-4 text-zinc-400" />
@@ -213,7 +250,7 @@ export default function UserRequestReviewPage() {
                 {/* Role Specific Details */}
                 <div className="space-y-4 p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/50 border border-zinc-200/60 dark:border-zinc-800">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    {user.role === UserRole.STUDIO ? "Studio Plan & Capacity" : "Photographer Profile"}
+                    {user.role === UserRole.STUDIO ? "Studio Plan & Showcase Slug" : "Profile & Showcase Slug"}
                   </h3>
 
                   {user.role === UserRole.STUDIO ? (
@@ -221,6 +258,19 @@ export default function UserRequestReviewPage() {
                       <p className="text-zinc-700 dark:text-zinc-300">
                         <strong>Studio Name:</strong> {user.studioName || "N/A"}
                       </p>
+                      {user.studioSlug && (
+                        <div className="flex items-center justify-between pb-1">
+                          <span className="text-zinc-500 font-medium">Studio Slug:</span>
+                          <Link
+                            href={`/studios/${user.studioSlug}`}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
+                          >
+                            {user.studioSlug}
+                            <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        </div>
+                      )}
                       <p className="text-zinc-700 dark:text-zinc-300">
                         <strong>Subscription Plan:</strong>{" "}
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300">
@@ -228,7 +278,7 @@ export default function UserRequestReviewPage() {
                         </span>
                       </p>
                       <p className="text-zinc-700 dark:text-zinc-300">
-                        <strong>Max Photographers Limit:</strong> {user.maxPhotographers || 5}
+                        <strong>Max Photographers Capacity:</strong> {user.maxPhotographers || 5}
                       </p>
                     </div>
                   ) : (
@@ -274,7 +324,7 @@ export default function UserRequestReviewPage() {
               {user.profile?.bio && (
                 <div className="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/50 border border-zinc-200/60 dark:border-zinc-800 space-y-1.5">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Applicant Bio & Style Description
+                    Profile Bio & Description
                   </h3>
                   <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
                     {user.profile.bio}
@@ -282,10 +332,52 @@ export default function UserRequestReviewPage() {
                 </div>
               )}
 
+              {/* Studio Registered Team Staff Section */}
+              {user.role === UserRole.STUDIO && (
+                <div className="space-y-3 pt-2">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <Users className="h-4 w-4 text-[#0e2d5c] dark:text-blue-400" />
+                    Studio Team Photographers & Staff ({studioStaff.length})
+                  </h3>
+
+                  {studioStaff.length === 0 ? (
+                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-xs text-zinc-400 text-center border border-zinc-200/60 dark:border-zinc-800">
+                      No team staff members registered under this studio account yet.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {studioStaff.map((staff) => (
+                        <div
+                          key={staff.id}
+                          className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 space-y-1 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-zinc-900 dark:text-white">
+                              {staff.firstName} {staff.lastName}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                              {staff.role === "STUDIO_STAFF" ? "Staff" : "Photographer"}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-zinc-500 truncate">{staff.email}</p>
+                          {staff.phone && (
+                            <p className="text-[11px] text-zinc-400">{staff.phone}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Review Actions Footer */}
               <div className="pt-4 border-t border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
                 <span className="text-xs text-zinc-400">
-                  {user.isActive ? "Account is active on SeyaRoo" : "Review application details before approving"}
+                  {isSelf
+                    ? "Logged in Super Admin account (self protection active)"
+                    : user.isActive
+                    ? "Account is active on SeyaRoo"
+                    : "Review application details before approving"}
                 </span>
 
                 <div className="flex items-center gap-2">
@@ -298,6 +390,15 @@ export default function UserRequestReviewPage() {
                     >
                       <CheckCircle2 className="h-4 w-4 mr-1.5" />
                       {actionLoading ? "Activating..." : "Approve & Activate Account"}
+                    </Button>
+                  ) : isSelf ? (
+                    <Button
+                      type="button"
+                      disabled
+                      className="h-10 px-5 bg-zinc-100 text-zinc-400 dark:bg-zinc-800 font-bold text-xs rounded-xl cursor-not-allowed border border-zinc-200 dark:border-zinc-700"
+                    >
+                      <ShieldCheck className="h-4 w-4 mr-1.5 text-emerald-500" />
+                      Self Account Protected
                     </Button>
                   ) : (
                     loggedInRole === UserRole.SUPER_ADMIN && (

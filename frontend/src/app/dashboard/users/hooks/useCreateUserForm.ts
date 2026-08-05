@@ -44,7 +44,7 @@ export function useCreateUserForm({
       lastName: "",
       email: "",
       password: "",
-      role: UserRole.PHOTOGRAPHER,
+      role: UserRole.ADMIN,
       phone: "",
       bookingSlug: "",
       bio: "",
