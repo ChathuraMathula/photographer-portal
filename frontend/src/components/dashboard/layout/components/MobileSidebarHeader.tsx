@@ -15,7 +15,7 @@ export function MobileSidebarHeader({
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-body-caption title-font tracking-tight">
-            Photographer Portal
+            SeyaRoo
           </span>
           <span className="text-body-caption text-zinc-400 truncate">
             {userName}

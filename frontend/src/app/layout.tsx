@@ -20,7 +20,7 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "Photographer Reservation Portal",
+  title: "SeyaRoo - Photography & Reservation Platform",
   description:
     "Manage client bookings, package proposals, and real-time chat details",
 };

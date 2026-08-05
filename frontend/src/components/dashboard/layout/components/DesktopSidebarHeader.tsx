@@ -17,7 +17,7 @@ export function DesktopSidebarHeader({
       {!isCollapsed && (
         <div className="flex flex-col truncate">
           <span className="font-bold text-body-small-s leading-none title-font tracking-tight whitespace-nowrap">
-            Photographer Portal
+            SeyaRoo
           </span>
           <span className="text-body-caption text-zinc-400 font-medium mt-1 truncate">
             {userName ? `${userName} · ${userRole}` : userRole}

@@ -46,11 +46,11 @@ export function PhotographersHeader({
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#0e2d5c] to-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md group-hover:scale-105 transition-transform">
-            P
+            S
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-zinc-900 dark:text-white leading-none">
-              Photographer<span className="text-blue-600 dark:text-blue-400">Portal</span>
+              Seya<span className="text-blue-600 dark:text-blue-400">Roo</span>
             </span>
             <span className="text-[10px] text-zinc-400 font-medium">Explore & Book</span>
           </div>

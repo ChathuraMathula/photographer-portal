@@ -25,7 +25,7 @@ export function LogoutConfirmModal({ open, onConfirm, onCancel }: Props) {
             <LogOut className="h-5 w-5 text-red-600" />
           </div>
           <AlertDialogTitle className="text-title-base text-zinc-900">
-            Log out of Photographer Portal?
+            Log out of SeyaRoo?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-body-small text-zinc-500 leading-relaxed">
             You&apos;ll be returned to the login screen. Any unsaved changes
