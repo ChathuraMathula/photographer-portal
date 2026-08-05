@@ -13,6 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { PhotographersHeader } from "@/app/photographers/components/PhotographersHeader";
+
 export default function BookingPage() {
   const {
     profile,
@@ -29,29 +31,33 @@ export default function BookingPage() {
     today,
   } = useBooking();
 
-
   if (pageState === "loading")
     return <LoadingSpinner text="Checking availability..." />;
 
   if (pageState === "not-found" || !profile) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Not found</CardTitle>
-            <CardDescription>
-              This booking link is invalid or has expired.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </main>
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+        <PhotographersHeader searchTerm="" onSearchChange={() => {}} />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm">
+            <CardHeader>
+              <CardTitle>Not found</CardTitle>
+              <CardDescription>
+                This booking link is invalid or has expired.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-4 md:p-8 dark:bg-zinc-950 animate-in fade-in duration-300">
-      <div className="mx-auto max-w-lg space-y-6">
-        <PhotographerHeader profile={profile} />
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+      <PhotographersHeader searchTerm="" onSearchChange={() => {}} />
+      <main className="flex-1 p-4 md:p-8 animate-in fade-in duration-300">
+        <div className="mx-auto max-w-lg space-y-6">
+          <PhotographerHeader profile={profile} />
 
         {!profile.isAvailableForBooking ? (
           <Card className="border border-amber-200 bg-amber-50/50 p-6 rounded-xl dark:bg-amber-950/10 dark:border-amber-900/30 shadow-sm animate-in zoom-in-95 duration-200">
@@ -100,5 +106,6 @@ export default function BookingPage() {
         )}
       </div>
     </main>
+  </div>
   );
 }

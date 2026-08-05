@@ -21,6 +21,8 @@ import {
   type PaymentConfirmDetails,
 } from "./components/PaymentConfirmDialog";
 
+import { PhotographersHeader } from "@/app/photographers/components/PhotographersHeader";
+
 export default function TrackingPage() {
   const {
     token,
@@ -122,7 +124,9 @@ export default function TrackingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-8 px-4 sm:px-6 md:px-8 dark:bg-zinc-950 animate-in fade-in duration-300">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+      <PhotographersHeader searchTerm="" onSearchChange={() => {}} />
+      <main className="flex-1 py-8 px-4 sm:px-6 md:px-8 animate-in fade-in duration-300">
       <div className="mx-auto max-w-5xl space-y-6">
         <ReservationHeader reservation={reservation} />
 
@@ -195,5 +199,6 @@ export default function TrackingPage() {
         details={paymentConfirmDetails}
       />
     </main>
+  </div>
   );
 }
