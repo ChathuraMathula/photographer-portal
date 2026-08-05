@@ -8,6 +8,7 @@ import { PhotographerDashboardProvider } from "./context/PhotographerDashboardCo
 import { UserSettingsProvider } from "@/context/UserSettingsContext";
 import { PhotographerLayoutWrapper } from "./components/PhotographerLayoutWrapper";
 import { AdminLayoutWrapper } from "./components/AdminLayoutWrapper";
+import { StudioLayoutWrapper } from "./components/StudioLayoutWrapper";
 
 export default function DashboardLayoutWrapper({
   children,
@@ -53,6 +54,16 @@ export default function DashboardLayoutWrapper({
         <AdminLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
           {children}
         </AdminLayoutWrapper>
+      </UserSettingsProvider>
+    );
+  }
+
+  if (role === UserRole.STUDIO) {
+    return (
+      <UserSettingsProvider>
+        <StudioLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
+          {children}
+        </StudioLayoutWrapper>
       </UserSettingsProvider>
     );
   }

@@ -31,7 +31,9 @@ export function UserTableRow({
   const [currentFirstName, setCurrentFirstName] = useState(user.firstName);
   const [currentLastName, setCurrentLastName] = useState(user.lastName);
   const [currentSlug, setCurrentSlug] = useState(
-    user.profile?.bookingSlug || "",
+    user.role === UserRole.STUDIO
+      ? user.studioSlug || ""
+      : user.profile?.bookingSlug || "",
   );
 
   const isDeactivating = user.isActive;
@@ -86,29 +88,36 @@ export function UserTableRow({
           {user.phone || "-"}
         </td>
         <td className="p-4">
-          <div className="flex items-center gap-2">
-            {currentSlug ? (
-              <a
-                href={`/book/${currentSlug}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-body-caption text-primary-light hover:text-primary-dark hover:underline dark:text-indigo-400 dark:hover:text-indigo-305 transition-colors font-semibold"
-              >
-                slug: {currentSlug}
-              </a>
-            ) : (
-              <span className="text-body-caption text-zinc-400">-</span>
+          <div className="flex flex-col gap-0.5">
+            {user.username && (
+              <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                @{user.username}
+              </span>
             )}
-            {loggedInRole === UserRole.SUPER_ADMIN &&
-              user.role === UserRole.PHOTOGRAPHER && (
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="p-1 text-zinc-400 hover:text-indigo-500 transition-colors"
-                  title="Edit Slug"
+            <div className="flex items-center gap-2">
+              {currentSlug ? (
+                <a
+                  href={user.role === UserRole.STUDIO ? `/studios/${currentSlug}` : `/book/${currentSlug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-body-caption text-primary-light hover:text-primary-dark hover:underline dark:text-indigo-400 dark:hover:text-indigo-305 transition-colors font-semibold"
                 >
-                  <Edit2 className="h-3.5 w-3.5" />
-                </button>
+                  {user.role === UserRole.STUDIO ? `studio: ${currentSlug}` : `slug: ${currentSlug}`}
+                </a>
+              ) : (
+                <span className="text-body-caption text-zinc-400">-</span>
               )}
+              {loggedInRole === UserRole.SUPER_ADMIN &&
+                user.role === UserRole.PHOTOGRAPHER && (
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="p-1 text-zinc-400 hover:text-indigo-500 transition-colors"
+                    title="Edit Slug"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+            </div>
           </div>
         </td>
         <td className="p-4 text-right">

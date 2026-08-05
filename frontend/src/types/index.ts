@@ -121,6 +121,7 @@ export type UserAccount = {
   role: UserRole;
   isActive: boolean;
   phone?: string;
+  username?: string;
   studioName?: string;
   studioSlug?: string;
   studioLogoUrl?: string;

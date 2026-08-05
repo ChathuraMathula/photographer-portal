@@ -77,6 +77,22 @@ export function useUserList({
     }
   }, [isAuthenticated, loggedInRole, fetchUsers]);
 
+  // Auto-refresh: poll every 30 seconds to pick up new registrations
+  useEffect(() => {
+    if (
+      !isAuthenticated ||
+      (loggedInRole !== UserRole.SUPER_ADMIN && loggedInRole !== UserRole.ADMIN)
+    ) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      fetchUsers();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, loggedInRole, fetchUsers]);
+
   const handleToggleActive = async (userId: string) => {
     try {
       const res = await authFetch(`${API}/users/${userId}/toggle-active`, {
