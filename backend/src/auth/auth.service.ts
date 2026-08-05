@@ -33,4 +33,8 @@ export class AuthService {
   async resetPassword(token: string, newPassword: string) {
     return this.passwordResetService.resetPassword(token, newPassword);
   }
+
+  async checkAvailability(query: { email?: string; username?: string; bookingSlug?: string }) {
+    return this.registerService.checkAvailability(query);
+  }
 }

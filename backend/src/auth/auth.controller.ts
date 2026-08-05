@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Get,
+  Query,
   Body,
   HttpCode,
   HttpStatus,
@@ -77,5 +79,14 @@ export class AuthController {
     @Body('password') password: string,
   ) {
     return this.authService.resetPassword(token, password);
+  }
+
+  @Get('check-availability')
+  async checkAvailability(
+    @Query('email') email?: string,
+    @Query('username') username?: string,
+    @Query('bookingSlug') bookingSlug?: string,
+  ) {
+    return this.authService.checkAvailability({ email, username, bookingSlug });
   }
 }

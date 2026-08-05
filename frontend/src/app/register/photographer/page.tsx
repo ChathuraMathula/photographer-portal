@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -29,6 +29,11 @@ import {
   EyeOff,
   AtSign,
   Globe,
+  Mail,
+  Phone,
+  Lock,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,18 +47,26 @@ const SPECIALIZATION_OPTIONS = [
   "Street",
 ];
 
+const STEPS = [
+  { step: 1, label: "Email Verification", icon: Mail },
+  { step: 2, label: "Contact Phone", icon: Phone },
+  { step: 3, label: "Personal Credentials", icon: User },
+  { step: 4, label: "Username & Handle", icon: AtSign },
+  { step: 5, label: "Profile & Specialties", icon: Sparkles },
+];
+
 export default function RegisterPhotographerWizardPage() {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
     firstName: "",
     lastName: "",
-    username: "",
-    bookingSlug: "",
-    email: "",
     password: "",
     confirmPassword: "",
-    phone: "",
+    username: "",
+    bookingSlug: "",
     city: "",
     bio: "",
     specializations: [] as string[],
@@ -62,27 +75,35 @@ export default function RegisterPhotographerWizardPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Availability checking state
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<{ available?: boolean; message?: string }>({});
+  const [handleStatus, setHandleStatus] = useState<{
+    usernameAvailable?: boolean;
+    slugAvailable?: boolean;
+    message?: string;
+  }>({});
+
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const slugify = (text: string) =>
-    text
+  // Formatting helpers
+  const formatUsername = (val: string) => {
+    return val
+      .toLowerCase()
+      .trim()
+      .replace(/^@/, "")
+      .replace(/[^\w]/g, "_") // Replace spaces & non-alphanumeric with underscore (_)
+      .replace(/_+/g, "_"); // Remove duplicate underscores
+  };
+
+  const formatSlug = (val: string) => {
+    return val
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
+      .replace(/[\s_-]+/g, "-") // Replace spaces & underscores with hyphen (-)
       .replace(/^-+|-+$/g, "");
-
-  const handleNameChange = (first: string, last: string) => {
-    const defaultSlug = slugify(`${first}-${last}`);
-    const defaultUsername = slugify(`${first}${last}`);
-    setFormData((prev) => ({
-      ...prev,
-      firstName: first,
-      lastName: last,
-      username: prev.username || defaultUsername,
-      bookingSlug: prev.bookingSlug || defaultSlug,
-    }));
   };
 
   const toggleSpecialization = (spec: string) => {
@@ -94,21 +115,48 @@ export default function RegisterPhotographerWizardPage() {
     }));
   };
 
-  const handleNextStep = () => {
+  // Step transition validation & availability checks
+  const handleNextStep = async () => {
+    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+
+    // STEP 1: Email Validation
     if (currentStep === 1) {
-      if (
-        !formData.firstName ||
-        !formData.lastName ||
-        !formData.username ||
-        !formData.bookingSlug ||
-        !formData.email ||
-        !formData.password ||
-        !formData.confirmPassword
-      ) {
-        toast.error("Please fill in all required account and username fields.");
+      if (!formData.email || !formData.email.includes("@")) {
+        toast.error("Please enter a valid email address.");
         return;
       }
-      if (formData.password.length < 6) {
+      try {
+        setCheckingAvailability(true);
+        const res = await fetch(`${API}/auth/check-availability?email=${encodeURIComponent(formData.email)}`);
+        const data = await res.json();
+        if (!data.emailAvailable) {
+          setEmailStatus({ available: false, message: data.messages?.[0] || "Email is already registered." });
+          toast.error("An account with this email address already exists.");
+          return;
+        }
+        setEmailStatus({ available: true });
+      } catch (err) {
+        console.error("Email availability check failed", err);
+      } finally {
+        setCheckingAvailability(false);
+      }
+    }
+
+    // STEP 2: Phone Validation
+    if (currentStep === 2) {
+      if (!formData.phone || formData.phone.trim().length < 8) {
+        toast.error("Please enter a valid contact phone number.");
+        return;
+      }
+    }
+
+    // STEP 3: Personal Info & Password Validation
+    if (currentStep === 3) {
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        toast.error("Please enter both first and last name.");
+        return;
+      }
+      if (!formData.password || formData.password.length < 6) {
         toast.error("Password must be at least 6 characters long.");
         return;
       }
@@ -117,7 +165,43 @@ export default function RegisterPhotographerWizardPage() {
         return;
       }
     }
-    setCurrentStep((prev) => Math.min(prev + 1, 3));
+
+    // STEP 4: Username & Booking Slug Availability Validation
+    if (currentStep === 4) {
+      if (!formData.username || !formData.bookingSlug) {
+        toast.error("Please enter both unique username and custom booking slug.");
+        return;
+      }
+
+      try {
+        setCheckingAvailability(true);
+        const res = await fetch(
+          `${API}/auth/check-availability?username=${encodeURIComponent(formData.username)}&bookingSlug=${encodeURIComponent(formData.bookingSlug)}`
+        );
+        const data = await res.json();
+
+        setHandleStatus({
+          usernameAvailable: data.usernameAvailable,
+          slugAvailable: data.bookingSlugAvailable,
+          message: data.messages?.join(" "),
+        });
+
+        if (!data.usernameAvailable) {
+          toast.error(`Username "@${formData.username}" is already taken.`);
+          return;
+        }
+        if (!data.bookingSlugAvailable) {
+          toast.error(`Booking slug "${formData.bookingSlug}" is already taken.`);
+          return;
+        }
+      } catch (err) {
+        console.error("Handle availability check error", err);
+      } finally {
+        setCheckingAvailability(false);
+      }
+    }
+
+    setCurrentStep((prev) => Math.min(prev + 1, 5));
   };
 
   const handlePrevStep = () => {
@@ -167,12 +251,15 @@ export default function RegisterPhotographerWizardPage() {
     }
   };
 
+  // Calculate percentage fill for progress bar
+  const progressPercentage = (currentStep / 5) * 100;
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between animate-in fade-in duration-300">
-      {/* Top Navigation */}
+      {/* Top Header Navigation */}
       <header className="w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/60 dark:border-zinc-800/80 px-4 py-3.5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/photographers" className="flex items-center gap-2.5 group">
+          <Link href="/photography" className="flex items-center gap-2.5 group">
             <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-[#0e2d5c] to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
               S
             </div>
@@ -182,19 +269,19 @@ export default function RegisterPhotographerWizardPage() {
           </Link>
 
           <Link
-            href="/photographers"
+            href="/photography"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Showcase
+            Back to Directory
           </Link>
         </div>
       </header>
 
-      {/* Main Container */}
+      {/* Main Form Container */}
       <main className="flex-1 max-w-xl w-full mx-auto p-4 sm:p-6 my-4">
         {submitted ? (
-          <Card className="border border-emerald-200 dark:border-emerald-900/60 shadow-lg bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-center p-6 sm:p-8 space-y-4">
+          <Card className="border border-emerald-200 dark:border-emerald-900/60 shadow-xl bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden animate-in zoom-in-95 duration-200 text-center p-6 sm:p-8 space-y-4">
             <div className="h-16 w-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
               <Clock className="h-8 w-8" />
             </div>
@@ -208,20 +295,21 @@ export default function RegisterPhotographerWizardPage() {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 text-left text-xs space-y-2">
+            <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 text-left text-xs space-y-2">
               <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
                 <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>Next Steps for Account Activation</span>
+                <span>Submitted Registration Details</span>
               </div>
               <ul className="list-disc list-inside text-zinc-500 space-y-1 text-[11px]">
-                <li>Super admins will review your details and contact number.</li>
-                <li>Your handle: <strong>@{formData.username.replace(/^@/, '')}</strong></li>
+                <li>Super admins will review your application details.</li>
+                <li>Your username: <strong>@{formData.username}</strong></li>
                 <li>Your booking link: <strong>seyaroo.com/book/{formData.bookingSlug}</strong></li>
+                <li>Email: <strong>{formData.email}</strong></li>
               </ul>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/photographers">
+              <Link href="/photography">
                 <Button className="w-full sm:w-auto h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer">
                   Return to Showcase
                 </Button>
@@ -234,79 +322,145 @@ export default function RegisterPhotographerWizardPage() {
             </div>
           </Card>
         ) : (
-          <Card className="border border-zinc-200/60 dark:border-zinc-800/80 shadow-md bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden">
-            {/* Wizard Progress Bar */}
-            <div className="bg-zinc-50 dark:bg-zinc-950 p-4 border-b border-zinc-200/60 dark:border-zinc-800">
-              <div className="flex items-center justify-between max-w-sm mx-auto">
-                {[
-                  { step: 1, label: "Account & Handle" },
-                  { step: 2, label: "Profile Info" },
-                  { step: 3, label: "Specialties" },
-                ].map((s, idx) => (
-                  <React.Fragment key={s.step}>
-                    <div className="flex flex-col items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (s.step < currentStep) setCurrentStep(s.step);
-                        }}
-                        disabled={s.step > currentStep}
-                        className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
-                          currentStep === s.step
-                            ? "bg-[#0e2d5c] text-white ring-4 ring-blue-100 dark:ring-blue-950 shadow-sm cursor-default"
-                            : currentStep > s.step
-                            ? "bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600"
-                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed"
+          <Card className="border border-zinc-200/70 dark:border-zinc-800/80 shadow-xl bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden">
+            {/* Animated Premium Progress Bar Header */}
+            <div className="bg-zinc-50/80 dark:bg-zinc-950/80 p-5 border-b border-zinc-200/60 dark:border-zinc-800/80 space-y-4">
+              <div className="flex items-center justify-between text-xs font-extrabold text-zinc-700 dark:text-zinc-300">
+                <span className="flex items-center gap-1.5 text-[#0e2d5c] dark:text-blue-400">
+                  <Camera className="h-4 w-4" />
+                  Photographer Registration
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[11px] font-bold">
+                  Step {currentStep} of 5 ({Math.round(progressPercentage)}%)
+                </span>
+              </div>
+
+              {/* Progress Bar Track */}
+              <div className="relative w-full h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 transition-all duration-300 ease-out rounded-full"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+
+              {/* Step Navigation Icons */}
+              <div className="grid grid-cols-5 gap-1 pt-1">
+                {STEPS.map((s) => {
+                  const Icon = s.icon;
+                  const isCompleted = currentStep > s.step;
+                  const isCurrent = currentStep === s.step;
+                  return (
+                    <div key={s.step} className="flex flex-col items-center gap-1 text-center">
+                      <div
+                        className={`h-7 w-7 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                          isCompleted
+                            ? "bg-emerald-500 text-white shadow-xs"
+                            : isCurrent
+                            ? "bg-[#0e2d5c] text-white ring-2 ring-blue-300 dark:ring-blue-800 shadow-sm"
+                            : "bg-zinc-200/80 dark:bg-zinc-800 text-zinc-400"
                         }`}
                       >
-                        {currentStep > s.step ? <Check className="h-4 w-4" /> : s.step}
-                      </button>
+                        {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                      </div>
                       <span
-                        className={`text-[10px] font-bold ${
-                          currentStep === s.step
+                        className={`text-[9px] font-bold leading-tight hidden sm:block truncate max-w-[70px] ${
+                          isCurrent
                             ? "text-[#0e2d5c] dark:text-blue-400"
+                            : isCompleted
+                            ? "text-emerald-600 dark:text-emerald-400"
                             : "text-zinc-400"
                         }`}
                       >
                         {s.label}
                       </span>
                     </div>
-                    {idx < 2 && (
-                      <div
-                        className={`flex-1 h-0.5 mx-2 rounded-full transition-all ${
-                          currentStep > s.step ? "bg-emerald-500" : "bg-zinc-200 dark:bg-zinc-800"
-                        }`}
-                      />
-                    )}
-                  </React.Fragment>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
             <CardHeader className="border-b border-zinc-150 dark:border-zinc-800 pb-4">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 uppercase tracking-wider flex items-center gap-1">
-                  <Camera className="h-3 w-3 text-blue-600" />
-                  Solo Photographer Registration
-                </span>
-                <span className="text-[10px] font-bold text-zinc-400">Step {currentStep} of 3</span>
-              </div>
-              <CardTitle className="text-xl font-black text-zinc-900 dark:text-white mt-1">
-                {currentStep === 1 && "Account Credentials & Username"}
-                {currentStep === 2 && "Location & Portfolio Information"}
-                {currentStep === 3 && "Specializations & Review Application"}
+              <CardTitle className="text-xl font-black text-zinc-900 dark:text-white">
+                {currentStep === 1 && "Step 1: Account Email Verification"}
+                {currentStep === 2 && "Step 2: Contact Phone Number"}
+                {currentStep === 3 && "Step 3: Personal Credentials"}
+                {currentStep === 4 && "Step 4: Username & Custom Booking Slug"}
+                {currentStep === 5 && "Step 5: Profile Info & Specializations"}
               </CardTitle>
               <CardDescription className="text-xs text-zinc-500">
-                {currentStep === 1 && "Choose your unique handle, booking slug, and login password."}
-                {currentStep === 2 && "Provide your base operating city and a brief introduction for clients."}
-                {currentStep === 3 && "Select your core photography styles and review your registration."}
+                {currentStep === 1 && "Enter your primary email address for portal sign-in and notifications."}
+                {currentStep === 2 && "Provide your contact number for booking updates and verification."}
+                {currentStep === 3 && "Enter your full name and create a secure login password."}
+                {currentStep === 4 && "Choose your unique handle (@username) and custom booking link (slug)."}
+                {currentStep === 5 && "Select your operating city, bio description, and photography styles."}
               </CardDescription>
             </CardHeader>
 
             <form onSubmit={handleSubmit}>
               <CardContent className="p-6 space-y-4">
-                {/* STEP 1: Account Credentials & Username */}
+
+                {/* STEP 1: Email Address */}
                 {currentStep === 1 && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                        <span>Email Address *</span>
+                        {emailStatus.available === true && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" /> Available
+                          </span>
+                        )}
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                        <Input
+                          type="email"
+                          required
+                          placeholder="kasun@example.com"
+                          value={formData.email}
+                          onChange={(e) => {
+                            setFormData({ ...formData, email: e.target.value });
+                            setEmailStatus({});
+                          }}
+                          className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                        />
+                      </div>
+                      {emailStatus.message && (
+                        <p className="text-[11px] text-red-500 font-medium">{emailStatus.message}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: Contact Phone Number */}
+                {currentStep === 2 && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                        Contact Phone Number *
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                        <Input
+                          type="tel"
+                          required
+                          placeholder="077 123 4567"
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                          className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                        />
+                      </div>
+                      <p className="text-[11px] text-zinc-400">
+                        We use this number to send client booking confirmations and SMS updates.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 3: Personal Credentials */}
+                {currentStep === 3 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
@@ -318,9 +472,9 @@ export default function RegisterPhotographerWizardPage() {
                           placeholder="e.g. Kasun"
                           value={formData.firstName}
                           onChange={(e) =>
-                            handleNameChange(e.target.value, formData.lastName)
+                            setFormData({ ...formData, firstName: e.target.value })
                           }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          className="h-11 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -332,72 +486,15 @@ export default function RegisterPhotographerWizardPage() {
                           placeholder="e.g. Perera"
                           value={formData.lastName}
                           onChange={(e) =>
-                            handleNameChange(formData.firstName, e.target.value)
+                            setFormData({ ...formData, lastName: e.target.value })
                           }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          className="h-11 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                         />
                       </div>
                     </div>
 
-                    {/* Username & Booking Slug inputs */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
-                          <span>Unique Username *</span>
-                          <span className="text-[10px] text-zinc-400">e.g. @kasunperera</span>
-                        </Label>
-                        <div className="relative">
-                          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                          <Input
-                            required
-                            placeholder="kasunperera"
-                            value={formData.username}
-                            onChange={(e) =>
-                              setFormData({ ...formData, username: slugify(e.target.value) })
-                            }
-                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
-                          <span>Custom Booking Slug *</span>
-                          <span className="text-[10px] text-zinc-400">seyaroo.com/book/slug</span>
-                        </Label>
-                        <div className="relative">
-                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                          <Input
-                            required
-                            placeholder="kasun-perera"
-                            value={formData.bookingSlug}
-                            onChange={(e) =>
-                              setFormData({ ...formData, bookingSlug: slugify(e.target.value) })
-                            }
-                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                        Email Address *
-                      </Label>
-                      <Input
-                        type="email"
-                        required
-                        placeholder="kasun@example.com"
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                        className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {/* Password */}
+                      {/* Create Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                           Create Password *
@@ -412,12 +509,12 @@ export default function RegisterPhotographerWizardPage() {
                             onChange={(e) =>
                               setFormData({ ...formData, password: e.target.value })
                             }
-                            className="h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                            className="h-11 pr-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                           >
                             {showPassword ? (
                               <EyeOff className="h-4 w-4" />
@@ -443,7 +540,7 @@ export default function RegisterPhotographerWizardPage() {
                             onChange={(e) =>
                               setFormData({ ...formData, confirmPassword: e.target.value })
                             }
-                            className={`h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 ${
+                            className={`h-11 pr-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 ${
                               formData.confirmPassword &&
                               formData.password !== formData.confirmPassword
                                 ? "border-red-500 focus:ring-red-500"
@@ -453,7 +550,7 @@ export default function RegisterPhotographerWizardPage() {
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                           >
                             {showConfirmPassword ? (
                               <EyeOff className="h-4 w-4" />
@@ -464,25 +561,76 @@ export default function RegisterPhotographerWizardPage() {
                         </div>
                       </div>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                        Contact Phone
-                      </Label>
-                      <Input
-                        placeholder="077 123 4567"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                        className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                      />
-                    </div>
                   </div>
                 )}
 
-                {/* STEP 2: Location & Portfolio */}
-                {currentStep === 2 && (
+                {/* STEP 4: Username & Booking Slug (Manual entry, formatted with _ and -) */}
+                {currentStep === 4 && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                      {/* Username (using _) */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Unique Username *</span>
+                          <span className="text-[10px] text-zinc-400 font-mono">e.g. kasun_perera</span>
+                        </Label>
+                        <div className="relative">
+                          <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="kasun_perera"
+                            value={formData.username}
+                            onChange={(e) => {
+                              const formatted = formatUsername(e.target.value);
+                              setFormData({ ...formData, username: formatted });
+                              setHandleStatus({});
+                            }}
+                            className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
+                        <p className="text-[10px] text-zinc-400">
+                          Spaces format automatically as underscores (<code>_</code>).
+                        </p>
+                      </div>
+
+                      {/* Custom Booking Slug (using -) */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Custom Booking Slug *</span>
+                          <span className="text-[10px] text-zinc-400 font-mono">seyaroo.com/book/slug</span>
+                        </Label>
+                        <div className="relative">
+                          <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="kasun-perera"
+                            value={formData.bookingSlug}
+                            onChange={(e) => {
+                              const formatted = formatSlug(e.target.value);
+                              setFormData({ ...formData, bookingSlug: formatted });
+                              setHandleStatus({});
+                            }}
+                            className="h-11 pl-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
+                        <p className="text-[10px] text-zinc-400">
+                          Spaces format automatically as hyphens (<code>-</code>).
+                        </p>
+                      </div>
+                    </div>
+
+                    {handleStatus.message && (
+                      <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 shrink-0" />
+                        <span>{handleStatus.message}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* STEP 5: Location, Bio & Specialties */}
+                {currentStep === 5 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
@@ -494,7 +642,7 @@ export default function RegisterPhotographerWizardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, city: e.target.value })
                         }
-                        className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                        className="h-11 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                       />
                     </div>
 
@@ -504,7 +652,7 @@ export default function RegisterPhotographerWizardPage() {
                       </Label>
                       <Textarea
                         placeholder="Briefly describe your photography style, years of experience, or equipment..."
-                        rows={4}
+                        rows={3}
                         value={formData.bio}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                           setFormData({ ...formData, bio: e.target.value })
@@ -512,12 +660,7 @@ export default function RegisterPhotographerWizardPage() {
                         className="text-xs rounded-xl border-zinc-200 dark:border-zinc-800 resize-none"
                       />
                     </div>
-                  </div>
-                )}
 
-                {/* STEP 3: Specializations & Review */}
-                {currentStep === 3 && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="space-y-2">
                       <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                         Select Photography Specializations
@@ -544,7 +687,7 @@ export default function RegisterPhotographerWizardPage() {
                     </div>
 
                     {/* Summary Box */}
-                    <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/40 text-xs space-y-1.5">
+                    <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/40 text-xs space-y-1.5 mt-2">
                       <div className="flex items-center justify-between font-bold text-blue-950 dark:text-blue-200 mb-1">
                         <span>Application Summary Review</span>
                         <button
@@ -559,20 +702,16 @@ export default function RegisterPhotographerWizardPage() {
                         <strong>Name:</strong> {formData.firstName} {formData.lastName}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Username Handle:</strong> @{formData.username.replace(/^@/, '')}
-                      </p>
-                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Booking Link:</strong> seyaroo.com/book/{formData.bookingSlug}
-                      </p>
-                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         <strong>Email:</strong> {formData.email}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Operating City:</strong> {formData.city || "Not specified"}
+                        <strong>Phone:</strong> {formData.phone}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        <strong>Selected Specialties:</strong>{" "}
-                        {formData.specializations.join(", ") || "None selected"}
+                        <strong>Username Handle:</strong> @{formData.username}
+                      </p>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                        <strong>Booking Slug Link:</strong> seyaroo.com/book/{formData.bookingSlug}
                       </p>
                     </div>
                   </div>
@@ -585,23 +724,32 @@ export default function RegisterPhotographerWizardPage() {
                     type="button"
                     variant="outline"
                     onClick={handlePrevStep}
+                    disabled={checkingAvailability}
                     className="h-10 px-4 font-bold text-xs rounded-xl cursor-pointer"
                   >
                     <ArrowLeft className="h-3.5 w-3.5 mr-1" />
                     Back (Step {currentStep - 1})
                   </Button>
                 ) : (
-                  <span className="text-[11px] text-zinc-400">Step 1 of 3</span>
+                  <span className="text-[11px] text-zinc-400 font-bold">Step 1 of 5</span>
                 )}
 
-                {currentStep < 3 ? (
+                {currentStep < 5 ? (
                   <Button
                     type="button"
+                    disabled={checkingAvailability}
                     onClick={handleNextStep}
                     className="h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer shadow-md"
                   >
-                    Next Step
-                    <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                    {checkingAvailability ? (
+                      <span className="flex items-center gap-1.5">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Verifying...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        Next Step <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    )}
                   </Button>
                 ) : (
                   <Button

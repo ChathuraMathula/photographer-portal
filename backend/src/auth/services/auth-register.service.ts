@@ -136,4 +136,42 @@ export class AuthRegisterService {
       studioSlug: cleanSlug,
     };
   }
+
+  async checkAvailability(query: { email?: string; username?: string; bookingSlug?: string }) {
+    const result = {
+      emailAvailable: true,
+      usernameAvailable: true,
+      bookingSlugAvailable: true,
+      messages: [] as string[],
+    };
+
+    if (query.email?.trim()) {
+      const existingEmail = await this.userRepository.findOneBy({ email: query.email.trim() });
+      if (existingEmail) {
+        result.emailAvailable = false;
+        result.messages.push('An account with this email address already exists.');
+      }
+    }
+
+    if (query.username?.trim()) {
+      const cleanUsername = query.username.toLowerCase().trim().replace(/^@/, '');
+      const existingUsername = await this.userRepository.findOneBy({ username: cleanUsername });
+      if (existingUsername) {
+        result.usernameAvailable = false;
+        result.messages.push(`Username "@${cleanUsername}" is already taken.`);
+      }
+    }
+
+    if (query.bookingSlug?.trim()) {
+      const cleanSlug = this.slugService.slugify(query.bookingSlug);
+      const existingSlug = await this.profileRepository.findOneBy({ bookingSlug: cleanSlug });
+      const existingStudioSlug = await this.userRepository.findOneBy({ studioSlug: cleanSlug });
+      if (existingSlug || existingStudioSlug) {
+        result.bookingSlugAvailable = false;
+        result.messages.push(`Booking slug "${cleanSlug}" is already taken.`);
+      }
+    }
+
+    return result;
+  }
 }
