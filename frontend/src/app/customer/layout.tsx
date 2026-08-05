@@ -49,9 +49,20 @@ export default function CustomerLayout({
     else router.push(`/customer/${tab}`);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout API error:", err);
+    }
     dispatch(logout());
-    router.push("/login");
+    if (typeof window !== "undefined") {
+      window.location.replace("/login");
+    }
   };
 
   const handlePlusClick = () => {

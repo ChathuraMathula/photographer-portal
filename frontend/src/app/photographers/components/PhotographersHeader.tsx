@@ -35,9 +35,21 @@ export function PhotographersHeader({
     setMounted(true);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout API error:", err);
+    }
     dispatch(logout());
     setDropdownOpen(false);
+    if (typeof window !== "undefined") {
+      window.location.replace("/login");
+    }
   };
 
   return (
