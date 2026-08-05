@@ -33,9 +33,18 @@ export class UserStatusService {
       throw new NotFoundException('User not found');
     }
 
-    // Admins can only manage photographers
-    if (callerRole === UserRole.ADMIN && user.role !== UserRole.PHOTOGRAPHER) {
-      throw new ForbiddenException('Admins can only manage Photographers');
+    // Admins can approve/activate pending accounts, but cannot suspend active accounts
+    if (callerRole === UserRole.ADMIN) {
+      if (user.role !== UserRole.PHOTOGRAPHER && user.role !== UserRole.STUDIO) {
+        throw new ForbiddenException(
+          'Admins can only review Photographers and Studios.',
+        );
+      }
+      if (user.isActive) {
+        throw new ForbiddenException(
+          'Admins cannot suspend active accounts. Only Super Admins have suspension privileges.',
+        );
+      }
     }
 
     const wasActive = user.isActive;

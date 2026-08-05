@@ -83,6 +83,13 @@ export class UsersController {
     });
   }
 
+  @Get(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  findOneById(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const callerRole = req.user.role;
+    return this.usersService.findOneById(id, callerRole);
+  }
+
   @Patch(':id/toggle-active')
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   toggleActive(@Param('id') id: string, @Req() req: RequestWithUser) {

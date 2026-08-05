@@ -42,6 +42,10 @@ export class UsersService {
     return this.searchService.findAll(callerRole, query);
   }
 
+  async findOneById(id: string, callerRole: UserRole) {
+    return this.searchService.findOneById(id, callerRole);
+  }
+
   async toggleActive(id: string, callerRole: UserRole) {
     return this.statusService.toggleActive(id, callerRole);
   }

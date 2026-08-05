@@ -107,7 +107,9 @@ export type UserProfile = {
   bookingSlug: string;
   bio?: string;
   baseLocation?: string;
-  specializations: string[];
+  city?: string;
+  district?: string;
+  specializations: string[] | string;
   offlineMessage?: string;
 };
 
@@ -119,7 +121,13 @@ export type UserAccount = {
   role: UserRole;
   isActive: boolean;
   phone?: string;
+  studioName?: string;
+  studioSlug?: string;
+  studioLogoUrl?: string;
+  subscriptionPlan?: string;
+  maxPhotographers?: number;
   profile?: UserProfile;
+  createdAt?: string;
 };
 
 export type NotificationItem = {

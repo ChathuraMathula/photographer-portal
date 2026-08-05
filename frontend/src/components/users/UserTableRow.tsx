@@ -1,7 +1,8 @@
 import { useState } from "react";
+import Link from "next/link";
 import { type UserAccount } from "@/types";
 import { UserRole } from "@/store/slices/authSlice";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye } from "lucide-react";
 import { EditUserDetailsModal } from "@/components/modals/EditUserDetailsModal";
 import { RoleBadge } from "./components/RoleBadge";
 import { ToggleStatusButton } from "./components/ToggleStatusButton";
@@ -37,6 +38,10 @@ export function UserTableRow({
   const fullName = `${user.firstName} ${user.lastName}`;
   const isSelf = user.id === loggedInUserId;
 
+  const canToggle =
+    !isSelf &&
+    (loggedInRole === UserRole.SUPER_ADMIN || (!user.isActive && loggedInRole === UserRole.ADMIN));
+
   const handleConfirm = async () => {
     setToggling(true);
     try {
@@ -62,9 +67,14 @@ export function UserTableRow({
     <>
       <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 dark:border-zinc-800 dark:hover:bg-zinc-900/20">
         <td className="p-4 text-body-small-s">
-          <span className="font-semibold text-zinc-900 dark:text-white">
+          <span className="font-semibold text-zinc-900 dark:text-white block">
             {currentFirstName} {currentLastName}
           </span>
+          {user.studioName && (
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block">
+              {user.studioName}
+            </span>
+          )}
         </td>
         <td className="p-4 text-body-small-s text-zinc-600 dark:text-zinc-350">
           {user.email}
@@ -103,12 +113,39 @@ export function UserTableRow({
         </td>
         <td className="p-4 text-right">
           <div className="flex items-center justify-end gap-2">
-            <ToggleStatusButton
-              isActive={user.isActive}
-              isSelf={isSelf}
-              onClick={() => !isSelf && setShowConfirm(true)}
-            />
+            {/* Review Details Button */}
+            <Link
+              href={`/dashboard/users/${user.id}`}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/40 text-[11px] font-bold transition-all"
+              title="Review Request Details"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span>Review</span>
+            </Link>
 
+            {/* Toggle Status Button */}
+            {canToggle ? (
+              <ToggleStatusButton
+                isActive={user.isActive}
+                isSelf={isSelf}
+                onClick={() => setShowConfirm(true)}
+              />
+            ) : user.isActive && loggedInRole === UserRole.ADMIN ? (
+              <span
+                className="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                title="Only Super Admins can suspend active accounts"
+              >
+                Active
+              </span>
+            ) : (
+              <ToggleStatusButton
+                isActive={user.isActive}
+                isSelf={isSelf}
+                onClick={() => {}}
+              />
+            )}
+
+            {/* Delete User Button (Super Admin Only) */}
             {loggedInRole === UserRole.SUPER_ADMIN && !isSelf && onDeleteUser && (
               <button
                 type="button"

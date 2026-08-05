@@ -21,6 +21,8 @@ import {
   ShieldCheck,
   Users,
   Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,10 +35,14 @@ export default function RegisterStudioWizardPage() {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
     city: "",
     address: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -48,13 +54,18 @@ export default function RegisterStudioWizardPage() {
         !formData.firstName ||
         !formData.lastName ||
         !formData.email ||
-        !formData.password
+        !formData.password ||
+        !formData.confirmPassword
       ) {
         toast.error("Please fill in all required studio credential fields.");
         return;
       }
       if (formData.password.length < 6) {
         toast.error("Password must be at least 6 characters long.");
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match.");
         return;
       }
     }
@@ -68,13 +79,27 @@ export default function RegisterStudioWizardPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
     try {
       setLoading(true);
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
       const res = await fetch(`${API}/auth/register/studio`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          studioName: formData.studioName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          city: formData.city,
+          address: formData.address,
+        }),
       });
 
       const data = await res.json();
@@ -170,17 +195,22 @@ export default function RegisterStudioWizardPage() {
                 ].map((s, idx) => (
                   <React.Fragment key={s.step}>
                     <div className="flex flex-col items-center gap-1">
-                      <div
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (s.step < currentStep) setCurrentStep(s.step);
+                        }}
+                        disabled={s.step > currentStep}
                         className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
                           currentStep === s.step
-                            ? "bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950 shadow-sm"
+                            ? "bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950 shadow-sm cursor-default"
                             : currentStep > s.step
-                            ? "bg-emerald-500 text-white"
-                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
+                            ? "bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600"
+                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed"
                         }`}
                       >
                         {currentStep > s.step ? <Check className="h-4 w-4" /> : s.step}
-                      </div>
+                      </button>
                       <span
                         className={`text-[10px] font-bold ${
                           currentStep === s.step
@@ -274,37 +304,88 @@ export default function RegisterStudioWizardPage() {
                       </div>
                     </div>
 
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                        Studio Official Email *
+                      </Label>
+                      <Input
+                        type="email"
+                        required
+                        placeholder="contact@apexvisuals.lk"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                      />
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                          Studio Official Email *
+                          Create Studio Password *
                         </Label>
-                        <Input
-                          type="email"
-                          required
-                          placeholder="contact@apexvisuals.lk"
-                          value={formData.email}
-                          onChange={(e) =>
-                            setFormData({ ...formData, email: e.target.value })
-                          }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            required
+                            minLength={6}
+                            placeholder="At least 6 characters"
+                            value={formData.password}
+                            onChange={(e) =>
+                              setFormData({ ...formData, password: e.target.value })
+                            }
+                            className="h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Confirm Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                          Create Password *
+                          Confirm Password *
                         </Label>
-                        <Input
-                          type="password"
-                          required
-                          minLength={6}
-                          placeholder="At least 6 characters"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({ ...formData, password: e.target.value })
-                          }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            required
+                            minLength={6}
+                            placeholder="Re-enter password"
+                            value={formData.confirmPassword}
+                            onChange={(e) =>
+                              setFormData({ ...formData, confirmPassword: e.target.value })
+                            }
+                            className={`h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 ${
+                              formData.confirmPassword &&
+                              formData.password !== formData.confirmPassword
+                                ? "border-red-500 focus:ring-red-500"
+                                : ""
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -367,9 +448,13 @@ export default function RegisterStudioWizardPage() {
                           <Building2 className="h-4 w-4 text-indigo-600" />
                           Studio Registration Summary
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 uppercase">
-                          Free Tier
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(1)}
+                          className="text-[11px] text-indigo-600 hover:underline cursor-pointer font-medium"
+                        >
+                          Edit Credentials
+                        </button>
                       </div>
                       <div className="space-y-1 text-zinc-600 dark:text-zinc-400 text-[11px]">
                         <p><strong>Studio Name:</strong> {formData.studioName}</p>
@@ -377,7 +462,7 @@ export default function RegisterStudioWizardPage() {
                         <p><strong>Official Email:</strong> {formData.email}</p>
                         <p><strong>Phone:</strong> {formData.phone || "Not specified"}</p>
                         <p><strong>City / Address:</strong> {formData.city} {formData.address ? `(${formData.address})` : ""}</p>
-                        <p><strong>Team Capacity:</strong> Up to 5 sub-photographers included</p>
+                        <p><strong>Team Capacity:</strong> Up to 5 sub-photographers included (Free Tier)</p>
                       </div>
                     </div>
                   </div>
@@ -393,7 +478,7 @@ export default function RegisterStudioWizardPage() {
                     className="h-10 px-4 font-bold text-xs rounded-xl cursor-pointer"
                   >
                     <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                    Back
+                    Back (Step {currentStep - 1})
                   </Button>
                 ) : (
                   <span className="text-[11px] text-zinc-400">Step 1 of 3</span>

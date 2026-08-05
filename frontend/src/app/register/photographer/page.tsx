@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Camera,
   CheckCircle2,
@@ -24,9 +25,10 @@ import {
   MapPin,
   Sparkles,
   Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
 
 const SPECIALIZATION_OPTIONS = [
   "Wedding",
@@ -46,11 +48,15 @@ export default function RegisterPhotographerWizardPage() {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
     city: "",
     bio: "",
     specializations: [] as string[],
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -66,12 +72,22 @@ export default function RegisterPhotographerWizardPage() {
 
   const handleNextStep = () => {
     if (currentStep === 1) {
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.email ||
+        !formData.password ||
+        !formData.confirmPassword
+      ) {
         toast.error("Please fill in all required account fields.");
         return;
       }
       if (formData.password.length < 6) {
         toast.error("Password must be at least 6 characters long.");
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match.");
         return;
       }
     }
@@ -85,13 +101,27 @@ export default function RegisterPhotographerWizardPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
     try {
       setLoading(true);
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
       const res = await fetch(`${API}/auth/register/photographer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          city: formData.city,
+          bio: formData.bio,
+          specializations: formData.specializations,
+        }),
       });
 
       const data = await res.json();
@@ -187,17 +217,22 @@ export default function RegisterPhotographerWizardPage() {
                 ].map((s, idx) => (
                   <React.Fragment key={s.step}>
                     <div className="flex flex-col items-center gap-1">
-                      <div
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (s.step < currentStep) setCurrentStep(s.step);
+                        }}
+                        disabled={s.step > currentStep}
                         className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
                           currentStep === s.step
-                            ? "bg-[#0e2d5c] text-white ring-4 ring-blue-100 dark:ring-blue-950 shadow-sm"
+                            ? "bg-[#0e2d5c] text-white ring-4 ring-blue-100 dark:ring-blue-950 shadow-sm cursor-default"
                             : currentStep > s.step
-                            ? "bg-emerald-500 text-white"
-                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
+                            ? "bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600"
+                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed"
                         }`}
                       >
                         {currentStep > s.step ? <Check className="h-4 w-4" /> : s.step}
-                      </div>
+                      </button>
                       <span
                         className={`text-[10px] font-bold ${
                           currentStep === s.step
@@ -293,35 +328,86 @@ export default function RegisterPhotographerWizardPage() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                           Create Password *
                         </Label>
-                        <Input
-                          type="password"
-                          required
-                          minLength={6}
-                          placeholder="At least 6 characters"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({ ...formData, password: e.target.value })
-                          }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            required
+                            minLength={6}
+                            placeholder="At least 6 characters"
+                            value={formData.password}
+                            onChange={(e) =>
+                              setFormData({ ...formData, password: e.target.value })
+                            }
+                            className="h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Confirm Password */}
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                          Contact Phone
+                          Confirm Password *
                         </Label>
-                        <Input
-                          placeholder="077 123 4567"
-                          value={formData.phone}
-                          onChange={(e) =>
-                            setFormData({ ...formData, phone: e.target.value })
-                          }
-                          className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            required
+                            minLength={6}
+                            placeholder="Re-enter password"
+                            value={formData.confirmPassword}
+                            onChange={(e) =>
+                              setFormData({ ...formData, confirmPassword: e.target.value })
+                            }
+                            className={`h-10 pr-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 ${
+                              formData.confirmPassword &&
+                              formData.password !== formData.confirmPassword
+                                ? "border-red-500 focus:ring-red-500"
+                                : ""
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                        Contact Phone
+                      </Label>
+                      <Input
+                        placeholder="077 123 4567"
+                        value={formData.phone}
+                        onChange={(e) =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
+                        className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
+                      />
                     </div>
                   </div>
                 )}
@@ -389,10 +475,17 @@ export default function RegisterPhotographerWizardPage() {
                     </div>
 
                     {/* Summary Box */}
-                    <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/40 text-xs space-y-1.5">
-                      <span className="font-bold text-blue-950 dark:text-blue-200 block">
-                        Summary Review
-                      </span>
+                    <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/40 text-xs space-y-1.5">
+                      <div className="flex items-center justify-between font-bold text-blue-950 dark:text-blue-200 mb-1">
+                        <span>Application Summary Review</span>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(1)}
+                          className="text-[11px] text-blue-600 hover:underline cursor-pointer"
+                        >
+                          Edit Details
+                        </button>
+                      </div>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         <strong>Name:</strong> {formData.firstName} {formData.lastName}
                       </p>
@@ -420,7 +513,7 @@ export default function RegisterPhotographerWizardPage() {
                     className="h-10 px-4 font-bold text-xs rounded-xl cursor-pointer"
                   >
                     <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                    Back
+                    Back (Step {currentStep - 1})
                   </Button>
                 ) : (
                   <span className="text-[11px] text-zinc-400">Step 1 of 3</span>
