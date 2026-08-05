@@ -15,6 +15,7 @@ export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   PHOTOGRAPHER = 'PHOTOGRAPHER',
+  STUDIO = 'STUDIO',
 }
 
 @Entity('users')
@@ -45,6 +46,15 @@ export class User {
 
   @Column({ nullable: true })
   phone?: string;
+
+  @Column({ nullable: true })
+  studioName?: string;
+
+  @Column({ default: 'FREE' })
+  subscriptionPlan!: string;
+
+  @Column({ default: 5 })
+  maxPhotographers!: number;
 
   @OneToOne(() => PhotographerProfile, (profile) => profile.user)
   profile?: PhotographerProfile;

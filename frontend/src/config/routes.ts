@@ -7,6 +7,8 @@ export const PUBLIC_ROUTES = [
   "/photographer/login",
   "/admin/login",
   "/photographers",
+  "/register/photographer",
+  "/register/studio",
   "/about",
   "/test-accounts",
   "/forgot-password",
@@ -14,12 +16,13 @@ export const PUBLIC_ROUTES = [
   "/auth/customer-verify",
 ];
 
-// Prefix-match public routes — /book/:slug, /photographers, etc. are public
+// Prefix-match public routes — /book/:slug, /photographers, /register, etc. are public
 export const PUBLIC_PREFIXES = [
   "/book",
   "/photographers",
   "/photographer",
   "/admin",
+  "/register",
   "/leaflet",
   "/tiles",
   "/maps",
@@ -42,6 +45,16 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/users",
     "/dashboard/reports",
     "/dashboard/profile",
+    "/photographers",
+  ],
+  [UserRole.STUDIO]: [
+    "/dashboard",
+    "/dashboard/reservations",
+    "/dashboard/calendar",
+    "/dashboard/photographers",
+    "/dashboard/packages",
+    "/dashboard/profile",
+    "/dashboard/settings",
     "/photographers",
   ],
   [UserRole.PHOTOGRAPHER]: [

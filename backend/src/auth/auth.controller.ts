@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterPhotographerDto } from './dto/register-photographer.dto';
+import { RegisterStudioDto } from './dto/register-studio.dto';
 import type { Response } from 'express';
 
 @Controller('auth')
@@ -35,6 +37,18 @@ export class AuthController {
       message: 'Logged in successfully',
       user: user,
     };
+  }
+
+  @Post('register/photographer')
+  @HttpCode(HttpStatus.CREATED)
+  async registerPhotographer(@Body() dto: RegisterPhotographerDto) {
+    return this.authService.registerPhotographer(dto);
+  }
+
+  @Post('register/studio')
+  @HttpCode(HttpStatus.CREATED)
+  async registerStudio(@Body() dto: RegisterStudioDto) {
+    return this.authService.registerStudio(dto);
   }
 
   @Post('logout')

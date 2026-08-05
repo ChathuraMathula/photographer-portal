@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, ShieldCheck, Camera, User, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck, Camera, User, ArrowRight, Building2 } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/store/slices/authSlice";
 
@@ -27,7 +27,6 @@ export function AdminLoginForm() {
   const [apiError, setApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const dispatch = useDispatch();
 
   const formik = useFormik({
@@ -75,14 +74,14 @@ export function AdminLoginForm() {
     <div className="space-y-6">
       <div className="space-y-2 text-center md:text-left">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200/60 text-[11px] font-bold">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          Admin Access
+          <Building2 className="h-3.5 w-3.5" />
+          Studio & Admin Access
         </div>
         <h1 className="text-title-large text-primary-dark dark:text-white leading-tight">
-          Super Admin Sign In
+          Studio & Admin Sign In
         </h1>
         <p className="text-body-small text-zinc-500 dark:text-zinc-400">
-          Enter administrator credentials to manage platform photographers, audit logs, and settings.
+          Enter credentials for Studio Accounts, Admins, and SeyaRoo platform managers.
         </p>
       </div>
 
@@ -98,12 +97,12 @@ export function AdminLoginForm() {
             htmlFor="email"
             className="text-body-small-s font-semibold text-zinc-700 dark:text-zinc-300"
           >
-            Admin Email
+            Email Address
           </Label>
           <Input
             id="email"
             type="email"
-            placeholder="admin@example.com"
+            placeholder="studio@example.com or admin@example.com"
             {...formik.getFieldProps("email")}
             className={`h-11 md:h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-primary-dark focus:border-primary-dark dark:bg-zinc-950 ${
               formik.touched.email && formik.errors.email
@@ -170,7 +169,7 @@ export function AdminLoginForm() {
           type="submit"
           disabled={formik.isSubmitting}
         >
-          {formik.isSubmitting ? "Signing in..." : "Admin Login"}
+          {formik.isSubmitting ? "Signing in..." : "Sign In to Studio / Admin Portal"}
         </Button>
       </form>
 

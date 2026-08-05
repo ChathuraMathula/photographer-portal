@@ -15,6 +15,8 @@ import {
   Sparkles,
   LayoutDashboard,
   Search,
+  UserPlus,
+  Building2,
 } from "lucide-react";
 
 interface PhotographersHeaderProps {
@@ -28,6 +30,8 @@ export function PhotographersHeader({
 }: PhotographersHeaderProps) {
   const [mounted, setMounted] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+
   const auth = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
@@ -68,20 +72,22 @@ export function PhotographersHeader({
           </div>
         </Link>
 
-        {/* Quick Search Input */}
-        <div className="flex-1 max-w-md hidden sm:block relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by name, location, or bio..."
-            className="w-full h-10 pl-9 pr-4 text-xs rounded-xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60 focus:outline-none focus:ring-2 focus:ring-[#0e2d5c] dark:focus:ring-blue-500 transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400"
-          />
+        {/* Search Input Bar */}
+        <div className="flex-1 max-w-md mx-2 sm:mx-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Search by photographer name, location, or style..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full h-9 pl-9 pr-4 text-xs bg-zinc-100 dark:bg-zinc-800 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all"
+            />
+          </div>
         </div>
 
-        {/* Right Actions / Sign In Menu */}
-        <div className="relative">
+        {/* Right Actions */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {mounted && auth.isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
@@ -97,7 +103,10 @@ export function PhotographersHeader({
               </Link>
               <button
                 type="button"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => {
+                  setDropdownOpen(!dropdownOpen);
+                  setRegisterOpen(false);
+                }}
                 className="flex items-center gap-2 h-10 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200/80 transition-colors"
               >
                 <span className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">
@@ -110,21 +119,78 @@ export function PhotographersHeader({
               </button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 h-10 px-4 rounded-xl bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-blue-300" />
-              <span>Sign In</span>
-              <ChevronDown className="h-3.5 w-3.5 text-blue-200" />
-            </button>
+            <div className="flex items-center gap-2 relative">
+              {/* Register Button Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegisterOpen(!registerOpen);
+                    setDropdownOpen(false);
+                  }}
+                  className="flex items-center gap-1.5 h-9 px-3 sm:px-3.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-bold transition-all cursor-pointer"
+                >
+                  <UserPlus className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>Register</span>
+                  <ChevronDown className="h-3 w-3 text-zinc-400" />
+                </button>
+
+                {registerOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                    onMouseLeave={() => setRegisterOpen(false)}
+                  >
+                    <div className="px-4 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                      Join SeyaRoo
+                    </div>
+
+                    <Link
+                      href="/register/photographer"
+                      onClick={() => setRegisterOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                    >
+                      <Camera className="h-4 w-4 text-blue-600" />
+                      <div>
+                        <span className="block leading-tight">As Photographer</span>
+                        <span className="text-[10px] text-zinc-400 font-normal">Individual Creator</span>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/register/studio"
+                      onClick={() => setRegisterOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-2"
+                    >
+                      <Building2 className="h-4 w-4 text-indigo-600" />
+                      <div>
+                        <span className="block leading-tight">As Studio</span>
+                        <span className="text-[10px] text-zinc-400 font-normal">Team & Multi-Photographer</span>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Sign In Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setDropdownOpen(!dropdownOpen);
+                  setRegisterOpen(false);
+                }}
+                className="flex items-center gap-1.5 h-9 px-3 sm:px-4 rounded-xl bg-[#0e2d5c] hover:bg-[#0b244a] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-blue-300" />
+                <span>Sign In</span>
+                <ChevronDown className="h-3.5 w-3.5 text-blue-200" />
+              </button>
+            </div>
           )}
 
-          {/* Dropdown Menu */}
+          {/* Sign In Dropdown Menu */}
           {dropdownOpen && (
             <div
-              className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+              className="absolute right-4 top-14 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
               onMouseLeave={() => setDropdownOpen(false)}
             >
               {mounted && auth.isAuthenticated ? (
@@ -190,10 +256,10 @@ export function PhotographersHeader({
                   <Link
                     href="/admin/login"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border-t border-zinc-100 dark:border-zinc-800 mt-1"
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border-t border-zinc-150 dark:border-zinc-800 mt-1 pt-2"
                   >
-                    <ShieldCheck className="h-4 w-4 text-purple-600" />
-                    Admin Login
+                    <Building2 className="h-4 w-4 text-purple-600" />
+                    Studio & Admin Login
                   </Link>
                 </>
               )}
