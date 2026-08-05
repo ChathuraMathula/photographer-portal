@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Bell, Shield, Mail, Check, Moon, Sun } from "lucide-react";
+import { Settings, Bell, Shield, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CustomerSettingsPage() {
@@ -54,55 +54,79 @@ export default function CustomerSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
+            <div className="space-y-0.5 pr-4">
               <span className="text-xs font-bold text-zinc-900 dark:text-white block">
                 Booking Status Updates
               </span>
-              <span className="text-[11px] text-zinc-500 block">
+              <span className="text-[11px] text-zinc-500 block leading-relaxed">
                 Receive instant emails when a photographer accepts or updates your booking.
               </span>
             </div>
-            <input
-              type="checkbox"
-              checked={emailNotifications}
-              onChange={(e) => setEmailNotifications(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#0e2d5c] cursor-pointer"
-            />
+            <button
+              type="button"
+              onClick={() => setEmailNotifications(!emailNotifications)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                emailNotifications ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+              }`}
+              aria-label="Toggle Booking Status Updates"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  emailNotifications ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
 
-          <div className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
+            <div className="space-y-0.5 pr-4">
               <span className="text-xs font-bold text-zinc-900 dark:text-white block">
                 Quotation Proposals & Pricing
               </span>
-              <span className="text-[11px] text-zinc-500 block">
+              <span className="text-[11px] text-zinc-500 block leading-relaxed">
                 Get notified when a photographer sends package options and price quotes.
               </span>
             </div>
-            <input
-              type="checkbox"
-              checked={proposalAlerts}
-              onChange={(e) => setProposalAlerts(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#0e2d5c] cursor-pointer"
-            />
+            <button
+              type="button"
+              onClick={() => setProposalAlerts(!proposalAlerts)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                proposalAlerts ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+              }`}
+              aria-label="Toggle Quotation Proposals & Pricing"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  proposalAlerts ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
 
-          <div className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/50">
+            <div className="space-y-0.5 pr-4">
               <span className="text-xs font-bold text-zinc-900 dark:text-white block">
                 Live Chat Notifications
               </span>
-              <span className="text-[11px] text-zinc-500 block">
+              <span className="text-[11px] text-zinc-500 block leading-relaxed">
                 Receive email alerts when a photographer sends you a direct message.
               </span>
             </div>
-            <input
-              type="checkbox"
-              checked={chatNotifications}
-              onChange={(e) => setChatNotifications(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#0e2d5c] cursor-pointer"
-            />
+            <button
+              type="button"
+              onClick={() => setChatNotifications(!chatNotifications)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                chatNotifications ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+              }`}
+              aria-label="Toggle Live Chat Notifications"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  chatNotifications ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
         </CardContent>
       </Card>

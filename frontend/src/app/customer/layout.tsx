@@ -8,14 +8,15 @@ import { RootState } from "@/store/store";
 import { logout } from "@/store/slices/authSlice";
 import { DashboardLayout } from "@/components/dashboard/layout/DashboardLayout";
 import { CUSTOMER_MENU } from "@/components/dashboard/layout/constants";
+import { Button } from "@/components/ui/button";
 import {
   CalendarCheck,
   CalendarDays,
   User,
   Settings,
   Plus,
+  Camera,
 } from "lucide-react";
-import { toast } from "sonner";
 
 export default function CustomerLayout({
   children,
@@ -71,6 +72,17 @@ export default function CustomerLayout({
         userName={userName}
         userRole="CUSTOMER"
         menuItems={CUSTOMER_MENU}
+        topbarActions={
+          <Button
+            onClick={() => router.push("/photographers")}
+            size="sm"
+            className="h-9 px-3.5 text-xs font-bold bg-[#0e2d5c] hover:bg-[#0b244a] text-white shadow-sm gap-1.5 rounded-xl cursor-pointer transition-all active:scale-95"
+          >
+            <Camera className="h-4 w-4" />
+            <span className="hidden sm:inline">Book a Photographer</span>
+            <span className="sm:hidden">Book</span>
+          </Button>
+        }
       >
         <div className="pb-16 sm:pb-0">{children}</div>
       </DashboardLayout>
