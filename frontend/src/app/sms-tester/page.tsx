@@ -23,13 +23,15 @@ export default function SmsTesterDevInboxPage() {
     try {
       setLoading(true);
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-      const res = await fetch(`${API}/auth/sms-inbox`);
+      const res = await fetch(`${API}/auth/sms-inbox`, {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data = await res.json();
         setMessages(data);
       }
-    } catch (err) {
-      console.error("Failed to fetch SMS dev inbox", err);
+    } catch {
+      // Silently catch temporary network disconnections during live polling
     } finally {
       setLoading(false);
     }
