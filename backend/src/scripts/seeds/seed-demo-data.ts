@@ -104,6 +104,9 @@ export async function seedDemoData(app: INestApplicationContext) {
 
   console.log('\n🧹 Clearing existing database tables...');
   await dataSource.query(
+    'DROP TABLE IF EXISTS photographer_profiles CASCADE;',
+  );
+  await dataSource.query(
     'TRUNCATE TABLE messages, payments, reservations, packages, service_profiles, customers, users, audit_logs CASCADE;',
   );
 
