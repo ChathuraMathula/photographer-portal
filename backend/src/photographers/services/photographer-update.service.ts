@@ -46,6 +46,8 @@ export class PhotographerUpdateService {
     const saved = await this.profileRepository.save(profile);
 
     this.chatGateway.broadcastProfileUpdate(saved.bookingSlug, {
+      id: saved.id,
+      userId: saved.userId,
       bookingSlug: saved.bookingSlug,
       firstName: profile.user.firstName,
       lastName: profile.user.lastName,
@@ -62,6 +64,8 @@ export class PhotographerUpdateService {
       allowedEventTypes: saved.allowedEventTypes,
       allowCustomEventTypes: saved.allowCustomEventTypes,
       offlineMessage: saved.offlineMessage,
+      rating: saved.rating,
+      ratingCount: saved.ratingCount,
     });
 
     return saved;
@@ -77,6 +81,8 @@ export class PhotographerUpdateService {
     const saved = await this.profileRepository.save(profile);
 
     this.chatGateway.broadcastProfileUpdate(saved.bookingSlug, {
+      id: saved.id,
+      userId: saved.userId,
       bookingSlug: saved.bookingSlug,
       firstName: profile.user.firstName,
       lastName: profile.user.lastName,
@@ -93,6 +99,8 @@ export class PhotographerUpdateService {
       allowedEventTypes: saved.allowedEventTypes,
       allowCustomEventTypes: saved.allowCustomEventTypes,
       offlineMessage: saved.offlineMessage,
+      rating: saved.rating,
+      ratingCount: saved.ratingCount,
     });
 
     return saved;

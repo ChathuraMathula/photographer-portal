@@ -111,13 +111,21 @@ export function usePhotographers() {
 
     socketRef.current = socket;
 
-    socket.on("photographerUpdated", (updatedData: Partial<PhotographerProfileItem>) => {
+    const handleUpdate = (updatedData: Partial<PhotographerProfileItem>) => {
       setPhotographers((prev) =>
         prev.map((p) => {
-          if (p.id === updatedData.id || p.userId === updatedData.userId) {
+          if (
+            (updatedData.id && p.id === updatedData.id) ||
+            (updatedData.userId && p.userId === updatedData.userId) ||
+            (updatedData.bookingSlug && p.bookingSlug === updatedData.bookingSlug)
+          ) {
             return {
               ...p,
               ...updatedData,
+              isAvailableForBooking:
+                updatedData.isAvailableForBooking !== undefined
+                  ? updatedData.isAvailableForBooking
+                  : p.isAvailableForBooking,
               rating: updatedData.rating !== undefined ? updatedData.rating : p.rating,
               ratingCount:
                 updatedData.ratingCount !== undefined
@@ -128,7 +136,10 @@ export function usePhotographers() {
           return p;
         })
       );
-    });
+    };
+
+    socket.on("photographerUpdated", handleUpdate);
+    socket.on("profileUpdated", handleUpdate);
 
     return () => {
       socket.disconnect();

@@ -26,9 +26,14 @@ export function PhotographersHeader({
   searchTerm,
   onSearchChange,
 }: PhotographersHeaderProps) {
+  const [mounted, setMounted] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const auth = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -65,7 +70,7 @@ export function PhotographersHeader({
 
         {/* Right Actions / Sign In Menu */}
         <div className="relative">
-          {auth.isAuthenticated ? (
+          {mounted && auth.isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
                 href={
@@ -110,7 +115,7 @@ export function PhotographersHeader({
               className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
               onMouseLeave={() => setDropdownOpen(false)}
             >
-              {auth.isAuthenticated ? (
+              {mounted && auth.isAuthenticated ? (
                 <>
                   <div className="px-4 py-2 border-b border-zinc-150 dark:border-zinc-800">
                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
