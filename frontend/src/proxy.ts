@@ -9,7 +9,7 @@ import {
 import { decodeJwtPayload } from "@/lib/jwt";
 import { UserRole } from "@/store/slices/authSlice";
 
-const AUTH_PAGES = ["/login", "/photographer/login", "/admin/login"];
+const AUTH_PAGES = ["/login", "/portal/login", "/photographer/login", "/admin/login"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

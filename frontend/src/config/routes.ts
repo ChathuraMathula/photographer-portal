@@ -4,8 +4,10 @@ import { UserRole } from "@/store/slices/authSlice";
 export const PUBLIC_ROUTES = [
   "/",
   "/login",
+  "/portal/login",
   "/photographer/login",
   "/admin/login",
+  "/photography",
   "/photographers",
   "/studios",
   "/register/photographer",
@@ -17,12 +19,14 @@ export const PUBLIC_ROUTES = [
   "/auth/customer-verify",
 ];
 
-// Prefix-match public routes — /book/:slug, /photographers, /studios, /register, etc. are public
+// Prefix-match public routes — /book/:slug, /photography, /photographers, /studios, /register, etc. are public
 export const PUBLIC_PREFIXES = [
   "/book",
+  "/photography",
   "/photographers",
   "/photographer",
   "/studios",
+  "/portal",
   "/admin",
   "/register",
   "/leaflet",
@@ -40,6 +44,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/settings",
     "/dashboard/audit-logs",
     "/dashboard/reports",
+    "/photography",
     "/photographers",
   ],
   [UserRole.ADMIN]: [
@@ -47,6 +52,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/users",
     "/dashboard/reports",
     "/dashboard/profile",
+    "/photography",
     "/photographers",
   ],
   [UserRole.STUDIO]: [
@@ -57,6 +63,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/packages",
     "/dashboard/profile",
     "/dashboard/settings",
+    "/photography",
     "/photographers",
   ],
   [UserRole.PHOTOGRAPHER]: [
@@ -67,10 +74,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/dashboard/profile",
     "/dashboard/settings",
     "/dashboard/invoices",
+    "/photography",
     "/photographers",
   ],
   [UserRole.CUSTOMER]: [
     "/customer",
+    "/photography",
     "/photographers",
   ],
 };
