@@ -181,21 +181,11 @@ export function AdminLoginForm() {
         <div className="flex flex-col sm:flex-row gap-2">
           <Link
             href="/login"
-            className="flex-1 inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
+            className="flex-1 inline-flex items-center justify-between p-3 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 font-bold">
               <User className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              Customer Sign In
-            </span>
-            <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
-          </Link>
-          <Link
-            href="/photographer/login"
-            className="flex-1 inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
-          >
-            <span className="flex items-center gap-1.5">
-              <Camera className="h-3.5 w-3.5 text-[#0e2d5c] dark:text-indigo-400" />
-              Photographer Login
+              Customer Sign In Portal
             </span>
             <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
           </Link>

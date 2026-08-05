@@ -5,8 +5,6 @@ export const PUBLIC_ROUTES = [
   "/",
   "/login",
   "/portal/login",
-  "/photographer/login",
-  "/admin/login",
   "/photography",
   "/photographers",
   "/studios",

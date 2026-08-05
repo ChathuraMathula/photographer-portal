@@ -245,21 +245,12 @@ export function PhotographersHeader({
                   </Link>
 
                   <Link
-                    href="/photographer/login"
+                    href="/portal/login"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors border-t border-zinc-150 dark:border-zinc-800 mt-1 pt-2"
                   >
-                    <Camera className="h-4 w-4 text-indigo-600" />
-                    Photographer Login
-                  </Link>
-
-                  <Link
-                    href="/admin/login"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border-t border-zinc-150 dark:border-zinc-800 mt-1 pt-2"
-                  >
-                    <Building2 className="h-4 w-4 text-purple-600" />
-                    Studio & Admin Login
+                    <Building2 className="h-4 w-4 text-indigo-600" />
+                    Provider & Partner Portal
                   </Link>
                 </>
               )}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, CheckCircle2, Camera, ShieldCheck, ArrowRight } from "lucide-react";
+import { Mail, CheckCircle2, Camera, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
 
 export function CustomerLoginForm() {
   const [customerEmail, setCustomerEmail] = useState("");
@@ -125,22 +125,12 @@ export function CustomerLoginForm() {
         </p>
         <div className="flex flex-col sm:flex-row gap-2">
           <Link
-            href="/photographer/login"
-            className="flex-1 inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
+            href="/portal/login"
+            className="flex-1 inline-flex items-center justify-between p-3 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
           >
-            <span className="flex items-center gap-1.5">
-              <Camera className="h-3.5 w-3.5 text-[#0e2d5c] dark:text-blue-400" />
-              Photographer Login
-            </span>
-            <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
-          </Link>
-          <Link
-            href="/admin/login"
-            className="flex-1 inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all group"
-          >
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
-              Admin Login
+            <span className="flex items-center gap-1.5 font-bold">
+              <Building2 className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+              Provider, Studio & Admin Portal Login
             </span>
             <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
           </Link>

@@ -226,9 +226,9 @@ export default function RegisterPhotographerWizardPage() {
                   Return to Showcase
                 </Button>
               </Link>
-              <Link href="/photographer/login">
+              <Link href="/portal/login">
                 <Button variant="outline" className="w-full sm:w-auto h-10 px-6 font-bold text-xs rounded-xl cursor-pointer">
-                  Go to Photographer Login
+                  Go to Provider Login
                 </Button>
               </Link>
             </div>
