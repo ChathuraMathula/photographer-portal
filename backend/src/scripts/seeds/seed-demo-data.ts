@@ -585,26 +585,177 @@ export async function seedDemoData(app: INestApplicationContext) {
     }
   }
 
-  // 7. Print Comprehensive Verification Report in Console
+  // 8. Create Demo Studio 1: Apex Lens Studios
+  const apexStudioEmail = 'studio.apex@photoportal.com';
+  const apexHash = await bcrypt.hash('Welcome@123', 10);
+  const apexStudioUser = manager.create(User, {
+    firstName: 'Ruwan',
+    lastName: 'Senanayake',
+    email: apexStudioEmail,
+    passwordHash: apexHash,
+    role: UserRole.STUDIO,
+    studioName: 'Apex Lens Studios',
+    studioSlug: 'studio-apex',
+    maxPhotographers: 5,
+    subscriptionPlan: 'PRO',
+    isActive: true,
+    phone: '+94773334455',
+  });
+  await manager.save(User, apexStudioUser);
+
+  const apexProfile = manager.create(PhotographerProfile, {
+    userId: apexStudioUser.id,
+    bookingSlug: 'studio-apex',
+    bio: "Colombo's premier multi-photographer production studio specializing in high-end fashion, luxury weddings, and commercial ad shoots.",
+    baseLocation: 'Colombo 07, Western Province',
+    city: 'Colombo',
+    district: 'Colombo District',
+    locationMapLink: 'https://www.google.com/maps?q=6.9174,79.8488',
+    allowedEventTypes: ['Wedding', 'Fashion', 'Commercial', 'Event', 'Portrait'],
+    isAvailableForBooking: true,
+    universalDepositType: 'fixed',
+    universalDepositValue: 2000000,
+  });
+  await manager.save(PhotographerProfile, apexProfile);
+
+  // Apex Team Members
+  const senakaHash = await bcrypt.hash('Welcome@123', 10);
+  const senakaStaff = manager.create(User, {
+    firstName: 'Senaka',
+    lastName: 'Silva',
+    email: 'apex.senaka@photoportal.com',
+    username: 'senaka_apex',
+    passwordHash: senakaHash,
+    role: UserRole.STUDIO_PHOTOGRAPHER,
+    studioId: apexStudioUser.id,
+    studioName: 'Apex Lens Studios',
+    studioSlug: 'studio-apex',
+    isActive: true,
+    phone: '+94774445566',
+  });
+  await manager.save(User, senakaStaff);
+
+  const senakaProfile = manager.create(PhotographerProfile, {
+    userId: senakaStaff.id,
+    bookingSlug: 'senaka-silva',
+    bio: 'Lead Wedding & Fashion Photographer at Apex Lens Studios.',
+  });
+  await manager.save(PhotographerProfile, senakaProfile);
+
+  // Apex Packages
+  const apexPkg = manager.create(Package, {
+    photographerId: apexStudioUser.id,
+    name: 'Apex Signature Wedding Suite',
+    description: 'Complete luxury studio coverage with 2 senior photographers, drone cinematography, and premium printed leather album.',
+    priceInCents: 30000000,
+    durationHours: 12,
+    depositType: 'fixed',
+    depositValue: 5000000,
+    includes: ['2 Lead Photographers', 'Drone Shots', '40-Page Photobook', 'All Edited RAW Files'],
+    isActive: true,
+  });
+  await manager.save(Package, apexPkg);
+
+  // Apex Sample Reservation
+  const apexRes = manager.create(Reservation, {
+    customerId: customers[0].id,
+    photographerId: apexStudioUser.id,
+    assignedPhotographerId: senakaStaff.id,
+    date: new Date('2026-08-15'),
+    startTime: '08:00',
+    endTime: '18:00',
+    eventType: 'Wedding',
+    location: locationsList[0].location,
+    city: locationsList[0].city,
+    district: locationsList[0].district,
+    status: ReservationStatus.CONFIRMED,
+    reservationToken: randomToken(),
+    totalAmountInCents: 30000000,
+    advancePaymentPriceInCents: 5000000,
+    clientSelectedPackageId: apexPkg.id,
+  });
+  await manager.save(Reservation, apexRes);
+
+  // 9. Create Demo Studio 2: Lumina Creative Studio
+  const luminaStudioEmail = 'studio.lumina@photoportal.com';
+  const luminaHash = await bcrypt.hash('Welcome@123', 10);
+  const luminaStudioUser = manager.create(User, {
+    firstName: 'Kavinda',
+    lastName: 'De Silva',
+    email: luminaStudioEmail,
+    passwordHash: luminaHash,
+    role: UserRole.STUDIO,
+    studioName: 'Lumina Creative Studio',
+    studioSlug: 'studio-lumina',
+    maxPhotographers: 5,
+    subscriptionPlan: 'PRO',
+    isActive: true,
+    phone: '+94775556677',
+  });
+  await manager.save(User, luminaStudioUser);
+
+  const luminaProfile = manager.create(PhotographerProfile, {
+    userId: luminaStudioUser.id,
+    bookingSlug: 'studio-lumina',
+    bio: 'Modern creative agency & photography studio based in Galle. Specialists in beach destination weddings, event cinematography & portraiture.',
+    baseLocation: 'Galle Fort, Southern Province',
+    city: 'Galle',
+    district: 'Galle District',
+    locationMapLink: 'https://www.google.com/maps?q=6.0425,80.2032',
+    allowedEventTypes: ['Wedding', 'Beach Shoot', 'Pre-Wedding', 'Event'],
+    isAvailableForBooking: true,
+    universalDepositType: 'fixed',
+    universalDepositValue: 1500000,
+  });
+  await manager.save(PhotographerProfile, luminaProfile);
+
+  // Lumina Packages
+  const luminaPkg = manager.create(Package, {
+    photographerId: luminaStudioUser.id,
+    name: 'Galle Destination Wedding Experience',
+    description: 'Bespoke coastal wedding photography & film session around Galle Fort.',
+    priceInCents: 28000000,
+    durationHours: 10,
+    depositType: 'fixed',
+    depositValue: 4000000,
+    includes: ['Full Day Beach & Fort Session', 'Online Gallery', 'Highlight Reel'],
+    isActive: true,
+  });
+  await manager.save(Package, luminaPkg);
+
+  // Lumina Sample Reservation
+  const luminaRes = manager.create(Reservation, {
+    customerId: customers[1].id,
+    photographerId: luminaStudioUser.id,
+    date: new Date('2026-08-22'),
+    startTime: '10:00',
+    endTime: '18:00',
+    eventType: 'Wedding',
+    location: locationsList[2].location,
+    city: locationsList[2].city,
+    district: locationsList[2].district,
+    status: ReservationStatus.PENDING,
+    reservationToken: randomToken(),
+    totalAmountInCents: 28000000,
+    advancePaymentPriceInCents: 4000000,
+    clientSelectedPackageId: luminaPkg.id,
+  });
+  await manager.save(Reservation, luminaRes);
+
+  // 10. Print Comprehensive Verification Report in Console
   const totalReservations = allSpecs.length;
   const totalRevenueLkr = (totalRevenueCents / 100).toLocaleString();
   const nuwanRevenueLkr = (nuwanRevenueCents / 100).toLocaleString();
 
   console.log('\n========================================================================');
-  console.log('🎉 DEMO SEED COMPLETED SUCCESSFULLY FOR SUPUN KANISHKA & NUWAN THUSHARA');
+  console.log('🎉 DEMO SEED COMPLETED SUCCESSFULLY (WITH 2 STUDIOS & SOLO TALENT)');
   console.log('========================================================================');
   console.log(`👤 Super Admin:          ${adminEmail} / ${adminPassword}`);
   console.log('------------------------------------------------------------------------');
-  console.log(`📸 Photographer 1:       Supun Kanishka`);
-  console.log(`📧 Email / Pass:         ${supunEmail} / ${supunPassword}`);
-  console.log(`🔗 Booking Slug:         ${profile.bookingSlug}`);
-  console.log(`• Total Reservations:    ${totalReservations} (Completed: ${totalCompleted}, Confirmed: ${totalConfirmed}, Pending: ${totalPending}, Rejected: ${totalRejected}, Cancelled: ${totalCancelled})`);
-  console.log(`• Settled Revenue:       LKR ${totalRevenueLkr}`);
+  console.log(`📸 Solo Photographer 1:  Supun Kanishka (${supunEmail} / ${supunPassword})`);
+  console.log(`📸 Solo Photographer 2:  Nuwan Thushara (${nuwanEmail} / ${nuwanPassword})`);
   console.log('------------------------------------------------------------------------');
-  console.log(`📸 Photographer 2:       Nuwan Thushara`);
-  console.log(`📧 Email / Pass:         ${nuwanEmail} / ${nuwanPassword}`);
-  console.log(`🔗 Booking Slug:         ${nuwanProfile.bookingSlug}`);
-  console.log(`• Total Reservations:    ${allNuwanSpecs.length} (Completed: ${nuwanCompleted}, Confirmed: ${nuwanConfirmed}, Pending: ${nuwanPending}, Rejected: ${nuwanRejected}, Cancelled: ${nuwanCancelled})`);
-  console.log(`• Settled Revenue:       LKR ${nuwanRevenueLkr}`);
+  console.log(`🏢 Studio 1:             Apex Lens Studios (${apexStudioEmail} / Welcome@123)`);
+  console.log(`🏢 Studio 2:             Lumina Creative Studio (${luminaStudioEmail} / Welcome@123)`);
   console.log('========================================================================\n');
 }

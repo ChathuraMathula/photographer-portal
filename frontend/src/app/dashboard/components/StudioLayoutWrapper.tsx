@@ -14,6 +14,7 @@ import {
   Package,
   Settings,
   UserCog,
+  Users,
 } from "lucide-react";
 
 export function StudioLayoutWrapper({
@@ -55,17 +56,16 @@ export function StudioLayoutWrapper({
       console.error("Backend logout error:", err);
     }
     dispatch(logout());
-    window.location.href = "/admin/login";
+    window.location.href = "/portal/login";
   };
 
   const menuItems = [
     { id: "dashboard", label: "Studio Overview", icon: LayoutDashboard },
     { id: "reservations", label: "Reservations", icon: CalendarDays },
     { id: "calendar", label: "Calendar", icon: CalendarDays },
-    { id: "photographers", label: "Team Photographers", icon: Camera },
+    { id: "photographers", label: "Team", icon: Users },
     { id: "packages", label: "Packages", icon: Package },
     { id: "profile", label: "Studio Profile", icon: UserCog },
-    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (

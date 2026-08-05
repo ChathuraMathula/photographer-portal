@@ -58,12 +58,18 @@ export default function DashboardLayoutWrapper({
     );
   }
 
-  if (role === UserRole.STUDIO) {
+  if (
+    role === UserRole.STUDIO ||
+    (role as string) === "STUDIO_PHOTOGRAPHER" ||
+    (role as string) === "STUDIO_STAFF"
+  ) {
     return (
       <UserSettingsProvider>
-        <StudioLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
-          {children}
-        </StudioLayoutWrapper>
+        <PhotographerDashboardProvider>
+          <StudioLayoutWrapper firstName={firstName ?? ""} role={role ?? ""}>
+            {children}
+          </StudioLayoutWrapper>
+        </PhotographerDashboardProvider>
       </UserSettingsProvider>
     );
   }

@@ -5,8 +5,8 @@ import { UserRole } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-// Dashboard sub-components
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard/AdminDashboard";
+import { StudioOverview } from "@/components/dashboard/studio-overview/StudioOverview";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,6 +32,14 @@ export default function DashboardPage() {
         onLogout={handleLogout}
       />
     );
+  }
+
+  if (
+    role === UserRole.STUDIO ||
+    (role as string) === "STUDIO_PHOTOGRAPHER" ||
+    (role as string) === "STUDIO_STAFF"
+  ) {
+    return <StudioOverview />;
   }
 
   return (
