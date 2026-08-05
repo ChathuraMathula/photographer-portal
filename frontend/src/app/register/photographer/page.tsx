@@ -27,6 +27,8 @@ import {
   Check,
   Eye,
   EyeOff,
+  AtSign,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -46,6 +48,8 @@ export default function RegisterPhotographerWizardPage() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    username: "",
+    bookingSlug: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -61,6 +65,26 @@ export default function RegisterPhotographerWizardPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const handleNameChange = (first: string, last: string) => {
+    const defaultSlug = slugify(`${first}-${last}`);
+    const defaultUsername = slugify(`${first}${last}`);
+    setFormData((prev) => ({
+      ...prev,
+      firstName: first,
+      lastName: last,
+      username: prev.username || defaultUsername,
+      bookingSlug: prev.bookingSlug || defaultSlug,
+    }));
+  };
+
   const toggleSpecialization = (spec: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -75,11 +99,13 @@ export default function RegisterPhotographerWizardPage() {
       if (
         !formData.firstName ||
         !formData.lastName ||
+        !formData.username ||
+        !formData.bookingSlug ||
         !formData.email ||
         !formData.password ||
         !formData.confirmPassword
       ) {
-        toast.error("Please fill in all required account fields.");
+        toast.error("Please fill in all required account and username fields.");
         return;
       }
       if (formData.password.length < 6) {
@@ -115,6 +141,8 @@ export default function RegisterPhotographerWizardPage() {
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
+          username: formData.username,
+          bookingSlug: formData.bookingSlug,
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
@@ -187,8 +215,8 @@ export default function RegisterPhotographerWizardPage() {
               </div>
               <ul className="list-disc list-inside text-zinc-500 space-y-1 text-[11px]">
                 <li>Super admins will review your details and contact number.</li>
-                <li>Once approved, your account will be activated and visible on the SeyaRoo showcase.</li>
-                <li>You will then be able to log in via <strong>Photographer Login</strong>.</li>
+                <li>Your handle: <strong>@{formData.username.replace(/^@/, '')}</strong></li>
+                <li>Your booking link: <strong>seyaroo.com/book/{formData.bookingSlug}</strong></li>
               </ul>
             </div>
 
@@ -211,8 +239,8 @@ export default function RegisterPhotographerWizardPage() {
             <div className="bg-zinc-50 dark:bg-zinc-950 p-4 border-b border-zinc-200/60 dark:border-zinc-800">
               <div className="flex items-center justify-between max-w-sm mx-auto">
                 {[
-                  { step: 1, label: "Account" },
-                  { step: 2, label: "Profile" },
+                  { step: 1, label: "Account & Handle" },
+                  { step: 2, label: "Profile Info" },
                   { step: 3, label: "Specialties" },
                 ].map((s, idx) => (
                   <React.Fragment key={s.step}>
@@ -264,12 +292,12 @@ export default function RegisterPhotographerWizardPage() {
                 <span className="text-[10px] font-bold text-zinc-400">Step {currentStep} of 3</span>
               </div>
               <CardTitle className="text-xl font-black text-zinc-900 dark:text-white mt-1">
-                {currentStep === 1 && "Create Your Photographer Credentials"}
+                {currentStep === 1 && "Account Credentials & Username"}
                 {currentStep === 2 && "Location & Portfolio Information"}
                 {currentStep === 3 && "Specializations & Review Application"}
               </CardTitle>
               <CardDescription className="text-xs text-zinc-500">
-                {currentStep === 1 && "Enter your basic contact details and account login password."}
+                {currentStep === 1 && "Choose your unique handle, booking slug, and login password."}
                 {currentStep === 2 && "Provide your base operating city and a brief introduction for clients."}
                 {currentStep === 3 && "Select your core photography styles and review your registration."}
               </CardDescription>
@@ -277,7 +305,7 @@ export default function RegisterPhotographerWizardPage() {
 
             <form onSubmit={handleSubmit}>
               <CardContent className="p-6 space-y-4">
-                {/* STEP 1: Account Credentials */}
+                {/* STEP 1: Account Credentials & Username */}
                 {currentStep === 1 && (
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -290,7 +318,7 @@ export default function RegisterPhotographerWizardPage() {
                           placeholder="e.g. Kasun"
                           value={formData.firstName}
                           onChange={(e) =>
-                            setFormData({ ...formData, firstName: e.target.value })
+                            handleNameChange(e.target.value, formData.lastName)
                           }
                           className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                         />
@@ -304,10 +332,51 @@ export default function RegisterPhotographerWizardPage() {
                           placeholder="e.g. Perera"
                           value={formData.lastName}
                           onChange={(e) =>
-                            setFormData({ ...formData, lastName: e.target.value })
+                            handleNameChange(formData.firstName, e.target.value)
                           }
                           className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                         />
+                      </div>
+                    </div>
+
+                    {/* Username & Booking Slug inputs */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Unique Username *</span>
+                          <span className="text-[10px] text-zinc-400">e.g. @kasunperera</span>
+                        </Label>
+                        <div className="relative">
+                          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="kasunperera"
+                            value={formData.username}
+                            onChange={(e) =>
+                              setFormData({ ...formData, username: slugify(e.target.value) })
+                            }
+                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Custom Booking Slug *</span>
+                          <span className="text-[10px] text-zinc-400">seyaroo.com/book/slug</span>
+                        </Label>
+                        <div className="relative">
+                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="kasun-perera"
+                            value={formData.bookingSlug}
+                            onChange={(e) =>
+                              setFormData({ ...formData, bookingSlug: slugify(e.target.value) })
+                            }
+                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -488,6 +557,12 @@ export default function RegisterPhotographerWizardPage() {
                       </div>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         <strong>Name:</strong> {formData.firstName} {formData.lastName}
+                      </p>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                        <strong>Username Handle:</strong> @{formData.username.replace(/^@/, '')}
+                      </p>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                        <strong>Booking Link:</strong> seyaroo.com/book/{formData.bookingSlug}
                       </p>
                       <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                         <strong>Email:</strong> {formData.email}

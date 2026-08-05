@@ -4,13 +4,10 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  IsArray,
 } from 'class-validator';
 
-export class RegisterStudioDto {
-  @IsNotEmpty()
-  @IsString()
-  studioName!: string;
-
+export class CreateStudioPhotographerDto {
   @IsNotEmpty()
   @IsString()
   firstName!: string;
@@ -28,7 +25,7 @@ export class RegisterStudioDto {
 
   @IsNotEmpty()
   @IsString()
-  studioSlug!: string;
+  bookingSlug!: string;
 
   @MinLength(6)
   password!: string;
@@ -39,9 +36,10 @@ export class RegisterStudioDto {
 
   @IsOptional()
   @IsString()
-  city?: string;
+  bio?: string;
 
   @IsOptional()
-  @IsString()
-  address?: string;
+  @IsArray()
+  @IsString({ each: true })
+  specializations?: string[];
 }

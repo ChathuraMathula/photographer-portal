@@ -19,6 +19,14 @@ export class RegisterPhotographerDto {
   @IsEmail()
   email!: string;
 
+  @IsNotEmpty()
+  @IsString()
+  username!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  bookingSlug!: string;
+
   @MinLength(6)
   password!: string;
 

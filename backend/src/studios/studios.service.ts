@@ -1,13 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../entities/user.entity';
+import { PhotographerProfile } from '../entities/photographer-profile.entity';
+import { CreateStudioPhotographerDto } from './dto/create-studio-photographer.dto';
+import { UserSlugService } from '../users/services/user-slug.service';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class StudiosService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PhotographerProfile)
+    private readonly profileRepository: Repository<PhotographerProfile>,
+    private readonly slugService: UserSlugService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   async findPublicPaginated(query: {
@@ -37,7 +51,6 @@ export class StudiosService {
 
     const [studios, total] = await qb.getManyAndCount();
 
-    // Attach photographer counts for each studio
     const studioItems = await Promise.all(
       studios.map(async (studio) => {
         const photographerCount = await this.userRepository.count({
@@ -82,7 +95,6 @@ export class StudiosService {
       throw new NotFoundException('Studio not found');
     }
 
-    // Get photographers under this studio
     const photographers = await this.userRepository.find({
       where: { studioId: studio.id, isActive: true },
       relations: { profile: true },
@@ -110,6 +122,125 @@ export class StudiosService {
         rating: p.profile?.rating || 5.0,
         ratingCount: p.profile?.ratingCount || 0,
         isAvailableForBooking: p.profile?.isAvailableForBooking ?? true,
+      })),
+    };
+  }
+
+  async createStudioPhotographer(
+    studioUserId: string,
+    dto: CreateStudioPhotographerDto,
+  ) {
+    const studio = await this.userRepository.findOneBy({ id: studioUserId });
+    if (!studio || studio.role !== UserRole.STUDIO) {
+      throw new ForbiddenException('Only verified Studios can add team photographers.');
+    }
+
+    // Check capacity quota
+    const currentCount = await this.userRepository.count({
+      where: { studioId: studioUserId, isActive: true },
+    });
+
+    if (currentCount >= studio.maxPhotographers) {
+      throw new ForbiddenException(
+        `You have reached the maximum photographer limit (${studio.maxPhotographers}) for your ${studio.subscriptionPlan} plan. Upgrade your plan to add more team members.`,
+      );
+    }
+
+    const cleanUsername = dto.username.toLowerCase().trim().replace(/^@/, '');
+    const cleanSlug = this.slugService.slugify(dto.bookingSlug);
+
+    const existingEmail = await this.userRepository.findOneBy({ email: dto.email });
+    if (existingEmail) {
+      throw new ConflictException('An account with this email address already exists.');
+    }
+
+    const existingUsername = await this.userRepository.findOneBy({ username: cleanUsername });
+    if (existingUsername) {
+      throw new ConflictException(`Username "@${cleanUsername}" is already taken.`);
+    }
+
+    const existingSlug = await this.profileRepository.findOneBy({ bookingSlug: cleanSlug });
+    if (existingSlug) {
+      throw new ConflictException(`Booking slug "${cleanSlug}" is already taken.`);
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    const user = this.userRepository.create({
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      username: cleanUsername,
+      passwordHash,
+      role: UserRole.PHOTOGRAPHER,
+      studioId: studioUserId,
+      studioName: studio.studioName,
+      studioLogoUrl: studio.studioLogoUrl,
+      studioSlug: studio.studioSlug,
+      isActive: true,
+      phone: dto.phone,
+      subscriptionPlan: studio.subscriptionPlan,
+    });
+    await this.userRepository.save(user);
+
+    const profile = this.profileRepository.create({
+      userId: user.id,
+      bookingSlug: cleanSlug,
+      bio: dto.bio,
+      specializations: dto.specializations ?? [],
+      isAvailableForBooking: true,
+    });
+    await this.profileRepository.save(profile);
+
+    await this.auditLogsService.logAction(
+      'STUDIO_PHOTOGRAPHER_CREATED',
+      `Studio ${studio.studioName} added photographer ${user.email} (@${cleanUsername})`,
+      user.id,
+      user.email,
+    );
+
+    return {
+      message: 'Photographer added successfully to your studio team!',
+      photographer: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: `@${cleanUsername}`,
+        bookingSlug: cleanSlug,
+      },
+    };
+  }
+
+  async getStudioPhotographers(studioUserId: string) {
+    const studio = await this.userRepository.findOneBy({ id: studioUserId });
+    if (!studio) throw new NotFoundException('Studio not found');
+
+    const photographers = await this.userRepository.find({
+      where: { studioId: studioUserId },
+      relations: { profile: true },
+    });
+
+    const currentCount = photographers.filter((p) => p.isActive).length;
+
+    return {
+      capacity: {
+        used: currentCount,
+        max: studio.maxPhotographers,
+        plan: studio.subscriptionPlan,
+      },
+      photographers: photographers.map((p) => ({
+        id: p.id,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        email: p.email,
+        username: p.username ? `@${p.username}` : undefined,
+        phone: p.phone,
+        isActive: p.isActive,
+        bookingSlug: p.profile?.bookingSlug,
+        bio: p.profile?.bio,
+        specializations: p.profile?.specializations || [],
+        isPublishedToGlobalShowcase: p.isPublishedToGlobalShowcase,
       })),
     };
   }

@@ -23,6 +23,8 @@ import {
   Check,
   Eye,
   EyeOff,
+  AtSign,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,6 +33,8 @@ export default function RegisterStudioWizardPage() {
 
   const [formData, setFormData] = useState({
     studioName: "",
+    username: "",
+    studioSlug: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -47,10 +51,31 @@ export default function RegisterStudioWizardPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const handleStudioNameChange = (name: string) => {
+    const defaultSlug = slugify(name);
+    const defaultUsername = slugify(name);
+    setFormData((prev) => ({
+      ...prev,
+      studioName: name,
+      username: prev.username || defaultUsername,
+      studioSlug: prev.studioSlug || defaultSlug,
+    }));
+  };
+
   const handleNextStep = () => {
     if (currentStep === 1) {
       if (
         !formData.studioName ||
+        !formData.username ||
+        !formData.studioSlug ||
         !formData.firstName ||
         !formData.lastName ||
         !formData.email ||
@@ -92,6 +117,8 @@ export default function RegisterStudioWizardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studioName: formData.studioName,
+          username: formData.username,
+          studioSlug: formData.studioSlug,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -165,8 +192,9 @@ export default function RegisterStudioWizardPage() {
               </div>
               <ul className="list-disc list-inside text-zinc-500 space-y-1 text-[11px]">
                 <li>Super admins will verify your studio organization and contact details.</li>
-                <li>Your studio starts on our <strong>Free Tier</strong> (up to 5 team photographers).</li>
-                <li>Once approved, log into your studio dashboard via the <strong>Studio & Admin Portal</strong>.</li>
+                <li>Studio Username: <strong>@{formData.username.replace(/^@/, '')}</strong></li>
+                <li>Studio Showcase URL: <strong>seyaroo.com/studios/{formData.studioSlug}</strong></li>
+                <li>Capacity: Up to 5 team photographers included on Free Tier.</li>
               </ul>
             </div>
 
@@ -189,7 +217,7 @@ export default function RegisterStudioWizardPage() {
             <div className="bg-zinc-50 dark:bg-zinc-950 p-4 border-b border-zinc-200/60 dark:border-zinc-800">
               <div className="flex items-center justify-between max-w-sm mx-auto">
                 {[
-                  { step: 1, label: "Credentials" },
+                  { step: 1, label: "Credentials & Handle" },
                   { step: 2, label: "Studio Info" },
                   { step: 3, label: "Review" },
                 ].map((s, idx) => (
@@ -242,12 +270,12 @@ export default function RegisterStudioWizardPage() {
                 <span className="text-[10px] font-bold text-zinc-400">Step {currentStep} of 3</span>
               </div>
               <CardTitle className="text-xl font-black text-zinc-900 dark:text-white mt-1">
-                {currentStep === 1 && "Studio & Manager Account Details"}
+                {currentStep === 1 && "Studio Name, Username & Credentials"}
                 {currentStep === 2 && "Location & Address Information"}
                 {currentStep === 3 && "Plan Summary & Final Submission"}
               </CardTitle>
               <CardDescription className="text-xs text-zinc-500">
-                {currentStep === 1 && "Enter studio business name, manager name, and login password."}
+                {currentStep === 1 && "Enter studio business name, unique handle, and login password."}
                 {currentStep === 2 && "Provide contact phone number and primary studio address."}
                 {currentStep === 3 && "Review your studio details before sending for administrator approval."}
               </CardDescription>
@@ -266,11 +294,50 @@ export default function RegisterStudioWizardPage() {
                         required
                         placeholder="e.g. Apex Visuals Studio"
                         value={formData.studioName}
-                        onChange={(e) =>
-                          setFormData({ ...formData, studioName: e.target.value })
-                        }
+                        onChange={(e) => handleStudioNameChange(e.target.value)}
                         className="h-10 text-xs rounded-xl border-zinc-200 dark:border-zinc-800"
                       />
+                    </div>
+
+                    {/* Studio Username & Studio Slug inputs */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Studio Username *</span>
+                          <span className="text-[10px] text-zinc-400">e.g. @apexvisuals</span>
+                        </Label>
+                        <div className="relative">
+                          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="apexvisuals"
+                            value={formData.username}
+                            onChange={(e) =>
+                              setFormData({ ...formData, username: slugify(e.target.value) })
+                            }
+                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
+                          <span>Studio Profile Slug *</span>
+                          <span className="text-[10px] text-zinc-400">seyaroo.com/studios/slug</span>
+                        </Label>
+                        <div className="relative">
+                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                          <Input
+                            required
+                            placeholder="apex-visuals"
+                            value={formData.studioSlug}
+                            onChange={(e) =>
+                              setFormData({ ...formData, studioSlug: slugify(e.target.value) })
+                            }
+                            className="h-10 pl-9 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 font-mono"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -458,6 +525,8 @@ export default function RegisterStudioWizardPage() {
                       </div>
                       <div className="space-y-1 text-zinc-600 dark:text-zinc-400 text-[11px]">
                         <p><strong>Studio Name:</strong> {formData.studioName}</p>
+                        <p><strong>Studio Username:</strong> @{formData.username.replace(/^@/, '')}</p>
+                        <p><strong>Studio Showcase Link:</strong> seyaroo.com/studios/{formData.studioSlug}</p>
                         <p><strong>Manager:</strong> {formData.firstName} {formData.lastName}</p>
                         <p><strong>Official Email:</strong> {formData.email}</p>
                         <p><strong>Phone:</strong> {formData.phone || "Not specified"}</p>

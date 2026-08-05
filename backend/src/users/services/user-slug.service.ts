@@ -10,11 +10,16 @@ export class UserSlugService {
     private readonly profileRepository: Repository<PhotographerProfile>,
   ) {}
 
-  buildSlug(firstName: string, lastName: string): string {
-    return `${firstName}-${lastName}`
+  slugify(text: string): string {
+    return text
       .toLowerCase()
+      .trim()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/^-+|-+$/g, '');
+  }
+
+  buildSlug(firstName: string, lastName: string): string {
+    return this.slugify(`${firstName}-${lastName}`);
   }
 
   async resolveSlug(base: string): Promise<string> {
