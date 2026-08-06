@@ -351,9 +351,6 @@ export default function RegisterPhotographerWizardPage() {
             <span className="text-sm font-bold text-zinc-900 dark:text-white leading-none">Seya<span className="text-blue-600 dark:text-blue-400">Roo</span></span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/sms-tester" target="_blank" className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 text-[11px] font-bold hover:bg-emerald-100 transition-colors">
-              <Smartphone className="h-3.5 w-3.5" /><span>SMS Dev Inbox</span>
-            </Link>
             <Link href="/photography" className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
               <ArrowLeft className="h-3.5 w-3.5" />Directory
             </Link>
@@ -368,7 +365,7 @@ export default function RegisterPhotographerWizardPage() {
               <Clock className="h-8 w-8" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-extrabold text-zinc-900 dark:text-white">Application Submitted & Verified</h2>
+              <h2 className="text-xl font-extrabold text-zinc-900 dark:text-white">Application Submitted</h2>
               <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-md mx-auto">
                 Your email and phone number have been successfully verified. Your profile is undergoing review by our administrative team.
               </p>
@@ -388,7 +385,6 @@ export default function RegisterPhotographerWizardPage() {
             </div>
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/photography"><Button className="h-10 px-6 bg-[#0e2d5c] hover:bg-[#0b244a] text-white font-bold text-xs rounded-xl cursor-pointer">Return to Directory</Button></Link>
-              <Link href="/portal/login"><Button variant="outline" className="h-10 px-6 font-bold text-xs rounded-xl cursor-pointer">Go to Provider Login</Button></Link>
             </div>
           </Card>
         ) : (
