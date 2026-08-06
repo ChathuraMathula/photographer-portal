@@ -18,6 +18,11 @@ export class ChatGateway {
           }
         },
       }),
+      emit: (event: string, data: any) => {
+        if (this.chatWorker?.server) {
+          this.chatWorker.server.emit(event, data);
+        }
+      },
     };
   }
 

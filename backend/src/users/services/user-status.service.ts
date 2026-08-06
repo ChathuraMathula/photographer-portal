@@ -74,6 +74,19 @@ export class UserStatusService {
       }
     }
 
+    try {
+      this.chatGateway.server.to(`user_${id}`).emit('userUpdated', {
+        userId: id,
+        isActive: user.isActive,
+      });
+      this.chatGateway.server.emit('userUpdated', {
+        userId: id,
+        isActive: user.isActive,
+      });
+    } catch (err) {
+      console.error('Failed to emit userUpdated event:', err);
+    }
+
     await this.auditLogsService.logAction(
       'USER_STATUS_TOGGLED',
       `User ${user.email} active status toggled to ${user.isActive} by admin`,
@@ -102,23 +115,55 @@ export class UserStatusService {
 
     if (updates.firstName) user.firstName = updates.firstName;
     if (updates.lastName) user.lastName = updates.lastName;
-    await this.userRepository.save(user);
 
     let finalSlug: string | null = null;
-    const profile = await this.profileRepository.findOneBy({ userId });
 
-    if (profile && updates.bookingSlug) {
-      if (profile.bookingSlug !== updates.bookingSlug) {
-        const existing = await this.profileRepository.findOneBy({
-          bookingSlug: updates.bookingSlug,
-        });
-        if (existing) {
-          throw new ConflictException('Booking slug is already in use');
+    if (updates.bookingSlug) {
+      const cleanSlug = updates.bookingSlug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-');
+      if (user.role === UserRole.STUDIO) {
+        if (user.studioSlug !== cleanSlug) {
+          const existing = await this.userRepository.findOneBy({ studioSlug: cleanSlug });
+          if (existing && existing.id !== user.id) {
+            throw new ConflictException('Studio slug is already in use');
+          }
+          user.studioSlug = cleanSlug;
         }
-        profile.bookingSlug = updates.bookingSlug;
-        await this.profileRepository.save(profile);
+        finalSlug = user.studioSlug;
       }
-      finalSlug = profile.bookingSlug;
+
+      const profile = await this.profileRepository.findOneBy({ userId });
+      if (profile) {
+        if (profile.bookingSlug !== cleanSlug) {
+          const existing = await this.profileRepository.findOneBy({
+            bookingSlug: cleanSlug,
+          });
+          if (existing && existing.userId !== userId) {
+            throw new ConflictException('Booking slug is already in use');
+          }
+          profile.bookingSlug = cleanSlug;
+          await this.profileRepository.save(profile);
+        }
+        finalSlug = profile.bookingSlug;
+      }
+    }
+
+    await this.userRepository.save(user);
+
+    try {
+      this.chatGateway.server.to(`user_${userId}`).emit('userUpdated', {
+        userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        bookingSlug: finalSlug,
+      });
+      this.chatGateway.server.emit('userUpdated', {
+        userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        bookingSlug: finalSlug,
+      });
+    } catch (err) {
+      console.error('Failed to emit userUpdated event:', err);
     }
 
     await this.auditLogsService.logAction(

@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { type UserAccount } from "@/types";
 
+import { UserRole } from "@/store/slices/authSlice";
+
 type Props = {
   user: UserAccount;
   onClose: () => void;
@@ -18,9 +20,18 @@ type Props = {
 };
 
 export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
+  const isPhotographerOrStudio =
+    user.role === UserRole.PHOTOGRAPHER ||
+    user.role === UserRole.STUDIO ||
+    (user.role as string) === "STUDIO_PHOTOGRAPHER";
+
   const [firstName, setFirstName] = useState(user.firstName || "");
   const [lastName, setLastName] = useState(user.lastName || "");
-  const [slug, setSlug] = useState(user.profile?.bookingSlug || "");
+  const [slug, setSlug] = useState(
+    user.role === "STUDIO"
+      ? user.studioSlug || ""
+      : user.profile?.bookingSlug || "",
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -33,8 +44,8 @@ export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim())
       return setError("First and Last name cannot be empty.");
-    if (user.role === "PHOTOGRAPHER" && !slug.trim())
-      return setError("Slug cannot be empty for photographers.");
+    if (isPhotographerOrStudio && !slug.trim())
+      return setError("Slug cannot be empty.");
     setIsSubmitting(true);
     setError("");
 
@@ -51,7 +62,7 @@ export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
       if (!res.ok) {
         if (res.status === 409)
           setError(
-            "This booking slug is already taken. Please choose another one.",
+            "This slug is already taken. Please choose another one.",
           );
         else setError("Failed to update user details.");
         return;
@@ -122,23 +133,25 @@ export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
                 />
               </div>
             </div>
-            {user.role === "PHOTOGRAPHER" && (
+            {isPhotographerOrStudio && (
               <div className="space-y-2">
                 <Label
                   htmlFor="bookingSlug"
                   className="text-body-small-s font-semibold"
                 >
-                  Photographer Booking Slug
+                  {user.role === "STUDIO" ? "Studio Showcase Slug" : "Photographer Booking Slug"}
                 </Label>
                 <Input
                   id="bookingSlug"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  placeholder="e.g. john-doe"
+                  placeholder="e.g. john-doe-studio"
                   className="h-11 rounded-xl"
                 />
                 <p className="text-body-caption text-zinc-500 dark:text-zinc-400">
-                  This forms the booking URL (e.g. /book/{slug || "slug"})
+                  {user.role === "STUDIO"
+                    ? `This forms the public studio URL (e.g. /studios/${slug || "slug"})`
+                    : `This forms the booking URL (e.g. /book/${slug || "slug"})`}
                 </p>
               </div>
             )}
@@ -158,7 +171,7 @@ export function EditUserDetailsModal({ user, onClose, onSuccess }: Props) {
                 isSubmitting ||
                 !firstName ||
                 !lastName ||
-                (user.role === "PHOTOGRAPHER" && !slug)
+                (isPhotographerOrStudio && !slug)
               }
               className="h-11 py-0 shadow-sm btn-primary gap-2"
             >

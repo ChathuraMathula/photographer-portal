@@ -28,7 +28,20 @@ export function AdminLayoutWrapper({
   const dispatch = useDispatch();
   const { start } = useTopLoadingBar();
 
-  const activeTab = pathname.split("/").pop() as any;
+  let activeTab = "dashboard";
+  if (pathname.startsWith("/dashboard/users")) {
+    activeTab = "users";
+  } else if (pathname.startsWith("/dashboard/reports")) {
+    activeTab = "reports";
+  } else if (pathname.startsWith("/dashboard/profile")) {
+    activeTab = "profile";
+  } else if (pathname.startsWith("/dashboard/settings")) {
+    activeTab = "settings";
+  } else if (pathname.startsWith("/dashboard/audit-logs")) {
+    activeTab = "audit-logs";
+  } else {
+    activeTab = pathname.split("/").filter(Boolean).pop() || "dashboard";
+  }
 
   const handleTabChange = (tab: string) => {
     start();

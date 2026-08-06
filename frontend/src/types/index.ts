@@ -109,6 +109,7 @@ export type UserProfile = {
   baseLocation?: string;
   city?: string;
   district?: string;
+  locationMapLink?: string;
   specializations: string[] | string;
   offlineMessage?: string;
 };

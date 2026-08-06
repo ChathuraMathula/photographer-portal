@@ -113,16 +113,6 @@ export function UserTableRow({
               ) : (
                 <span className="text-body-caption text-zinc-400">-</span>
               )}
-              {loggedInRole === UserRole.SUPER_ADMIN &&
-                user.role === UserRole.PHOTOGRAPHER && (
-                  <button
-                    onClick={() => setShowEditModal(true)}
-                    className="p-1 text-zinc-400 hover:text-indigo-500 transition-colors"
-                    title="Edit Slug"
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
             </div>
           </div>
         </td>
@@ -201,19 +191,6 @@ export function UserTableRow({
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteConfirm(false)}
       />
-
-      {showEditModal && (
-        <EditUserDetailsModal
-          user={user}
-          onClose={() => setShowEditModal(false)}
-          onSuccess={(updatedUser) => {
-            setCurrentFirstName(updatedUser.firstName);
-            setCurrentLastName(updatedUser.lastName);
-            setCurrentSlug(updatedUser.bookingSlug || "");
-            setShowEditModal(false);
-          }}
-        />
-      )}
     </>
   );
 }
