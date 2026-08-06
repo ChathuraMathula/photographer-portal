@@ -4,6 +4,7 @@ export interface PhotographerUser {
   firstName: string;
   lastName: string;
   role: string;
+  studioId?: string;
   isDeactivated?: boolean;
 }
 
@@ -11,6 +12,7 @@ export interface PhotographerProfileItem {
   id: string;
   userId: string;
   bookingSlug: string;
+  role?: string;
   bio?: string;
   specializations: string[] | string;
   portfolioUrl?: string;

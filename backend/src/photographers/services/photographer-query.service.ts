@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PhotographerProfile } from '../../entities/photographer-profile.entity';
 
+import { UserRole } from '../../entities/user.entity';
+
 @Injectable()
 export class PhotographerQueryService {
   constructor(
@@ -42,7 +44,9 @@ export class PhotographerQueryService {
     const query = this.profileRepository
       .createQueryBuilder('profile')
       .leftJoinAndSelect('profile.user', 'user')
-      .where('(user.isActive = :active OR user.isActive IS NULL)', { active: true });
+      .where('(user.isActive = :active OR user.isActive IS NULL)', { active: true })
+      .andWhere('user.role = :soloRole', { soloRole: UserRole.PHOTOGRAPHER })
+      .andWhere('user.studioId IS NULL');
 
     if (search && search.trim()) {
       const q = `%${search.trim().toLowerCase()}%`;

@@ -119,6 +119,11 @@ export default function UnifiedPhotographyPage() {
     });
   };
 
+  const soloPhotographers = photographers.filter((p) => {
+    const role = p.user?.role || p.role;
+    return role === "PHOTOGRAPHER" && !p.user?.studioId && !p.studioName;
+  });
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col animate-in fade-in duration-300">
       {/* Top Header */}
@@ -169,7 +174,7 @@ export default function UnifiedPhotographyPage() {
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
               }`}
             >
-              All Providers ({photographers.length + studios.length})
+              All Providers ({soloPhotographers.length + studios.length})
             </button>
 
             <button
@@ -181,7 +186,7 @@ export default function UnifiedPhotographyPage() {
               }`}
             >
               <Camera className="h-3.5 w-3.5" />
-              Photographers ({photographers.length})
+              Photographers ({soloPhotographers.length})
             </button>
 
             <button
@@ -229,17 +234,17 @@ export default function UnifiedPhotographyPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                     <Camera className="h-5 w-5 text-[#0e2d5c] dark:text-blue-400" />
-                    Independent Photographers ({photographers.length})
+                    Independent Photographers ({soloPhotographers.length})
                   </h2>
                 </div>
 
-                {photographers.length === 0 ? (
+                {soloPhotographers.length === 0 ? (
                   <Card className="border-dashed border-zinc-250 dark:border-zinc-800 p-8 text-center bg-white dark:bg-zinc-900 rounded-2xl">
-                    <p className="text-xs text-zinc-500">No photographers match your search query.</p>
+                    <p className="text-xs text-zinc-500">No independent solo photographers match your search query.</p>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {photographers.map((photographer) => (
+                    {soloPhotographers.map((photographer) => (
                       <div
                         key={photographer.id}
                         onClick={(e) => {
