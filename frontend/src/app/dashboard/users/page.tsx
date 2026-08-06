@@ -40,6 +40,8 @@ export default function UserManagementPage() {
     setRoleFilter,
     statusFilter,
     setStatusFilter,
+    unreadUserIds,
+    markAsRead,
   } = useUserManagement();
 
   if (
@@ -52,6 +54,8 @@ export default function UserManagementPage() {
       </div>
     );
   }
+
+  const unreadCount = users.filter((u) => unreadUserIds.includes(u.id)).length;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -70,6 +74,7 @@ export default function UserManagementPage() {
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         loggedInRole={loggedInRole}
+        unreadCount={unreadCount}
       />
 
       {/* Users list */}
@@ -87,6 +92,8 @@ export default function UserManagementPage() {
             onDeleteUser={handleDeleteUser}
             loggedInUserId={loggedInUserId ?? ""}
             loggedInRole={loggedInRole as UserRole}
+            unreadUserIds={unreadUserIds}
+            onMarkAsRead={markAsRead}
           />
 
           {/* Pagination */}

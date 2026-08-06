@@ -21,6 +21,8 @@ export function useUserManagement() {
     setRoleFilter,
     statusFilter,
     setStatusFilter,
+    unreadUserIds,
+    markAsRead,
     fetchUsers,
     handleToggleActive,
     handleDeleteUser,
@@ -72,5 +74,7 @@ export function useUserManagement() {
     setRoleFilter,
     statusFilter,
     setStatusFilter,
+    unreadUserIds,
+    markAsRead,
   };
 }

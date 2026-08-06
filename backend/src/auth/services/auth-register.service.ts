@@ -12,6 +12,8 @@ import { RegisterStudioDto } from '../dto/register-studio.dto';
 import { UserSlugService } from '../../users/services/user-slug.service';
 import { AuditLogsService } from '../../audit-logs/audit-logs.service';
 
+import { ChatGateway } from '../../reservations/chat.gateway';
+
 @Injectable()
 export class AuthRegisterService {
   constructor(
@@ -21,6 +23,7 @@ export class AuthRegisterService {
     private readonly profileRepository: Repository<PhotographerProfile>,
     private readonly slugService: UserSlugService,
     private readonly auditLogsService: AuditLogsService,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async registerPhotographer(dto: RegisterPhotographerDto) {
@@ -70,6 +73,20 @@ export class AuthRegisterService {
       isAvailableForBooking: false,
     });
     await this.profileRepository.save(profile);
+
+    try {
+      this.chatGateway.server.emit('userRegistered', {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        isActive: user.isActive,
+      });
+    } catch (err) {
+      console.error('Failed to emit userRegistered event:', err);
+    }
 
     await this.auditLogsService.logAction(
       'USER_SELF_REGISTERED',
@@ -135,6 +152,21 @@ export class AuthRegisterService {
       isAvailableForBooking: false,
     });
     await this.profileRepository.save(profile);
+
+    try {
+      this.chatGateway.server.emit('userRegistered', {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        studioName: user.studioName,
+        createdAt: user.createdAt,
+        isActive: user.isActive,
+      });
+    } catch (err) {
+      console.error('Failed to emit userRegistered event:', err);
+    }
 
     await this.auditLogsService.logAction(
       'STUDIO_SELF_REGISTERED',

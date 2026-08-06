@@ -3,8 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type UserAccount } from "@/types";
 import { UserRole } from "@/store/slices/authSlice";
-import { Edit2, Trash2, Eye, ShieldAlert, CheckCircle2 } from "lucide-react";
-import { EditUserDetailsModal } from "@/components/modals/EditUserDetailsModal";
+import { Trash2, Eye, CheckCircle2, Sparkles } from "lucide-react";
 import { RoleBadge } from "./components/RoleBadge";
 import { ToggleStatusButton } from "./components/ToggleStatusButton";
 import { SuspendConfirmModal } from "./components/SuspendConfirmModal";
@@ -16,6 +15,8 @@ type Props = {
   onDeleteUser?: (id: string) => void;
   loggedInUserId: string;
   loggedInRole: string;
+  isUnread?: boolean;
+  onMarkAsRead?: (id: string) => void;
 };
 
 export function UserTableRow({
@@ -24,20 +25,21 @@ export function UserTableRow({
   onDeleteUser,
   loggedInUserId,
   loggedInRole,
+  isUnread = false,
+  onMarkAsRead,
 }: Props) {
   const router = useRouter();
   const [showConfirm, setShowConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [currentFirstName, setCurrentFirstName] = useState(user.firstName);
-  const [currentLastName, setCurrentLastName] = useState(user.lastName);
-  const [currentSlug, setCurrentSlug] = useState(
+
+  const currentFirstName = user.firstName;
+  const currentLastName = user.lastName;
+  const currentSlug =
     user.role === UserRole.STUDIO
       ? user.studioSlug || ""
-      : user.profile?.bookingSlug || "",
-  );
+      : user.profile?.bookingSlug || "";
 
   const isDeactivating = user.isActive;
   const fullName = `${user.firstName} ${user.lastName}`;
@@ -46,6 +48,11 @@ export function UserTableRow({
   const canToggle =
     !isSelf &&
     (loggedInRole === UserRole.SUPER_ADMIN || (!user.isActive && loggedInRole === UserRole.ADMIN));
+
+  const handleRowClick = () => {
+    onMarkAsRead?.(user.id);
+    router.push(`/dashboard/users/${user.id}`);
+  };
 
   const handleConfirm = async () => {
     setToggling(true);
@@ -71,15 +78,25 @@ export function UserTableRow({
   return (
     <>
       <tr
-        onClick={() => router.push(`/dashboard/users/${user.id}`)}
-        className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/80 dark:hover:bg-zinc-850/60 transition-colors cursor-pointer"
+        onClick={handleRowClick}
+        className={`border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/80 dark:hover:bg-zinc-850/60 transition-colors cursor-pointer ${
+          isUnread ? "bg-rose-50/30 dark:bg-rose-950/20" : ""
+        }`}
       >
         <td className="p-4 text-body-small-s">
-          <span className="font-semibold text-zinc-900 dark:text-white block">
-            {currentFirstName} {currentLastName}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-zinc-900 dark:text-white">
+              {currentFirstName} {currentLastName}
+            </span>
+            {isUnread && (
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-600 text-white animate-pulse flex items-center gap-1 shadow-xs">
+                <Sparkles className="h-2.5 w-2.5" />
+                NEW
+              </span>
+            )}
+          </div>
           {user.studioName && (
-            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block">
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block mt-0.5">
               {user.studioName}
             </span>
           )}
@@ -106,6 +123,7 @@ export function UserTableRow({
                   href={user.role === UserRole.STUDIO ? `/studios/${currentSlug}` : `/book/${currentSlug}`}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                   className="text-body-caption text-primary-light hover:text-primary-dark hover:underline dark:text-indigo-400 dark:hover:text-indigo-305 transition-colors font-semibold"
                 >
                   {user.role === UserRole.STUDIO ? `studio: ${currentSlug}` : `slug: ${currentSlug}`}
@@ -121,6 +139,7 @@ export function UserTableRow({
             {/* View Details Button */}
             <Link
               href={`/dashboard/users/${user.id}`}
+              onClick={() => onMarkAsRead?.(user.id)}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:hover:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/40 text-xs font-bold transition-all"
               title="Review User Details"
             >

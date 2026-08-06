@@ -17,11 +17,14 @@ import { EmailModule } from '../email/email.module';
 import { SmsDevService } from './services/sms-dev.service';
 import { OtpService } from './services/otp.service';
 
+import { ReservationsModule } from '../reservations/reservations.module';
+
 @Module({
   imports: [
     DatabaseModule,
     UsersModule,
     EmailModule,
+    ReservationsModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? 'SUPER_SECRET_KEY_CHANGE_ME',

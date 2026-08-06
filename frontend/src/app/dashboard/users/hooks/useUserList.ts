@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { UserRole } from "@/store/slices/authSlice";
 import { type UserAccount } from "@/types";
+import { useSocket } from "@/context/SocketContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
@@ -18,6 +19,7 @@ export function useUserList({
   loggedInRole,
   authFetch,
 }: UseUserListProps) {
+  const { socket } = useSocket();
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,6 +35,33 @@ export function useUserList({
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
+  // Track unread new registration submissions
+  const [unreadUserIds, setUnreadUserIds] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("unread_user_registrations");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("unread_user_registrations", JSON.stringify(unreadUserIds));
+      } catch (err) {
+        console.error("Failed to store unread registrations", err);
+      }
+    }
+  }, [unreadUserIds]);
+
+  const markAsRead = (userId: string) => {
+    setUnreadUserIds((prev) => prev.filter((id) => id !== userId));
+  };
+
   // Debounce search input by 400ms
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -42,8 +71,8 @@ export function useUserList({
     return () => clearTimeout(handler);
   }, [search]);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
+  const fetchUsers = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const params = new URLSearchParams();
       params.append("page", page.toString());
@@ -61,6 +90,14 @@ export function useUserList({
       setUsers(data.data || []);
       setTotalPages(data.totalPages || 1);
       setTotal(data.total || 0);
+
+      // Auto-mark any active users as read
+      if (data.data && Array.isArray(data.data)) {
+        const activeIds = data.data.filter((u: UserAccount) => u.isActive).map((u: UserAccount) => u.id);
+        if (activeIds.length > 0) {
+          setUnreadUserIds((prev) => prev.filter((id) => !activeIds.includes(id)));
+        }
+      }
     } catch (err: any) {
       setError(err.message || "Error loading users");
     } finally {
@@ -77,21 +114,42 @@ export function useUserList({
     }
   }, [isAuthenticated, loggedInRole, fetchUsers]);
 
-  // Auto-refresh: poll every 30 seconds to pick up new registrations
+  // Real-time WebSocket Listeners for New Registrations & Updates
   useEffect(() => {
     if (
       !isAuthenticated ||
-      (loggedInRole !== UserRole.SUPER_ADMIN && loggedInRole !== UserRole.ADMIN)
+      (loggedInRole !== UserRole.SUPER_ADMIN && loggedInRole !== UserRole.ADMIN) ||
+      !socket
     ) {
       return;
     }
 
-    const interval = setInterval(() => {
-      fetchUsers();
-    }, 30000);
+    const handleNewRegistration = (data: any) => {
+      toast.info("🔔 New Registration Submission Received!", {
+        description: `${data?.firstName || "New applicant"} (${data?.role || "provider"}) submitted a registration request.`,
+      });
 
-    return () => clearInterval(interval);
-  }, [isAuthenticated, loggedInRole, fetchUsers]);
+      if (data?.id) {
+        setUnreadUserIds((prev) => Array.from(new Set([data.id, ...prev])));
+      }
+
+      fetchUsers(true);
+    };
+
+    const handleUserUpdate = () => {
+      fetchUsers(true);
+    };
+
+    socket.on("userRegistered", handleNewRegistration);
+    socket.on("userCreated", handleNewRegistration);
+    socket.on("userUpdated", handleUserUpdate);
+
+    return () => {
+      socket.off("userRegistered", handleNewRegistration);
+      socket.off("userCreated", handleNewRegistration);
+      socket.off("userUpdated", handleUserUpdate);
+    };
+  }, [isAuthenticated, loggedInRole, socket, fetchUsers]);
 
   const handleToggleActive = async (userId: string) => {
     try {
@@ -101,6 +159,8 @@ export function useUserList({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to toggle status");
+      
+      markAsRead(userId);
       setUsers((prev) =>
         prev.map((u) =>
           u.id === userId ? { ...u, isActive: data.isActive } : u,
@@ -120,6 +180,7 @@ export function useUserList({
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete user");
       toast.success(data.message || "User deleted successfully");
+      markAsRead(userId);
       setUsers((prev) => prev.filter((u) => u.id !== userId));
     } catch (err: any) {
       toast.error(err.message || "Error deleting user");
@@ -140,6 +201,8 @@ export function useUserList({
     setRoleFilter,
     statusFilter,
     setStatusFilter,
+    unreadUserIds,
+    markAsRead,
     fetchUsers,
     handleToggleActive,
     handleDeleteUser,
