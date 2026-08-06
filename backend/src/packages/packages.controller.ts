@@ -28,7 +28,7 @@ interface RequestWithUser extends Request {
 
 @Controller('packages')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.PHOTOGRAPHER)
+@Roles(UserRole.PHOTOGRAPHER, UserRole.STUDIO)
 export class PackagesController {
   constructor(private readonly packagesService: PackagesService) {}
 

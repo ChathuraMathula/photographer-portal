@@ -34,9 +34,9 @@ export class ReservationsLifecycleService {
   ) {}
 
   async createManualBooking(dto: CreateManualBookingDto, user: JwtUser) {
-    if (user.role !== UserRole.PHOTOGRAPHER) {
+    if (user.role !== UserRole.PHOTOGRAPHER && user.role !== UserRole.STUDIO) {
       throw new ForbiddenException(
-        'Only Photographers can create manual bookings',
+        'Only Photographers and Studios can create manual bookings',
       );
     }
 

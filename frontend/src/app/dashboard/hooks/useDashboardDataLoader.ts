@@ -79,7 +79,7 @@ export function useDashboardDataLoader({
   };
 
   const loadPhotographerData = async () => {
-    if (role !== UserRole.PHOTOGRAPHER) return;
+    if (role !== UserRole.PHOTOGRAPHER && role !== UserRole.STUDIO) return;
     if (!userId || userId === "null" || userId === "undefined") return;
     try {
       const [pkgRes, profRes] = await Promise.all([
