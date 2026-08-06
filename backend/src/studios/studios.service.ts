@@ -177,7 +177,8 @@ export class StudiosService {
     }
 
     const cleanUsername = dto.username.toLowerCase().trim().replace(/^@/, '');
-    const cleanSlug = this.slugService.slugify(dto.bookingSlug);
+    const rawSlug = dto.bookingSlug || cleanUsername || `${dto.firstName}-${dto.lastName}`;
+    const cleanSlug = this.slugService.slugify(rawSlug);
 
     const existingEmail = await this.userRepository.findOneBy({ email: dto.email });
     if (existingEmail) {

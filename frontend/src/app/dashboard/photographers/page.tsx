@@ -49,12 +49,13 @@ interface CapacityInfo {
 const AddMemberSchema = Yup.object().shape({
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
   username: Yup.string().required("Username is required"),
-  bookingSlug: Yup.string().required("Booking slug is required"),
-  password: Yup.string().min(6, "Must be at least 6 characters").required("Password is required"),
+  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords do not match")
+    .required("Please confirm your password"),
   phone: Yup.string().optional(),
-  bio: Yup.string().optional(),
   role: Yup.string().oneOf(["STUDIO_PHOTOGRAPHER", "STUDIO_STAFF"]).required(),
 });
 
@@ -96,21 +97,21 @@ export default function StudioTeamPage() {
       lastName: "",
       email: "",
       username: "",
-      bookingSlug: "",
       password: "",
+      confirmPassword: "",
       phone: "",
-      bio: "",
       role: "STUDIO_PHOTOGRAPHER",
     },
     validationSchema: AddMemberSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       setServerError("");
       if (!context?.authFetch) return;
+      const { confirmPassword, ...payload } = values;
       try {
         const res = await context.authFetch(`${API}/studios/my/photographers`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
+          body: JSON.stringify(payload),
           credentials: "include",
         });
         const data = await res.json();
@@ -305,102 +306,105 @@ export default function StudioTeamPage() {
             <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">First Name</Label>
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">First Name</Label>
                   <Input
                     placeholder="First Name"
                     {...formik.getFieldProps("firstName")}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
                   />
                   {formik.touched.firstName && formik.errors.firstName && (
-                    <p className="text-[10px] text-red-500">{formik.errors.firstName}</p>
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.firstName}</p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">Last Name</Label>
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Last Name</Label>
                   <Input
                     placeholder="Last Name"
                     {...formik.getFieldProps("lastName")}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
                   />
                   {formik.touched.lastName && formik.errors.lastName && (
-                    <p className="text-[10px] text-red-500">{formik.errors.lastName}</p>
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.lastName}</p>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold">Email Address</Label>
-                <Input
-                  type="email"
-                  placeholder="photographer@studio.com"
-                  {...formik.getFieldProps("email")}
-                  className="h-10 text-xs rounded-xl"
-                />
-                {formik.touched.email && formik.errors.email && (
-                  <p className="text-[10px] text-red-500">{formik.errors.email}</p>
-                )}
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">Username</Label>
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Email Address</Label>
+                  <Input
+                    type="email"
+                    placeholder="photographer@studio.com"
+                    {...formik.getFieldProps("email")}
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.email}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Username</Label>
                   <Input
                     placeholder="john_studio"
                     {...formik.getFieldProps("username")}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
                   />
                   {formik.touched.username && formik.errors.username && (
-                    <p className="text-[10px] text-red-500">{formik.errors.username}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">Booking Slug</Label>
-                  <Input
-                    placeholder="john-studio"
-                    {...formik.getFieldProps("bookingSlug")}
-                    className="h-10 text-xs rounded-xl"
-                  />
-                  {formik.touched.bookingSlug && formik.errors.bookingSlug && (
-                    <p className="text-[10px] text-red-500">{formik.errors.bookingSlug}</p>
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.username}</p>
                   )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">Password</Label>
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Password</Label>
                   <Input
                     type="password"
                     placeholder="••••••••"
                     {...formik.getFieldProps("password")}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
                   />
                   {formik.touched.password && formik.errors.password && (
-                    <p className="text-[10px] text-red-500">{formik.errors.password}</p>
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.password}</p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold">Role</Label>
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Confirm Password</Label>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...formik.getFieldProps("confirmPassword")}
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+                  />
+                  {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                    <p className="text-[10px] font-semibold text-red-500">{formik.errors.confirmPassword}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Role</Label>
                   <select
                     {...formik.getFieldProps("role")}
-                    className="w-full h-10 px-3 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white"
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="STUDIO_PHOTOGRAPHER">Studio Photographer</option>
                     <option value="STUDIO_STAFF">Studio Staff</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold">Phone (Optional)</Label>
-                <Input
-                  placeholder="+94 77 123 4567"
-                  {...formik.getFieldProps("phone")}
-                  className="h-10 text-xs rounded-xl"
-                />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Phone (Optional)</Label>
+                  <Input
+                    placeholder="+94 77 123 4567"
+                    {...formik.getFieldProps("phone")}
+                    className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-3 pt-3">

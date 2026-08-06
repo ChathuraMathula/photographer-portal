@@ -23,9 +23,9 @@ export class CreateStudioPhotographerDto {
   @IsString()
   username!: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  bookingSlug!: string;
+  bookingSlug?: string;
 
   @MinLength(6)
   password!: string;
