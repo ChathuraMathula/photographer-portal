@@ -76,6 +76,22 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/photography",
     "/photographers",
   ],
+  [UserRole.STUDIO_PHOTOGRAPHER]: [
+    "/dashboard",
+    "/dashboard/reservations",
+    "/dashboard/calendar",
+    "/dashboard/profile",
+    "/photography",
+    "/photographers",
+  ],
+  [UserRole.STUDIO_STAFF]: [
+    "/dashboard",
+    "/dashboard/reservations",
+    "/dashboard/calendar",
+    "/dashboard/profile",
+    "/photography",
+    "/photographers",
+  ],
   [UserRole.CUSTOMER]: [
     "/customer",
     "/photography",
