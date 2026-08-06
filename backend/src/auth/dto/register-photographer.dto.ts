@@ -40,6 +40,14 @@ export class RegisterPhotographerDto {
 
   @IsOptional()
   @IsString()
+  district?: string;
+
+  @IsOptional()
+  @IsString()
+  baseLocation?: string;
+
+  @IsOptional()
+  @IsString()
   bio?: string;
 
   @IsOptional()

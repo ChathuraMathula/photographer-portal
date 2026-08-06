@@ -43,6 +43,14 @@ export class RegisterStudioDto {
 
   @IsOptional()
   @IsString()
+  district?: string;
+
+  @IsOptional()
+  @IsString()
+  baseLocation?: string;
+
+  @IsOptional()
+  @IsString()
   address?: string;
 
   @IsOptional()

@@ -63,6 +63,9 @@ export class AuthRegisterService {
       bookingSlug: cleanSlug,
       bio: dto.bio,
       city: dto.city,
+      district: dto.district,
+      baseLocation: dto.baseLocation || dto.city,
+      locationMapLink: dto.locationMapLink,
       specializations: dto.specializations ?? [],
       isAvailableForBooking: false,
     });
@@ -120,6 +123,18 @@ export class AuthRegisterService {
       maxPhotographers: 5,
     });
     await this.userRepository.save(user);
+
+    const profile = this.profileRepository.create({
+      userId: user.id,
+      bookingSlug: cleanSlug,
+      bio: dto.description,
+      city: dto.city,
+      district: dto.district,
+      baseLocation: dto.baseLocation || dto.address || dto.city,
+      locationMapLink: dto.locationMapLink,
+      isAvailableForBooking: false,
+    });
+    await this.profileRepository.save(profile);
 
     await this.auditLogsService.logAction(
       'STUDIO_SELF_REGISTERED',

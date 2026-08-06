@@ -9,6 +9,7 @@ import { UserRole } from "@/store/slices/authSlice";
 import { useSocket } from "@/context/SocketContext";
 import { OSMMapPreview } from "@/components/maps/OSMMapPreview";
 import { EditUserDetailsModal } from "@/components/modals/EditUserDetailsModal";
+import { SuspendConfirmModal } from "@/components/users/components/SuspendConfirmModal";
 import {
   Card,
   CardContent,
@@ -66,7 +67,9 @@ export default function UserRequestReviewPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedSlug, setCopiedSlug] = useState(false);
+  const [copiedMapLink, setCopiedMapLink] = useState(false);
   const [showEditSlugModal, setShowEditSlugModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const fetchUserDetails = useCallback(async (isSilent = false) => {
     if (!userId) return;
@@ -116,7 +119,6 @@ export default function UserRequestReviewPage() {
   useEffect(() => {
     if (!socket || !userId) return;
 
-    // Join room for this specific user if possible
     socket.emit("joinUserRoom", { userId });
 
     const handleUserUpdate = (data: any) => {
@@ -137,10 +139,11 @@ export default function UserRequestReviewPage() {
     };
   }, [socket, userId, fetchUserDetails]);
 
-  const handleToggleActive = async () => {
+  const handleConfirmToggleActive = async () => {
     if (!user) return;
     if (user.id === loggedInUserId) {
       toast.error("You cannot suspend or deactivate your own account.");
+      setShowConfirmModal(false);
       return;
     }
 
@@ -168,6 +171,7 @@ export default function UserRequestReviewPage() {
       toast.error(err.message || "Error updating account status");
     } finally {
       setActionLoading(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -182,12 +186,30 @@ export default function UserRequestReviewPage() {
       : `${typeof window !== "undefined" ? window.location.origin : ""}/book/${currentSlug}`
     : "";
 
+  const generatedGoogleMapsLink =
+    user?.profile?.locationMapLink ||
+    (user?.profile?.baseLocation || user?.profile?.city || user?.profile?.district
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          [user.profile?.baseLocation, user.profile?.city, user.profile?.district, "Sri Lanka"]
+            .filter(Boolean)
+            .join(", ")
+        )}`
+      : "");
+
   const handleCopySlug = () => {
     if (!fullBookingUrl) return;
     navigator.clipboard.writeText(fullBookingUrl);
     setCopiedSlug(true);
     toast.success("Booking URL copied to clipboard!");
     setTimeout(() => setCopiedSlug(false), 2000);
+  };
+
+  const handleCopyMapLink = () => {
+    if (!generatedGoogleMapsLink) return;
+    navigator.clipboard.writeText(generatedGoogleMapsLink);
+    setCopiedMapLink(true);
+    toast.success("Google Maps Link copied to clipboard!");
+    setTimeout(() => setCopiedMapLink(false), 2000);
   };
 
   if (
@@ -303,7 +325,7 @@ export default function UserRequestReviewPage() {
             </CardHeader>
 
             <CardContent className="p-6 space-y-6">
-              {/* BOOKING SLUG & SHOWCASE CARD (NEW / MOVED HERE) */}
+              {/* BOOKING SLUG & SHOWCASE CARD */}
               <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-50/70 via-blue-50/40 to-transparent dark:from-indigo-950/40 dark:via-blue-950/20 border border-indigo-150 dark:border-indigo-900/40 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-100 dark:border-indigo-900/30 pb-3">
                   <div>
@@ -473,7 +495,7 @@ export default function UserRequestReviewPage() {
                 </div>
               </div>
 
-              {/* LOCATION DETAILS & INTERACTIVE MAP PREVIEW (NEW & FEATURED) */}
+              {/* LOCATION DETAILS & GENERATED MAPS LINK & INTERACTIVE MAP PREVIEW */}
               <div className="space-y-4 pt-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
@@ -486,40 +508,69 @@ export default function UserRequestReviewPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Location Meta Card */}
-                  <div className="space-y-3 p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 text-xs">
-                    <div>
-                      <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">Base Location Address</span>
-                      <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
-                        {user.profile?.baseLocation || "No address specified"}
-                      </span>
+                  {/* Location Meta & Generated Google Maps Link Card */}
+                  <div className="space-y-3 p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800 text-xs flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">Base Location Address</span>
+                        <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
+                          {user.profile?.baseLocation || "No address specified"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">City</span>
+                        <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
+                          {user.profile?.city || "Not provided"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">District</span>
+                        <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
+                          {user.profile?.district || "Not provided"}
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">City</span>
-                      <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
-                        {user.profile?.city || "Not provided"}
-                      </span>
-                    </div>
+                    {/* GENERATED GOOGLE MAPS LINK SECTION */}
+                    {generatedGoogleMapsLink && (
+                      <div className="pt-3 border-t border-zinc-200/60 dark:border-zinc-800 space-y-2">
+                        <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide block">
+                          Generated Google Maps Link
+                        </span>
 
-                    <div>
-                      <span className="text-zinc-400 font-bold block text-[10px] uppercase tracking-wider">District</span>
-                      <span className="font-bold text-zinc-800 dark:text-zinc-200 block mt-0.5">
-                        {user.profile?.district || "Not provided"}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCopyMapLink}
+                            className="h-8 text-[11px] font-bold rounded-lg border-emerald-200 dark:border-emerald-900/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 shrink-0"
+                          >
+                            {copiedMapLink ? (
+                              <>
+                                <Check className="h-3 w-3 mr-1 text-emerald-600" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3 w-3 mr-1" />
+                                Copy Link
+                              </>
+                            )}
+                          </Button>
 
-                    {user.profile?.locationMapLink && (
-                      <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800">
-                        <a
-                          href={user.profile.locationMapLink}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
-                        >
-                          Open Google Maps Link
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                          <a
+                            href={generatedGoogleMapsLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:underline truncate"
+                          >
+                            Open Google Maps
+                            <ExternalLink className="h-3 w-3 shrink-0" />
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -613,7 +664,7 @@ export default function UserRequestReviewPage() {
                     <Button
                       type="button"
                       disabled={actionLoading}
-                      onClick={handleToggleActive}
+                      onClick={() => setShowConfirmModal(true)}
                       className="h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
                     >
                       <CheckCircle2 className="h-4 w-4 mr-1.5" />
@@ -634,7 +685,7 @@ export default function UserRequestReviewPage() {
                         type="button"
                         variant="destructive"
                         disabled={actionLoading}
-                        onClick={handleToggleActive}
+                        onClick={() => setShowConfirmModal(true)}
                         className="h-10 px-6 font-bold text-xs rounded-xl cursor-pointer"
                       >
                         <Ban className="h-4 w-4 mr-1.5" />
@@ -677,6 +728,18 @@ export default function UserRequestReviewPage() {
             setShowEditSlugModal(false);
             fetchUserDetails(true);
           }}
+        />
+      )}
+
+      {/* Suspend / Activate Confirm Modal */}
+      {showConfirmModal && user && (
+        <SuspendConfirmModal
+          open={showConfirmModal}
+          isDeactivating={user.isActive}
+          fullName={user.studioName || `${user.firstName} ${user.lastName}`}
+          loading={actionLoading}
+          onConfirm={handleConfirmToggleActive}
+          onCancel={() => setShowConfirmModal(false)}
         />
       )}
     </div>
