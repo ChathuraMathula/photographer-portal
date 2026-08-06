@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSocket } from "@/context/SocketContext";
 import { PhotographersHeader } from "@/app/photographers/components/PhotographersHeader";
 import { PhotographerCard } from "@/app/photographers/components/PhotographerCard";
 import { RatingModal } from "@/app/photographers/components/RatingModal";
@@ -14,12 +15,10 @@ import {
   Building2,
   Users,
   Search,
-  SlidersHorizontal,
   ShieldCheck,
   ChevronRight,
-  MapPin,
   CalendarCheck,
-  Star,
+  Wifi,
 } from "lucide-react";
 
 export interface StudioItem {
@@ -36,6 +35,7 @@ export interface StudioItem {
 
 export default function UnifiedPhotographyPage() {
   const router = useRouter();
+  const { socket, connected: socketConnected } = useSocket();
 
   const [activeTab, setActiveTab] = useState<"all" | "photographers" | "studios">("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,37 +49,60 @@ export default function UnifiedPhotographyPage() {
     useState<PhotographerProfileItem | null>(null);
   const [rateModalOpen, setRateModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-        const query = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : "";
+  const fetchData = useCallback(async (isSilent = false) => {
+    try {
+      if (!isSilent) setLoading(true);
+      setError("");
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      const query = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : "";
 
-        const [photogsRes, studiosRes] = await Promise.all([
-          fetch(`${API}/photographers/public${query}`),
-          fetch(`${API}/studios/public${query}`),
-        ]);
+      const [photogsRes, studiosRes] = await Promise.all([
+        fetch(`${API}/photographers/public${query}`),
+        fetch(`${API}/studios/public${query}`),
+      ]);
 
-        if (photogsRes.ok) {
-          const pData = await photogsRes.json();
-          setPhotographers(pData.data || []);
-        }
-
-        if (studiosRes.ok) {
-          const sData = await studiosRes.json();
-          setStudios(sData.data || []);
-        }
-      } catch (err: any) {
-        setError("Failed to fetch photography providers.");
-      } finally {
-        setLoading(false);
+      if (photogsRes.ok) {
+        const pData = await photogsRes.json();
+        setPhotographers(pData.data || []);
       }
+
+      if (studiosRes.ok) {
+        const sData = await studiosRes.json();
+        setStudios(sData.data || []);
+      }
+    } catch (err: any) {
+      setError("Failed to fetch photography providers.");
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Real-time WebSocket Listeners for Live Directory Updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleRealtimeUpdate = () => {
+      fetchData(true);
     };
 
-    fetchData();
-  }, [searchTerm]);
+    socket.on("userUpdated", handleRealtimeUpdate);
+    socket.on("userRegistered", handleRealtimeUpdate);
+    socket.on("userCreated", handleRealtimeUpdate);
+    socket.on("photographerUpdated", handleRealtimeUpdate);
+    socket.on("profileUpdated", handleRealtimeUpdate);
+
+    return () => {
+      socket.off("userUpdated", handleRealtimeUpdate);
+      socket.off("userRegistered", handleRealtimeUpdate);
+      socket.off("userCreated", handleRealtimeUpdate);
+      socket.off("photographerUpdated", handleRealtimeUpdate);
+      socket.off("profileUpdated", handleRealtimeUpdate);
+    };
+  }, [socket, fetchData]);
 
   const handleOpenRateModal = (photographer: PhotographerProfileItem) => {
     setSelectedPhotographer(photographer);
@@ -174,9 +197,11 @@ export default function UnifiedPhotographyPage() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Instant Booking Active</span>
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200/60 dark:border-emerald-900/60">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              {socketConnected ? "Live Real-Time Sync Active" : "Instant Booking Active"}
+            </span>
           </div>
         </div>
 
