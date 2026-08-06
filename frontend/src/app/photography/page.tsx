@@ -245,7 +245,7 @@ export default function UnifiedPhotographyPage() {
                         onClick={(e) => {
                           const target = e.target as HTMLElement;
                           if (target.closest("button") || target.closest("a")) return;
-                          router.push(`/book/${photographer.bookingSlug}`);
+                          router.push(`/photographers/${photographer.bookingSlug}`);
                         }}
                         className="cursor-pointer"
                       >

@@ -119,7 +119,7 @@ export function PhotographerCard({
         <div className="space-y-4">
           {/* Profile Avatar */}
           <div className="-mt-12 flex items-end justify-between">
-            <div className="relative">
+            <Link href={`/photographers/${photographer.bookingSlug}`} className="relative block group-hover:scale-105 transition-transform">
               {photographer.profileImageUrl ? (
                 <img
                   src={photographer.profileImageUrl}
@@ -131,7 +131,7 @@ export function PhotographerCard({
                   {initials}
                 </div>
               )}
-            </div>
+            </Link>
 
             {/* Star Rating Display */}
             <div className="flex flex-col items-end">
@@ -153,9 +153,11 @@ export function PhotographerCard({
 
           {/* Name & Location */}
           <div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {fullName}
-            </h3>
+            <Link href={`/photographers/${photographer.bookingSlug}`} className="block">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {fullName}
+              </h3>
+            </Link>
             {(photographer.city || photographer.baseLocation) && (
               <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5 font-medium">
                 <MapPin className="h-3.5 w-3.5 text-red-500 shrink-0" />
