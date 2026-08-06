@@ -1,30 +1,42 @@
 import React from "react";
 import { type PhotographerProfile } from "@/types";
+import { UserAvatar } from "@/components/common/UserAvatar";
+import { Building2, ShieldCheck } from "lucide-react";
 
 export function PhotographerHeaderInfo({
   profile,
 }: {
   profile: PhotographerProfile;
 }) {
+  const isStudio = profile.role === "STUDIO" || Boolean(profile.studioName);
+  const displayName = isStudio
+    ? profile.studioName || `${profile.firstName}'s Studio`
+    : `${profile.firstName} ${profile.lastName}`;
+
+  const logoOrAvatar = isStudio
+    ? profile.studioLogoUrl || profile.profileImageUrl
+    : profile.profileImageUrl;
+
   return (
     <div className="flex flex-col sm:flex-row gap-5 p-5 items-center sm:items-start text-center sm:text-left">
-      {profile.profileImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={profile.profileImageUrl}
-          alt={`${profile.firstName} ${profile.lastName}`}
-          className="h-24 w-24 shrink-0 rounded-full object-cover shadow-sm border border-zinc-200 dark:border-zinc-800"
-        />
-      ) : (
-        <div className="h-24 w-24 shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 text-title-medium font-bold border border-zinc-250 dark:border-zinc-800 shadow-inner">
-          {profile.firstName[0]}
-          {profile.lastName[0]}
-        </div>
-      )}
+      <UserAvatar
+        src={logoOrAvatar}
+        name={displayName}
+        className="h-24 w-24 rounded-full border-2 border-white dark:border-zinc-800 shadow-md text-2xl"
+      />
+
       <div className="space-y-2 flex-1">
-        <h1 className="text-title-large font-bold text-zinc-900 dark:text-white leading-tight">
-          {profile.firstName} {profile.lastName}
-        </h1>
+        <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+          <h1 className="text-title-large font-bold text-zinc-900 dark:text-white leading-tight">
+            {displayName}
+          </h1>
+          {isStudio && (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200/60 flex items-center gap-1">
+              <Building2 className="h-3 w-3 text-indigo-500" />
+              Verified Studio
+            </span>
+          )}
+        </div>
         {profile.bio && (
           <p className="text-body-small text-zinc-650 dark:text-zinc-350 leading-relaxed font-normal">
             {profile.bio}

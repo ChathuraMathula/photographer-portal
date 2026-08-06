@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProfileImageUploader } from "./components/ProfileImageUploader";
+import { BannerImageUploader } from "./components/BannerImageUploader";
 
 type BiographyCardProps = {
   bio: string;
@@ -17,6 +18,9 @@ type BiographyCardProps = {
   onSpecializationsChange?: (v: string[]) => void;
   profileImageUrl: string;
   onProfileImageUrlChange: (v: string) => void;
+  coverImageUrl?: string;
+  onCoverImageUrlChange?: (v: string) => void;
+  userRole?: string;
   offlineMessage: string;
   onOfflineMessageChange: (v: string) => void;
 };
@@ -28,9 +32,14 @@ export function BiographyCard({
   onSpecializationsChange,
   profileImageUrl,
   onProfileImageUrlChange,
+  coverImageUrl = "",
+  onCoverImageUrlChange,
+  userRole,
   offlineMessage,
   onOfflineMessageChange,
 }: BiographyCardProps) {
+  const isStaff = userRole === "STUDIO_STAFF" || userRole === "STUDIO_PHOTOGRAPHER";
+
   const [newSpecInput, setNewSpecInput] = React.useState("");
 
   const handleAddSpecialization = () => {
@@ -61,7 +70,9 @@ export function BiographyCard({
           Biography & Portrait
         </CardTitle>
         <CardDescription className="text-body-caption text-zinc-500 mt-1">
-          Customize your professional portrait, style bio, specializations, and offline message.
+          {isStaff
+            ? "Upload your profile picture and customize your personal details."
+            : "Customize your professional portrait, cover banner, style bio, specializations, and offline message."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
@@ -69,6 +80,13 @@ export function BiographyCard({
           profileImageUrl={profileImageUrl}
           onProfileImageUrlChange={onProfileImageUrlChange}
         />
+
+        {!isStaff && onCoverImageUrlChange && (
+          <BannerImageUploader
+            coverImageUrl={coverImageUrl}
+            onCoverImageUrlChange={onCoverImageUrlChange}
+          />
+        )}
         <div className="space-y-2">
           <Label
             htmlFor="profBio"

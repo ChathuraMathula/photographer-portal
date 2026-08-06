@@ -115,13 +115,15 @@ export function PhotographerLayoutWrapper({
         />
       }
       topbarActions={
-        <PhotographerTopbarActions
-          showAcceptBookingsInTopbar={showAcceptBookingsInTopbar}
-          showManualBookingInTopbar={showManualBookingInTopbar}
-          profileAvailability={profileAvailability}
-          onToggleAvailability={handleToggleAvailability}
-          onAddManualBooking={() => setShowManualModal(true)}
-        />
+        role === "STUDIO_PHOTOGRAPHER" || role === "STUDIO_STAFF" ? null : (
+          <PhotographerTopbarActions
+            showAcceptBookingsInTopbar={showAcceptBookingsInTopbar}
+            showManualBookingInTopbar={showManualBookingInTopbar}
+            profileAvailability={profileAvailability}
+            onToggleAvailability={handleToggleAvailability}
+            onAddManualBooking={() => setShowManualModal(true)}
+          />
+        )
       }
     >
       <div className="space-y-6">{children}</div>

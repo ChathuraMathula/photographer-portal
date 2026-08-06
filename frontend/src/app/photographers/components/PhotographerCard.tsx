@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { StarRating } from "./StarRating";
 import { PhotographerProfileItem } from "../types";
+import { UserAvatar } from "@/components/common/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
   MapPin,
@@ -48,7 +49,7 @@ export function PhotographerCard({
   if (Array.isArray(photographer.specializations)) {
     specArray = photographer.specializations;
   } else if (typeof photographer.specializations === "string" && photographer.specializations) {
-    specArray = photographer.specializations.split(",").map((s) => s.trim());
+    specArray = (photographer.specializations as string).split(",").map((s: string) => s.trim());
   }
 
   const handleCopyLink = () => {
@@ -120,17 +121,11 @@ export function PhotographerCard({
           {/* Profile Avatar */}
           <div className="-mt-12 flex items-end justify-between">
             <Link href={`/photographers/${photographer.bookingSlug}`} className="relative block group-hover:scale-105 transition-transform">
-              {photographer.profileImageUrl ? (
-                <img
-                  src={photographer.profileImageUrl}
-                  alt={fullName}
-                  className="h-20 w-20 rounded-2xl object-cover border-4 border-white dark:border-zinc-900 shadow-md bg-zinc-100"
-                />
-              ) : (
-                <div className="h-20 w-20 rounded-2xl bg-gradient-to-tr from-[#0e2d5c] to-blue-500 text-white font-black text-2xl border-4 border-white dark:border-zinc-900 shadow-md flex items-center justify-center">
-                  {initials}
-                </div>
-              )}
+              <UserAvatar
+                src={photographer.profileImageUrl}
+                name={fullName}
+                className="h-20 w-20 rounded-full border-4 border-white dark:border-zinc-900 shadow-md text-2xl"
+              />
             </Link>
 
             {/* Star Rating Display */}

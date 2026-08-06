@@ -8,6 +8,7 @@ import { RoleBadge } from "./components/RoleBadge";
 import { ToggleStatusButton } from "./components/ToggleStatusButton";
 import { SuspendConfirmModal } from "./components/SuspendConfirmModal";
 import { DeleteUserConfirmModal } from "./components/DeleteUserConfirmModal";
+import { UserAvatar } from "@/components/common/UserAvatar";
 
 type Props = {
   user: UserAccount;
@@ -84,22 +85,31 @@ export function UserTableRow({
         }`}
       >
         <td className="p-4 text-body-small-s">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-zinc-900 dark:text-white">
-              {currentFirstName} {currentLastName}
-            </span>
-            {isUnread && (
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-600 text-white animate-pulse flex items-center gap-1 shadow-xs">
-                <Sparkles className="h-2.5 w-2.5" />
-                NEW
-              </span>
-            )}
+          <div className="flex items-center gap-3">
+            <UserAvatar
+              src={user.profile?.profileImageUrl || user.studioLogoUrl}
+              name={fullName}
+              className="h-8 w-8 text-[10px]"
+            />
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-zinc-900 dark:text-white">
+                  {currentFirstName} {currentLastName}
+                </span>
+                {isUnread && (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-600 text-white animate-pulse flex items-center gap-1 shadow-xs">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    NEW
+                  </span>
+                )}
+              </div>
+              {user.studioName && (
+                <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block mt-0.5">
+                  {user.studioName}
+                </span>
+              )}
+            </div>
           </div>
-          {user.studioName && (
-            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block mt-0.5">
-              {user.studioName}
-            </span>
-          )}
         </td>
         <td className="p-4 text-body-small-s text-zinc-600 dark:text-zinc-350">
           {user.email}

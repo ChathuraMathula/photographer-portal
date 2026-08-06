@@ -28,6 +28,7 @@ import { Payment } from './entities/payment.entity';
 import { AuditLog } from './entities/audit-log.entity';
 import { LockedDate } from './entities/locked-date.entity';
 import { SubscriptionPlan } from './entities/subscription-plan.entity';
+import { UploadsModule } from './uploads/uploads.module';
 
 // Load local .env variables
 const envPath = join(process.cwd(), '.env');
@@ -74,6 +75,7 @@ if (
     AuditLogsModule,
     RabbitMQModule,
     StudiosModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

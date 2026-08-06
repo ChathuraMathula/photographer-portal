@@ -18,6 +18,7 @@ export class PhotographerUpdateService {
       'specializations',
       'portfolioUrl',
       'profileImageUrl',
+      'coverImageUrl',
       'baseLocation',
       'isAvailableForBooking',
       'allowedEventTypes',

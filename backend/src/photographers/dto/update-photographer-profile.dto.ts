@@ -26,6 +26,10 @@ export class UpdatePhotographerProfileDto {
 
   @IsOptional()
   @IsString()
+  coverImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
   baseLocation?: string;
 
   @IsOptional()

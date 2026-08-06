@@ -306,6 +306,8 @@ export function usePhotographerDashboard() {
     calendarReservations: reservationsState.calendarReservations,
     fetchCalendarReservations: reservationsState.fetchCalendarReservations,
     calendarLoading: reservationsState.calendarLoading,
+    coverImageUrl: profile.coverImageUrl,
+    setCoverImageUrl: profile.setCoverImageUrl,
     showManualBookingInTopbar: profile.showManualBookingInTopbar,
     setShowManualBookingInTopbar: profile.setShowManualBookingInTopbar,
     showAcceptBookingsInTopbar: profile.showAcceptBookingsInTopbar,

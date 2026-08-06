@@ -104,6 +104,9 @@ export function useDashboardDataLoader({
         profile.setProfileAvailability(profData.isAvailableForBooking);
         profile.setBookingSlug(profData.bookingSlug || "");
         profile.setProfileImageUrl(profData.profileImageUrl || "");
+        if (typeof profile.setCoverImageUrl === "function") {
+          profile.setCoverImageUrl(profData.coverImageUrl || "");
+        }
         profile.setAllowedEventTypes(profData.allowedEventTypes || []);
         profile.setAllowCustomEventTypes(
           profData.allowCustomEventTypes !== false,

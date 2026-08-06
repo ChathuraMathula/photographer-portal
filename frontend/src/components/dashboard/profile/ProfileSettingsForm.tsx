@@ -34,20 +34,27 @@ export function ProfileSettingsForm({
   onAllowCustomEventTypesChange,
   offlineMessage,
   onOfflineMessageChange,
+  userRole,
+  coverImageUrl,
+  onCoverImageUrlChange,
   profileAvailability,
   onToggleAvailability,
 }: ProfileSettingsFormProps) {
+  const isStaff = userRole === "STUDIO_STAFF" || userRole === "STUDIO_PHOTOGRAPHER";
+
   return (
     <form
       onSubmit={onSubmit}
       className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300"
     >
-      <AcceptBookingsToggle
-        profileAvailability={profileAvailability}
-        onToggleAvailability={onToggleAvailability}
-      />
+      {!isStaff && (
+        <AcceptBookingsToggle
+          profileAvailability={profileAvailability}
+          onToggleAvailability={onToggleAvailability}
+        />
+      )}
 
-      {bookingSlug && <BookingPageLinkCard bookingSlug={bookingSlug} />}
+      {bookingSlug && !isStaff && <BookingPageLinkCard bookingSlug={bookingSlug} />}
 
       <BiographyCard
         bio={bio}
@@ -56,40 +63,47 @@ export function ProfileSettingsForm({
         onSpecializationsChange={onSpecializationsChange}
         profileImageUrl={profileImageUrl}
         onProfileImageUrlChange={onProfileImageUrlChange}
+        coverImageUrl={coverImageUrl}
+        onCoverImageUrlChange={onCoverImageUrlChange}
+        userRole={userRole}
         offlineMessage={offlineMessage}
         onOfflineMessageChange={onOfflineMessageChange}
       />
 
-      <LocationPortfolioCard
-        location={location}
-        onLocationChange={onLocationChange}
-        portfolio={portfolio}
-        onPortfolioChange={onPortfolioChange}
-        city={city}
-        onCityChange={onCityChange}
-        district={district}
-        onDistrictChange={onDistrictChange}
-        locationMapLink={locationMapLink}
-        onLocationMapLinkChange={onLocationMapLinkChange}
-        showMapPreviewOnBookingPage={showMapPreviewOnBookingPage}
-        onShowMapPreviewOnBookingPageChange={
-          onShowMapPreviewOnBookingPageChange
-        }
-      />
+      {!isStaff && (
+        <>
+          <LocationPortfolioCard
+            location={location}
+            onLocationChange={onLocationChange}
+            portfolio={portfolio}
+            onPortfolioChange={onPortfolioChange}
+            city={city}
+            onCityChange={onCityChange}
+            district={district}
+            onDistrictChange={onDistrictChange}
+            locationMapLink={locationMapLink}
+            onLocationMapLinkChange={onLocationMapLinkChange}
+            showMapPreviewOnBookingPage={showMapPreviewOnBookingPage}
+            onShowMapPreviewOnBookingPageChange={
+              onShowMapPreviewOnBookingPageChange
+            }
+          />
 
-      <ProfileCalendarLockCard />
+          <ProfileCalendarLockCard />
 
-      <EventTypesCard
-        allowedEventTypes={allowedEventTypes}
-        onAllowedEventTypesChange={onAllowedEventTypesChange}
-        allowCustomEventTypes={allowCustomEventTypes}
-        onAllowCustomEventTypesChange={onAllowCustomEventTypesChange}
-      />
+          <EventTypesCard
+            allowedEventTypes={allowedEventTypes}
+            onAllowedEventTypesChange={onAllowedEventTypesChange}
+            allowCustomEventTypes={allowCustomEventTypes}
+            onAllowCustomEventTypesChange={onAllowCustomEventTypesChange}
+          />
+        </>
+      )}
 
       <div className="flex justify-end pt-2">
         <Button
           type="submit"
-          className="btn btn-primary h-11 px-8 font-semibold shadow-md cursor-pointer hover:shadow-lg transition-all"
+          className="bg-[#0e2d5c] hover:bg-[#0b244a] text-white h-11 px-8 font-semibold shadow-md cursor-pointer hover:shadow-lg transition-all"
         >
           Save Profile
         </Button>

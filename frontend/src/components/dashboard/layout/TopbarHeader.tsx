@@ -1,6 +1,5 @@
-"use client";
-import React from "react";
 import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { UserAvatar } from "@/components/common/UserAvatar";
 
 type TopbarHeaderProps = {
   isCollapsed: boolean;
@@ -62,22 +61,16 @@ export function TopbarHeader({
         <span className="h-8 w-[1px] bg-zinc-200" />
         <div
           onClick={() => {
-            if (userRole === "PHOTOGRAPHER") onTabChange("profile");
+            if (userRole === "PHOTOGRAPHER" || userRole === "STUDIO_PHOTOGRAPHER" || userRole === "STUDIO_STAFF") onTabChange("profile");
           }}
-          title={userRole === "PHOTOGRAPHER" ? "View Profile" : undefined}
-          className={`h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-body-small-s text-zinc-800 shadow-inner overflow-hidden ${userRole === "PHOTOGRAPHER" ? "cursor-pointer hover:bg-zinc-200 transition-colors" : ""}`}
+          title="View Profile"
+          className="cursor-pointer hover:opacity-90 transition-opacity"
         >
-          {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt="Profile"
-              className="h-full w-full object-cover animate-in fade-in duration-100"
-            />
-          ) : userName ? (
-            userName[0].toUpperCase()
-          ) : (
-            "P"
-          )}
+          <UserAvatar
+            src={profileImageUrl}
+            name={userName}
+            className="h-9 w-9 text-xs"
+          />
         </div>
       </div>
     </header>

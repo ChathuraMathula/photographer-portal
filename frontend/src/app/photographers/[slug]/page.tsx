@@ -1,5 +1,6 @@
 "use client";
 
+import { UserAvatar } from "@/components/common/UserAvatar";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -202,17 +203,11 @@ export default function PhotographerProfileSocialPage() {
                   {/* Left: Avatar & Main Info */}
                   <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
                     <div className="relative shrink-0">
-                      {profile.profileImageUrl ? (
-                        <img
-                          src={profile.profileImageUrl}
-                          alt={fullName}
-                          className="h-28 w-28 sm:h-36 sm:w-36 rounded-3xl object-cover border-4 border-white dark:border-zinc-900 shadow-2xl bg-zinc-100"
-                        />
-                      ) : (
-                        <div className="h-28 w-28 sm:h-36 sm:w-36 rounded-3xl bg-gradient-to-tr from-[#0e2d5c] via-blue-600 to-indigo-600 text-white font-black text-3xl sm:text-4xl border-4 border-white dark:border-zinc-900 shadow-2xl flex items-center justify-center">
-                          {initials}
-                        </div>
-                      )}
+                      <UserAvatar
+                        src={profile.profileImageUrl}
+                        name={fullName}
+                        className="h-28 w-28 sm:h-36 sm:w-36 rounded-full border-4 border-white dark:border-zinc-900 shadow-2xl text-3xl sm:text-4xl"
+                      />
 
                       {/* Status Dot */}
                       <span

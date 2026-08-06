@@ -86,6 +86,9 @@ export default function ProfilePage() {
       onUniversalDepositValueChange={setUniversalDepositValue}
       offlineMessage={offlineMessage}
       onOfflineMessageChange={setOfflineMessage}
+      userRole={role || undefined}
+      coverImageUrl={context.coverImageUrl}
+      onCoverImageUrlChange={context.setCoverImageUrl}
       profileAvailability={profileAvailability}
       onToggleAvailability={handleToggleAvailability}
     />

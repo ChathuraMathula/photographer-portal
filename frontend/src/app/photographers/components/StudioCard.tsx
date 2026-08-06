@@ -1,4 +1,4 @@
-"use client";
+import { UserAvatar } from "@/components/common/UserAvatar";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -73,17 +73,11 @@ export function StudioCard({ studio }: StudioCardProps) {
           {/* Studio Avatar Logo */}
           <div className="-mt-12 flex items-end justify-between">
             <Link href={profileUrl} className="relative block group-hover:scale-105 transition-transform">
-              {studio.studioLogoUrl ? (
-                <img
-                  src={studio.studioLogoUrl}
-                  alt={studio.studioName}
-                  className="h-20 w-20 rounded-2xl object-cover border-4 border-white dark:border-zinc-900 shadow-md bg-zinc-100"
-                />
-              ) : (
-                <div className="h-20 w-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-blue-600 text-white font-black text-2xl border-4 border-white dark:border-zinc-900 shadow-md flex items-center justify-center">
-                  {initial}
-                </div>
-              )}
+              <UserAvatar
+                src={studio.studioLogoUrl}
+                name={studio.studioName}
+                className="h-20 w-20 rounded-full border-4 border-white dark:border-zinc-900 shadow-md text-2xl"
+              />
             </Link>
           </div>
 

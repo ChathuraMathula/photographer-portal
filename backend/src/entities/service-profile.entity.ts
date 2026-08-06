@@ -30,6 +30,9 @@ export class ServiceProfile {
   profileImageUrl?: string;
 
   @Column({ nullable: true })
+  coverImageUrl?: string;
+
+  @Column({ nullable: true })
   baseLocation?: string;
 
   @Column({ nullable: true })

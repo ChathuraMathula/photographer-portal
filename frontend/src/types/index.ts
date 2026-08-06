@@ -73,6 +73,10 @@ export type PhotographerProfile = {
   showMapPreviewOnBookingPage?: boolean;
   isAvailableForBooking: boolean;
   profileImageUrl?: string;
+  coverImageUrl?: string;
+  role?: string;
+  studioName?: string;
+  studioLogoUrl?: string;
   allowedEventTypes?: string[];
   allowCustomEventTypes?: boolean;
   universalDepositType?: string;
@@ -111,6 +115,8 @@ export type UserProfile = {
   district?: string;
   locationMapLink?: string;
   specializations: string[] | string;
+  profileImageUrl?: string;
+  coverImageUrl?: string;
   offlineMessage?: string;
 };
 

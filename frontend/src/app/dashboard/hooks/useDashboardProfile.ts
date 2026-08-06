@@ -28,6 +28,7 @@ export function useDashboardProfile({
   const [profileAvailability, setProfileAvailability] = useState(true);
   const [bookingSlug, setBookingSlug] = useState("");
   const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
   const [allowedEventTypes, setAllowedEventTypes] = useState<string[]>([]);
   const [allowCustomEventTypes, setAllowCustomEventTypes] = useState(true);
   const [universalDepositType, setUniversalDepositType] = useState("fixed");
@@ -57,6 +58,7 @@ export function useDashboardProfile({
           showMapPreviewOnBookingPage,
           portfolioUrl: profilePortfolio,
           profileImageUrl,
+          coverImageUrl,
           allowedEventTypes,
           allowCustomEventTypes,
           universalDepositType,
@@ -125,6 +127,8 @@ export function useDashboardProfile({
     setBookingSlug,
     profileImageUrl,
     setProfileImageUrl,
+    coverImageUrl,
+    setCoverImageUrl,
     allowedEventTypes,
     setAllowedEventTypes,
     allowCustomEventTypes,

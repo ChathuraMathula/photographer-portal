@@ -6,7 +6,7 @@ export function useProfileImageUpload(
 ) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -15,49 +15,26 @@ export function useProfileImageUpload(
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let width = img.width;
-          let height = img.height;
-          const MAX_WIDTH = 400;
-          const MAX_HEIGHT = 400;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height = Math.round((height * MAX_WIDTH) / width);
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width = Math.round((width * MAX_HEIGHT) / height);
-              height = MAX_HEIGHT;
-            }
-          }
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      const res = await fetch(`${API}/uploads/image?type=profile`, {
+        method: "POST",
+        body: formData,
+      });
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            onProfileImageUrlChange(canvas.toDataURL("image/jpeg", 0.7));
-            toast.success(
-              "Profile image uploaded and compressed successfully!",
-            );
-          } else {
-            onProfileImageUrlChange(reader.result as string);
-            toast.warning("Profile image uploaded without compression.");
-          }
-        };
-        img.onerror = () =>
-          toast.error("Failed to load image for compression.");
-        img.src = reader.result as string;
+      if (!res.ok) {
+        throw new Error("Failed to upload image");
       }
-    };
-    reader.readAsDataURL(file);
+
+      const data = await res.json();
+      onProfileImageUrlChange(data.url);
+      toast.success("Profile image uploaded & converted to WebP successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload profile image.");
+    }
   };
 
   const handleRemoveImage = () => {

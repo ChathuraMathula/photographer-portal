@@ -31,6 +31,9 @@ export type ProfileSettingsFormProps = {
   onUniversalDepositValueChange: (v: number) => void;
   offlineMessage: string;
   onOfflineMessageChange: (v: string) => void;
+  userRole?: string;
+  coverImageUrl?: string;
+  onCoverImageUrlChange?: (v: string) => void;
   profileAvailability: boolean;
   onToggleAvailability: () => void;
 };

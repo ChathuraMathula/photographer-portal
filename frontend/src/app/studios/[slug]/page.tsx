@@ -1,5 +1,6 @@
 "use client";
 
+import { UserAvatar } from "@/components/common/UserAvatar";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -162,17 +163,11 @@ export default function StudioDetailPage() {
                   {/* Left: Logo Avatar & Info */}
                   <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
                     <div className="relative shrink-0">
-                      {studio.studioLogoUrl ? (
-                        <img
-                          src={studio.studioLogoUrl}
-                          alt={studio.studioName}
-                          className="h-28 w-28 sm:h-36 sm:w-36 rounded-3xl object-cover border-4 border-white dark:border-zinc-900 shadow-2xl bg-zinc-100"
-                        />
-                      ) : (
-                        <div className="h-28 w-28 sm:h-36 sm:w-36 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-blue-600 text-white font-black text-3xl sm:text-4xl border-4 border-white dark:border-zinc-900 shadow-2xl flex items-center justify-center">
-                          {studio.studioName.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                      <UserAvatar
+                        src={studio.studioLogoUrl}
+                        name={studio.studioName}
+                        className="h-28 w-28 sm:h-36 sm:w-36 rounded-full border-4 border-white dark:border-zinc-900 shadow-2xl text-3xl sm:text-4xl"
+                      />
                     </div>
 
                     <div className="space-y-1.5 pb-1">
@@ -363,13 +358,9 @@ export default function StudioDetailPage() {
                       <span className="text-zinc-500">Manager:</span>
                       <span className="font-bold text-zinc-800 dark:text-zinc-200">{studio.managerName}</span>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-zinc-100 dark:border-zinc-800">
+                    <div className="flex items-center justify-between py-1">
                       <span className="text-zinc-500">Active Staff:</span>
                       <span className="font-bold text-indigo-600 dark:text-indigo-400">{studio.photographers.length} Staff Photographers</span>
-                    </div>
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-zinc-500">Plan Tier:</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[10px]">{studio.subscriptionPlan || "Verified Network"}</span>
                     </div>
                   </div>
                 </Card>
