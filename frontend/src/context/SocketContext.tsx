@@ -31,15 +31,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      if (socket) {
-        socket.disconnect();
-        setSocket(null);
-        setConnected(false);
-      }
-      return;
-    }
-
     const socketInstance = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
@@ -50,10 +41,10 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     socketInstance.on("connect", () => {
       setConnected(true);
       console.log(
-        `🔌 Global WebSocket Connected: ${socketInstance.id} (User: ${userId}, Role: ${role})`,
+        `🔌 Global WebSocket Connected: ${socketInstance.id} (User: ${userId || "guest"}, Role: ${role || "public"})`,
       );
 
-      // Join personal user room for account-level events
+      // Join personal user room for account-level events if logged in
       if (userId) {
         socketInstance.emit("joinUserRoom", { userId });
       }
@@ -65,8 +56,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Handle real-time account deactivation
-    const handleUserDeactivated = async () => {
-      console.log("🚫 Account deactivated — logging out...");
+    const handleUserDeactivated = async (data?: any) => {
+      // Ignore deactivation if it's meant for a different user
+      if (data?.userId && userId && data.userId !== userId) {
+        return;
+      }
+
+      console.log("🚫 Current account deactivated — logging out...");
 
       try {
         await fetch(`${API}/auth/logout`, {
@@ -90,7 +86,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setSocket(null);
       setConnected(false);
     };
-  }, [isAuthenticated, userId, role]);
+  }, [isAuthenticated, userId, role, dispatch]);
 
   return (
     <SocketContext.Provider value={{ socket, connected }}>

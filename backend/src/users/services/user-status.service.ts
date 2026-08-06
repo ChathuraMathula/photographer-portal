@@ -83,6 +83,10 @@ export class UserStatusService {
         userId: id,
         isActive: user.isActive,
       });
+      this.chatGateway.server.emit('photographerUpdated', {
+        userId: id,
+        isActive: user.isActive,
+      });
     } catch (err) {
       console.error('Failed to emit userUpdated event:', err);
     }
