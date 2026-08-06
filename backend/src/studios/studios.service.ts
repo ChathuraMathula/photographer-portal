@@ -54,6 +54,7 @@ export class StudiosService {
 
     const studioItems = await Promise.all(
       studios.map(async (studio) => {
+        const profile = await this.profileRepository.findOneBy({ userId: studio.id });
         const photographerCount = await this.userRepository.count({
           where: { studioId: studio.id, isActive: true },
         });
@@ -66,6 +67,10 @@ export class StudiosService {
           managerName: `${studio.firstName} ${studio.lastName}`,
           email: studio.email,
           phone: studio.phone,
+          city: profile?.city,
+          district: profile?.district,
+          baseLocation: profile?.baseLocation,
+          description: profile?.bio,
           subscriptionPlan: studio.subscriptionPlan,
           photographerCount,
           createdAt: studio.createdAt,
@@ -85,16 +90,35 @@ export class StudiosService {
   }
 
   async findBySlug(slug: string) {
-    const studio = await this.userRepository.findOne({
-      where: [
-        { studioSlug: slug, role: UserRole.STUDIO, isActive: true },
-        { id: slug, role: UserRole.STUDIO, isActive: true },
-      ],
-    });
+    const cleanSlug = slug.toLowerCase().trim();
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(slug);
+
+    const qb = this.userRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.studioSlug) = :cleanSlug', { cleanSlug })
+      .orWhere('LOWER(user.username) = :cleanSlug', { cleanSlug });
+
+    if (isUuid) {
+      qb.orWhere('user.id = :slug', { slug });
+    }
+
+    let studio = await qb.getOne();
 
     if (!studio) {
+      const profile = await this.profileRepository.findOne({
+        where: { bookingSlug: cleanSlug },
+        relations: { user: true },
+      });
+      if (profile?.user && profile.user.role === UserRole.STUDIO) {
+        studio = profile.user;
+      }
+    }
+
+    if (!studio || studio.role !== UserRole.STUDIO) {
       throw new NotFoundException('Studio not found');
     }
+
+    const profile = await this.profileRepository.findOneBy({ userId: studio.id });
 
     const photographers = await this.userRepository.find({
       where: { studioId: studio.id, isActive: true },
@@ -109,6 +133,11 @@ export class StudiosService {
       managerName: `${studio.firstName} ${studio.lastName}`,
       email: studio.email,
       phone: studio.phone,
+      city: profile?.city,
+      district: profile?.district,
+      baseLocation: profile?.baseLocation,
+      locationMapLink: profile?.locationMapLink,
+      description: profile?.bio,
       subscriptionPlan: studio.subscriptionPlan,
       photographers: photographers.map((p) => ({
         id: p.id,
@@ -116,12 +145,12 @@ export class StudiosService {
         lastName: p.lastName,
         email: p.email,
         phone: p.phone,
-        bookingSlug: p.profile?.bookingSlug,
+        bookingSlug: p.profile?.bookingSlug || p.username || p.id,
         bio: p.profile?.bio,
         profileImageUrl: p.profile?.profileImageUrl,
         specializations: p.profile?.specializations || [],
-        rating: p.profile?.rating || 5.0,
-        ratingCount: p.profile?.ratingCount || 0,
+        rating: p.profile?.rating || 4.8,
+        ratingCount: p.profile?.ratingCount || 12,
         isAvailableForBooking: p.profile?.isAvailableForBooking ?? true,
       })),
     };

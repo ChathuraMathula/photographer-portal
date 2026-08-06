@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
 import { PhotographersHeader } from "@/app/photographers/components/PhotographersHeader";
 import { PhotographerCard } from "@/app/photographers/components/PhotographerCard";
+import { StudioCard, StudioItem } from "@/app/photographers/components/StudioCard";
 import { RatingModal } from "@/app/photographers/components/RatingModal";
 import { PhotographerProfileItem } from "@/app/photographers/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,18 +21,6 @@ import {
   CalendarCheck,
   Wifi,
 } from "lucide-react";
-
-export interface StudioItem {
-  id: string;
-  studioName: string;
-  studioSlug: string;
-  studioLogoUrl?: string;
-  managerName: string;
-  email: string;
-  phone?: string;
-  subscriptionPlan: string;
-  photographerCount: number;
-}
 
 export default function UnifiedPhotographyPage() {
   const router = useRouter();
@@ -284,67 +273,14 @@ export default function UnifiedPhotographyPage() {
                     {studios.map((studio) => (
                       <div
                         key={studio.id}
-                        onClick={() => router.push(`/studios/${studio.studioSlug}`)}
-                        className="cursor-pointer group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 hover:border-indigo-400 dark:hover:border-indigo-600 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                        onClick={(e) => {
+                          const target = e.target as HTMLElement;
+                          if (target.closest("button") || target.closest("a")) return;
+                          router.push(`/studios/${studio.studioSlug}`);
+                        }}
+                        className="cursor-pointer"
                       >
-                        <CardContent className="p-6 space-y-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              {studio.studioLogoUrl ? (
-                                <img
-                                  src={studio.studioLogoUrl}
-                                  alt={studio.studioName}
-                                  className="h-14 w-14 rounded-2xl object-cover border border-zinc-200 dark:border-zinc-700 bg-zinc-100 shrink-0"
-                                />
-                              ) : (
-                                <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-black text-xl flex items-center justify-center shrink-0 shadow-md">
-                                  {studio.studioName.charAt(0).toUpperCase()}
-                                </div>
-                              )}
-                              <div>
-                                <h3 className="text-base font-extrabold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                  {studio.studioName}
-                                </h3>
-                                <p className="text-xs text-zinc-400 font-medium">
-                                  Managed by {studio.managerName}
-                                </p>
-                              </div>
-                            </div>
-
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200/60 flex items-center gap-1">
-                              <ShieldCheck className="h-3 w-3 text-indigo-500" />
-                              Studio
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-2 text-xs text-zinc-500">
-                            <Users className="h-3.5 w-3.5 text-indigo-500" />
-                            <span>
-                              <strong className="text-zinc-800 dark:text-zinc-200">
-                                {studio.photographerCount}
-                              </strong>{" "}
-                              Team Members registered
-                            </span>
-                          </div>
-                        </CardContent>
-
-                        <div className="p-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-150 dark:border-zinc-800/80 flex items-center justify-between">
-                          <Link
-                            href={`/studios/${studio.studioSlug}`}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
-                          >
-                            View Studio Profile & Team
-                            <ChevronRight className="h-3.5 w-3.5" />
-                          </Link>
-
-                          <Link
-                            href={`/book/${studio.studioSlug}`}
-                            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
-                          >
-                            <CalendarCheck className="h-3.5 w-3.5" />
-                            Book Studio
-                          </Link>
-                        </div>
+                        <StudioCard studio={studio} />
                       </div>
                     ))}
                   </div>
